@@ -1,13 +1,13 @@
 {
   "lessonId": "c-4-3",
-  "title": "按引用传递（指针）",
-  "concept": "想修改原始值，就传递变量的"地址"",
+  "title": "通过引用调用（指针）",
+  "concept": "如果您想更改原始值，请传递变量的“地址”。",
   "content": {
     "code": "#include <stdio.h>\n\nvoid reallyChange(int *p) {\n    *p = 999;\n    printf(\"Inside func: Changed!\\n\");\n}\n\nint main() {\n    int a = 10;\n\n    printf(\"Before: %d\\n\", a);\n    reallyChange(&a);\n    printf(\"After:  %d\\n\", a);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含头文件",
-        "explanation": "`#include <stdio.h>` 启用输出函数。\n\n本课讲解通过传递地址（指针）来修改原始值的流程。",
+        "title": "带标题",
+        "explanation": "将输出函数与“#include <stdio.h>”一起使用。\n\n本课介绍通过传递地址（指针）修改原始数据的流程。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "创建 main 帧，准备调用接受指针参数的函数 `reallyChange(int *p)`。",
+        "title": "启动主函数",
+        "explanation": "主框架创建完成，准备调用指针参数函数“reallyChange(int *p)”。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "声明并初始化变量 a",
-        "explanation": "`int a = 10;` 创建原始变量。\n\n这次我们将向函数传递 `a` 的地址而非值。",
+        "title": "声明并初始化变量a",
+        "explanation": "使用“int a = 10;”创建原始变量。\n\n这次，我们将“a”的地址而不是值传递给函数。",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "stack": [
@@ -43,15 +43,15 @@
         ]
       },
       {
-        "title": "输出修改前的值",
-        "explanation": "调用前输出 `a=10`。",
+        "title": "值输出前",
+        "explanation": "在调用之前打印 `a=10`。",
         "visualizationType": "cMemory",
         "code": "printf(\"Before: %d\\n\", a);",
         "stdout": "Before: 10"
       },
       {
-        "title": "函数调用与地址传递",
-        "explanation": "在 `reallyChange(&a);` 中，地址 `&a` 被传递，使 `p` 指向 `a`。\n\nC 仍然是值复制，但复制的是地址值，因此可以修改原始数据。",
+        "title": "函数调用和地址传递",
+        "explanation": "在“reallyChange(&a);”中，传递地址“&a”，以便“p”指向“a”。\n\nC仍然是值复制，但由于复制目标是地址，因此可以修改原始值。",
         "visualizationType": "cMemory",
         "code": "reallyChange(&a);",
         "highlightOffset": [
@@ -76,9 +76,9 @@
         ]
       },
       {
-        "title": "通过解引用修改原始值",
-        "keyInsight": "指针解引用（`*p`）修改的是它所指向的实际内存。",
-        "explanation": "`*p = 999;` 将 999 存储到 `p` 指向的位置（`a`）。\n\n也就是说函数内部直接修改了 main 中的原始变量。",
+        "title": "通过反向引用更改原始内容",
+        "keyInsight": "指针取消引用（`*p`）会修改它指向的物理内存。",
+        "explanation": "`*p = 999;` 将 999 存储在 `p` 指向的实际位置 (`a`) 中。\n\n即直接替换函数内部main中原来的变量。",
         "visualizationType": "cMemory",
         "code": "*p = 999;",
         "stack": [
@@ -100,8 +100,8 @@
         ]
       },
       {
-        "title": "函数内部输出",
-        "explanation": "输出变更消息。\n\n此时原始 `a` 的值已变为 999。",
+        "title": "功能内部输出",
+        "explanation": "打印更改消息。\n\n此时，原来的a值已经变成了999。",
         "visualizationType": "cMemory",
         "code": "printf(\"Inside func: Changed!\\n\");",
         "stack": [
@@ -123,8 +123,8 @@
         "stdout": "Before: 10\nInside func: Changed!"
       },
       {
-        "title": "确认修改（After 输出）",
-        "explanation": "调用后输出 `a` 显示 999。\n\n地址传递 + 解引用是实现原始值修改的核心机制。",
+        "title": "确认更改（输出后）",
+        "explanation": "如果调用后打印“a”，则会得到 999。\n\n地址传递+取消引用是创建原始更改的关键机制。",
         "visualizationType": "cMemory",
         "code": "printf(\"After:  %d\\n\", a);",
         "stack": [
@@ -142,22 +142,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "要创建一个交换两个变量 a、b 值的 swap 函数，参数应该是什么？",
+    "question": "要创建一个交换两个变量a和b的值的交换函数，参数是什么？",
     "options": [
-      "void swap(int x, int y)",
-      "void swap(int *x, int *y)",
-      "void swap(int &x, int &y)",
-      "int swap(int x, int y)"
+      "无效交换（int x，int y）",
+      "无效交换（int *x，int *y）",
+      "无效交换（int＆x，int＆y）",
+      "int 交换(int x, int y)"
     ],
     "correctIndex": 1,
-    "explanation": "在 C 中要修改原始值必须接收指针。\n调用方式为 `swap(&a, &b)`。\n（C++ 有 & 引用，但 C 没有）"
+    "explanation": "要改变C语言中的原始内容，必须接收一个指针。\n像这样调用它：`swap(&a, &b)`。\n（C++ 有 & 引用，C 没有）"
   },
   "misconceptions": [
     {
-      "wrong": "按引用传递不会发生内存复制",
-      "correct": "实际上"地址值"被复制了。",
-      "why": "严格来说 C 只有**按值传递（Call by Value）**。\n只是传递"地址这个值"来达到引用的效果。"
+      "wrong": "通过引用调用不会复制内存。",
+      "correct": "事实上，“地址值”被复制。",
+      "why": "严格来说，C只有**Call by Value**。\n它只是通过传递“地址值”来创建参考效果。"
     }
   ],
-  "keyTakeaway": "要从函数中修改原始值，用 `&` 传递地址，用 `*` 接收并修改。"
+  "keyTakeaway": "要更改函数中的原始值，请使用“&”传递地址并使用“*”接收它以更改它。"
 }

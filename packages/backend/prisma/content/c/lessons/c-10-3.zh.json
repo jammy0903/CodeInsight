@@ -1,37 +1,87 @@
 {
   "lessonId": "c-10-3",
-  "title": "Buffered I/O",
-  "concept": "缓冲 I/O 通过减少系统调用提高性能，但需要理解刷新时机",
+  "title": "缓冲输入/输出",
+  "concept": "缓冲 I/O 通过减少系统调用次数来提高性能，但需要了解何时刷新。",
   "content": {
     "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main() {\n    printf(\"Example 1... \");\n\n    fflush(stdout);\n    printf(\"Printed immediately!\\n\");\n\n    printf(\"Example 2 with newline\\n\");\n\n    return 0;\n}",
     "steps": [
-      {"title":"包含 stdio.h 头文件","explanation":"**`#include <stdio.h>`** -- 使用 `printf`、`fflush` 等标准输入输出函数的头文件。\n\n本课学习**缓冲（Buffering）**。","visualizationType":"cMemory","code":"#include <stdio.h>","stack":[],"heap":[],"stdout":""},
-      {"title":"main 函数开始","explanation":"**`int main() {`** -- 程序启动时，操作系统打开标准流并为每个设置**缓冲模式**。\n\nC 有 3 种缓冲模式。","visualizationType":"cMemory","code":"int main() {","stack":[{"name":"main","type":"frame","func":"main","value":"frame"}]},
-      {"title":"数据存入缓冲区","explanation":"**`printf(\"Example 1... \");`** -- 调用了 `printf` 但字符串末尾**没有 `\\n`**。\n\n数据当前在内存中 `stdout` 的内部缓冲区中。","visualizationType":"cMemory","code":"printf(\"Example 1... \");","stack":[]},
-      {"title":"强制刷新缓冲区（Flush）","explanation":"**`fflush(stdout);`** -- **强制清空**指定流的缓冲区，立即将所有积累的数据发送到目的地。此时缓冲的 `\"Example 1... \"` 被发送到终端。","visualizationType":"cMemory","code":"fflush(stdout);","stdout":"Example 1... "},
-      {"title":"带换行符的输出","explanation":"**`printf(\"Printed immediately!\\n\");`** -- 这个 `printf` 末尾包含 **`\\n`**。在行缓冲中遇到 `\\n` 会**自动刷新**缓冲区，无需 `fflush` 就能立即显示在屏幕上。","visualizationType":"cMemory","code":"printf(\"Printed immediately!\\n\");","stdout":"Example 1... Printed immediately!"},
-      {"title":"确认自动刷新","explanation":"**`printf(\"Example 2 with newline\\n\");`** -- 包含 `\\n`，行缓冲自动刷新，立即显示在屏幕上。","visualizationType":"cMemory","code":"printf(\"Example 2 with newline\\n\");","stdout":"Example 1... Printed immediately!\nExample 2 with newline"},
-      {"title":"程序结束","explanation":"**`return 0;`** -- 正常终止时，C 运行时自动刷新所有打开流的缓冲区。即使是没有 `\\n` 的 `printf` 数据也会在此时输出。","visualizationType":"cMemory","code":"return 0;"}
+      {
+        "title": "包含 stdio.h 标头",
+        "explanation": "**`#include <stdio.h>`** — 使用标准输入/输出函数（例如“printf”和“fflush”）的标头。\n\n在本课中，您将学习**缓冲**。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "启动主函数",
+        "explanation": "**`int main() {`** — 当程序启动时，操作系统打开标准流并为每个流设置**缓冲模式**。\n\nC语言中有三种缓冲模式：",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "将数据存储在缓冲区中",
+        "explanation": "**`printf(\"示例 1... \");`** — 您调用了 `printf`，但字符串末尾没有 **`\\n`。\n\n数据的当前位置是内存中的“stdout”内部缓冲区。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Example 1... \");",
+        "stack": []
+      },
+      {
+        "title": "强制刷新缓冲区（Flush）",
+        "explanation": "**`fflush(stdout);`** — 强制刷新指定流的缓冲区，并立即将所有累积的数据传输到目的地。此时，“示例 1...",
+        "visualizationType": "cMemory",
+        "code": "fflush(stdout);",
+        "stdout": "Example 1... "
+      },
+      {
+        "title": "输出带有换行符",
+        "explanation": "**`printf(\"立即打印！\\n\");`** — 此 `printf` 在字符串末尾包含 **`\\n`**。在逐行缓冲中，当遇到`\\n`时，缓冲区**自动清空**，因此它会立即显示在屏幕上，而不需要`fflush`。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Printed immediately!\\n\");",
+        "stdout": "Example 1... Printed immediately!"
+      },
+      {
+        "title": "自动冲洗复检",
+        "explanation": "**`printf(\"带有换行符的示例 2\\n\");`** — 由于包含了 `\\n`，每行缓冲会自动刷新并立即打印到屏幕上。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Example 2 with newline\\n\");",
+        "stdout": "Example 1... Printed immediately!\nExample 2 with newline"
+      },
+      {
+        "title": "程序退出",
+        "explanation": "**`return 0;`** — 正常终止时，C 运行时会自动刷新所有打开流的缓冲区。末尾没有“\\n”的“printf”数据也会在此时输出。",
+        "visualizationType": "cMemory",
+        "code": "return 0;"
+      }
     ],
     "deltaFormat": true
   },
   "quiz": {
-    "question": "程序崩溃（Crash）终止时，为什么 printf 的内容可能不会显示在屏幕上？",
+    "question": "当程序崩溃并终止时，为什么 printf 内容不会出现在屏幕上？",
     "options": [
-      "操作系统 bug",
-      "输出缓冲区未刷新就进程终止了",
-      "printf 函数太慢",
+      "操作系统错误",
+      "这是因为输出缓冲区无法清空，进程终止。",
+      "因为printf函数很慢",
       "内存不足"
     ],
     "correctIndex": 1,
-    "explanation": "如果没有换行（\\n）或 fflush，数据只在缓冲区中，崩溃时这些数据无法到达屏幕就消失了。\n调试时需要注意。"
+    "explanation": "如果缓冲区中有没有换行符（\\n）或fflush的数据并且发生崩溃，则数据不会出现在屏幕上并消失。\n调试时要小心。"
   },
   "misconceptions": [
     {
-      "wrong": "所有 I/O 都是立即处理的。",
-      "correct": "为了减少磁盘 I/O 和系统调用开销，几乎总是涉及缓冲（完全缓冲、行缓冲、无缓冲）。",
-      "why": "系统调用是昂贵的操作。"
+      "wrong": "所有输入和输出都会立即处理。",
+      "correct": "缓冲几乎总是涉及到减少磁盘 I/O 和系统调用成本（完整、行、无缓冲）。",
+      "why": "这是因为系统调用是昂贵的操作。"
     }
   ],
-  "keyTakeaway": "缓冲提高了性能，但当需要实时输出或调试时，理解 fflush 的重要性至关重要。"
+  "keyTakeaway": "缓冲可以提高性能，但是当您需要实时输出或正在调试时，您需要了解 fflush 的重要性。"
 }

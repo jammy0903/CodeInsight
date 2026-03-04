@@ -1,0 +1,138 @@
+{
+  "lessonId": "py-practical-3-2",
+  "title": "reportlab으로 보고서 생성",
+  "concept": "데이터를 PDF 보고서로 자동 생성합니다. 제목, 표, 그래프를 포함한 전문적인 보고서를 만들 수 있습니다",
+  "content": {
+    "code": "from reportlab.lib.pagesizes import A4\nfrom reportlab.pdfgen import canvas\n\nc = canvas.Canvas('report.pdf', pagesize=A4)\nc.setFont('Helvetica-Bold', 20)\nc.drawString(100, 800, 'Monthly Sales Report')\nc.setFont('Helvetica', 12)\nc.drawString(100, 750, 'Total Sales: $50,000')\nc.save()",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Step 1: 페이지 크기 불러오기",
+        "explanation": "`reportlab.lib.pagesizes`에서 **용지 크기**를 가져옵니다.\n\n**주요 용지 크기**:\n- `A4`: 210 × 297mm (가장 흔함)\n- `LETTER`: 8.5 × 11 inch (미국)\n- `A3`: 297 × 420mm (큰 문서)\n\n**왜 필요한가?** PDF는 용지 크기를 지정해야 텍스트 위치를 정할 수 있습니다.",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 2,
+        "title": "Step 2: Canvas 불러오기",
+        "explanation": "`canvas`는 **PDF에 그림을 그리는 도구**입니다.\n\n**Canvas 비유**: 하얀 종이에 펜으로 그림 그리기\n- `drawString()`: 텍스트 쓰기\n- `drawImage()`: 이미지 삽입\n- `line()`: 선 그리기\n\n**Canvas vs Excel**: Excel은 셀 기반, Canvas는 좌표 기반입니다.",
+        "highlight": [
+          2
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 4,
+        "title": "Step 3: Canvas 생성",
+        "explanation": "`canvas.Canvas('report.pdf', pagesize=A4)`로 **새 PDF를 생성**합니다.\n\n**매개변수**:\n- `'report.pdf'`: 저장할 파일명\n- `pagesize=A4`: 용지 크기\n\n**아직 빈 PDF**: 내용을 추가한 후 `c.save()`로 저장해야 실제 파일이 만들어집니다.",
+        "highlight": [
+          4
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "c",
+              "pointsTo": "obj_c"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_c",
+              "type": "object",
+              "value": "canvas.Canvas('report.pdf', pagesize=A4)",
+              "pyId": "5001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "Step 4: 폰트 설정 (제목용)",
+        "explanation": "`c.setFont('Helvetica-Bold', 20)`으로 **폰트를 설정**합니다.\n\n**매개변수**:\n- `'Helvetica-Bold'`: 폰트 이름 (볼드체)\n- `20`: 글자 크기 (포인트)\n\n**기본 폰트**:\n- Helvetica: 산세리프 (깔끔)\n- Times-Roman: 세리프 (전통적)\n- Courier: 고정폭 (코드용)\n\n**이 설정은 다음 drawString()에 적용됩니다.**",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "obj_c",
+              "type": "object",
+              "value": "canvas.Canvas('report.pdf', pagesize=A4)",
+              "pyId": "5001"
+            }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "Step 5: 제목 그리기",
+        "explanation": "`c.drawString(100, 800, 'Monthly Sales Report')`로 **텍스트를 그립니다**.\n\n**매개변수**:\n- `100`: X 좌표 (왼쪽에서 100pt)\n- `800`: Y 좌표 (아래에서 800pt)\n- `'Monthly Sales Report'`: 텍스트 내용\n\n**좌표 시스템**: 왼쪽 아래가 (0, 0), A4는 약 (595, 842)\n\n**실무 팁**: Y 좌표가 클수록 위쪽입니다.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 7,
+        "title": "Step 6: 폰트 변경 (본문용)",
+        "explanation": "제목보다 작은 폰트로 변경합니다.\n\n**Helvetica vs Helvetica-Bold**:\n- Helvetica: 일반체 (본문)\n- Helvetica-Bold: 볼드체 (제목)\n\n**크기 12pt**: 본문에 적합한 크기입니다.",
+        "highlight": [
+          7
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 8,
+        "title": "Step 7: 본문 텍스트 작성",
+        "explanation": "`c.drawString(100, 750, 'Total Sales: $50,000')`로 **본문을 추가**합니다.\n\n**Y 좌표 750**: 제목(800)보다 50pt 아래입니다.\n\n**실무 활용**: 데이터를 루프로 출력\n```python\ny = 750\nfor dept, sales in data.items():\n    c.drawString(100, y, f'{dept}: ${sales}')\n    y -= 20  # 20pt씩 아래로\n```",
+        "highlight": [
+          8
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 9,
+        "title": "Step 8: PDF 저장",
+        "explanation": "`c.save()`로 **Canvas 내용을 파일로 저장**합니다.\n\n**결과**: report.pdf 파일 생성\n- 제목: 'Monthly Sales Report' (볼드 20pt)\n- 본문: 'Total Sales: $50,000' (일반 12pt)\n\n**실무 흐름**: 데이터 준비 → Canvas로 그리기 → 저장",
+        "highlight": [
+          9
+        ],
+        "visualizationType": "python"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "如何在reportlab中指定文本位置？",
+    "options": [
+      "drawString(x, y, text) - 指定为坐标",
+      "drawString(row, col, text) - 指定为行和列",
+      "setCellValue(x, y, text) - 指定为单元格地址",
+      "addText(text,position) - 指定相对位置"
+    ],
+    "correctIndex": 0,
+    "explanation": "reportlab 是基于坐标的。\n使用drawString(x, y, text) 在(x, y) 坐标处绘制文本。\n与 Excel 不同，它使用像素坐标。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "reportlab은 Excel처럼 셀 기반이다",
+      "correct": "reportlab은 좌표 기반입니다.\n(x, y) 좌표로 모든 요소의 위치를 지정합니다.",
+      "why": "PDF는 '인쇄 문서' 형식이므로 픽셀 단위로 정확한 위치를 지정해야 합니다."
+    },
+    {
+      "wrong": "Canvas()만 하면 PDF가 생성된다",
+      "correct": "Canvas()는 메모리에 객체만 만듭니다.\nc.save()를 호출해야 실제 파일이 저장됩니다.",
+      "why": "모든 내용을 추가한 후 마지막에 한 번만 저장하는 방식입니다."
+    }
+  ],
+  "keyTakeaway": "Canvas = 좌표 기반 그리기 도구 (setFont → drawString → save)"
+}

@@ -1,13 +1,13 @@
 {
   "lessonId": "java-6-4",
-  "title": "创建自定义异常",
-  "concept": "学习如何定义和使用符合业务逻辑的自定义异常（Custom Exception）。",
+  "title": "사용자 정의 예외 만들기",
+  "concept": "비즈니스 로직에 맞는 커스텀 예외(Custom Exception)를 정의하고 사용하는 방법을 배웁니다.",
   "content": {
-    "code": "class BankException extends Exception {\n    public BankException(String msg) { super(msg); }\n}\n\n// 1. 定义自定义异常\nclass NoMoneyException extends BankException {\n    public NoMoneyException(int lack) {\n        // 调用父类构造函数\n        super(\"余额不足: \" + lack);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        try {\n            withdraw(1000);\n        } catch (NoMoneyException e) {\n            System.out.println(e.getMessage());\n        } catch (BankException e) {\n            System.out.println(\"银行错误\");\n        }\n    }\n\n    static void withdraw(int money) throws BankException {\n        int balance = 500;\n        if (money > balance) {\n            // 2. 抛出异常\n            throw new NoMoneyException(money - balance);\n        }\n    }\n}",
+    "code": "class BankException extends Exception {\n    public BankException(String msg) { super(msg); }\n}\n\n// 1. 커스텀 예외 정의\nclass NoMoneyException extends BankException {\n    public NoMoneyException(int lack) {\n        // 부모 생성자 호출\n        super(\"부족한 금액: \" + lack);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        try {\n            withdraw(1000);\n        } catch (NoMoneyException e) {\n            System.out.println(e.getMessage());\n        } catch (BankException e) {\n            System.out.println(\"은행 오류\");\n        }\n    }\n\n    static void withdraw(int money) throws BankException {\n        int balance = 500;\n        if (money > balance) {\n            // 2. 예외 던지기\n            throw new NoMoneyException(money - balance);\n        }\n    }\n}",
     "steps": [
       {
-        "title": "main 方法开始",
-        "explanation": "**`public static void main(String[] args)`**\n\n程序的起点。\n\n**类比**：模拟客户在银行柜台（main）尝试取款的场景。",
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다.\n\n**비유**: 은행 창구(main)에서 고객이 출금을 시도하는 상황을 시뮬레이션합니다.",
         "visualizationType": "javaMemory",
         "code": "public class Main {",
         "javaMemoryState": {
@@ -18,8 +18,8 @@
         }
       },
       {
-        "title": "自定义异常类定义",
-        "explanation": "**执行流程：**\n1. 继承自 `BankException` 的 `NoMoneyException` 类被加载。\n\n**说明：**\nJava 提供的内置异常不足以描述"余额不足"、"ID 重复"等具体场景。\n这时候创建自己的异常类，代码可读性会大幅提升。",
+        "title": "커스텀 예외 클래스 정의",
+        "explanation": "**실행 순서:**\n1. `BankException`을 상속받은 `NoMoneyException` 클래스가 로딩됩니다.\n\n**해설:**\n자바가 제공하는 기본 예외만으로는 \"잔고 부족\", \"아이디 중복\" 같은 구체적인 상황을 표현하기 어렵습니다.\n이럴 때 우리만의 예외 클래스를 만들어 쓰면 코드 읽기가 훨씬 좋아집니다.",
         "visualizationType": "javaMemory",
         "code": "class NoMoneyException extends BankException {",
         "highlightOffset": [
@@ -43,8 +43,8 @@
         }
       },
       {
-        "title": "方法调用",
-        "explanation": "**执行流程：**\n1. `main` 调用 `withdraw(1000)`。\n2. `balance` 变量在栈帧中创建。\n\n**说明：**\n取款金额（1000）超过了余额（500）。\n问题即将爆发。",
+        "title": "메서드 호출",
+        "explanation": "**실행 순서:**\n1. `main`에서 `withdraw(1000)`을 호출합니다.\n2. `balance` 변수가 스택 프레임에 생성됩니다.\n\n**해설:**\n출금액(1000)이 잔고(500)보다 많습니다.\n문제가 터지기 일보 직전입니다.",
         "visualizationType": "javaMemory",
         "code": "try {",
         "highlightOffset": [
@@ -71,8 +71,8 @@
         }
       },
       {
-        "title": "自定义异常抛出",
-        "explanation": "**执行流程：**\n1. `money > balance` 条件为真，进入 `if` 块。\n2. 在堆上创建 `NoMoneyException` 对象。\n消息为 \"余额不足: 500\"。\n3. 用 `throw` 抛出异常。\n\n**说明：**\n比起简单的 `throw new Exception()`，使用 `throw new NoMoneyException(...)` 能让人一目了然："原来是因为钱不够才出错的！"",
+        "title": "커스텀 예외 발생",
+        "explanation": "**실행 순서:**\n1. `money > balance` 조건이 참이 되어 `if`문 안으로 들어갑니다.\n2. `NoMoneyException` 객체가 Heap에 생성됩니다.\n이때 메시지는 \"부족한 금액: 500\"이 됩니다.\n3. `throw`로 예외를 던집니다.\n\n**해설:**\n단순히 `throw new Exception()` 하는 것보다, `throw new NoMoneyException(...)` 이라고 하면 \"아, 돈이 없어서 터졌구나!\" 라고 바로 알 수 있습니다.",
         "visualizationType": "javaMemory",
         "code": "}",
         "occurrence": 4,
@@ -88,17 +88,17 @@
           "heap": [
             {
               "address": "0x777",
-              "content": "NoMoneyEx: 余额不足: 500",
+              "content": "NoMoneyEx: 부족한 금액: 500",
               "type": "NoMoneyException",
               "new": true
             }
           ],
-          "error": "NoMoneyException 已抛出！"
+          "error": "NoMoneyException 던짐!"
         }
       },
       {
-        "title": "具体的 Catch",
-        "explanation": "**执行流程：**\n1. 返回 `main`，执行 `catch (NoMoneyException e)` 块。\n2. 输出异常消息。\n\n**说明：**\n子类 `NoMoneyException` 的 catch 块必须在父类 `BankException` 之前。\n（具体的在先！）这样我们才能看到准确的错误消息。",
+        "title": "구체적인 Catch",
+        "explanation": "**실행 순서:**\n1. `main` 메서드로 돌아와 `catch (NoMoneyException e)` 블록이 실행됩니다.\n2. 예외 메시지를 출력합니다.\n\n**해설:**\n부모인 `BankException`보다 자식인 `NoMoneyException`을 잡는 `catch` 블록이 먼저 와야 합니다.\n(구체적인 것 먼저!) 덕분에 우리는 정확한 에러 메시지를 볼 수 있습니다.",
         "visualizationType": "javaMemory",
         "code": "withdraw(1000);",
         "highlightOffset": [
@@ -115,7 +115,7 @@
             }
           ],
           "output": [
-            "余额不足: 500"
+            "부족한 금액: 500"
           ],
           "error": null
         }
@@ -124,22 +124,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "继承 RuntimeException 创建自定义异常会有什么效果？",
+    "question": "继承RuntimeException并创建自定义异常有什么作用？",
     "options": [
-      "编译器会强制异常处理（Checked）。",
-      "编译器不会强制异常处理（Unchecked）。",
-      "所有方法都会自动添加 throws。",
-      "性能提升 2 倍。"
+      "编译器强制异常处理（已检查）",
+      "编译器不强制异常处理（未检查）",
+      "抛出会自动添加到所有方法中。",
+      "性能提高 2 倍"
     ],
     "correctIndex": 1,
-    "explanation": "继承 `RuntimeException` 会使其成为 Unchecked Exception，调用方不需要 `try-catch` 也不会出现编译错误。\n通常用于业务逻辑中真正不可恢复的错误。"
+    "explanation": "如果继承了`RuntimeException`，它就变成了Unchecked Exception，所以即使用户不使用`try-catch`也不会出现编译错误。\n主要用于业务逻辑确实存在不可恢复的错误时。"
   },
   "misconceptions": [
     {
-      "wrong": "自定义异常越多越好。",
-      "correct": "不是。\n如果标准异常（如 IllegalArgumentException）足够用，就应该使用标准异常。",
-      "why": "过多的自定义异常会导致类爆炸（Class Explosion），增加维护成本。"
+      "wrong": "커스텀 예외는 많을수록 좋다.",
+      "correct": "아닙니다.\n표준 예외(IllegalArgumentException 등)로 충분하다면 표준 예외를 쓰는 것이 좋습니다.",
+      "why": "너무 많은 커스텀 예외는 클래스 폭발(Class Explosion)을 일으켜 관리 비용을 높입니다."
     }
   ],
-  "keyTakeaway": "自定义异常可以清晰传达错误含义，通过继承可以层次化地管理异常。"
+  "keyTakeaway": "커스텀 예외를 사용하면 에러의 의미를 명확히 전달할 수 있으며, 상속을 통해 예외를 계층적으로 관리할 수 있습니다."
 }

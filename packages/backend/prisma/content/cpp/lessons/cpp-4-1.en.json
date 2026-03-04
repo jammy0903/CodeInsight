@@ -1,0 +1,76 @@
+{
+  "lessonId": "cpp-4-1",
+  "title": "new and delete",
+  "concept": "new allocates memory on the heap, and delete frees it.",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int* p = new int(42);\n    cout << *p << endl;\n\n    delete p;\n    p = nullptr;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Allocating memory on the heap",
+        "explanation": "`new int(42)` allocates space of size int on the heap and initializes it to 42.\n\nThe returned address is stored in pointer `p`. This is a structure where `p` on the stack points to data on the heap.",
+        "visualizationType": "cMemory",
+        "code": "int* p = new int(42);",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0x8000",
+            "type": "int*",
+            "address": "0x1000",
+            "points_to": "*p"
+          }
+        ],
+        "heap": [
+          {
+            "name": "*p",
+            "value": "42",
+            "type": "int",
+            "address": "0x8000"
+          }
+        ]
+      },
+      {
+        "title": "Using values ​​as dereferences",
+        "explanation": "Read the value 42 stored in the heap with `*p`.",
+        "visualizationType": "terminal",
+        "code": "cout << *p << endl;",
+        "stdout": "42"
+      },
+      {
+        "title": "Release with delete",
+        "explanation": "`delete p` returns heap memory to the operating system.\n\n**Note**: After delete, `p` still contains the old address (dangling pointer). To prevent this, initialize it with `p = nullptr`.",
+        "visualizationType": "cMemory",
+        "code": "delete p;",
+        "stack": [
+          {
+            "name": "p",
+            "value": "nullptr",
+            "type": "int*",
+            "address": "0x1000",
+            "highlight": true
+          }
+        ],
+        "heap": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Why do I set the pointer to nullptr after delete?",
+    "options": [
+      "to reallocate memory",
+      "To prevent dangling pointer",
+      "To optimize performance",
+      "Because the compiler requires it"
+    ],
+    "correctIndex": 1,
+    "explanation": "After delete, the pointer becomes a dangling pointer pointing to freed memory. Setting it to nullptr will cause an immediate crash when accidentally accessed, making debugging easier."
+  },
+  "misconceptions": [
+    {
+      "wrong": "When you call delete, the pointer automatically becomes nullptr.",
+      "correct": "delete only releases heap memory and does not change the value of the pointer variable.",
+      "why": "In C++, a pointer is a simple address value, so the programmer must manually set it to nullptr."
+    }
+  ],
+  "keyTakeaway": "new/delete is the basis for manual memory management, but it's easy to forget, so smart pointers are safer."
+}

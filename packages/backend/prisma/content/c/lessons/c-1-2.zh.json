@@ -1,13 +1,13 @@
 {
   "lessonId": "c-1-2",
-  "title": "初始化与垃圾值",
-  "concept": "变量使用前必须进行初始化，以避免不可预测的行为",
+  "title": "初始化和垃圾值",
+  "concept": "为了安全地使用变量，必须对它们进行初始化。",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int score = 100;\n\n    int level;\n    level = 1;\n\n    printf(\"Score: %d, Level: %d\\n\", score, level);\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "为了使用 ```printf```，我们引入标准输入输出库（```stdio.h```）。正如上节课所学，如果没有这一行，编译器将无法识别 ```printf``` 并报错。\n\n这是因为 C 编译器需要在使用函数**之前**知道该函数的签名（参数和返回类型）。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "导入标准输入/输出工具箱（``stdio.h``）以使用``printf```。正如我们在上一课中学到的，如果没有这一行，就会发生错误，因为编译器不知道“printf”。\n\n这是因为 C 编译器在使用函数之前**必须提前知道函数的类型（参数和返回类型）。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "程序的入口点。栈上会创建一个 **main 栈帧**（专用工作空间）。正如之前所学，局部变量存储在这个空间中。\n\n目前就像分配了一个空柜子 — 稍后 ```score``` 和 ```level``` 两个变量将存入其中。",
+        "title": "启动主函数",
+        "explanation": "程序起点。在堆栈上创建**主堆栈框架**（专用工作区）。正如我们在上一课中学到的，局部变量存储在这个空间中。\n\n现在，我们已经被分配了一个空的储物柜——很快两个变量“score```和“``level``”将被放置在里面。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "声明并同时初始化",
-        "explanation": "`int score = 100;` 是最安全的模式 — 一步完成声明和初始化。\n\n如果延迟初始化，在实际赋值之前会存在一个危险区间。因此最好养成使用 `类型 变量 = 初始值;` 形式的习惯。",
+        "title": "声明时初始化",
+        "explanation": "`int Score = 100;` 是最安全的模式，因为它同时完成声明和初始化。\n\n如果延迟初始化，则在读取值之前会有一个风险期。因此，养成“类型变量 = 初始值；”形式的基本习惯是个好主意。",
         "visualizationType": "cMemory",
         "code": "int score = 100;",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "仅声明（垃圾值）",
-        "explanation": "`int level;` 只分配了空间而没有存入值。\n\n在这种状态下读取 `level` 可能导致未定义行为，因此像 `int level = 1;` 这样立即初始化会更安全。",
+        "title": "如果仅声明（垃圾值）",
+        "explanation": "`int level;` 只创建一个空格，不插入值。\n\n在这种状态下读取`level`可能会导致未定义的操作，因此立即初始化它是安全的，例如`int level = 1;`。",
         "visualizationType": "cMemory",
         "code": "int level;",
         "stack": [
@@ -64,8 +64,8 @@
         ]
       },
       {
-        "title": "赋值（Assignment）",
-        "explanation": "`level = 1;` 用实际值覆盖之前的垃圾状态。\n\n`=` 是赋值运算符而非比较运算符，它将右侧的计算结果存储到左侧的变量中。",
+        "title": "任务",
+        "explanation": "`level = 1;` 用实际值覆盖现有的垃圾状态。\n\n`=` 是赋值运算符，而不是比较运算符，并将右侧计算的结果存储在左侧变量中。",
         "visualizationType": "cMemory",
         "code": "level = 1;",
         "stack": [
@@ -85,8 +85,8 @@
         ]
       },
       {
-        "title": "输出变量值",
-        "explanation": "在 `printf(\"Score: %d, Level: %d\\n\", score, level);` 中，两个 `%d` 占位符按顺序填入对应的值。\n\n如果格式说明符的数量与参数数量不匹配，会产生错误的输出或 bug。",
+        "title": "打印变量值",
+        "explanation": "`printf(\"Score: %d, Level: %d\\n\", Score, level);`中，数值按顺序输入两个`%d`。\n\n如果格式数量和参数数量不匹配，则可能会出现不正确的输出或错误。",
         "visualizationType": "cMemory",
         "code": "printf(\"Score: %d, Level: %d\\n\", score, level);",
         "stack": [
@@ -106,8 +106,8 @@
         "stdout": "Score: 100, Level: 1"
       },
       {
-        "title": "程序结束",
-        "explanation": "`return 0;` 正常终止程序，同时清理 main 的局部变量。\n\n总结来说，在声明时就初始化变量是 C 语言中最基本的安全措施。",
+        "title": "程序退出",
+        "explanation": "程序以“return 0;”正常终止，并且 main 中的局部变量也被清除。\n\n综上所述，声明后立即初始化的习惯是C中最基本的安全措施。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -116,22 +116,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "忘记初始化变量会导致什么问题？",
+    "question": "如果忘记初始化变量会发生什么？",
     "options": [
-      "编译错误导致无法运行",
-      "总是按 0 来计算",
-      "垃圾值导致意外结果或 bug",
-      "计算机会重启"
+      "由于编译错误而无法运行",
+      "始终计算为 0",
+      "垃圾值会导致不正确的结果或错误。",
+      "电脑重新启动"
     ],
     "correctIndex": 2,
-    "explanation": "大多数现代编译器会发出警告（Warning），但代码仍会编译运行。\n这可能导致不可预测的行为（Undefined Behavior）。"
+    "explanation": "大多数现代编译器会发出警告，但仍会运行。\n并且它会导致不可预测的行为（未定义的行为）。"
   },
   "misconceptions": [
     {
-      "wrong": "反正之后会赋值，先声明就行了",
-      "correct": "尽可能用默认值初始化，例如 `int a = 0;`。",
-      "why": "随着代码变长，很容易忘记在哪里（或是否）初始化了变量。"
+      "wrong": "由于您稍后将添加该值，因此您可以直接声明它。",
+      "correct": "如果可能，至少保留一个默认值，例如“int a = 0;”。",
+      "why": "随着代码变长，很容易忘记在哪里初始化它。"
     }
   ],
-  "keyTakeaway": "声明时就初始化。这是最安全的做法。"
+  "keyTakeaway": "在声明的同时输入该值。这样才是最安全的。"
 }

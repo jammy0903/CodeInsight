@@ -7,10 +7,10 @@
  * Two rounds: R1 (explanation) → R2 (visualization) → quiz
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Layers } from 'lucide-react';
+import { Play, Layers, Lightbulb } from 'lucide-react';
 
 import { useRoundNavigation } from '../hooks/useRoundNavigation';
 import { useLessonVisualization } from '../hooks/useLessonVisualization';
@@ -21,9 +21,11 @@ import { StepExplanation } from './day/StepExplanation';
 import { LessonBottomNav } from './LessonBottomNav';
 
 import { LessonFlowVisualizer, LessonMemoryVisualizer } from '@/features/visualizers';
+import { ConceptPopup } from '@/features/visualizers/shared/components/ConceptPopup';
 import { useIsMobile } from '@/hooks';
 import type { LessonStep } from '@/types';
 import type { CodeSelection } from '@/features/visualizers/shared/components/CodeMirrorEditor';
+import { hasMeaningfulValue } from '../utils/visualizationData';
 
 interface LessonUnifiedViewProps {
   code: string;
@@ -40,6 +42,16 @@ const contentVariants = {
   exit: { opacity: 0, y: -12, transition: { duration: 0.15 } },
 } as const;
 
+const CONCEPT_TYPES = new Set(['preprocessor', 'streams', 'buffering', 'fileio']);
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
 export function LessonUnifiedView({
   code,
   steps,
@@ -51,6 +63,7 @@ export function LessonUnifiedView({
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [activeVizTab, setActiveVizTab] = useState<'flow' | 'memory'>('flow');
+  const [isConceptOpen, setIsConceptOpen] = useState(false);
 
   // Round navigation (shared for both layouts)
   const nav = useRoundNavigation({
@@ -60,8 +73,13 @@ export function LessonUnifiedView({
   });
 
   const currentStep = steps[nav.actualStepIndex];
+  const currentStepRecord = currentStep as Record<string, unknown> | undefined;
   const isExplanationRound = nav.round === 'explanation';
   const showMemoryTab = languageId === 'c' || languageId === 'cpp';
+  const rawConceptType = asString(currentStepRecord?.conceptVisualizationType) || asString(currentStepRecord?.visualizationType);
+  const conceptType = rawConceptType && CONCEPT_TYPES.has(rawConceptType) ? rawConceptType : undefined;
+  const conceptState = isRecord(currentStepRecord?.conceptState) ? currentStepRecord.conceptState : undefined;
+  const hasConceptPopup = !!conceptType || hasMeaningfulValue(conceptState);
 
   // Visualization data
   const { memoryState, changedBlocks } = useLessonVisualization(steps, nav.actualStepIndex);
@@ -79,16 +97,20 @@ export function LessonUnifiedView({
     onPrev: nav.goPrev,
     onNext: nav.goNext,
     enabled: !isMobile,
-    isModalOpen: false,
+    isModalOpen: isConceptOpen,
     canGoPrev: nav.canGoPrev,
     canGoNext: true,
   });
+
+  useEffect(() => {
+    setIsConceptOpen(false);
+  }, [nav.round, nav.actualStepIndex]);
 
   // Next button label
   const nextLabel = (() => {
     if (isExplanationRound) {
       if (nav.stepIndex >= steps.length - 1) {
-        return nav.hasVizRound ? t('lesson.visualization', '시각화') : t('lesson.quiz');
+        return nav.hasVizRound ? t('lesson.visualization') : t('lesson.quiz');
       }
       return t('common.next');
     }
@@ -109,11 +131,11 @@ export function LessonUnifiedView({
     >
       <div className="flex gap-1">
         <span className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full ${isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
-          {t('quiz.explanation', '설명')}
+          {t('lesson.explanation')}
         </span>
         {nav.hasVizRound && (
           <span className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full ${!isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
-            {t('lesson.visualization', '시각화')}
+            {t('lesson.visualization')}
           </span>
         )}
       </div>
@@ -150,23 +172,36 @@ export function LessonUnifiedView({
             exit="exit"
             className="w-full"
           >
-            {/* Flow/Memory tab switcher (C only) */}
-            {showMemoryTab && (
-              <div className="flex shrink-0 border-b border-[var(--theme-lesson-panel-border)]">
-                <button
-                  onClick={() => setActiveVizTab('flow')}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all ${activeVizTab === 'flow' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
-                >
-                  <Play className="w-4 h-4" />
-                  Flow
-                </button>
-                <button
-                  onClick={() => setActiveVizTab('memory')}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'memory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
-                >
-                  <Layers className="w-4 h-4" />
-                  Memory
-                </button>
+            {(showMemoryTab || hasConceptPopup) && (
+              <div className="flex items-center shrink-0 border-b border-[var(--theme-lesson-panel-border)]">
+                {showMemoryTab && (
+                  <div className="flex flex-1">
+                    <button
+                      onClick={() => setActiveVizTab('flow')}
+                      className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all ${activeVizTab === 'flow' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
+                    >
+                      <Play className="w-4 h-4" />
+                      {t('lesson.flow')}
+                    </button>
+                    <button
+                      onClick={() => setActiveVizTab('memory')}
+                      className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'memory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
+                    >
+                      <Layers className="w-4 h-4" />
+                      {t('lesson.memory')}
+                    </button>
+                  </div>
+                )}
+
+                {hasConceptPopup && (
+                  <button
+                    onClick={() => setIsConceptOpen(true)}
+                    className={`flex items-center gap-1.5 px-3 py-2 text-sm md:text-base font-semibold transition-all ${showMemoryTab ? 'border-l border-[var(--theme-lesson-panel-border)]' : ''} viz-tab-inactive hover:viz-tab-active`}
+                  >
+                    <Lightbulb className="w-4 h-4" />
+                    {t('lesson.concept')}
+                  </button>
+                )}
               </div>
             )}
 
@@ -226,6 +261,15 @@ export function LessonUnifiedView({
         canGoPrev={nav.canGoPrev}
         nextLabel={nextLabel}
         onQuiz={onQuiz}
+      />
+
+      <ConceptPopup
+        open={isConceptOpen}
+        onOpenChange={setIsConceptOpen}
+        conceptType={conceptType}
+        conceptState={conceptState}
+        explanation={currentStep?.explanation}
+        code={currentStep?.code}
       />
     </div>
   );

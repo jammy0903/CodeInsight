@@ -1,13 +1,13 @@
 {
   "lessonId": "c-5-2",
-  "title": "malloc usage",
-  "concept": "malloc："请借我一些内存！"",
+  "title": "malloc 的使用",
+  "concept": "malloc：“请借给我一些内存！”",
   "content": {
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = (int*)malloc(sizeof(int));\n\n    if (p == NULL) {\n        printf(\"Memory full!\\n\");\n        return 1;\n    }\n\n    *p = 100;\n    printf(\"Stored in heap: %d\\n\", *p);\n\n    free(p);\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 `printf` 所需的头文件。\n\n本课讲解 malloc 的安全使用模式：分配-检查-使用-释放。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用“printf”的标头。\n\n本课程介绍 malloc 安全模式（分配-检查-免使用）。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,13 +16,13 @@
       },
       {
         "title": "包含 stdlib.h 头文件",
-        "explanation": "使用 `malloc` 和 `free` 所需的头文件。\n\n动态内存相关的函数声明在此头文件中。",
+        "explanation": "使用“malloc”和“free”的标头。\n\n与动态内存相关的函数声明位于此处。",
         "visualizationType": "cMemory",
         "code": "#include <stdlib.h>"
       },
       {
-        "title": "定义 main 函数",
-        "explanation": "创建 main 栈帧。\n\n接下来的步骤将遵循堆内存的标准使用顺序。",
+        "title": "主函数定义",
+        "explanation": "主框架已创建。\n\n在后续步骤中，我们遵循堆内存的标准使用顺序。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -35,8 +35,8 @@
         ]
       },
       {
-        "title": "请求堆内存分配",
-        "explanation": "`malloc(sizeof(int))` 在堆上申请一个整型大小的空间。\n\n成功时返回地址，失败时返回 `NULL`。",
+        "title": "堆内存分配请求",
+        "explanation": "使用“malloc(sizeof(int))”从堆中请求一个整数的大小。\n\n成功时返回地址，失败时返回“NULL”。",
         "visualizationType": "cMemory",
         "code": "int *p = (int*)malloc(sizeof(int));",
         "stack": [
@@ -56,13 +56,13 @@
         ]
       },
       {
-        "title": "检查内存分配是否失败",
-        "explanation": "首先检查 `p == NULL`。\n\nNULL 检查是防止崩溃的基本安全措施。",
+        "title": "内存分配失败检查",
+        "explanation": "首先检查是否`p == NULL`。\n\nNULL 检查是防止崩溃的基本故障保护措施。",
         "visualizationType": "cMemory",
         "code": "if (p == NULL) {"
       },
       {
-        "title": "输出失败消息",
+        "title": "输出失败信息",
         "explanation": "通知用户分配失败的情况。",
         "visualizationType": "cMemory",
         "code": "printf(\"Memory full!\\n\");",
@@ -71,15 +71,15 @@
         "stdout": "Memory full!"
       },
       {
-        "title": "返回错误码",
-        "explanation": "`return 1;` 表示异常终止。\n\n失败后不继续执行非常重要。",
+        "title": "返回错误代码",
+        "explanation": "异常终止用“return 1;”指定。\n\n失败后不要继续前进，这一点很重要。",
         "visualizationType": "cMemory",
         "code": "return 1;",
         "stdout": ""
       },
       {
-        "title": "在堆内存中存储值",
-        "explanation": "`*p = 100;` 将值存储到已分配的堆空间中。",
+        "title": "将值存储在堆内存中",
+        "explanation": "将值存储在用“*p = 100;”分配的堆空间中。",
         "visualizationType": "cMemory",
         "code": "*p = 100;",
         "stack": [
@@ -100,8 +100,8 @@
         ]
       },
       {
-        "title": "输出堆中的值",
-        "explanation": "读取 `*p` 来输出存储的值。",
+        "title": "堆内存值输出",
+        "explanation": "读取“*p”并输出存储的值。",
         "visualizationType": "cMemory",
         "code": "printf(\"Stored in heap: %d\\n\", *p);",
         "heap": [
@@ -114,8 +114,8 @@
         "stdout": "Stored in heap: 100"
       },
       {
-        "title": "释放堆内存",
-        "explanation": "`free(p)` 将使用过的堆内存归还给系统。\n\n释放后应避免再次使用该指针。",
+        "title": "空闲堆内存",
+        "explanation": "释放使用`free(p)`使用的堆内存。\n\n释放后应避免指针重用。",
         "visualizationType": "cMemory",
         "code": "free(p);",
         "stack": [
@@ -130,8 +130,8 @@
         "heap": []
       },
       {
-        "title": "程序正常结束",
-        "explanation": "通过 `return 0;` 正常终止程序。\n\n总结：使用 malloc 时必须包含 NULL 检查和 free。",
+        "title": "计划顺利完成",
+        "explanation": "它通常以“return 0;”结束。\n\n摘要： 使用 malloc 总是包括 NULL 检查和释放。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -140,22 +140,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "malloc 的返回类型是 `void*`。\n这是什么意思？",
+    "question": "malloc 的返回类型是“void*”。\n这是什么意思？",
     "options": [
-      "不返回任何东西",
+      "什么也不返回",
       "返回错误",
-      "是一个类型未确定的地址",
+      "它是一个没有类型的地址（未确定）。",
       "返回 0"
     ],
     "correctIndex": 2,
-    "explanation": "`void*` 表示"不知道是什么类型的地址"。\n所以标准做法是像 `(int*)` 这样进行强制类型转换。"
+    "explanation": "`void*` 是“未知类型的地址”。\n因此，通过像“(int*)”这样的转换来使用它是标准的。"
   },
   "misconceptions": [
     {
-      "wrong": "malloc 分配的内存会被初始化为 0",
-      "correct": "里面是垃圾值。",
-      "why": "如果需要初始化为零的内存，应该使用 `calloc`。\n`malloc` 为了速度跳过了初始化。"
+      "wrong": "malloc获取的内存初始化为0。",
+      "correct": "其中包含垃圾价格。",
+      "why": "如果你需要将内存初始化为0，你应该使用`calloc`。\n`malloc` 不会为了速度而初始化。"
     }
   ],
-  "keyTakeaway": "用 `malloc(sizeof(type))` 借内存，检查 `NULL`，通过指针使用。"
+  "keyTakeaway": "使用“malloc(sizeof(type))”借用，检查“NULL”，然后写入指针。"
 }

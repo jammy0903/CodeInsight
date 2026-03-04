@@ -1,13 +1,13 @@
 {
   "lessonId": "c-9-4",
-  "title": "Token Pasting",
-  "concept": "标记粘贴宏通过自动化标识符生成来减少重复代码",
+  "title": "令牌粘贴",
+  "concept": "令牌组合宏可自动创建标识符，减少重复代码",
   "content": {
     "code": "#include <stdio.h>\n\n#define MAKE_VAR(type, name) type var_##name\n\n#define GETTER(name) int get_##name() { return var_##name; }\n\nMAKE_VAR(int, apple);\nMAKE_VAR(int, banana);\n\nGETTER(apple)\nGETTER(banana)\n\nint main() {\n    var_apple = 100;\n    printf(\"Apple: %d\\n\", get_apple());\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "**`#include <stdio.h>`** -- 包含使用 `printf` 的头文件。\n\n本课学习 **`##` 运算符（Token Pasting，标记粘贴）**。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "**`#include <stdio.h>`** — 包含“printf”使用的标头。\n\n在本课程中，您将学习 **`##` 运算符（标记粘贴）**。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,34 +15,40 @@
         "stdout": ""
       },
       {
-        "title": "宏定义 1：变量生成器",
-        "explanation": "**`#define MAKE_VAR(type, name) type var_##name`** -- `##` 将左侧标记（`var_`）与右侧标记（`name` 的实际值）连接成一个新标记。`MAKE_VAR(int, apple)` 变为 `int var_apple`。",
+        "title": "宏定义1：变量生成器",
+        "explanation": "**`#define MAKE_VAR(type, name) type var_##name`** — `##` 将左标记 (`var_`) 和右标记（`name` 的实际值）组合成一个新标记。 `MAKE_VAR(int, apple)` → `int var_apple`, `MAKE_V",
         "visualizationType": "cMemory",
         "code": "#define MAKE_VAR(type, name) type var_##name"
       },
       {
         "title": "宏定义 2：Getter 函数生成器",
-        "explanation": "**`#define GETTER(name) int get_##name() { return var_##name; }`** -- **两次**使用 `##`，同时生成函数名和函数体中的变量名。`GETTER(apple)` 变为 `int get_apple() { return var_apple; }`。",
+        "explanation": "**`#define GETTER(name) int get_##name() { return var_##name; }`** — 使用 `##` **两次**可以同时在主体中创建函数名称和变量名称。 `GETTER(apple)` → `int get_apple() { return var_",
         "visualizationType": "cMemory",
         "code": "#define GETTER(name) int get_##name() { return var_##name; }"
       },
       {
-        "title": "预处理器执行：生成变量",
-        "explanation": "**`MAKE_VAR(int, apple);`** 和 **`MAKE_VAR(int, banana);`** -- 预处理器用 `##` 连接标记，生成实际的 C 代码：`int var_apple;` 和 `int var_banana;`。",
+        "title": "运行预处理器：创建变量",
+        "explanation": "**`MAKE_VAR(int, apple);`** 和 **`MAKE_VAR(int, Banana);`** — 预处理器将标记与 `##` 组合在一起，并将其替换为实际的 C 代码：`int var_apple;` 和 `int var_banana;`。 `type` = `int`, `name` = `appl",
         "visualizationType": "cMemory",
         "code": "MAKE_VAR(int, apple);",
-        "highlightOffset": [0, 1]
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "title": "预处理器执行：生成函数",
-        "explanation": "**`GETTER(apple)`** 和 **`GETTER(banana)`** -- `##` 生成完整的函数定义：`int get_apple() { return var_apple; }` 和 `int get_banana() { return var_banana; }`。",
+        "title": "执行预处理器：创建函数",
+        "explanation": "**`GETTER(apple)`** 和 **`GETTER(banana)`** — `##` 返回 `int get_apple() { return var_apple; }` 和 `int get_banana() { return var_banana;替换为名为 }` 的完整函数定义代码。",
         "visualizationType": "cMemory",
         "code": "GETTER(apple)",
-        "highlightOffset": [0, 1]
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "title": "main 函数开始",
-        "explanation": "**`int main() {`** -- 此时编译器看到的整体结构是：全局变量 `var_apple`、`var_banana`（宏生成）+ 函数 `get_apple()`、`get_banana()`（宏生成）+ `main()`（手写）。",
+        "title": "启动主函数",
+        "explanation": "**`int main() {`** — 此时编译器识别的整个结构是：全局变量`var_apple`、`var_banana`（创建宏）+函数`get_apple()`、`get_banana()`（创建宏）+`main()`（自己写）。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -55,22 +61,22 @@
         ]
       },
       {
-        "title": "给生成的变量赋值",
-        "explanation": "**`var_apple = 100;`** -- 虽然这个名字是 `##` 将 `var_` 和 `apple` 连接后自动创建的，但使用时与直接写 `int var_apple;` 完全相同。",
+        "title": "为创建的变量赋值",
+        "explanation": "**`var_apple = 100;`** — 虽然 `##` 运算符通过组合 `var_` 和 `apple` 自动创建名称，但它的使用方式与直接将其声明为 `int var_apple;` 的方式完全相同。",
         "visualizationType": "cMemory",
         "code": "var_apple = 100;",
         "stack": []
       },
       {
-        "title": "调用生成的函数",
-        "explanation": "**`printf(\"Apple: %d\\n\", get_apple());`** -- 调用 `GETTER(apple)` 生成的 `get_apple()` 函数。该函数返回 `var_apple` 的当前值，所以输出 `100`。",
+        "title": "生成的函数调用",
+        "explanation": "**`printf(\"Apple: %d\\n\", get_apple());`** — 调用由 `GETTER(apple)` 创建的 `get_apple()` 函数。该函数返回“var_apple”的当前值，因此输出“100”。",
         "visualizationType": "cMemory",
         "code": "printf(\"Apple: %d\\n\", get_apple());",
         "stdout": "Apple: 100"
       },
       {
-        "title": "程序结束",
-        "explanation": "**`return 0;`** -- 程序终止。\n\n`##`（Token Pasting）是将两个标记连接成新标识符的预处理器运算符，只能在 `#define` 内使用。",
+        "title": "程序退出",
+        "explanation": "**`return 0;`** — 程序终止。\n\n`##`（标记粘贴）是一个预处理器运算符，它组合两个标记来创建新的标识符，并且只能在`#define`中使用。",
         "visualizationType": "cMemory",
         "code": "return 0;"
       }
@@ -78,22 +84,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "宏运算符 ## 的作用是？",
+    "question": "宏运算符##有什么作用？",
     "options": [
-      "注释处理",
-      "字符串化（Stringify）",
-      "将两个标记合并为一个（Token Pasting）",
+      "评论处理",
+      "字符串化",
+      "将两个令牌合并为一个（令牌粘贴）",
       "终止宏函数"
     ],
     "correctIndex": 2,
-    "explanation": "## 运算符将左右两侧的标记物理连接，用于创建新的变量名或函数名等。"
+    "explanation": "## 运算符用于通过物理附加前面和后面的标记来创建新的变量名称或函数名称。"
   },
   "misconceptions": [
     {
-      "wrong": "# 运算符和 ## 运算符是一样的。",
-      "correct": "# 将参数转为字符串（\" \"），而 ## 将参数连接成代码标记。",
-      "why": "#x -> \"x\"，x##y -> xy"
+      "wrong": "# 运算符和## 运算符是相同的。",
+      "correct": "# 将参数转换为字符串 (\" \")，## 将参数组合成代码标记。",
+      "why": "#x -> \"x\", x##y -> xy"
     }
   ],
-  "keyTakeaway": "利用 ## 运算符，只需几行宏就能自动生成数十个模式相似的变量或函数。"
+  "keyTakeaway": "使用##运算符，您可以在短短几行宏中自动创建数十个具有相似模式的变量或函数。"
 }

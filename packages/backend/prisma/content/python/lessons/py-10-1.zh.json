@@ -1,18 +1,18 @@
 {
   "lessonId": "py-10-1",
-  "title": "全局解释器锁 (GIL)",
-  "concept": "GIL是一种约束机制，即使存在多个线程，在任何时刻也只允许一个线程执行Python代码。",
+  "title": "전역 인터프리터 락 (GIL)",
+  "concept": "GIL은, 여러 스레드가 있어도 한 순간에는 단 하나의 스레드만 파이썬 코드를 실행하도록 하는 제약입니다.",
   "content": {
     "code": "import threading\n\nshared_counter = 0\n\ndef increment():\n    global shared_counter\n    for i in range(5):\n        shared_counter += 1\n        print(f\"Thread {threading.current_thread().name}: counter = {shared_counter}\")\n\n# 두 개의 스레드 생성\nt1 = threading.Thread(target=increment, name=\"A\")\nt2 = threading.Thread(target=increment, name=\"B\")\n\n# 스레드 시작\nt1.start()\nt2.start()\n\n# 스레드 종료 대기\nt1.join()\nt2.join()\n\nprint(f\"\\nFinal counter: {shared_counter}\")",
     "steps": [
       {
-        "title": "导入 threading 模块",
-        "explanation": "**`import threading`**\n\n**导入用于创建和管理线程的 `threading` 模块。**\n\n**什么是线程（Thread）？**\n- 线程是允许在单个程序中同时执行多个任务的执行单元\n- 就像同一个办公室里多个员工同时工作\n- 线程共享相同的内存空间（这既是优点也是风险！）\n\n**类比**：就像在公司（程序）中建立人事管理系统（threading 模块），用于雇佣员工（线程）。\n\n**内部原理**：当 `threading` 模块加载时，`Thread`、`Lock`、`Event` 等各种并发管理工具变得可用。\n\n**为什么是这个顺序？** 使用线程之前，必须先导入工具（模块）。\n\n**注意**：Python的 `threading` 使用真正的操作系统级线程，但有一个特殊的约束叫做GIL。在本课中，我们将亲眼看到这个约束的作用。",
+        "title": "threading 모듈 임포트",
+        "explanation": "**`import threading`**\n\n스레드를 생성하고 관리하기 위한 `threading` 모듈을 가져옵니다. 스레드는 하나의 프로그램 안에서 동시에 실행되는 작업 단위로, 같은 메모리 공간을 공유합니다. `Thread`, `Lock`, `Event` 등 동시성 관련 도구가 사용 가능해집니다.",
         "visualizationType": "pythonMemory",
         "code": "import threading",
         "pythonMemoryState": {
           "output": [],
-          "note": "threading 模块准备就绪。",
+          "note": "threading 모듈 준비 완료.",
           "names": [
             {
               "name": "threading",
@@ -32,12 +32,12 @@
         }
       },
       {
-        "title": "声明共享变量",
-        "explanation": "**`shared_counter = 0`**\n\n**声明一个多个线程将同时访问的全局变量。** `shared_counter` 被初始化为 0。\n\n**为什么这个变量很重要？**\n- 两个线程将同时访问并修改这个变量\n- 如果没有GIL，两个线程可能同时读取和写入相同的值，导致"竞态条件（race condition）"\n- 例如：两个都读到0 -> 两个都写入1 -> 结果是1（应该是2）\n\n**类比**：这是办公室白板上写的一个数字。两个员工同时试图修改白板上的数字。如果没有秩序，就会产生混乱！\n\n**内部原理**：`shared_counter` 在全局命名空间中创建，指向整数 `0`。\n\n**为什么是这个顺序？** 在线程启动之前，必须先准备好共享资源。\n\n**注意**：没有 `global` 关键字，就无法在函数内部修改这个变量。这就是为什么在 `increment` 函数内部声明了 `global shared_counter`。",
+        "title": "공유 변수 선언",
+        "explanation": "**`shared_counter = 0`**\n\n여러 스레드가 동시에 접근할 전역 변수를 선언합니다. 두 스레드가 이 변수를 동시에 읽고 쓰면 경쟁 조건(race condition)이 발생할 수 있습니다. 함수 내에서 수정하려면 `global` 키워드가 필요합니다.",
         "visualizationType": "pythonMemory",
         "code": "shared_counter = 0",
         "pythonMemoryState": {
-          "note": "共享变量 shared_counter 已初始化为 0。",
+          "note": "공유 변수 shared_counter가 0으로 초기화되었습니다.",
           "names": [
             {
               "name": "shared_counter",
@@ -57,8 +57,8 @@
         }
       },
       {
-        "title": "定义计数器递增函数",
-        "explanation": "**`def increment():`**\n\n**定义每个线程将执行的任务函数。** 这个函数将全局变量 `shared_counter` 递增5次，并在每一步打印当前线程名称和计数器值。\n\n**函数体分析：**\n- `global shared_counter`：声明在函数内部修改全局变量\n- `for i in range(5)`：重复5次\n- `shared_counter += 1`：计数器加1\n- `print(...)`：打印当前线程名称和计数器值\n\n**类比**：这是员工的任务说明书。"将白板上的数字增加5次。每次增加时，报告你的名字和当前数字。"\n\n**内部原理**：`increment` 函数对象（0x1100）被创建。由于 `global` 声明，函数内的 `shared_counter` 直接引用全局命名空间中的变量。\n\n**为什么是这个顺序？** 需要为线程定义要执行的任务。创建线程时会将此函数作为 `target` 传递。\n\n**注意**：`threading.current_thread().name` 返回当前正在执行的线程的名称。这让我们可以追踪哪个线程在何时执行。",
+        "title": "카운터 증가 함수 정의",
+        "explanation": "**`def increment():`**\n\n각 스레드가 실행할 함수를 정의합니다. `global shared_counter`로 전역 변수를 수정 선언하고, `range(5)` 반복으로 카운터를 5번 증가시킵니다. `threading.current_thread().name`으로 어느 스레드가 실행 중인지 추적할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "def increment():",
         "highlightOffset": [
@@ -69,7 +69,7 @@
           4
         ],
         "pythonMemoryState": {
-          "note": "increment 函数已定义。",
+          "note": "increment 함수가 정의되었습니다.",
           "names": [
             {
               "name": "increment",
@@ -89,8 +89,8 @@
         }
       },
       {
-        "title": "创建两个线程",
-        "explanation": "**`t1 = threading.Thread(target=increment, name=\"A\")`**\n**`t2 = threading.Thread(target=increment, name=\"B\")`**\n\n**创建两个线程对象。** 每个线程将执行 `increment` 函数，名称分别为 \"A\" 和 \"B\"。\n\n**`Thread` 构造函数参数：**\n- `target`：线程要执行的函数（传递引用，而不是调用！）\n- `name`：用于标识线程的名称（对调试很有用）\n\n**类比**：就像雇佣两名员工，并给每人一份相同的任务说明书（increment）。\n- 员工 A（t1）：\"我是A，我将执行 increment。\"\n- 员工 B（t2）：\"我是B，我将执行 increment。\"\n他们还没有开始工作，处于就绪（Ready）状态。\n\n**内部原理**：`Thread` 实例已创建，但操作系统线程尚未创建。必须调用 `start()` 才能创建实际的操作系统线程。\n\n**为什么是这个顺序？** 先创建线程，稍后再启动。将创建和启动分开，可以准备好多个线程后同时启动。\n\n**注意**：在 `target=increment` 中不要加括号！写成 `target=increment()` 会立即执行函数，其结果（None）会成为 target。",
+        "title": "두 개의 스레드 생성",
+        "explanation": "**`t1 = threading.Thread(target=increment, name=\"A\")`**\n**`t2 = threading.Thread(target=increment, name=\"B\")`**\n\n두 개의 스레드 객체를 생성합니다. `target`에는 함수 참조(호출이 아닌 참조)를 전달하고, `name`은 디버깅용 식별자입니다. `start()` 호출 전까지 실제 OS 스레드는 생성되지 않습니다.",
         "visualizationType": "pythonMemory",
         "code": "# 두 개의 스레드 생성",
         "highlightOffset": [
@@ -99,7 +99,7 @@
           2
         ],
         "pythonMemoryState": {
-          "note": "已创建两个线程（就绪状态）。",
+          "note": "두 개의 스레드가 생성되었습니다 (Ready 상태).",
           "names": [
             {
               "name": "t1",
@@ -131,8 +131,8 @@
         }
       },
       {
-        "title": "同时启动线程",
-        "explanation": "**`t1.start()` / `t2.start()`**\n\n**将两个线程转换为运行状态。** 从这一刻起，两个线程"同时"执行。\n\n**但它们真的同时运行吗？GIL登场！**\n- CPython中有一个叫做GIL（全局解释器锁）的东西\n- GIL确保在任何时刻只有**一个线程**可以执行Python字节码\n- 因此两个线程是"交替"执行的（不是真正的并行！）\n\n**类比**：办公室里只有一台电脑（GIL），所以两个员工必须轮流使用。\nA工作一会儿 -> 交给B -> B工作一会儿 -> 交给A...\n\n**内部原理**：调用 `start()` 时会创建操作系统级别的线程。操作系统调度器管理两个线程的执行顺序，但由于GIL的存在，实际上只有一个线程在执行Python代码。\n\n**为什么是这个顺序？** 快速连续启动两个线程，让操作系统交替执行它们。\n\n**注意**：输出顺序在每次运行时可能不同。哪个线程先执行由操作系统调度器决定。",
+        "title": "스레드 동시 시작",
+        "explanation": "**`t1.start()` / `t2.start()`**\n\n두 스레드를 Running 상태로 전환합니다. GIL(Global Interpreter Lock) 때문에 한 순간에 단 하나의 스레드만 파이썬 바이트코드를 실행할 수 있으므로, 두 스레드는 번갈아가며 실행됩니다. 출력 순서는 OS 스케줄러가 결정하므로 실행마다 달라질 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "# 스레드 시작",
         "highlightOffset": [
@@ -147,7 +147,7 @@
             "Thread A: counter = 3",
             "..."
           ],
-          "note": "线程已启动。由于GIL，它们交替执行。",
+          "note": "스레드가 시작되었습니다. GIL 때문에 번갈아가며 실행됩니다.",
           "objects": [
             {
               "id": "instance1",
@@ -167,8 +167,8 @@
         }
       },
       {
-        "title": "等待线程结束",
-        "explanation": "**`t1.join()` / `t2.join()`**\n\n**主线程等待所有子线程完成。** `join()` 的意思是"我（主线程）在这里停下来，直到这个线程完成。"\n\n**如果没有 `join()` 会怎样？**\n- 主线程可能先结束\n- 子线程还在工作时程序就可能终止\n- 最终结果（`shared_counter`）可能在还没到达10时就被打印\n\n**类比**：团队负责人（主线程）说"在A和B完成工作之前我不会下班"。所有员工必须完成任务，才能编写最终报告。\n\n**内部原理**：`join()` 内部使用条件变量（Condition Variable）来阻塞当前线程，直到目标线程终止。\n\n**为什么是这个顺序？** 我们需要两个线程都完成后才能检查最终结果。\n\n**注意**：无论 `join()` 的调用顺序如何，它都会等待所有线程完成。由于在 `t1.join()` 期间 t2 已经在运行，总等待时间等于运行时间最长的线程的时间。",
+        "title": "스레드 종료 대기",
+        "explanation": "**`t1.join()` / `t2.join()`**\n\n메인 스레드가 자식 스레드들이 모두 끝날 때까지 기다립니다. `join()` 없이는 자식 스레드가 아직 실행 중인데 메인 스레드가 먼저 종료될 수 있어, 최종 결과가 불완전할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "# 스레드 종료 대기",
         "highlightOffset": [
@@ -182,7 +182,7 @@
             "Thread B: counter = 9",
             "Thread A: counter = 10"
           ],
-          "note": "所有线程任务已完成。",
+          "note": "모든 스레드 작업이 완료되었습니다.",
           "objects": [
             {
               "id": "instance1",
@@ -202,8 +202,8 @@
         }
       },
       {
-        "title": "检查最终结果",
-        "explanation": "**`print(f\"\\nFinal counter: {shared_counter}\")`**\n\n**检查最终计数器值。** 结果是 **10**（每个线程各递增5次）。\n\n**GIL保证了什么：**\n- 由于一次只有一个线程执行，`shared_counter += 1` 操作近似"原子性（atomic）"地运行\n- 因此在这个例子中不会发生竞态条件，结果正好是10\n\n**GIL的两面性：**\n- **优点**：保证内存安全。Python的引用计数垃圾回收可以安全运行\n- **缺点**：CPU密集型任务无法利用多核。无论创建多少线程，都只使用一个CPU\n\n**类比**：因为只有一台电脑，两个员工轮流使用。最终工作总量是准确的，但所花时间和一个人独自完成差不多。\n\n**为什么是这个顺序？** 这是所有线程终止后验证结果的最终步骤。\n\n**注意**：GIL并不总是保证安全！对于更复杂的操作（例如 `counter = counter + 1` 被拆分为多个字节码），竞态条件仍然可能发生。要实现安全的并发，请使用 `Lock`。",
+        "title": "최종 결과 확인",
+        "explanation": "**`print(f\"\\nFinal counter: {shared_counter}\")`**\n\n최종 카운터 값을 확인합니다. GIL이 한 순간에 하나의 스레드만 실행되도록 보장하므로 `shared_counter += 1` 연산이 안전하게 동작하여 결과는 정확히 10이 됩니다. CPU 집약적 작업에서는 멀티코어 이점을 활용할 수 없지만, I/O 작업에서는 스레딩이 여전히 유효합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"\\nFinal counter: {shared_counter}\")",
         "pythonMemoryState": {
@@ -211,7 +211,7 @@
             "...",
             "Final counter: 10"
           ],
-          "note": "最终结果是10。",
+          "note": "최종 결과는 10입니다.",
           "names": [
             {
               "name": "shared_counter",
@@ -234,27 +234,27 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "关于上述代码的执行结果，哪个描述是正确的？",
+    "question": "对于上述代码的执行结果，正确的解释是什么？",
     "options": [
-      "线程A和B完全同时执行，输出混合在一起",
-      "由于GIL，一次只有一个线程执行，交替产生输出",
-      "由于竞态条件，shared_counter 最终值小于10",
-      "线程A完全结束后线程B才开始"
+      "线程 A 和 B 完全同时运行，导致混合输出",
+      "由于 GIL，一次只有一个线程运行并且输出交替。",
+      "由于竞争条件，shared_counter 的值会小于 10。",
+      "线程 A 完全完成后，线程 B 启动。"
     ],
     "correctIndex": 1,
-    "explanation": "由于GIL（全局解释器锁），即使有多个线程，在任何时刻也只有一个线程可以执行Python代码。\n因此两个线程交替执行，由于GIL保证了内存一致性，最终值始终是10。"
+    "explanation": "由于 GIL（全局解释器锁）的存在，即使有多个线程，任何时候也只有一个线程在执行 Python 代码。\n所以两个线程交替运行，最终值始终为10，因为GIL保证了内存一致性。"
   },
   "misconceptions": [
     {
-      "wrong": "Python线程完全并行运行",
-      "correct": "由于GIL，任何时刻只有一个线程执行Python代码",
-      "why": "GIL的存在是为了保证Python内存管理的安全性。\n如果需要真正的并行处理，应该使用multiprocessing模块。"
+      "wrong": "파이썬 스레드는 완전히 동시에 실행된다",
+      "correct": "GIL 때문에 한 순간에 하나의 스레드만 파이썬 코드를 실행합니다",
+      "why": "GIL은 파이썬 메모리 관리의 안전성을 보장하기 위해 존재합니다.\n진정한 병렬 처리가 필요하면 multiprocessing 모듈을 사용해야 합니다."
     },
     {
-      "wrong": "Python中多线程毫无意义",
-      "correct": "对于I/O密集型任务，线程仍然很有用",
-      "why": "对于网络请求、文件读取等I/O操作，GIL在I/O等待期间会被释放，允许其他线程运行。\n只有CPU密集型工作难以并行化。"
+      "wrong": "파이썬은 멀티스레딩이 의미 없다",
+      "correct": "I/O 대기가 많은 작업에서는 스레딩이 여전히 유용합니다",
+      "why": "네트워크 요청, 파일 읽기 등 I/O 작업은 대기 시간 동안 GIL을 해제하므로 다른 스레드가 실행될 수 있습니다.\nCPU 작업만 병렬화가 어렵습니다."
     }
   ],
-  "keyTakeaway": "GIL限制在任何时刻只有一个线程可以执行Python代码。CPU密集型任务无法并行化，但I/O密集型任务仍然可以从线程中受益。"
+  "keyTakeaway": "GIL은 한 순간에 하나의 스레드만 파이썬 코드를 실행하도록 제한합니다. CPU 작업은 병렬화되지 않지만, I/O 작업은 스레딩의 이점을 얻을 수 있습니다."
 }

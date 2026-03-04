@@ -1,18 +1,18 @@
 {
   "lessonId": "py-2-4",
-  "title": "Break 和 Continue：循环的控制",
-  "concept": "在循环中途停止或跳过某次迭代",
+  "title": "Break와 Continue: 반복문의 통제",
+  "concept": "반복문을 중간에 멈추거나 건너뛰기",
   "content": {
     "code": "for i in range(10):\n    if i == 2:\n        print(\"Skip 2\")\n        continue  # 이번 턴은 여기서 끝! 위로 올라가\n    \n    if i == 5:\n        print(\"Stop!\")\n        break     # 반복문 전체 종료!\n        \n    print(i)",
     "steps": [
       {
-        "title": "for 循环开始 (i=0)",
-        "explanation": "**`for i in range(10):`** -- 开始一个从 0 到 9 的 for 循环。\n\nPython 从上到下按顺序执行。`range(10)` 是一个逐个生成 0 到 9 数字的迭代器。获取第一个值 `0` 并赋值给 `i`。\n\n**本课核心：** 在这个 for 循环中，我们将学习两个控制关键字：`continue` 和 `break`。`continue` 只跳过当前迭代，而 `break` 终止整个循环。\n\n**类比：** 想象 10 个人排队（编号 0~9），一个一个进行审查。2 号将被跳过（continue），在 5 号时审查完全停止（break）。\n\n**Python 内部原理：** 从 `range(10)` 对象创建迭代器，`next()` 返回第一个值 `0`。然后执行 for 循环代码块。\n\n**执行顺序**: 创建 range(10) 迭代器 → next() 获取 0 → i = 0 → 第 2 行",
+        "title": "for 루프 시작 (i=0)",
+        "explanation": "**`for i in range(10):`** -- 0부터 9까지 반복하는 for 루프를 시작합니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. `range(10)`은 0부터 9까지의 숫자를 하나씩 만들어내는 이터레이터입니다. 첫 번째 값 `0`을 가져와 `i`에 할당합니다.",
         "visualizationType": "pythonMemory",
         "code": "for i in range(10):",
         "pythonMemoryState": {
           "output": [],
-          "note": "第 1 次迭代开始",
+          "note": "1번째 반복 시작",
           "names": [
             {
               "name": "i",
@@ -30,12 +30,12 @@
         }
       },
       {
-        "title": "第一个条件检查 (i=0)",
-        "explanation": "**`if i == 2:`** -- 检查 `i` 是否等于 2。如果是，将执行 `continue`。\n\n当前 `i` 是 `0`，所以 `0 == 2` 为 **False**。跳过缩进块（print 和 continue），移动到下一个条件（第 6 行）。\n\n**为什么有这个条件？** 这是为了在 `i` 等于 2 时使用 `continue` 跳过该次迭代的检查。当不是 2 时，什么都不发生，继续执行后面的代码。\n\n**执行顺序**: 检查条件(0 == 2 = False) → 跳过代码块 → 第 6 行",
+        "title": "첫 번째 조건문 검사 (i=0)",
+        "explanation": "**`if i == 2:`** -- `i`가 2인지 확인합니다. 2이면 `continue`를 실행할 것입니다.\n\n현재 `i`는 `0`이므로, `0 == 2`는 **False**입니다. 들여쓰기된 블록(print와 continue)을 건너뛰고 다음 조건문(line 6)으로 이동합니다.\n\n**왜 이 조건문이 있는가?** `i`가 2일 때 `continue`를 사용하여 그 반복을 건너뛰기 위한 검사입니다. 2가 아니면 아무 일도 일어나지 않고 다음 코드로 넘어갑니다.\n\n**실행 순서**: 조건 확인(0 == 2 = False) → 블록 건너뜀 → line 6",
         "visualizationType": "pythonMemory",
         "code": "if i == 2:",
         "pythonMemoryState": {
-          "note": "条件 False → 跳过第 3-4 行",
+          "note": "조건 False → line 3-4 건너뜀",
           "names": [
             {
               "name": "i",
@@ -53,12 +53,12 @@
         }
       },
       {
-        "title": "第二个条件检查 (i=0)",
-        "explanation": "**`if i == 5:`** -- 检查 `i` 是否等于 5。如果是，将执行 `break` 终止整个循环。\n\n当前 `i` 是 `0`，所以 `0 == 5` 为 **False**。跳过缩进块（print 和 break），移动到下一段代码（第 10 行）。\n\n**for 循环中的两个检查站：** 这个循环有 2 个 if 语句：\n1. `if i == 2`：用 continue **只跳过本次迭代**\n2. `if i == 5`：用 break **终止整个循环**\n\n两个条件都为 False 时，最后的 `print(i)` 正常执行。\n\n**执行顺序**: 检查条件(0 == 5 = False) → 跳过代码块 → 第 10 行",
+        "title": "두 번째 조건문 검사 (i=0)",
+        "explanation": "**`if i == 5:`** -- `i`가 5인지 확인합니다. 5이면 `break`를 실행하여 루프 전체를 종료할 것입니다.\n\n현재 `i`는 `0`이므로, `0 == 5`는 **False**입니다. 들여쓰기된 블록(print와 break)을 건너뛰고 다음 코드(line 10)로 이동합니다.\n\n**for 루프 안의 두 가지 검문소:** 이 루프에는 2개의 if문이 있습니다:\n1. `if i == 2`: continue로 **이번 반복만 건너뛰기**\n2. `if i == 5`: break로 **루프 전체 종료**\n\n두 조건 모두 False이면, 마지막의 `print(i)`가 정상적으로 실행됩니다.\n\n**실행 순서**: 조건 확인(0 == 5 = False) → 블록 건너뜀 → line 10",
         "visualizationType": "pythonMemory",
         "code": "if i == 5:",
         "pythonMemoryState": {
-          "note": "条件 False → 跳过第 7-8 行",
+          "note": "조건 False → line 7-8 건너뜀",
           "names": [
             {
               "name": "i",
@@ -76,8 +76,8 @@
         }
       },
       {
-        "title": "输出值 (i=0)",
-        "explanation": "**`print(i)`** -- 两个条件都通过了，所以输出当前 `i` 的值（0）。\n\n**为什么这段代码被执行了？** 第一个 if(i==2) 和第二个 if(i==5) 都为 False，所以 `continue` 和 `break` 都没有执行。因此按顺序到达了 `print(i)`。\n\n**类比：** 0 号通过了两个检查站（是 2 号吗？是 5 号吗？），安全到达输出阶段。\n\n**核心模式：** 当 continue 和 break 都没有执行时，代码块中的所有代码按顺序执行。这是**正常流程**。\n\n**执行顺序**: print(0) 执行 → 代码块结束 → 跳转到第 1 行",
+        "title": "값 출력 (i=0)",
+        "explanation": "**`print(i)`** -- 두 조건문을 모두 통과했으므로 현재 `i` 값(0)을 출력합니다.\n\n**왜 이 코드가 실행되었는가?** 첫 번째 if(i==2)도 False, 두 번째 if(i==5)도 False였기 때문에 `continue`도 `break`도 실행되지 않았습니다. 그래서 순서대로 마지막 `print(i)`에 도달한 것입니다.\n\n**비유:** 0번 사람이 두 개의 검문소(2번인가? 5번인가?)를 모두 통과하여 무사히 출력 단계에 도달했습니다.\n\n**핵심 패턴:** continue나 break가 실행되지 않으면, 블록의 모든 코드가 순서대로 실행됩니다. 이것이 **정상적인 흐름**입니다.\n\n**실행 순서**: print(0) 실행 → 블록 끝 → line 1로 점프",
         "visualizationType": "pythonMemory",
         "code": "print(i)",
         "pythonMemoryState": {
@@ -102,12 +102,12 @@
         }
       },
       {
-        "title": "下一次迭代 (i=1)",
-        "explanation": "**`for i in range(10):`** -- 代码块结束后自动跳转到循环起点。这是第 2 次迭代。\n\nfor 循环在代码块结束时会自动跳转回循环起点。从 `range(10)` 迭代器获取下一个值 `1` 并重新赋值给 `i`。\n\n本次迭代中两个条件（`i==2`、`i==5`）同样都为 False，所以 `print(1)` 将正常执行。\n\n**执行顺序**: 代码块结束 → 跳转到第 1 行 → i = 1 → 第 2 行",
+        "title": "다음 반복 (i=1)",
+        "explanation": "**`for i in range(10):`** -- 블록 끝에서 루프 시작점으로 자동 점프했습니다. 2번째 반복입니다.\n\nfor 루프는 블록이 끝나면 자동으로 루프 시작점으로 점프합니다. `range(10)` 이터레이터에서 다음 값 `1`을 가져와 `i`에 재할당합니다.\n\n이번 반복에서도 두 조건(`i==2`, `i==5`)이 모두 False이므로, `print(1)`이 정상 실행될 것입니다.\n\n**실행 순서**: 블록 끝 → line 1 점프 → i = 1 → line 2",
         "visualizationType": "pythonMemory",
         "code": "for i in range(10):",
         "pythonMemoryState": {
-          "note": "第 2 次迭代开始",
+          "note": "2번째 반복 시작",
           "names": [
             {
               "name": "i",
@@ -127,8 +127,8 @@
         }
       },
       {
-        "title": "第一个条件检查 (i=1)",
-        "explanation": "**`if i == 2:`** -- `1 == 2` 为 **False**，跳过 continue 代码块。\n\ni=1 不是 2，所以 continue 不执行，继续到下一个条件。\n\n**执行顺序**: 检查条件(1 == 2 = False) → 跳过代码块 → 第 6 行",
+        "title": "첫 번째 조건문 검사 (i=1)",
+        "explanation": "**`if i == 2:`** -- `1 == 2`는 **False**이므로 continue 블록을 건너뜁니다.\n\ni=1은 2가 아니므로, continue가 실행되지 않고 다음 조건문으로 넘어갑니다.\n\n**실행 순서**: 조건 확인(1 == 2 = False) → 블록 건너뜀 → line 6",
         "visualizationType": "pythonMemory",
         "code": "if i == 2:",
         "pythonMemoryState": {
@@ -150,8 +150,8 @@
         }
       },
       {
-        "title": "第二个条件检查 (i=1)",
-        "explanation": "**`if i == 5:`** -- `1 == 5` 为 **False**，跳过 break 代码块。\n\ni=1 不是 5，所以 break 不执行，继续到 `print(i)`。\n\n**执行顺序**: 检查条件(1 == 5 = False) → 跳过代码块 → 第 10 行",
+        "title": "두 번째 조건문 검사 (i=1)",
+        "explanation": "**`if i == 5:`** -- `1 == 5`는 **False**이므로 break 블록을 건너뜁니다.\n\ni=1은 5가 아니므로, break가 실행되지 않고 `print(i)`로 넘어갑니다.\n\n**실행 순서**: 조건 확인(1 == 5 = False) → 블록 건너뜀 → line 10",
         "visualizationType": "pythonMemory",
         "code": "if i == 5:",
         "pythonMemoryState": {
@@ -173,8 +173,8 @@
         }
       },
       {
-        "title": "输出值 (i=1)",
-        "explanation": "**`print(i)`** -- 输出当前 `i` 的值（1）。\n\n两个条件都通过了，正常输出。\n\n**输出追踪：** `0` → **`1`** → 下一次 i=2 时将被 continue 跳过。\n\n**执行顺序**: print(1) 执行 → 代码块结束 → 跳转到第 1 行",
+        "title": "값 출력 (i=1)",
+        "explanation": "**`print(i)`** -- 현재 `i` 값(1)을 출력합니다.\n\n두 조건문을 모두 통과했으므로 정상적으로 출력됩니다.\n\n**출력 추적:** `0` → **`1`** → 다음에 i=2가 되면 continue로 건너뛰어질 것입니다.\n\n**실행 순서**: print(1) 실행 → 블록 끝 → line 1로 점프",
         "visualizationType": "pythonMemory",
         "code": "print(i)",
         "pythonMemoryState": {
@@ -198,12 +198,12 @@
         }
       },
       {
-        "title": "下一次迭代 (i=2)",
-        "explanation": "**`for i in range(10):`** -- 第 3 次迭代。这次 `continue` 将被执行！\n\n从代码块末尾跳回第 1 行。从 `range(10)` 迭代器获取下一个值 `2` 并重新赋值给 `i`。\n\n**重要：** 本次迭代中 `i == 2` 将为 True，所以 `continue` 将执行。`print(i)` 将**不会**被执行。\n\n**执行顺序**: 代码块结束 → 跳转到第 1 行 → i = 2 → 第 2 行（continue 测试！）",
+        "title": "다음 반복 (i=2)",
+        "explanation": "**`for i in range(10):`** -- 3번째 반복입니다. 이번에 `continue`가 실행될 것입니다!\n\n블록 끝에서 다시 line 1로 점프했습니다. `range(10)` 이터레이터에서 다음 값 `2`를 가져와 `i`에 재할당합니다.\n\n**중요:** 이번 반복에서 `i == 2`가 True가 되므로, `continue`가 실행됩니다. `print(i)`는 실행되지 **않습니다**.\n\n**실행 순서**: 블록 끝 → line 1 점프 → i = 2 → line 2 (continue 테스트!)",
         "visualizationType": "pythonMemory",
         "code": "for i in range(10):",
         "pythonMemoryState": {
-          "note": "第 3 次迭代开始（continue 测试）",
+          "note": "3번째 반복 시작 (continue 테스트)",
           "names": [
             {
               "name": "i",
@@ -223,12 +223,12 @@
         }
       },
       {
-        "title": "第一个条件检查 (i=2)",
-        "explanation": "**`if i == 2:`** -- 终于，`2 == 2` 为 **True**！continue 代码块将被执行。\n\n在之前的迭代（i=0, i=1）中这个条件都是 False，但这次是 True。进入缩进块（print 和 continue）。\n\n**类比：** 2 号在第一个检查站被拦下了！这个人将被跳过（continue）处理。\n\n**执行顺序**: 检查条件(2 == 2 = True) → 进入代码块 → 第 3 行",
+        "title": "첫 번째 조건문 검사 (i=2)",
+        "explanation": "**`if i == 2:`** -- 드디어 `2 == 2`가 **True**입니다! continue 블록이 실행됩니다.\n\n이전 반복(i=0, i=1)에서는 이 조건이 False였지만, 이번에는 True입니다. 들여쓰기된 블록(print와 continue) 안으로 들어갑니다.\n\n**비유:** 2번 사람이 첫 번째 검문소에 걸렸습니다! 이 사람은 건너뛰기(continue) 처리됩니다.\n\n**실행 순서**: 조건 확인(2 == 2 = True) → 블록 진입 → line 3",
         "visualizationType": "pythonMemory",
         "code": "if i == 2:",
         "pythonMemoryState": {
-          "note": "条件 True → 第 3 行将执行",
+          "note": "조건 True → line 3 실행 예정",
           "names": [
             {
               "name": "i",
@@ -246,8 +246,8 @@
         }
       },
       {
-        "title": "输出消息",
-        "explanation": "**`print(\"Skip 2\")`** -- 在 continue 执行之前输出消息。\n\nif 条件为 True，所以按顺序执行代码块内的代码。首先输出 \"Skip 2\"，然后下一行的 `continue` 将被执行。\n\n**注意：** 这个 print 在 continue **之前**，所以会执行。如果在 continue **之后**，就不会执行。因为 continue 执行后，后面的所有代码都会被跳过。\n\n**执行顺序**: 输出 \"Skip 2\" → 第 4 行(continue)",
+        "title": "메시지 출력",
+        "explanation": "**`print(\"Skip 2\")`** -- continue 실행 직전에 메시지를 출력합니다.\n\nif 조건이 True였으므로 블록 안의 코드를 순서대로 실행합니다. 먼저 \"Skip 2\"를 출력하고, 다음 줄의 `continue`를 실행할 것입니다.\n\n**주의:** 이 print는 continue **앞에** 있으므로 실행됩니다. 만약 continue **뒤에** 있었다면 실행되지 않았을 것입니다. continue가 실행되면 그 뒤의 모든 코드는 건너뛰어지기 때문입니다.\n\n**실행 순서**: \"Skip 2\" 출력 → line 4(continue)",
         "visualizationType": "pythonMemory",
         "code": "print(\"Skip 2\")",
         "pythonMemoryState": {
@@ -272,12 +272,12 @@
         }
       },
       {
-        "title": "continue 执行",
-        "explanation": "**`continue`** -- **跳过当前迭代的所有剩余代码**，直接跳转到下一次迭代。\n\ncontinue 执行的瞬间，代码块的剩余部分（第 6、7、8、10 行的 `if i == 5`、`print(\"Stop!\")`、`break`、`print(i)`）**全部被忽略**，直接跳转到 for 循环的起点（第 1 行）。\n\n**为什么 print(i) 没有执行？** 因为 `print(i)` 在 continue 下面。当 continue 执行时，它下面的代码不会运行。所以输出中没有 `2`。\n\n**break 与 continue 的核心区别：**\n- **continue：** 只跳过本次迭代，**下一次迭代正常进行**（"这次跳过！"）\n- **break：** **终止整个循环**，不再有任何迭代（"全部结束！"）\n\n**类比：** 跳绳时绊了一次，continue 是"这次跳过，继续！"，而 break 是"不跳了！"\n\n**Python 内部原理：** continue 在字节码中通过 `JUMP_ABSOLUTE` 指令实现。直接跳转到 for 循环的 `next()` 调用点来获取下一个值。\n\n**注意：** continue 只能在**循环（for/while）内部**使用。在循环外使用会引发 `SyntaxError`。\n\n**执行顺序**: continue 执行 → 跳过第 6-10 行 → 跳转到第 1 行 → 获取下一个值(3)",
+        "title": "continue 실행",
+        "explanation": "**`continue`** -- 현재 반복의 **나머지 코드를 모두 건너뛰고** 바로 다음 반복으로 점프합니다.\n\ncontinue가 실행되는 순간, 블록의 나머지(line 6, 7, 8, 10의 `if i == 5`, `print(\"Stop!\")`, `break`, `print(i)`)를 **모두 무시하고** for 루프의 시작점(line 1)으로 바로 점프합니다.",
         "visualizationType": "pythonMemory",
         "code": "continue  # 이번 턴은 여기서 끝! 위로 올라가",
         "pythonMemoryState": {
-          "note": "continue → 跳过第 6-10 行 → 跳转到第 1 行",
+          "note": "continue → line 6-10 건너뜀 → line 1로 점프",
           "names": [
             {
               "name": "i",
@@ -295,12 +295,12 @@
         }
       },
       {
-        "title": "下一次迭代 (i=3)",
-        "explanation": "**`for i in range(10):`** -- 由于 continue，直接跳到了下一次迭代。i=3。\n\n**为什么到这里了？** 上一次迭代（i=2）中 `continue` 被执行，跳过了 `print(i)` 并直接跳转到 for 循环起点。从 `range(10)` 迭代器获取下一个值 `3` 并重新赋值给 `i`。\n\n**确认 continue 的效果：** 查看输出结果，`0`、`1` 之后 `2` **缺失**，直接跳到了 `3`。这就是 continue 的效果——2 被跳过了。\n\n**执行顺序**: continue → 跳转到第 1 行 → i = 3 → 第 2 行",
+        "title": "다음 반복 (i=3)",
+        "explanation": "**`for i in range(10):`** -- continue로 인해 바로 다음 반복으로 왔습니다. i=3입니다.\n\n**왜 여기로 왔는가?** 이전 반복(i=2)에서 `continue`가 실행되어 `print(i)`를 건너뛰고 바로 for 루프 시작점으로 점프했습니다. `range(10)` 이터레이터에서 다음 값 `3`을 가져와 `i`에 재할당합니다.\n\n**continue의 효과 확인:** 출력 결과를 보면 `0`, `1` 다음에 `2`가 **빠져있고** 바로 `3`으로 넘어갑니다. 이것이 continue의 효과입니다 -- 2는 건너뛰어졌습니다.\n\n**실행 순서**: continue → line 1 점프 → i = 3 → line 2",
         "visualizationType": "pythonMemory",
         "code": "for i in range(10):",
         "pythonMemoryState": {
-          "note": "第 4 次迭代开始（由于 continue，2 未被输出）",
+          "note": "4번째 반복 시작 (continue로 인해 2는 출력 안 됨)",
           "names": [
             {
               "name": "i",
@@ -320,8 +320,8 @@
         }
       },
       {
-        "title": "第一个条件检查 (i=3)",
-        "explanation": "**`if i == 2:`** 检查当前值 `i=3`。\n\n条件结果为 `False`。因此 `continue` 代码块不执行，流程正常进入下一个条件（`if i == 5`）。\n\n关键点：\n- `continue` 只在条件为 True 时跳过当前迭代\n- 为 False 时保持正常迭代流程\n\n**执行顺序**: `3 == 2` 判定(False) → continue 未执行 → 移动到第 6 行",
+        "title": "첫 번째 조건문 검사 (i=3)",
+        "explanation": "**`if i == 2:`**에서 현재 값 `i=3`을 검사합니다.\n\n조건 결과는 `False`입니다. 따라서 `continue` 블록은 실행되지 않고, 흐름은 그대로 다음 조건문(`if i == 5`)으로 넘어갑니다.\n\n핵심 포인트:\n- `continue`는 조건이 True일 때만 현재 반복을 건너뜁니다\n- False면 일반 반복 흐름이 유지됩니다\n\n**실행 순서**: `3 == 2` 판정(False) → continue 미실행 → line 6 이동",
         "visualizationType": "pythonMemory",
         "code": "if i == 2:",
         "pythonMemoryState": {
@@ -343,8 +343,8 @@
         }
       },
       {
-        "title": "第二个条件检查 (i=3)",
-        "explanation": "**`if i == 5:`** -- `3 == 5` 为 **False**，跳过 break 代码块。\n\ni=3 不是 5，所以 break 不执行，继续到 `print(i)`。\n\n**执行顺序**: 检查条件(3 == 5 = False) → 跳过代码块 → 第 10 行",
+        "title": "두 번째 조건문 검사 (i=3)",
+        "explanation": "**`if i == 5:`** -- `3 == 5`는 **False**이므로 break 블록을 건너뜁니다.\n\ni=3은 5가 아니므로 break가 실행되지 않고 `print(i)`로 넘어갑니다.\n\n**실행 순서**: 조건 확인(3 == 5 = False) → 블록 건너뜀 → line 10",
         "visualizationType": "pythonMemory",
         "code": "if i == 5:",
         "pythonMemoryState": {
@@ -366,8 +366,8 @@
         }
       },
       {
-        "title": "输出值 (i=3)",
-        "explanation": "**`print(i)`** -- 输出当前 `i` 的值（3）。\n\n两个条件都为 False，正常输出。\n\n**输出追踪：** `0`、`1`、`Skip 2`（continue 跳过了 2）、**`3`** → 接下来 4 也将正常输出。\n\n**执行顺序**: print(3) 执行 → 代码块结束 → 跳转到第 1 行",
+        "title": "값 출력 (i=3)",
+        "explanation": "**`print(i)`** -- 현재 `i` 값(3)을 출력합니다.\n\n두 조건문 모두 False여서 정상적으로 출력됩니다.\n\n**출력 추적:** `0`, `1`, `Skip 2`(continue로 2 건너뜀), **`3`** → 다음에 4도 정상 출력될 것입니다.\n\n**실행 순서**: print(3) 실행 → 블록 끝 → line 1로 점프",
         "visualizationType": "pythonMemory",
         "code": "print(i)",
         "pythonMemoryState": {
@@ -391,12 +391,12 @@
         }
       },
       {
-        "title": "下一次迭代 (i=4)",
-        "explanation": "**`for i in range(10):`** -- 第 5 次迭代。i=4，又是正常流程。\n\n从代码块末尾跳回第 1 行。从 `range(10)` 迭代器获取下一个值 `4` 并重新赋值给 `i`。\n\ni=4 既不是 2 也不是 5，所以 `print(4)` 将正常执行。\n\n**执行顺序**: 代码块结束 → 跳转到第 1 行 → i = 4 → 第 2 行",
+        "title": "다음 반복 (i=4)",
+        "explanation": "**`for i in range(10):`** -- 5번째 반복입니다. i=4로, 이번에도 정상 흐름입니다.\n\n블록 끝에서 다시 line 1로 점프했습니다. `range(10)` 이터레이터에서 다음 값 `4`를 가져와 `i`에 재할당합니다.\n\ni=4는 2도 아니고 5도 아니므로 정상적으로 `print(4)`가 실행될 것입니다.\n\n**실행 순서**: 블록 끝 → line 1 점프 → i = 4 → line 2",
         "visualizationType": "pythonMemory",
         "code": "for i in range(10):",
         "pythonMemoryState": {
-          "note": "第 5 次迭代开始",
+          "note": "5번째 반복 시작",
           "names": [
             {
               "name": "i",
@@ -416,8 +416,8 @@
         }
       },
       {
-        "title": "第一个条件检查 (i=4)",
-        "explanation": "**`if i == 2:`** 检查当前值 `i=4`。\n\n条件同样为 `False`。所以 `continue` 不会触发，本次迭代也沿正常路径进行。\n\n关键点：\n- 没有 `continue` 时，后面的代码（第二个 if、print）正常执行\n- 唯一被跳过的迭代是 `i==2` 时\n\n**执行顺序**: `4 == 2` 判定(False) → continue 未执行 → 移动到第 6 行",
+        "title": "첫 번째 조건문 검사 (i=4)",
+        "explanation": "**`if i == 2:`**에서 현재 값 `i=4`를 검사합니다.\n\n역시 조건은 `False`입니다. 그래서 `continue`는 발동하지 않고, 이번 턴도 정상 경로로 진행됩니다.\n\n짚고 갈 포인트:\n- `continue`가 없으면 그 아래 코드(두 번째 if, print)가 그대로 실행됩니다\n- 즉, \"건너뛰는 턴\"은 `i==2`일 때뿐입니다\n\n**실행 순서**: `4 == 2` 판정(False) → continue 미실행 → line 6 이동",
         "visualizationType": "pythonMemory",
         "code": "if i == 2:",
         "pythonMemoryState": {
@@ -439,8 +439,8 @@
         }
       },
       {
-        "title": "第二个条件检查 (i=4)",
-        "explanation": "**`if i == 5:`** -- `4 == 5` 为 **False**，跳过 break 代码块。\n\ni=4 不是 5，所以 break 不执行，继续到 `print(i)`。下一次迭代（i=5）中 break 终于会执行。\n\n**执行顺序**: 检查条件(4 == 5 = False) → 跳过代码块 → 第 10 行",
+        "title": "두 번째 조건문 검사 (i=4)",
+        "explanation": "**`if i == 5:`** -- `4 == 5`는 **False**이므로 break 블록을 건너뜁니다.\n\ni=4는 5가 아니므로 break가 실행되지 않고 `print(i)`로 넘어갑니다. 다음 반복(i=5)에서 드디어 break가 실행될 것입니다.\n\n**실행 순서**: 조건 확인(4 == 5 = False) → 블록 건너뜀 → line 10",
         "visualizationType": "pythonMemory",
         "code": "if i == 5:",
         "pythonMemoryState": {
@@ -462,8 +462,8 @@
         }
       },
       {
-        "title": "输出值 (i=4)",
-        "explanation": "**`print(i)`** -- 输出当前 `i` 的值（4）。这是 break 之前的最后一次正常输出。\n\n两个条件都为 False，正常输出。\n\n**输出追踪：** `0`、`1`、`Skip 2`、`3`、**`4`** → 下一次 i=5 时 break 将完全终止循环。\n\n**执行顺序**: print(4) 执行 → 代码块结束 → 跳转到第 1 行",
+        "title": "값 출력 (i=4)",
+        "explanation": "**`print(i)`** -- 현재 `i` 값(4)을 출력합니다. break 직전의 마지막 정상 출력입니다.\n\n두 조건문 모두 False여서 정상적으로 출력됩니다.\n\n**출력 추적:** `0`, `1`, `Skip 2`, `3`, **`4`** → 다음에 i=5가 되면 break로 루프가 완전히 종료됩니다.\n\n**실행 순서**: print(4) 실행 → 블록 끝 → line 1로 점프",
         "visualizationType": "pythonMemory",
         "code": "print(i)",
         "pythonMemoryState": {
@@ -487,12 +487,12 @@
         }
       },
       {
-        "title": "下一次迭代 (i=5)",
-        "explanation": "**`for i in range(10):`** -- 第 6 次迭代。这次 `break` 将执行，循环将完全终止！\n\n从代码块末尾跳回第 1 行。从 `range(10)` 迭代器获取下一个值 `5` 并重新赋值给 `i`。\n\n**重要：** 本次迭代中 `if i == 5` 将为 True，`break` 将执行。整个循环终止，i=6、7、8、9 将**永远不会被处理**。\n\n**执行顺序**: 代码块结束 → 跳转到第 1 行 → i = 5 → 第 2 行（break 测试！）",
+        "title": "다음 반복 (i=5)",
+        "explanation": "**`for i in range(10):`** -- 6번째 반복입니다. 이번에 `break`가 실행되어 루프가 완전히 종료됩니다!\n\n블록 끝에서 다시 line 1로 점프했습니다. `range(10)` 이터레이터에서 다음 값 `5`를 가져와 `i`에 재할당합니다.\n\n**중요:** 이번 반복에서 `if i == 5`가 True가 되어 `break`가 실행됩니다. 루프 전체가 종료되므로 i=6, 7, 8, 9는 **절대 처리되지 않습니다**.\n\n**실행 순서**: 블록 끝 → line 1 점프 → i = 5 → line 2 (break 테스트!)",
         "visualizationType": "pythonMemory",
         "code": "for i in range(10):",
         "pythonMemoryState": {
-          "note": "第 6 次迭代开始（break 测试）",
+          "note": "6번째 반복 시작 (break 테스트)",
           "names": [
             {
               "name": "i",
@@ -512,8 +512,8 @@
         }
       },
       {
-        "title": "第一个条件检查 (i=5)",
-        "explanation": "**`if i == 2:`** -- `5 == 2` 为 **False**，跳过 continue 代码块。\n\ni=5 不是 2，所以 continue 不执行。移动到下一个条件（if i == 5）。\n\n**执行顺序**: 检查条件(5 == 2 = False) → 跳过代码块 → 第 6 行",
+        "title": "첫 번째 조건문 검사 (i=5)",
+        "explanation": "**`if i == 2:`** -- `5 == 2`는 **False**이므로 continue 블록을 건너뜁니다.\n\ni=5는 2가 아니므로 continue는 실행되지 않습니다. 다음 조건문(if i == 5)으로 넘어갑니다.\n\n**실행 순서**: 조건 확인(5 == 2 = False) → 블록 건너뜀 → line 6",
         "visualizationType": "pythonMemory",
         "code": "if i == 2:",
         "pythonMemoryState": {
@@ -535,12 +535,12 @@
         }
       },
       {
-        "title": "第二个条件检查 (i=5)",
-        "explanation": "**`if i == 5:`** -- 终于，`5 == 5` 为 **True**！break 代码块将被执行。\n\n在之前的迭代中这个条件一直为 False，但这次第一次变成了 True。进入缩进块（print 和 break）。\n\n**类比：** 5 号在第二个检查站被拦下了！这次不是跳过（continue），而是完全停止审查（break）。\n\n**执行顺序**: 检查条件(5 == 5 = True) → 进入代码块 → 第 7 行",
+        "title": "두 번째 조건문 검사 (i=5)",
+        "explanation": "**`if i == 5:`** -- 드디어 `5 == 5`가 **True**입니다! break 블록이 실행됩니다.\n\n이전 반복에서는 이 조건이 항상 False였지만, 이번에 처음으로 True가 되었습니다. 들여쓰기된 블록(print와 break) 안으로 들어갑니다.\n\n**비유:** 5번 사람이 두 번째 검문소에 걸렸습니다! 이번에는 건너뛰기(continue)가 아니라 심사 중단(break)입니다.\n\n**실행 순서**: 조건 확인(5 == 5 = True) → 블록 진입 → line 7",
         "visualizationType": "pythonMemory",
         "code": "if i == 5:",
         "pythonMemoryState": {
-          "note": "条件 True → 第 7 行将执行",
+          "note": "조건 True → line 7 실행 예정",
           "names": [
             {
               "name": "i",
@@ -558,8 +558,8 @@
         }
       },
       {
-        "title": "输出消息",
-        "explanation": "**`print(\"Stop!\")`** -- 在 break 执行之前输出终止消息。\n\nif 条件为 True，所以按顺序执行代码块内的代码。输出 \"Stop!\" 后，下一行的 `break` 将执行，循环完全终止。\n\n**注意：** 和 continue 一样，这个 print 在 break **之前**，所以会执行。即使 break 后面有代码也不会运行。\n\n**执行顺序**: 输出 \"Stop!\" → 第 8 行(break)",
+        "title": "메시지 출력",
+        "explanation": "**`print(\"Stop!\")`** -- break 실행 직전에 종료 메시지를 출력합니다.\n\nif 조건이 True였으므로 블록 안의 코드를 순서대로 실행합니다. \"Stop!\"을 출력한 후, 다음 줄의 `break`가 실행되어 루프가 완전히 종료됩니다.\n\n**주의:** continue 때와 마찬가지로, 이 print는 break **앞에** 있으므로 실행됩니다. break 뒤에 코드가 있어도 실행되지 않습니다.\n\n**실행 순서**: \"Stop!\" 출력 → line 8(break)",
         "visualizationType": "pythonMemory",
         "code": "print(\"Stop!\")",
         "pythonMemoryState": {
@@ -584,12 +584,12 @@
         }
       },
       {
-        "title": "break 执行",
-        "explanation": "**`break`** -- **立即终止整个循环。** 完全退出循环。\n\nbreak 执行的瞬间，for 循环彻底结束。尽管 `range(10)` 中还剩余 6、7、8、9，但**不再向迭代器请求 `next()`**。直接跳转到循环外的下一段代码（在这个程序中，循环外没有代码，所以程序结束）。\n\n**continue 和 break 的最终对比：**\n- **continue**（在 i=2 时执行）：只跳过本次迭代，**下一次迭代继续** → 从 i=3 正常进行\n- **break**（在 i=5 时执行）：**终止整个循环** → i=6、7、8、9 永远不会被处理\n\n**完整输出结果：** `0`、`1`、`Skip 2`、`3`、`4`、`Stop!`（2 被跳过，在 5 停止，6~9 未被处理）\n\n**类比：** 在 10 人的队列中，2 号被跳过（continue），在 5 号时审查完全中断（break）。6~9 号没有接受审查。\n\n**Python 内部原理：** break 在字节码中通过 `BREAK_LOOP`（Python 3.8 之前）或 `JUMP_FORWARD`（Python 3.8+）指令实现。直接跳转到 for 循环结束之后的位置。\n\n**注意：** break 只终止它所在的**最内层循环**。在嵌套循环（`for` 中的 `for`）中，要退出外层循环，需要使用单独的标志变量或函数的 `return`。\n\n**执行顺序**: break 执行 → 完全退出 for 循环 → 程序结束",
+        "title": "break 실행",
+        "explanation": "**`break`** -- 반복문 **전체를 즉시 종료**합니다. 루프 밖으로 완전히 탈출합니다.\n\nbreak가 실행되는 순간, for 루프가 완전히 끝나버립니다. `range(10)`에 아직 6, 7, 8, 9가 남아있지만, **더 이상 이터레이터에 `next()`를 요청하지 않습니다**. 루프 밖의 다음 코드로 바로 점프합니다 (이 프로그램에서는 루프 밖에 코드가 없으므로 프로그램이 종료됩니다).",
         "visualizationType": "pythonMemory",
         "code": "break     # 반복문 전체 종료!",
         "pythonMemoryState": {
-          "note": "break → 循环终止（i=6~9 不会执行）",
+          "note": "break → 루프 종료 (i=6~9는 실행 안 됨)",
           "names": [
             {
               "name": "i",
@@ -610,22 +610,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "遇到 break 时会发生什么？",
+    "question": "遇到中断时会发生以下哪项操作？",
     "options": [
-      "整个程序完全终止",
-      "退出当前所在的循环",
-      "跳到下一行",
+      "程序完全终止",
+      "完全跳出当前循环",
+      "移至下一行",
       "返回到循环的开头"
     ],
     "correctIndex": 1,
-    "explanation": "break 会立即终止它所在的最近的循环（for/while）。"
+    "explanation": "Break 立即结束包含它的最近一个循环（for/while）。"
   },
   "misconceptions": [
     {
-      "wrong": "在嵌套循环中使用 break 会退出所有循环",
-      "correct": "不是的。\n只会退出最内层的循环。",
-      "why": "要一次退出多个循环，需要使用单独的标志（flag）变量。"
+      "wrong": "중첩 반복문에서 break하면 다 빠져나간다",
+      "correct": "아닙니다.\n가장 안쪽의 반복문 하나만 탈출합니다.",
+      "why": "여러 개를 한 번에 나가려면 별도의 플래그(flag) 변수를 써야 합니다."
     }
   ],
-  "keyTakeaway": "continue 是"跳到下一个"，break 是"停下来"。"
+  "keyTakeaway": "continue는 '다음 순서로', break는 '그만해'."
 }

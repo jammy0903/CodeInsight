@@ -1,13 +1,13 @@
 {
   "lessonId": "c-5-1",
   "title": "Stack vs Heap",
-  "concept": "The stack is automatic but small; the heap is manual but vast",
+  "concept": "Stack is automatic but narrow, heap is manual but wide",
   "content": {
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int stackErr[1000];\n\n    int *heapArr = (int*)malloc(sizeof(int) * 10000000);\n\n    if (heapArr != NULL) {\n        printf(\"Heap allocation success!\\n\");\n        free(heapArr);\n    }\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
-        "explanation": "We include `#include <stdio.h>` to use `printf`.\n\nThis lesson compares the different roles of the stack and the heap.",
+        "title": "Include stdio.h header",
+        "explanation": "Include `#include <stdio.h>` for use with `printf`.\n\nThis lesson compares the differences in roles between the stack and the heap.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,14 +15,14 @@
         "stdout": ""
       },
       {
-        "title": "Including stdlib.h header",
-        "explanation": "We include `#include <stdlib.h>` to use `malloc`/`free`.\n\nHeap memory is managed directly through functions from this header.",
+        "title": "Include stdlib.h header",
+        "explanation": "Include `#include <stdlib.h>` for `malloc`/`free` use.\n\nHeap memory is managed directly by functions in this header.",
         "visualizationType": "cMemory",
         "code": "#include <stdlib.h>"
       },
       {
-        "title": "Defining the main function",
-        "explanation": "The main frame is created.\n\nNow we will compare a stack array and a heap allocation in the same code.",
+        "title": "main function definition",
+        "explanation": "The main frame is created.\n\nNow compare stack array and heap allocation in the same code.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -35,8 +35,8 @@
         ]
       },
       {
-        "title": "Declaring an array on the stack",
-        "explanation": "An integer array is created on the stack.\n\nStack memory is fast and automatically freed, but has a limited size.",
+        "title": "Declare array on stack",
+        "explanation": "An array of integers is created on the stack.\n\nStack memory is fast and automatically freed, but has small size limits.",
         "visualizationType": "cMemory",
         "code": "int stackErr[1000];",
         "stack": [
@@ -50,7 +50,7 @@
       },
       {
         "title": "Allocating memory on the heap (malloc)",
-        "explanation": "`malloc` requests a large contiguous block of memory on the heap, and stores the starting address in a pointer.\n\nThe actual data lives on the heap; only the pointer holding the address remains on the stack.",
+        "explanation": "With `malloc` we request a large piece of contiguous memory from the heap and store its starting address in a pointer.\n\nThe actual data is in the heap, and only a pointer containing the address remains on the stack.",
         "visualizationType": "cMemory",
         "code": "int *heapArr = (int*)malloc(sizeof(int) * 10000000);",
         "stack": [
@@ -76,21 +76,21 @@
         ]
       },
       {
-        "title": "Checking heap allocation success",
-        "explanation": "We check whether the allocation succeeded with `heapArr != NULL`.\n\nDereferencing a NULL pointer is dangerous, so checking before use is essential.",
+        "title": "Check heap allocation success",
+        "explanation": "Check whether allocation was successful with `heapArr != NULL`.\n\nDereferencing in case of failure is dangerous, so confirmation before use is essential.",
         "visualizationType": "cMemory",
         "code": "if (heapArr != NULL) {"
       },
       {
-        "title": "Printing success message",
-        "explanation": "We print the heap allocation success status.",
+        "title": "Print success message",
+        "explanation": "Outputs the heap allocation success status.",
         "visualizationType": "cMemory",
         "code": "printf(\"Heap allocation success!\\n\");",
         "stdout": "Heap allocation success!"
       },
       {
-        "title": "Freeing heap memory (free)",
-        "explanation": "`free(heapArr)` returns the heap memory back to the system.\n\nDynamic allocations must always be paired with a corresponding free.",
+        "title": "Free heap memory",
+        "explanation": "Free the heap memory with `free(heapArr)`.\n\nDynamic allocations must be managed in pairs until freed.",
         "visualizationType": "cMemory",
         "code": "free(heapArr);",
         "stack": [
@@ -111,8 +111,8 @@
         "heap": []
       },
       {
-        "title": "Program termination",
-        "explanation": "The program ends with `return 0;`.\n\nKey point: The stack is automatic; the heap requires manual management.",
+        "title": "Program exit",
+        "explanation": "Exit with `return 0;`.\n\nBottom line: Stack is automatic, heap is manually managed.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -121,22 +121,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "In which situation should you use the Heap?",
+    "question": "In which of the following situations should the Heap area be used?",
     "options": [
-      "When storing just a single variable (int)",
-      "For temporary variables that can disappear when the function ends",
-      "When you need to create a large array whose size is determined dynamically at runtime",
-      "When you need the fastest possible speed"
+      "When storing only one variable (int)",
+      "Temporary variable that can disappear when the function ends",
+      "When you need to create an array as large (dynamically) as the size entered by the user.",
+      "When you need the fastest speed"
     ],
     "correctIndex": 2,
-    "explanation": "When the array size is not known at compile time (dynamic), or when dealing with very large data, you should use the heap."
+    "explanation": "When the array size is not determined at compile time (dynamic) or when dealing with very large data, the heap must be used."
   },
   "misconceptions": [
     {
-      "wrong": "The heap is faster than the stack",
-      "correct": "The stack is much faster.",
-      "why": "The stack is a simple structure managed directly by the CPU, while the heap requires complex algorithms to search for free space."
+      "wrong": "Heap is faster than Stack",
+      "correct": "Stack is much faster.",
+      "why": "This is because the Stack is a simple structure directly managed by the CPU, but the Heap requires a complex algorithm to search for empty space."
     }
   ],
-  "keyTakeaway": "Small and fast? Use the stack. Large and long-lived? Use the heap."
+  "keyTakeaway": "A small and fast thing is a stack, a big and long-lasting thing is a heap."
 }

@@ -1,13 +1,13 @@
 {
   "lessonId": "c-6-1",
   "title": "String Memory Structure",
-  "concept": "C has no 'string type'. It just uses a character array with a 0 at the end.",
+  "concept": "There is no ‘string type’ in C language. It is simply written by adding 0 to the end of the character array.",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    char str[] = \"Code\";\n\n    printf(\"String: %s\\n\", str);\n    printf(\"Size:   %zu\\n\", sizeof(str));\n\n    printf(\"[%c] [%c] [%c] [%c] [%d]\\n\",\n           str[0], str[1], str[2], str[3], str[4]);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
-        "explanation": "Standard I/O header for using `printf`.\n\nThis lesson examines how strings are stored as `char` arrays.",
+        "title": "Include stdio.h header",
+        "explanation": "Standard input/output header for using `printf`.\n\nThis lesson examines how strings are stored as `char` arrays.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting main function",
-        "explanation": "The main frame is created.\n\nWe will see step by step how a string literal is placed into an array.",
+        "title": "Start main function",
+        "explanation": "The main frame is created.\n\nSee step by step how string literals go into an array.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Declaring a string as a char array",
-        "explanation": "`char str[] = \"Code\";` creates an array with 4 characters plus the null terminator `\\0`.\n\nSo the actual array size is 5.",
+        "title": "Declare a string as an array of characters",
+        "explanation": "`char str[] = \"Code\";` creates an array containing four characters plus the terminating character `\\0`.\n\nThat is, the actual array size will be 5.",
         "visualizationType": "cMemory",
         "code": "char str[] = \"Code\";",
         "stack": [
@@ -43,22 +43,22 @@
         ]
       },
       {
-        "title": "Printing the string (%s)",
-        "explanation": "`%s` prints characters until it encounters `\\0`.\n\nThat is why only the text portion of `str` appears as a normal string.",
+        "title": "String output (%s)",
+        "explanation": "`%s` prints characters until it encounters `\\0`.\n\nSo only the text part of `str` appears as a normal string.",
         "visualizationType": "cMemory",
         "code": "printf(\"String: %s\\n\", str);",
         "stdout": "String: Code"
       },
       {
-        "title": "Checking total array size (sizeof)",
-        "explanation": "`sizeof(str)` returns the total byte count of the array.\n\nSince the return type is `size_t`, the format specifier `%zu` is used.",
+        "title": "Check the total size of an array (sizeof)",
+        "explanation": "`sizeof(str)` returns the total number of bytes in the array.\n\nSince the return type is `size_t`, the output format uses `%zu`.",
         "visualizationType": "cMemory",
         "code": "printf(\"Size:   %zu\\n\", sizeof(str));",
         "stdout": "String: Code\nSize:   5"
       },
       {
-        "title": "Examining array contents directly",
-        "explanation": "Printing each element by index reveals the null terminator value (0) at the end.\n\nThe key point is that strings end with an invisible `\\0`.",
+        "title": "Check array contents directly",
+        "explanation": "If you print each column by index, you can also check the ending character value (0) at the end.\n\nThe key point is that the string ends with an invisible `\\0`.",
         "visualizationType": "cMemory",
         "code": "printf(\"[%c] [%c] [%c] [%c] [%d]\\n\",",
         "highlightOffset": [
@@ -68,8 +68,8 @@
         "stdout": "String: Code\nSize:   5\n[C] [o] [d] [e] [0]"
       },
       {
-        "title": "Program termination",
-        "explanation": "The program ends with `return 0;`.\n\nKey point: When a string literal is copied into an array, the null terminator is included.",
+        "title": "Program exit",
+        "explanation": "Exit with `return 0;`.\n\nKey point: String literals even include the terminating character when copied into an array.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -78,22 +78,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "Why is char buf[5] = \"Hello\"; dangerous?",
+    "question": "char buf[5] = \"Hello\"; Why is it dangerous?",
     "options": [
-      "It wastes memory",
-      "There is no room for the trailing \\0, so it is not recognized as a string",
-      "It causes a compile error",
-      "There is no problem"
+      "It's a waste of memory",
+      "It is not recognized as a string because there is no final \\0 space.",
+      "A compilation error occurs",
+      "no problem"
     ],
     "correctIndex": 1,
-    "explanation": "\"Hello\" has 5 characters, but requires 6 slots including `\\0`.\nForcing it into `buf[5]` means there is no end marker, so printing will read past the buffer into adjacent memory (the start of Buffer Overflow)."
+    "explanation": "\"Hello\" has 5 characters, but requires 6 spaces including `\\0`.\nIf you force it into `buf[5]`, there is no end mark, so when output, a line appears all the way to the back memory (the beginning of Buffer Overflow)."
   },
   "misconceptions": [
     {
-      "wrong": "You can get the string length with `sizeof`",
+      "wrong": "The length of a string can be found with `sizeof`.",
       "correct": "In most cases, you should use `strlen`.",
-      "why": "`sizeof` returns the total size of the container (array), while `strlen` returns the actual content length (up to `\\0`)."
+      "why": "`sizeof` is the overall size of the container (array), and `strlen` is the actual length of its contents (before `\\0`)."
     }
   ],
-  "keyTakeaway": "In C, a string is a `char` array ending with `0`. Always remember the `+1` slot."
+  "keyTakeaway": "In C, a string is a `char` array terminated with `0`. Always remember the `+1` field."
 }

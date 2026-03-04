@@ -1,13 +1,13 @@
 {
   "lessonId": "c-2-2",
-  "title": "Pointer Declaration (*): A Variable That Stores Addresses",
-  "concept": "A pointer is a special variable that stores an 'address'",
+  "title": "Pointer declaration (*): Variable containing address",
+  "concept": "A pointer is a special variable that stores an ‘address’.",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int num = 10;\n\n    int *ptr = &num;\n\n    printf(\"num value:   %d\\n\", num);\n    printf(\"num address: %p\\n\", &num);\n    printf(\"ptr value:   %p\\n\", ptr);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h Header",
-        "explanation": "Header for I/O functions like ```printf```. It's processed during the preprocessing stage before compilation, so there's no memory change.",
+        "title": "Include stdio.h header",
+        "explanation": "Header for using input/output functions such as ```printf```. Since it is processed in the preprocessing stage before compilation, there is no memory change.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting the main Function",
-        "explanation": "The program starts — ```main```'s **stack frame** is created on the stack, and ```num``` and ```ptr``` will be placed inside it.",
+        "title": "Start main function",
+        "explanation": "Program startup — A **stack frame** of ```main``` is created on the stack, and ```num``` and ```ptr``` are placed inside it.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Declaring an Integer Variable",
-        "explanation": "A **4-byte** space (```0x1000```) is allocated in the stack frame, and the integer ```10``` is stored.\n\nAs we learned in the previous lesson, variable ```num``` has two properties: a **value (10)** and an **address (0x1000)**. This address is exactly the value that will be stored in the pointer in the next step.",
+        "title": "Integer variable declaration",
+        "explanation": "**4 bytes** space (```0x1000```) is secured in the stack frame, and the integer ````10```` is stored.\n\nAs you learned in the previous lesson, the variable ```num``` has two properties: **value(10)** and **address(0x1000)**. This address is the value that will be stored in the pointer in the next step.",
         "visualizationType": "cMemory",
         "code": "int num = 10;",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "Declaring and Initializing a Pointer Variable",
-        "explanation": "`int *ptr = &num;` stores `num`'s address in the pointer `ptr`.\n\nIn a declaration, `*` indicates a pointer type, but in an expression, `*ptr` means dereferencing (accessing the pointed-to value) — the meaning is different.",
+        "title": "Declaring and initializing pointer variables",
+        "explanation": "`int *ptr = &num;` stores the address of `num` in the pointer `ptr`.\n\nIn the declaration, `*` indicates a pointer type, and in the expression, `*ptr` is a dereference (access to the pointed value), so their meaning is different.",
         "visualizationType": "cMemory",
         "code": "int *ptr = &num;",
         "stack": [
@@ -64,29 +64,29 @@
         ]
       },
       {
-        "title": "Printing num's Value",
-        "explanation": "When you write ```num```, the compiler reads the **value (10)** from address ```0x1000```. This is the **direct** way of accessing a variable by its name.\n\nIn the next step, compare this with the **indirect** method through a pointer.",
+        "title": "Print the value of num",
+        "explanation": "If you write ```num```, the compiler reads **value (10)** from address ```0x1000```. This is a **direct method** of directly accessing the variable name.\n\nLet's compare it with the **indirect method** via pointers in the next step.",
         "visualizationType": "cMemory",
         "code": "printf(\"num value:   %d\\n\", num);",
         "stdout": "num value:   10"
       },
       {
-        "title": "Printing num's Address",
-        "explanation": "```&num``` — using the **address operator** from the previous lesson, we print ```num```'s address ```0x1000``` with the ```%p``` format.\n\nRemember this result. When we print ```ptr```'s value in the next step, we'll get **exactly the same number** — that's the concrete meaning of 'a pointer points to'.",
+        "title": "Print address of num",
+        "explanation": "```&num``` — Use the **address operator** from the previous lesson to output the address ```0x1000``` of ```num``` in ```%p``` format.\n\nLet's keep this result in mind. In the next step, printing the value of ``ptr``` yields **exactly the same number** — that's what it specifically means to 'point to'.",
         "visualizationType": "cMemory",
         "code": "printf(\"num address: %p\\n\", &num);",
         "stdout": "num value:   10\nnum address: 0x1000"
       },
       {
-        "title": "Printing ptr's Value",
-        "explanation": "Printing `ptr` shows the same address value as `&num`.\n\nTo summarize: `num` is the value, `&num` is num's address, and `ptr` is a variable that stores that address.",
+        "title": "Print value of ptr",
+        "explanation": "If you print `ptr`, the same address value as `&num` appears.\n\nTo summarize, `num` is the value, `&num` is the address of num, and `ptr` is the variable that stores the address.",
         "visualizationType": "cMemory",
         "code": "printf(\"ptr value:   %p\\n\", ptr);",
         "stdout": "num value:   10\nnum address: 0x1000\nptr value:   0x1000"
       },
       {
-        "title": "Program Termination",
-        "explanation": "```return 0``` — the stack frame is removed and both ```num``` and ```ptr``` disappear from memory.\n\nKey takeaways: ```int *ptr``` -> pointer declaration, ```ptr = &num``` -> pointer points to num, ```ptr```'s value equals ```&num``` -> the actual meaning of 'pointing to'.",
+        "title": "Program exit",
+        "explanation": "```return 0``` — The stack frame is removed, causing both ```num``` and ```ptr``` to disappear from memory.\n\nThe essence of this lesson: ````int *ptr``` → pointer declaration, ```ptr = &num``` → point the pointer to num, the value of ```ptr``` and ```&num``` are the same → the actual meaning of 'points to'.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
@@ -96,7 +96,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "Which is the correct pointer declaration? (targeting a double variable)",
+    "question": "Which of the following is a valid pointer declaration? (Target is a double variable)",
     "options": [
       "pointer double p;",
       "double p;",
@@ -104,14 +104,14 @@
       "double *p;"
     ],
     "correctIndex": 3,
-    "explanation": "In C, pointer types are declared using the format `type *name`."
+    "explanation": "In C language, pointer types are declared in the format `type *name`."
   },
   "misconceptions": [
     {
       "wrong": "The meaning of * is always the same",
-      "correct": "The `*` in a declaration (`int *p`) and in usage (`*p = 10`) have **completely different** meanings.",
-      "why": "In a declaration, `*` indicates a type. In an expression, `*` is the dereference operator.\nYou must pay attention to the context."
+      "correct": "The meaning when declared (`int *p`) and when used (`*p = 10`) is **completely different**.",
+      "why": "`*` in the declaration part is a ‘type indicator’, and `*` in the usage part is a ‘dereference operator’.\nYou have to look at the context carefully."
     }
   ],
-  "keyTakeaway": "`int *p` is a variable that stores an integer's address. Connect it with `p = &a`."
+  "keyTakeaway": "`int *p` is a variable that holds an integer address. Connect with `p = &a`."
 }

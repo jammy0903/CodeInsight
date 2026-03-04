@@ -6,8 +6,8 @@
     "code": "#include <stdio.h>\n\nint main() {\n    int temperature = 35;\n\n    if (temperature >= 30) {\n        printf(\"It's hot!\\n\");\n    } else if (temperature >= 20) {\n        printf(\"Nice weather!\\n\");\n    } else {\n        printf(\"It's cold!\\n\");\n    }\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "main 函数开始",
-        "explanation": "**`int main() {`** -- 程序的入口点。当 `main` 被调用时，栈上会创建一个**栈帧（Stack Frame）**。\n\n本课使用一个 `temperature` 变量来学习如何**根据条件进行程序流程分支**。",
+        "title": "启动主函数",
+        "explanation": "**`int main() {`** — 程序的起点。当调用“main”时，会在堆栈上创建一个**堆栈帧**。\n\n在本课程中，您将学习如何使用单个“温度”变量根据条件对程序流程进行分支。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -22,8 +22,8 @@
         "stdout": ""
       },
       {
-        "title": "初始化温度变量",
-        "explanation": "**`int temperature = 35;`** -- 声明整型变量 `temperature` 并初始化为 **35**。这一行在栈帧中分配了 4 字节空间，并将 `35` 存入其中。",
+        "title": "温度变量初始化",
+        "explanation": "**`int temp = 35;`** — 声明一个整型变量 `temper` 并将其初始化为 **35**。在这一行中，在堆栈帧内保留了 4 个字节的空间，并且“35”存储在该空间中。",
         "code": "int temperature = 35;",
         "stack": [
           {
@@ -42,8 +42,8 @@
         ]
       },
       {
-        "title": "评估 if 条件（真）",
-        "explanation": "**`if (temperature >= 30) {`** -- 本课的核心：**if 语句**。如果括号内的条件为**真（非零值）**，则执行大括号内的代码；如果为**假（0）**，则跳过。",
+        "title": "评估 if 条件（true）",
+        "explanation": "**`if (温度 >= 30) {`** — 这是 **if 语句** 出现的地方，也是本课的核心。如果括号内的条件为**真（非零）**，则执行大括号内的代码，如果为**假（0）**，则跳过。",
         "code": "if (temperature >= 30) {",
         "stack": [
           {
@@ -61,15 +61,15 @@
         ]
       },
       {
-        "title": "执行真分支（输出）",
-        "explanation": "**`printf(\"It's hot!\\n\");`** -- 由于条件为真，这行被执行，屏幕上输出 `It's hot!`。\n\nif-else if-else 链最重要的规则是：一旦某个条件为真，只执行该块，其余的 `else if` 和 `else` **全部跳过**。",
+        "title": "执行正确的分支（输出）",
+        "explanation": "**`printf(\"It's hot!\\n\");`** — 由于条件为 true，因此执行此行并将 `It's hot!` 打印到屏幕上。\n\nif-else if-else 链最重要的规则是，如果一个条件为 true，则仅执行该块，其余的 else if 和 else 都是无条件的。",
         "visualizationType": "terminal",
         "code": "printf(\"It's hot!\\n\");",
         "stdout": "It's hot!"
       },
       {
-        "title": "跳过 else if / else",
-        "explanation": "**`} else if (temperature >= 20) {`** -- 由于前面的 `if` 条件已经为真，这个 `else if` 和下面的 `else` 块被**完全跳过，甚至不会被评估**。表达式 `temperature >= 20` 不会被执行。",
+        "title": "否则如果/否则跳过",
+        "explanation": "**`} else if (温度 >= 20) {`** — 由于前面的 `if` 条件已经为真，因此这个 `else if` 和下面的 `else` 块**甚至不被评估**并且被完全跳过。不执行条件表达式“温度 >= 20”。",
         "visualizationType": "cMemory",
         "code": "} else if (temperature >= 20) {",
         "stack": [
@@ -89,8 +89,8 @@
         "stdout": "It's hot!"
       },
       {
-        "title": "程序终止",
-        "explanation": "**`return 0;`** -- 条件分支结束后程序正常终止。`return 0` 向操作系统发出"一切正常结束"的信号，随着 main 的栈帧被释放，`temperature` 也从内存中消失。",
+        "title": "程序退出",
+        "explanation": "**`return 0;`** — 条件分支结束，程序正常终止。 `return 0` 是向操作系统发出的一个信号，表示“没有问题地完成了”，并且当 main 的堆栈帧被释放时，`temperary` 也会从内存中删除。",
         "code": "return 0;",
         "stack": []
       }
@@ -98,22 +98,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "当 temperature 为 20 时，以下代码的输出结果是什么？\n\nif (temperature >= 30) printf(\"A\");\nelse if (temperature >= 20) printf(\"B\");\nelse if (temperature >= 10) printf(\"C\");",
+    "question": "当温度为20时，下面代码的输出结果是什么？\n\nif (温度 >= 30) printf(\"A\");\n否则 if (温度 >= 20) printf(\"B\");\n否则 if (温度 >= 10) printf(\"C\");",
     "options": [
-      "A",
-      "B",
-      "BC",
+      "一个",
+      "乙",
+      "公元前",
       "ABC"
     ],
     "correctIndex": 1,
-    "explanation": "if-else if 链从上到下依次检查条件，只执行第一个为真的条件所对应的块。\n当 temperature = 20 时，第一个条件（>= 30）为假，第二个（>= 20）为真，所以只输出 B。\n第三个（>= 10）虽然也为真，但因为第二个已经匹配，所以不会执行。"
+    "explanation": "if-else if 链从顶部开始按顺序检查，仅执行条件第一次为 true 的块。\n如果温度 = 20，则第一个 (>= 30) 为 false，第二个 (>= 20) 为 true，因此仅输出 B。\n第三个（>= 10）也是如此，但它没有被执行，因为它已经被第二个捕获了。"
   },
   "misconceptions": [
     {
-      "wrong": "else if 的条件总是会被检查",
-      "correct": "如果前面的 if 或 else if 中有一个为真，后面所有的 else if / else 都会被跳过。",
-      "why": "if-else if-else 形成一个"链"，找到第一个为真的块后，其余全部忽略。"
+      "wrong": "else if 条件也总是被检查",
+      "correct": "如果前面的 if 或 else if 之一为真，则跳过其后的所有 else if / else 。",
+      "why": "if-else If-else 连接成一条“链”，因此当找到第一个 true 块时，其余块将被忽略。"
     }
   ],
-  "keyTakeaway": "if-else if-else 链从上到下检查条件，只执行第一个条件为真的块。"
+  "keyTakeaway": "if-else if-else 链从顶部检查条件，仅执行第一个为 true 的块。"
 }

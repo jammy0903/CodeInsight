@@ -200,7 +200,6 @@ export class JSTransformer implements IFlowTransformer {
         // 형태: {methodName, className, variables: {...}} - 시뮬레이터 출력
         if (isStackFrameItem(item)) {
           const frameName = item.methodName || '__main__';
-          const frameVarIds = getFrameVarIds(frameName);
           const frameVariables = item.variables;
 
           if (frameVariables && typeof frameVariables === 'object') {
@@ -244,13 +243,18 @@ export class JSTransformer implements IFlowTransformer {
                 }
               }
 
+              const destinationFrame = frameName === '__main__' && this.isFunctionLike(type, value)
+                ? 'Functions'
+                : frameName;
+              const frameVarIds = getFrameVarIds(destinationFrame);
+
               const variable: FlowVariable = {
-                id: `${frameName}-${varName}`,
+                id: `${destinationFrame}-${varName}`,
                 name: varName,
                 value,
                 type,
                 state: 'idle',
-                scope: frameName,
+                scope: destinationFrame,
                 isPointer: !!pointsToAddr,
                 pointsTo: pointsToAddr ? `heap-${pointsToAddr}` : undefined,
               };
@@ -267,7 +271,6 @@ export class JSTransformer implements IFlowTransformer {
         // 형태 2: 단순 형태 {name, value, type?} - 레슨 JSON
         else if (isStackVariableItem(item)) {
           const frameName = '__main__';
-          const frameVarIds = getFrameVarIds(frameName);
 
           const pointsTo = extractPointsTo(item.value);
           const isReference = !!pointsTo;
@@ -275,14 +278,17 @@ export class JSTransformer implements IFlowTransformer {
           const type = isReference
             ? (heapTypeMap.get(pointsTo) || item.type || 'Reference')
             : (item.type || 'unknown');
+          const parsedValue = parseValue(item.value);
+          const destinationFrame = this.isFunctionLike(type, parsedValue) ? 'Functions' : frameName;
+          const frameVarIds = getFrameVarIds(destinationFrame);
 
           const variable: FlowVariable = {
-            id: `${frameName}-${item.name}`,
+            id: `${destinationFrame}-${item.name}`,
             name: item.name,
-            value: parseValue(item.value),
+            value: parsedValue,
             type,
             state: 'idle',
-            scope: frameName,
+            scope: destinationFrame,
             isPointer: isReference,
             pointsTo: pointsTo ? `heap-${pointsTo}` : undefined,
           };
@@ -403,6 +409,16 @@ export class JSTransformer implements IFlowTransformer {
     if (typeof value === 'object') return 'Object';
     if (typeof value === 'function') return 'Function';
     return 'unknown';
+  }
+
+  private isFunctionLike(type: string, value: unknown): boolean {
+    if (type.toLowerCase().includes('function')) return true;
+    if (typeof value === 'string') {
+      return /^f\s+[A-Za-z_$][\w$]*\(\)$/.test(value)
+        || value.includes('=>')
+        || value.startsWith('function ');
+    }
+    return false;
   }
 
   /**

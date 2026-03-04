@@ -1,13 +1,13 @@
 {
   "lessonId": "java-10-1",
-  "title": "Threads: New Workers in Our Factory",
-  "concept": "A Thread is like a 'worker' that performs tasks concurrently within a single program (factory).",
+  "title": "Thread: Our Factory's New Workhorse",
+  "concept": "A thread is like a ‘worker’ that works simultaneously within one program (factory).",
   "content": {
     "code": "class MyWorker extends Thread {\n    public void run() {\n        System.out.println(\"새로운 일꾼이 일을 시작합니다!\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        MyWorker worker = new MyWorker();\n        worker.start(); // 일꾼에게 일을 시작하라고 지시합니다.\n        \n        System.out.println(\"메인 일꾼도 자기 일을 합니다.\");\n    }\n}",
     "steps": [
       {
-        "title": "main Method Starts",
-        "explanation": "**`public static void main(String[] args)`**\n\nThe program's entry point.\nHere we'll hire a new worker (thread) and assign them a task.",
+        "title": "Start main method",
+        "explanation": "**`public static void main(String[] args)`**\n\nThis is the program entry point.\nHere, new workers (threads) are hired and given work.",
         "visualizationType": "memory",
         "code": "public static void main(String[] args) {",
         "memoryState": {
@@ -23,8 +23,8 @@
         }
       },
       {
-        "title": "Extending the Thread Class",
-        "explanation": "The easiest way to create a new worker (thread) in Java is to extend the `Thread` class and define the actual work inside the `run` method.",
+        "title": "Thread class inheritance",
+        "explanation": "The easiest way to create a new worker (thread) in Java is to inherit the `Thread` class and define the actual work to be done in the `run` method.",
         "visualizationType": "memory",
         "code": "class MyWorker extends Thread {",
         "highlightOffset": [
@@ -39,8 +39,8 @@
         }
       },
       {
-        "title": "Creating the Worker Object",
-        "explanation": "An actual `MyWorker` worker object is created from the blueprint.\nIt hasn't started working yet -- it's in the 'ready' state (NEW).",
+        "title": "Create worker object",
+        "explanation": "Create an actual `MyWorker` worker object based on the blueprint.\nI haven't started work yet, but it's in 'ready' status (NEW).",
         "keyInsight": "new Thread() = Worker ready (Ready)",
         "visualizationType": "memory",
         "code": "MyWorker worker = new MyWorker();",
@@ -62,8 +62,8 @@
         }
       },
       {
-        "title": "Starting Work (start)",
-        "explanation": "Calling `start()` requests the JVM to create a new execution flow.\nThe JVM creates a new thread, assigns it an independent stack, and runs the `run()` method on it.",
+        "title": "Start the task (start)",
+        "explanation": "When you call `start()`, you ask the JVM to create a new execution flow.\nThe JVM creates a new thread, allocates an independent stack, and executes the `run()` method on it.",
         "keyInsight": "start() creates a new stack frame",
         "visualizationType": "memory",
         "code": "worker.start(); // 일꾼에게 일을 시작하라고 지시합니다.",
@@ -83,9 +83,9 @@
         }
       },
       {
-        "title": "Main Thread Continues",
-        "explanation": "`start()` merely 'requests' the task and returns immediately.\nSo the `main` thread doesn't stop and continues its own work.\nWhich message prints first depends on OS scheduling, and results may vary between runs.",
-        "keyInsight": "The two threads don't wait for each other -- they run independently.",
+        "title": "Main thread continues execution",
+        "explanation": "`start()` only 'requests' a task and returns immediately.\nTherefore, the `main` thread continues its work without stopping.\nWhich message is displayed first depends on the OS's scheduling, and results may vary each time it is run.",
+        "keyInsight": "The two threads run independently without waiting for each other.",
         "visualizationType": "memory",
         "code": "System.out.println(\"메인 일꾼도 자기 일을 합니다.\");",
         "memoryState": {
@@ -99,7 +99,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "Which method must be called to execute a thread?",
+    "question": "Which method must be called to run a thread?",
     "options": [
       "run()",
       "start()",
@@ -107,14 +107,14 @@
       "begin()"
     ],
     "correctIndex": 1,
-    "explanation": "Calling run() directly just runs the method on the current thread.\nTo create a new execution flow, you must use start()."
+    "explanation": "Calling run() directly simply executes the method on the current thread.\nTo create a new execution flow, you must use start()."
   },
   "misconceptions": [
     {
-      "wrong": "Calling run() makes it run in multithreaded mode.",
-      "correct": "No! run() is just a regular method call.\nOnly start() creates a new thread.",
-      "why": "The start() method internally calls native code to create an OS-level thread."
+      "wrong": "When you call run(), it operates as a multithread.",
+      "correct": "no! run() is just a regular method call.\nOnly start() creates a new thread.",
+      "why": "This is because native code is called inside the start() method to create an OS-level thread."
     }
   ],
-  "keyTakeaway": "A Thread is an execution unit with its own independent Stack. Use start() to turn on the engine!"
+  "keyTakeaway": "Thread is an execution unit with an independent stack. Turn on the engine with start()!"
 }

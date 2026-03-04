@@ -1,0 +1,94 @@
+{
+  "lessonId": "cpp-3-2",
+  "title": "size vs capacity",
+  "concept": "Vector manages size (actual number of elements) and capacity (allocated space) separately.",
+  "content": {
+    "code": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> v;\n    cout << \"size: \" << v.size() << \", cap: \" << v.capacity() << endl;\n\n    v.push_back(1);\n    cout << \"size: \" << v.size() << \", cap: \" << v.capacity() << endl;\n\n    v.push_back(2);\n    cout << \"size: \" << v.size() << \", cap: \" << v.capacity() << endl;\n\n    v.push_back(3);\n    cout << \"size: \" << v.size() << \", cap: \" << v.capacity() << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Create an empty vector",
+        "explanation": "The first created vector has size=0, capacity=0. We have not allocated any memory on the heap yet.",
+        "visualizationType": "cMemory",
+        "code": "vector<int> v;",
+        "stack": [
+          {
+            "name": "v",
+            "value": "[]",
+            "type": "vector<int>",
+            "address": "0x5000"
+          }
+        ],
+        "heap": [],
+        "stdout": "size: 0, cap: 0"
+      },
+      {
+        "title": "first push_back",
+        "explanation": "Since capacity is 0, new space (usually 1) is allocated in the heap and then elements are added.\n\nsize=1, capacity=1.",
+        "visualizationType": "cMemory",
+        "code": "v.push_back(1);",
+        "stack": [
+          {
+            "name": "v",
+            "value": "[1]",
+            "type": "vector<int>",
+            "address": "0x5000",
+            "highlight": true
+          }
+        ],
+        "stdout": "size: 1, cap: 1"
+      },
+      {
+        "title": "Second push_back — reallocation occurs",
+        "explanation": "Since capacity(1) is insufficient, allocate **larger space (usually 2 times)** and copy the existing data.\n\nOld memory is freed. This is Vector’s ‘growth strategy’.",
+        "visualizationType": "cMemory",
+        "code": "v.push_back(2);",
+        "stack": [
+          {
+            "name": "v",
+            "value": "[1, 2]",
+            "type": "vector<int>",
+            "address": "0x5000",
+            "highlight": true
+          }
+        ],
+        "stdout": "size: 2, cap: 2"
+      },
+      {
+        "title": "Third push_back — reallocate again",
+        "explanation": "As capacity(2) is exceeded, new memory of twice the size (4) is allocated again.\n\n**Key**: size=3 but capacity=4. The remaining 1 space will be used without reallocation during the next push_back.",
+        "visualizationType": "cMemory",
+        "code": "v.push_back(3);",
+        "stack": [
+          {
+            "name": "v",
+            "value": "[1, 2, 3]",
+            "type": "vector<int>",
+            "address": "0x5000",
+            "highlight": true
+          }
+        ],
+        "stdout": "size: 3, cap: 4"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Why is the capacity of a vector greater than its size?",
+    "options": [
+      "To intentionally create memory waste",
+      "Free space to avoid reallocation every time push_back",
+      "Capacity is always exactly twice the size",
+      "The operating system automatically decides"
+    ],
+    "correctIndex": 1,
+    "explanation": "If you reserve enough capacity in advance, push_back will mostly complete in O(1). Amortization analysis ensures efficiency."
+  },
+  "misconceptions": [
+    {
+      "wrong": "push_back is always O(1)",
+      "correct": "Normally this would be O(1), but when reallocation occurs, it is O(n) because all existing elements must be copied.",
+      "why": "However, the reallocation frequency decreases exponentially, becoming O(1) with amortization."
+    }
+  ],
+  "keyTakeaway": "vector guarantees the amortized O(1) performance of push_back with a 2x growth strategy."
+}

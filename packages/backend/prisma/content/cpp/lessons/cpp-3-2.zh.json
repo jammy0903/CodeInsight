@@ -1,0 +1,94 @@
+{
+  "lessonId": "cpp-3-2",
+  "title": "尺寸与容量",
+  "concept": "Vector 分别管理大小（元素的实际数量）和容量（分配的空间）。",
+  "content": {
+    "code": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> v;\n    cout << \"size: \" << v.size() << \", cap: \" << v.capacity() << endl;\n\n    v.push_back(1);\n    cout << \"size: \" << v.size() << \", cap: \" << v.capacity() << endl;\n\n    v.push_back(2);\n    cout << \"size: \" << v.size() << \", cap: \" << v.capacity() << endl;\n\n    v.push_back(3);\n    cout << \"size: \" << v.size() << \", cap: \" << v.capacity() << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "创建一个空向量",
+        "explanation": "第一个创建的向量的大小=0，容量=0。我们还没有在堆上分配任何内存。",
+        "visualizationType": "cMemory",
+        "code": "vector<int> v;",
+        "stack": [
+          {
+            "name": "v",
+            "value": "[]",
+            "type": "vector<int>",
+            "address": "0x5000"
+          }
+        ],
+        "heap": [],
+        "stdout": "size: 0, cap: 0"
+      },
+      {
+        "title": "第一次推回",
+        "explanation": "由于容量为 0，因此会在堆中分配新空间（通常为 1），然后添加元素。\n\n大小=1，容量=1。",
+        "visualizationType": "cMemory",
+        "code": "v.push_back(1);",
+        "stack": [
+          {
+            "name": "v",
+            "value": "[1]",
+            "type": "vector<int>",
+            "address": "0x5000",
+            "highlight": true
+          }
+        ],
+        "stdout": "size: 1, cap: 1"
+      },
+      {
+        "title": "第二次 push_back — 发生重新分配",
+        "explanation": "由于capacity(1)不足，请分配**更大的空间（通常是2倍）**并复制现有数据。\n\n旧内存被释放。这就是Vector的‘增长战略’。",
+        "visualizationType": "cMemory",
+        "code": "v.push_back(2);",
+        "stack": [
+          {
+            "name": "v",
+            "value": "[1, 2]",
+            "type": "vector<int>",
+            "address": "0x5000",
+            "highlight": true
+          }
+        ],
+        "stdout": "size: 2, cap: 2"
+      },
+      {
+        "title": "第三次push_back——再次重新分配",
+        "explanation": "当超出容量（2）时，将再次分配两倍大小（4）的新内存。\n\n**关键**：大小=3，但容量=4。剩余的1个空间将在下一次push_back期间使用，无需重新分配。",
+        "visualizationType": "cMemory",
+        "code": "v.push_back(3);",
+        "stack": [
+          {
+            "name": "v",
+            "value": "[1, 2, 3]",
+            "type": "vector<int>",
+            "address": "0x5000",
+            "highlight": true
+          }
+        ],
+        "stdout": "size: 3, cap: 4"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "为什么向量的容量大于其大小？",
+    "options": [
+      "故意制造内存浪费",
+      "释放空间以避免每次push_back时重新分配",
+      "容量始终是尺寸的两倍",
+      "操作系统自动决定"
+    ],
+    "correctIndex": 1,
+    "explanation": "如果提前预留足够的容量，push_back 大部分会在 O(1) 内完成。摊销分析确保效率。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Push_back 总是 O(1)",
+      "correct": "通常情况下，这将是 O(1)，但当发生重新分配时，它是 O(n)，因为必须复制所有现有元素。",
+      "why": "然而，重新分配频率呈指数下降，摊销后变为 O(1)。"
+    }
+  ],
+  "keyTakeaway": "vector 以 2 倍增长策略保证了 Push_back 的摊销 O(1) 性能。"
+}

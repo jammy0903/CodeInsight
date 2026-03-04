@@ -1,13 +1,13 @@
 {
   "lessonId": "c-5-3",
-  "title": "free usage",
-  "concept": "free："用完了，还给你！"",
+  "title": "免费使用",
+  "concept": "free：“我已经用完了，我还给你！”",
   "content": {
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = (int*)malloc(sizeof(int));\n    *p = 100;\n\n    printf(\"Using memory...\\n\");\n\n    free(p);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 `printf` 所需的头文件。\n\n本课重点讲解 `free` 的工作原理和注意事项。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用“printf”的标头。\n\n本课重点讲解“自由”的动作及注意事项。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,13 +16,13 @@
       },
       {
         "title": "包含 stdlib.h 头文件",
-        "explanation": "提供 `malloc`/`free` 的头文件。\n\n只有动态分配的地址才能被 free。",
+        "explanation": "`malloc`/`free` 的标头。\n\n只有动态分配的地址才可以被释放。",
         "visualizationType": "cMemory",
         "code": "#include <stdlib.h>"
       },
       {
-        "title": "main 函数开始",
-        "explanation": "创建 main 栈帧。\n\n我们将遵循 分配 -> 使用 -> 释放 的流程。",
+        "title": "启动主函数",
+        "explanation": "主框架已创建。\n\n检查分配->使用->释放流程。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -35,8 +35,8 @@
         ]
       },
       {
-        "title": "分配堆内存",
-        "explanation": "在堆上分配一个整型大小的空间，将地址存储在指针 `p` 中。",
+        "title": "堆内存分配",
+        "explanation": "从堆中分配 1 个整数的大小并将地址存储在指针“p”中。",
         "visualizationType": "cMemory",
         "code": "int *p = (int*)malloc(sizeof(int));",
         "stack": [
@@ -56,8 +56,8 @@
         ]
       },
       {
-        "title": "在堆内存中存储值",
-        "explanation": "`*p = 100;` 初始化堆内存。",
+        "title": "将值存储在堆内存中",
+        "explanation": "使用“*p = 100;”初始化堆内存。",
         "visualizationType": "cMemory",
         "code": "*p = 100;",
         "heap": [
@@ -70,8 +70,8 @@
         ]
       },
       {
-        "title": "使用内存期间的输出",
-        "explanation": "输出正在使用已分配的内存。\n\n这是 malloc 和 free 之间的正常使用区间。",
+        "title": "使用中的内存输出",
+        "explanation": "打印出分配的内存正在使用中。\n\n该段是malloc和free之间的正常使用段。",
         "visualizationType": "cMemory",
         "code": "printf(\"Using memory...\\n\");",
         "heap": [
@@ -84,8 +84,8 @@
         "stdout": "Using memory..."
       },
       {
-        "title": "释放堆内存",
-        "explanation": "`free(p)` 归还堆内存，但不会删除指针变量本身。\n\n释放后 `p` 会变成悬空指针，需要格外小心。",
+        "title": "空闲堆内存",
+        "explanation": "`free(p)` 释放堆内存，但不会清除指针变量本身。\n\n请小心，因为“p”在释放后可能会变得悬空。",
         "visualizationType": "cMemory",
         "code": "free(p);",
         "stack": [
@@ -100,8 +100,8 @@
         "heap": []
       },
       {
-        "title": "程序结束",
-        "explanation": "通过 `return 0;` 结束程序。\n\n要点：malloc 和 free 必须 1:1 配对使用。",
+        "title": "程序退出",
+        "explanation": "使用“return 0;”退出。\n\n要点：malloc/free 以 1:1 的比例使用。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -110,22 +110,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "如果对栈变量（局部变量）的地址调用 free() 会怎样？",
+    "question": "如果您 free() 堆栈变量（局部变量）的地址，会发生什么？",
     "options": [
-      "成功清空",
-      "什么都不会发生",
-      "程序崩溃（Crash）",
-      "编译报错"
+      "清空成功",
+      "什么也没发生",
+      "程序死掉（崩溃）",
+      "出现编译错误"
     ],
     "correctIndex": 2,
-    "explanation": "`free` 只能处理由 `malloc/calloc/realloc` 分配的地址。\n传入无效地址会导致内存管理器混乱，从而强制终止程序。"
+    "explanation": "`free` 只能处理用 `malloc/calloc/realloc` 分配的地址。\n 如果输入不正确的地址，内存管理器将变得混乱并强制程序终止。"
   },
   "misconceptions": [
     {
-      "wrong": "free(p) 会销毁变量 p 本身",
-      "correct": "变量 p 仍然存在。",
-      "why": "只是 p 指向的"房子"被拆除了。\np 仍然保存着被拆除房子的地址（悬空指针）。"
+      "wrong": "当您 free(p) 时，p 变量本身就会消失。",
+      "correct": "p 变量保持不变。",
+      "why": "只是p所指的‘房子’已经被拆了。\np仍然保存着被拆迁房屋的地址（悬空指针）。"
     }
   ],
-  "keyTakeaway": "借的内存必须用 `free` 归还。`malloc` 和 `free` 是一对。"
+  "keyTakeaway": "一定要“无偿”偿还借来的钱。 `malloc` 和 `free` 是一对。"
 }

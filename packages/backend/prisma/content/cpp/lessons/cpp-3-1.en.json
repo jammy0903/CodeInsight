@@ -1,0 +1,67 @@
+{
+  "lessonId": "cpp-3-1",
+  "title": "vector basics",
+  "concept": "A vector is a dynamic array whose size is automatically adjusted.",
+  "content": {
+    "code": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> nums = {10, 20, 30};\n    nums.push_back(40);\n\n    for (int i = 0; i < nums.size(); i++) {\n        cout << nums[i] << \" \";\n    }\n    cout << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "create vector",
+        "explanation": "`vector<int> nums = {10, 20, 30}` creates a dynamic array containing 3 ints.\n\nInternally, contiguous memory is allocated on the heap and the values ​​of the initialization list are copied.",
+        "visualizationType": "cMemory",
+        "code": "vector<int> nums = {10, 20, 30};",
+        "stack": [
+          {
+            "name": "nums",
+            "value": "[10, 20, 30]",
+            "type": "vector<int>",
+            "address": "0x4000"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "Add with push_back",
+        "explanation": "`push_back(40)` adds a new element to the end of the array.\n\nIf capacity is sufficient, it is added immediately. If capacity is insufficient, larger memory is allocated and existing data is copied.",
+        "visualizationType": "cMemory",
+        "code": "nums.push_back(40);",
+        "stack": [
+          {
+            "name": "nums",
+            "value": "[10, 20, 30, 40]",
+            "type": "vector<int>",
+            "address": "0x4000",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "circuit output",
+        "explanation": "Index access is possible like an array with `nums[i]`. `.size()` returns the current number of elements.",
+        "visualizationType": "terminal",
+        "code": "cout << nums[i] << \" \";",
+        "stdout": "10 20 30 40"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is wrong with the description of vector?",
+    "options": [
+      "Size is adjusted automatically",
+      "Internally uses contiguous memory",
+      "push_back is always O(n)",
+      "O(1) access is possible by index."
+    ],
+    "correctIndex": 2,
+    "explanation": "push_back is usually O(1), and reallocation (O(n)) occurs only when capacity is exceeded. This is called amortized O(1)."
+  },
+  "misconceptions": [
+    {
+      "wrong": "vector is like a linked list",
+      "correct": "A vector is a contiguous memory array and is a completely different data structure from a linked list.",
+      "why": "Contiguous memory allows for high cache efficiency and O(1) index access."
+    }
+  ],
+  "keyTakeaway": "Vectors are a convenient alternative to C arrays and handle size management and memory freeing automatically."
+}

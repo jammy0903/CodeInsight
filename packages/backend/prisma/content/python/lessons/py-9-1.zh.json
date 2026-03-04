@@ -1,13 +1,13 @@
 {
   "lessonId": "py-9-1",
-  "title": "闭包：记住父函数变量的函数",
-  "concept": "当一个函数内部的函数引用了外部（封闭）函数的变量时，就创建了一个"闭包"。",
+  "title": "클로저: 부모 함수의 변수를 기억하는 함수",
+  "concept": "함수 안의 함수가, 자신을 감싸는 바깥 함수의 변수를 참조할 때 '클로저'가 만들어집니다.",
   "content": {
     "code": "def outer_func(x):\n    # 바깥 함수의 지역 변수\n    def inner_func(y):\n        # 바깥 함수의 변수 x를 참조\n        return x * y\n    return inner_func\n\n# 클로저 생성\ntimes_2 = outer_func(2)\ntimes_3 = outer_func(3)\n\n# 클로저는 바깥 함수의 변수를 기억\nprint(f\"times_2(5) = {times_2(5)}\")\nprint(f\"times_3(5) = {times_3(5)}\")",
     "steps": [
       {
-        "title": "定义 outer_func",
-        "explanation": "**`def outer_func(x):`**\n\n**定义外部函数。**\n这个函数内部包含了另一个函数（`inner_func`），形成了"嵌套函数"结构。\n\n**类比**：想象一下俄罗斯套娃。\n- 外层的娃娃是 `outer_func`，里面装着小娃娃 `inner_func`\n- 必须打开（调用）外层的娃娃才能取出里面的\n\n**内部机制**：当 Python 遇到这个 `def` 语句时，它会在内存中创建一个函数对象（0x1100），并在全局命名空间中注册 `outer_func` 这个名称。\n函数体还没有被执行——只是注册了"存在这样一个函数"。\n\n**为什么是这个顺序？** 因为程序从上到下执行，函数必须在使用之前先定义。\n\n**注意**：`def` 是"定义"函数，而不是"执行"函数。函数内部的代码只有在之后调用 `outer_func(2)` 时才会执行。",
+        "title": "outer_func 정의",
+        "explanation": "**`def outer_func(x):`**\n\n**바깥 함수(외부 함수)를 정의합니다.**\n이 함수는 안에 또 다른 함수(`inner_func`)를 품고 있는 '중첩 함수' 구조의 바깥쪽입니다.",
         "visualizationType": "pythonMemory",
         "code": "def outer_func(x):",
         "highlightOffset": [
@@ -18,7 +18,7 @@
         ],
         "pythonMemoryState": {
           "output": [],
-          "note": "outer_func (0x1100) 已被定义。",
+          "note": "outer_func(0x1100)가 정의되었습니다.",
           "names": [
             {
               "name": "outer_func",
@@ -38,12 +38,12 @@
         }
       },
       {
-        "title": "调用 outer_func(2)",
-        "explanation": "**`times_2 = outer_func(2)`**\n\n**调用 `outer_func` 并将值 `2` 传递给参数 `x`。**\n\n这一行中发生了两件事：\n1. **右侧**：调用 `outer_func(2)`，函数体开始执行\n2. **左侧**：执行结果（返回值）存储到 `times_2` 中\n\n**类比**：就像向工厂提交了一份订单（x=2）。\n- 工厂（`outer_func`）启动运行，制造出一台能记住订单上数字 2 的专用机器（`inner_func`），然后返回它\n\n**内部机制**：当 Python 遇到 `outer_func(2)` 时，会创建一个新的**局部作用域**。在这个作用域中，变量 `x` 绑定到整数 `2`。\n\n**为什么是这个顺序？** 要创建闭包，必须"调用"外部函数。只有调用时 `inner_func` 才会被定义，也只有那时它才能捕获当前的 `x` 值。\n\n**注意**：`times_2` 还没有被赋值。只有当 `outer_func(2)` 执行完毕并 `return` 时才会赋值。",
+        "title": "outer_func(2) 호출",
+        "explanation": "**`times_2 = outer_func(2)`**\n\n**`outer_func`을 호출하면서 매개변수 `x`에 값 `2`를 전달합니다.**",
         "visualizationType": "pythonMemory",
         "code": "times_2 = outer_func(2)",
         "pythonMemoryState": {
-          "note": "outer_func 正在以 x=2 执行。",
+          "note": "outer_func가 x=2를 가지고 실행됩니다.",
           "names": [
             {
               "name": "x",
@@ -63,8 +63,8 @@
         }
       },
       {
-        "title": "定义 inner_func（x=2 环境）",
-        "explanation": "**`def inner_func(y):`**\n\n**在 `outer_func(2)` 执行过程中，内部函数 `inner_func` 被定义。**\n\n闭包的核心就发生在这里：\n- `inner_func` 的函数体包含 `return x * y`，但 `x` 不是它自己的变量\n- `x` 是外部函数 `outer_func` 的参数\n- Python 检测到这种情况，将 `x` 存储在一个叫做 **Cell 对象（0x3000）** 的特殊容器中\n\n**类比**：就像在便利贴上写下"x=2"然后放进 `inner_func` 的背包里。\n不管 `inner_func` 以后在哪里执行，它都可以翻看背包里的便利贴，知道 `x` 是 2。\n\n**内部机制**：Python 在编译阶段就已经识别出 `inner_func` 引用了外部变量 `x`。因此它将 `x` 包装在 Cell 对象中，并将这个 Cell 的引用存储在 `inner_func.__closure__` 中。\n\n**为什么是这个顺序？** `def` 语句每次执行时都会创建一个新的函数对象。在 `outer_func(2)` 调用期间创建的 `inner_func` 专属于 `x=2` 环境。\n\n**注意**：虽然代码都是同一个 `def inner_func(y):`，但每次调用 `outer_func` 时都会创建**不同的**函数对象。这就是闭包与普通函数的区别。",
+        "title": "inner_func 정의 (x=2 환경)",
+        "explanation": "**`def inner_func(y):`**\n\n**`outer_func(2)` 실행 중에, 안쪽 함수 `inner_func`이 정의됩니다.**",
         "visualizationType": "pythonMemory",
         "code": "def inner_func(y):",
         "highlightOffset": [
@@ -72,7 +72,7 @@
           2
         ],
         "pythonMemoryState": {
-          "note": "inner_func (0x2000) 已创建。x=2 存储在 Cell (0x3000) 中。",
+          "note": "inner_func(0x2000)가 생성됩니다. x=2를 Cell(0x3000)에 저장합니다.",
           "names": [
             {
               "name": "x",
@@ -102,12 +102,12 @@
         }
       },
       {
-        "title": "返回闭包（1）",
-        "explanation": "**`return inner_func`**\n\n**返回 `inner_func` 函数对象本身。** 不是调用（`inner_func()`），而是返回函数本身。\n\n这就是闭包完成的时刻：\n- 当 `outer_func(2)` 执行结束时，它的局部作用域被销毁\n- 但 `inner_func` 仍然通过 Cell 对象引用着 `x=2`\n- 这种**记住自身作用域之外变量的函数**就叫做"闭包（closure）"\n\n**类比**：即使工厂（`outer_func`）关门了，工厂里制造的机器（`inner_func`）仍然可以在外面运行，因为它带着工厂的设计图纸（x=2）。\n\n**内部机制**：当 `return inner_func` 执行时，这个函数对象被赋值给调用处的 `times_2 = outer_func(2)` 中的 `times_2`。现在 `times_2` 就是一个记住了 `x=2` 的闭包。\n\n**为什么是这个顺序？** 外部函数的目的就是"创建并导出闭包"。内部函数必须通过 `return` 返回才能在外部使用。\n\n**注意**：`return inner_func` 和 `return inner_func()` 完全不同！没有括号返回的是函数本身；加了括号返回的是函数的执行结果。",
+        "title": "클로저 반환 (1)",
+        "explanation": "**`return inner_func`**\n\n**`inner_func` 함수 객체 자체를 반환합니다.** 호출(`inner_func()`)이 아니라, 함수 그 자체를 돌려주는 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "return inner_func",
         "pythonMemoryState": {
-          "note": "变量 times_2 现在指向闭包（0x2000）。",
+          "note": "times_2 변수가 클로저(0x2000)를 가리킵니다.",
           "names": [
             {
               "name": "times_2",
@@ -127,12 +127,12 @@
         }
       },
       {
-        "title": "调用 outer_func(3)",
-        "explanation": "**`times_3 = outer_func(3)`**\n\n**这次以 `x=3` 调用同一个 `outer_func`。**\n\n这是一个与之前 `outer_func(2)` 完全独立的新调用。\n会创建一个新的局部作用域，在这个作用域中 `x` 是 `3`。\n\n**类比**：就像向同一个工厂提交了新的订单"x=3"。\n- 这将制造出一台全新的机器，与之前用订单（x=2）制造的 `times_2` 完全无关\n\n**内部机制**：Python 创建了一个与之前 `outer_func(2)` 调用完全独立的新执行帧。`times_2` 的 Cell 和这次将要创建的 Cell 拥有不同的内存地址。\n\n**为什么是这个顺序？** 这展示了闭包的强大之处。用不同的参数调用同一个函数时，每次调用都会创建一个记住不同值的独立闭包。\n\n**注意**：`times_2` 和 `times_3` 基于相同的代码（`inner_func`），但它们是记住不同 `x` 值的完全独立的函数对象。",
+        "title": "outer_func(3) 호출",
+        "explanation": "**`times_3 = outer_func(3)`**\n\n**같은 `outer_func`을 이번에는 `x=3`으로 호출합니다.**",
         "visualizationType": "pythonMemory",
         "code": "times_3 = outer_func(3)",
         "pythonMemoryState": {
-          "note": "这次 outer_func 以 x=3 执行。",
+          "note": "이번에는 x=3으로 outer_func가 실행됩니다.",
           "names": [
             {
               "name": "times_2",
@@ -162,8 +162,8 @@
         }
       },
       {
-        "title": "定义 inner_func（x=3 环境）",
-        "explanation": "**`def inner_func(y):`**\n\n**这次定义了一个记住 `x=3` 环境的全新 `inner_func`。**\n\n这是闭包的核心机制：\n- 第一次调用（`outer_func(2)`）创建的 `inner_func` 将 `x=2` 存储在 Cell (0x3000) 中\n- 这次调用（`outer_func(3)`）创建的 `inner_func` 将 `x=3` 存储在**另一个** Cell (0x3100) 中\n- 两个 Cell 存在于完全不同的内存区域\n\n**类比**：就像用同一张设计图制造的两辆汽车，但涂了不同的颜色（x=2 是蓝色，x=3 是红色）。\n\n**内部机制**：创建了一个新的函数对象（0x2100），并分配了一个新的 `__closure__` 元组。这个元组中的 Cell 引用的是 `x=3`。\n\n**为什么是这个顺序？** `def` 语句每次执行都会创建一个新的函数对象。之前的 `inner_func`（0x2000）和这次的 `inner_func`（0x2100）是不同的对象。",
+        "title": "inner_func 정의 (x=3 환경)",
+        "explanation": "**`def inner_func(y):`**\n\n**이번에는 `x=3`인 환경을 기억하는 완전히 새로운 `inner_func`이 정의됩니다.**",
         "visualizationType": "pythonMemory",
         "code": "def inner_func(y):",
         "highlightOffset": [
@@ -171,7 +171,7 @@
           2
         ],
         "pythonMemoryState": {
-          "note": "新的 inner_func (0x2100) 已创建。x=3 存储在单独的 Cell (0x3100) 中。",
+          "note": "새로운 inner_func(0x2100)가 생성됩니다. x=3을 별도의 Cell(0x3100)에 저장합니다.",
           "names": [
             {
               "name": "x",
@@ -201,12 +201,12 @@
         }
       },
       {
-        "title": "返回闭包（2）",
-        "explanation": "**`return inner_func`**\n\n**返回第二个闭包（记住 `x=3` 的 `inner_func`）。**\n这个返回值被存储到 `times_3` 中。\n\n现在内存中有两个独立的闭包：\n- `times_2` -> `inner_func` (0x2000)，Cell 中存储 `x=2`\n- `times_3` -> `inner_func` (0x2100)，Cell 中存储 `x=3`\n\n**类比**：同一个工厂出来的两台机器，但设置不同。\n- 机器 A（`times_2`）：无论放入什么材料，都会乘以 2\n- 机器 B（`times_3`）：无论放入什么材料，都会乘以 3\n\n**内部机制**：`outer_func(3)` 的执行帧已终止，但 Cell (0x3100) 不会被垃圾回收，因为它仍然通过 `times_3.__closure__` 被引用。\n\n**为什么是这个顺序？** 返回第二个闭包后，`times_2` 和 `times_3` 都已准备好使用。",
+        "title": "클로저 반환 (2)",
+        "explanation": "**`return inner_func`**\n\n**두 번째 클로저(`x=3`을 기억하는 `inner_func`)를 반환합니다.**\n이 반환값이 `times_3`에 저장됩니다.",
         "visualizationType": "pythonMemory",
         "code": "return inner_func",
         "pythonMemoryState": {
-          "note": "times_3 指向 0x2100。times_2 和 times_3 是不同的对象。",
+          "note": "times_3는 0x2100을 가리킵니다. times_2와 times_3는 서로 다른 객체입니다.",
           "names": [
             {
               "name": "times_2",
@@ -236,12 +236,12 @@
         }
       },
       {
-        "title": "调用 times_2(5)",
-        "explanation": "**`print(f\"times_2(5) = {times_2(5)}\")`**\n\n**以 `y=5` 调用闭包 `times_2`。**\n\n由于 `times_2` 实际上就是 `inner_func`，这等同于调用 `inner_func(5)`。\n`inner_func` 的参数 `y` 接收到值 `5`。\n\n**需要记住的关键点**：`inner_func` 的函数体是 `return x * y`，这里 `x` 是从存储了值 `2` 的 Cell 中获取的。\n- `x` = 从 Cell 中取出的值 = **2**（闭包记住的值）\n- `y` = 刚刚传入的值 = **5**（调用时传入的参数）\n\n**类比**：这就是将材料 5 放入 2 倍机器（`times_2`）的时刻。\n机器使用内部存储的设置值（x=2）来执行计算。\n\n**为什么是这个顺序？** 创建闭包的目的最终是为了"使用它"。现在我们验证闭包是否正确工作。\n\n**注意**：尽管 `outer_func(2)` 的调用已经结束，`x=2` 这个值仍然存活着。这就是闭包的魔力！",
+        "title": "times_2(5) 호출",
+        "explanation": "**`print(f\"times_2(5) = {times_2(5)}\")`**\n\n**클로저 `times_2`를 `y=5`로 호출합니다.**",
         "visualizationType": "pythonMemory",
         "code": "print(f\"times_2(5) = {times_2(5)}\")",
         "pythonMemoryState": {
-          "note": "执行 times_2：使用存储在 Cell 中的 x=2。",
+          "note": "times_2 실행: Cell에 저장된 x=2를 사용합니다.",
           "names": [
             {
               "name": "x",
@@ -271,15 +271,15 @@
         }
       },
       {
-        "title": "执行 times_2（2 * 5）",
-        "explanation": "**`return x * y`**\n\n**将 Cell 中的 `x=2` 与参数 `y=5` 相乘，返回 `10`。**\n\n逐步计算过程：\n1. 引用 `x` -> 从 Cell (0x3000) 中取出值 `2`\n2. 引用 `y` -> 从局部变量中取出值 `5`\n3. 计算 `2 * 5 = 10`\n4. 返回 `10`\n\n返回的 `10` 在 `print` 的 f-string 中被转换为字符串，输出 `\"times_2(5) = 10\"`。\n\n**类比**：2 倍机器接收了材料 5，产出了 10。机器的内部设置（x=2）没有改变。\n\n**内部机制**：Python 使用 `LOAD_DEREF` 字节码从 Cell 对象中获取 `x` 的值。这与普通局部变量访问（`LOAD_FAST`）是不同的机制。\n\n**注意**：闭包记住的不是"值"，而是"对变量的引用"。如果 `x` 指向一个可变对象，它可以在闭包内部被修改。",
+        "title": "times_2 실행 (2 * 5)",
+        "explanation": "**`return x * y`**\n\n**Cell에서 꺼낸 `x=2`와 매개변수 `y=5`를 곱하여 `10`을 반환합니다.**",
         "visualizationType": "pythonMemory",
         "code": "return x * y",
         "pythonMemoryState": {
           "output": [
             "times_2(5) = 10"
           ],
-          "note": "结果 10 已被输出。",
+          "note": "결과 10이 출력되었습니다.",
           "names": [
             {
               "name": "x",
@@ -307,12 +307,12 @@
         }
       },
       {
-        "title": "调用 times_3(5)",
-        "explanation": "**`print(f\"times_3(5) = {times_3(5)}\")`**\n\n**这次以 `y=5` 调用闭包 `times_3`。**\n\n由于 `times_3` 是由 `outer_func(3)` 创建的，它的 Cell (0x3100) 中存储着 `x=3`。\n即使传入相同的 `y=5`，由于记住的 `x` 值不同，结果也会不同。\n\n**类比**：这次我们将相同的材料 5 放入 3 倍机器（`times_3`）。\n材料相同，但机器的设置不同，因此产出不同的结果。\n\n**关键要点**：`times_2` 和 `times_3` 各自拥有独立的 Cell，因此调用其中一个不会改变另一个的 `x` 值。\n\n**为什么是这个顺序？** 用 `times_2(5)` 验证了闭包的行为后，我们用 `times_3(5)` 来证明不同的闭包是独立运行的。\n\n**注意**：`times_2` 的 `x` 是 2，`times_3` 的 `x` 是 3。它们互不干扰。这就是闭包的"状态隔离"。",
+        "title": "times_3(5) 호출",
+        "explanation": "**`print(f\"times_3(5) = {times_3(5)}\")`**\n\n**이번에는 클로저 `times_3`를 `y=5`로 호출합니다.**",
         "visualizationType": "pythonMemory",
         "code": "print(f\"times_3(5) = {times_3(5)}\")",
         "pythonMemoryState": {
-          "note": "执行 times_3：使用存储在 Cell 0x3100 中的 x=3。",
+          "note": "times_3 실행: 0x3100 Cell에 저장된 x=3을 사용합니다.",
           "names": [
             {
               "name": "x",
@@ -342,15 +342,15 @@
         }
       },
       {
-        "title": "执行 times_3（3 * 5）",
-        "explanation": "**`return x * y`**\n\n**将 Cell 中的 `x=3` 与参数 `y=5` 相乘，返回 `15`。**\n\n计算过程：\n1. 引用 `x` -> 从 Cell (0x3100) 中取出值 `3`\n2. 引用 `y` -> 从局部变量中取出值 `5`\n3. 计算 `3 * 5 = 15`\n4. 返回 `15`\n\n最终输出：`\"times_3(5) = 15\"`\n\n**总结**：从同一个 `outer_func` 诞生的两个闭包产生了不同的结果。\n- `times_2(5)` = 2 * 5 = **10**（记住了 x=2）\n- `times_3(5)` = 3 * 5 = **15**（记住了 x=3）\n\n这就是闭包的核心价值。**它让函数能够拥有"状态"。**\n\n**实际应用**：闭包广泛应用于装饰器、回调函数、事件处理程序等。它是下一课将要学习的装饰器模式的基础技术。\n\n**注意**：过度使用闭包可能导致内存泄漏。由于 Cell 对象维持着引用，只要闭包存活，被引用的变量就不会被垃圾回收。",
+        "title": "times_3 실행 (3 * 5)",
+        "explanation": "**`return x * y`**\n\n**Cell에서 꺼낸 `x=3`과 매개변수 `y=5`를 곱하여 `15`를 반환합니다.**",
         "visualizationType": "pythonMemory",
         "code": "return x * y",
         "pythonMemoryState": {
           "output": [
             "times_3(5) = 15"
           ],
-          "note": "结果 15 已被输出。",
+          "note": "결과 15가 출력되었습니다.",
           "names": [
             {
               "name": "x",
@@ -381,22 +381,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "闭包记住的是什么？",
+    "question": "闭包会记住什么？",
     "options": [
       "调用时的全局变量",
-      "定义时的封闭（enclosing）作用域中的变量",
-      "仅自身的局部变量",
-      "什么都不记住"
+      "定义变量时，变量位于封闭范围内",
+      "只有你自己的局部变量",
+      "什么都不记得了"
     ],
     "correctIndex": 1,
-    "explanation": "闭包的核心在于它记住自身被"定义"时的环境（作用域），即使之后在其他地方被"调用"，也能使用那个记忆。"
+    "explanation": "闭包的要点是记住它被“定义”的环境（范围），并使用该内存，即使以后从其他地方“调用”它。"
   },
   "misconceptions": [
     {
-      "wrong": "所有嵌套函数都是闭包。",
-      "correct": "只有当嵌套函数引用了其封闭（非全局）作用域中的变量时，才成为闭包。",
-      "why": "如果不引用任何外部变量，就没有必要记住环境。"
+      "wrong": "모든 중첩 함수가 클로저다.",
+      "correct": "중첩 함수가 자신을 둘러싼(non-global) 스코프의 변수를 참조해야 클로저가 됩니다.",
+      "why": "외부 변수를 참조하지 않으면, 굳이 환경을 기억할 필요가 없기 때문입니다."
     }
   ],
-  "keyTakeaway": "闭包"记住"了它被定义时的环境（作用域）。通过闭包，可以创建携带状态的函数。"
+  "keyTakeaway": "클로저는 자신이 정의된 환경(스코프)을 '기억'합니다. 이를 통해 상태를 가진 함수를 만들 수 있습니다."
 }

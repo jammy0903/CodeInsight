@@ -1,13 +1,13 @@
 {
   "lessonId": "c-6-3",
   "title": "Struct Basics",
-  "concept": "A bundle that groups multiple variables together (user-defined type)",
+  "concept": "A package that combines multiple variables into one (user-defined type)",
   "content": {
     "code": "#include <stdio.h>\n\nstruct Point {\n    int x;\n    int y;\n};\n\nint main() {\n    struct Point p1 = {10, 20};\n\n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n\n    struct Point p2 = p1;\n    p2.x = 99;\n\n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n    printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
-        "explanation": "This header is needed to use `printf`.\n\nThis lesson covers struct definition, member access, and copy behavior.",
+        "title": "Include stdio.h header",
+        "explanation": "Header for using `printf`.\n\nThis lesson covers structure definition, member access, and copy operations.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Defining the struct 'blueprint'",
-        "explanation": "`struct Point { int x; int y; };` is a blueprint for a new type with two members.\n\nThis step is a type definition -- no actual variable memory is created yet.",
+        "title": "Definition of structure ‘frame’",
+        "explanation": "`struct Point { int x; int y; };` is a new type blueprint with two members.\n\nThis step is a type definition and no actual variable memory is created yet.",
         "visualizationType": "cMemory",
         "code": "struct Point {",
         "highlightOffset": [
@@ -27,8 +27,8 @@
         ]
       },
       {
-        "title": "Starting main function",
-        "explanation": "The main frame is created.\n\nNext we will create struct variables to observe values and copy behavior.",
+        "title": "Start main function",
+        "explanation": "The main frame is created.\n\nAfterwards, create a structure variable to check the value and copy operation.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -41,8 +41,8 @@
         ]
       },
       {
-        "title": "Declaring and initializing a struct variable",
-        "explanation": "`struct Point p1 = {10, 20};` creates the actual variable `p1` and initializes its members.\n\nA single variable name can manage a bundle of related data.",
+        "title": "Declare and initialize structure variables",
+        "explanation": "The actual variable `p1` is created and its members are initialized with `struct Point p1 = {10, 20};`.\n\nYou can manage a bunch of related data with one variable name.",
         "visualizationType": "cMemory",
         "code": "struct Point p1 = {10, 20};",
         "stack": [
@@ -55,15 +55,15 @@
         ]
       },
       {
-        "title": "Accessing and printing struct members",
-        "explanation": "The dot operator (`.`) accesses `p1.x` and `p1.y` to read values.",
+        "title": "Access and output structure members",
+        "explanation": "Access `p1.x` and `p1.y` using the dot operator (`.`) to read the values.",
         "visualizationType": "cMemory",
         "code": "printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);",
         "stdout": "p1: (10, 20)"
       },
       {
-        "title": "Copying a struct (value copy)",
-        "explanation": "The `p2 = p1` assignment copies the member values to a new variable.\n\nThe original and the copy exist independently afterward.",
+        "title": "Copy structure (copy value)",
+        "explanation": "A copy of the form `p2 = p1` copies the member value to a new variable.\n\nThe original and the copy will henceforth exist independently.",
         "visualizationType": "cMemory",
         "code": "struct Point p2 = p1;",
         "stack": [
@@ -83,8 +83,8 @@
         ]
       },
       {
-        "title": "Modifying the copied struct member",
-        "explanation": "Changing a member of the copy `p2` only affects the copy.",
+        "title": "Modify copied structure members",
+        "explanation": "If you change a member of copy `p2`, the change only applies to the copy.",
         "visualizationType": "cMemory",
         "code": "p2.x = 99;",
         "stack": [
@@ -103,23 +103,23 @@
         ]
       },
       {
-        "title": "Verifying the original (p1)",
-        "explanation": "Checking the original value confirms it remains unchanged.\n\nThis is key evidence that it was a value copy.",
+        "title": "Check the original (p1) value",
+        "explanation": "If you check the original values ​​again, they will remain in their previous state.\n\nThis is key evidence showing that it was a value copy.",
         "visualizationType": "cMemory",
         "code": "printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);",
         "occurrence": 2,
         "stdout": "p1: (10, 20)\np1: (10, 20)"
       },
       {
-        "title": "Verifying the copy (p2)",
-        "explanation": "The copy retains the modified value and is separate from the original.",
+        "title": "Check copy(p2) value",
+        "explanation": "The copy retains the modified values ​​and is separate from the original.",
         "visualizationType": "cMemory",
         "code": "printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);",
         "stdout": "p1: (10, 20)\np1: (10, 20)\np2: (99, 20)"
       },
       {
-        "title": "Program termination",
-        "explanation": "The program ends with `return 0;`.\n\nKey point: Struct assignment is a value copy, and member access uses the `.` operator.",
+        "title": "Program exit",
+        "explanation": "Exit with `return 0;`.\n\nKey point: Struct assignment is copying values, and member access uses the `.` operator.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -128,7 +128,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What operator is used to access struct members?",
+    "question": "What operator accesses structure members?",
     "options": [
       "->",
       ".",
@@ -136,14 +136,14 @@
       "$"
     ],
     "correctIndex": 1,
-    "explanation": "When accessing members from the variable itself, use the dot (`.`).\nWhen using a pointer, use the arrow (`->`)."
+    "explanation": "When entering a member from the variable itself, use a dot (`.`).\nFor pointers, use an arrow (`->`)."
   },
   "misconceptions": [
     {
-      "wrong": "A struct's size equals the sum of its members' sizes",
-      "correct": "Usually true, but it can be larger due to padding.",
-      "why": "The CPU inserts empty spaces (padding) between members to read data faster (Memory Alignment)."
+      "wrong": "The size of a structure is the sum of the sizes of its members.",
+      "correct": "This is mostly correct, but may be larger due to padding.",
+      "why": "In order for the CPU to read data quickly, it aligns the lines by inserting empty space (padding) in between (Memory Alignment)."
     }
   ],
-  "keyTakeaway": "Group related data with `struct`. Using `=` copies the entire value."
+  "keyTakeaway": "Let's group related data into `struct`. If you use `=`, the entire value is copied."
 }

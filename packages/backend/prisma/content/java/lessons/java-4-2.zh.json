@@ -1,13 +1,13 @@
 {
   "lessonId": "java-4-2",
   "title": "String vs StringBuilder",
-  "concept": "需要频繁修改字符串时，应使用可变（Mutable）对象 StringBuilder。",
+  "concept": "문자열 수정이 많을 땐 가변(Mutable) 객체인 StringBuilder를 써야 한다.",
   "content": {
-    "code": "// 反面示例：String 拼接（产生垃圾）\nString bad = \"\";\nfor (int i = 0; i < 3; i++) {\n    bad = bad + i;\n}\n\n// 正面示例：StringBuilder（对象复用）\nStringBuilder good = new StringBuilder();\nfor (int i = 0; i < 3; i++) {\n    good.append(i);\n}\nString result = good.toString();",
+    "code": "// 나쁜 예: String 연결 (쓰레기 생성)\nString bad = \"\";\nfor (int i = 0; i < 3; i++) {\n    bad = bad + i;\n}\n\n// 좋은 예: StringBuilder (재사용)\nStringBuilder good = new StringBuilder();\nfor (int i = 0; i < 3; i++) {\n    good.append(i);\n}\nString result = good.toString();",
     "steps": [
       {
-        "title": "创建空字符串",
-        "explanation": "**执行流程：**\n1. 在 String Pool 中创建 `\"\"`（空字符串）。\n2. 变量 `bad` 引用它。\n\n接下来我们将尝试不断向 `bad` 追加内容。",
+        "title": "빈 String 생성",
+        "explanation": "**실행 순서:**\n1. String Pool에 `\"\"`(빈 문자열) 생성.\n2. `bad` 변수가 이를 참조.\n\n이제부터 `bad`에 계속 덧붙이기를 시도할 것입니다.",
         "visualizationType": "javaMemory",
         "code": "String bad = \"\";",
         "javaMemoryState": {
@@ -30,8 +30,8 @@
         }
       },
       {
-        "title": "循环开始（String）",
-        "explanation": "**执行流程：**\n1. 初始化 `i = 0`。\n2. 检查循环条件。\n\n准备进入循环。",
+        "title": "반복문 시작 (String)",
+        "explanation": "**실행 순서:**\n1. `i = 0` 초기화.\n2. 반복 조건 확인.\n\n루프를 돌 준비를 합니다.",
         "visualizationType": "javaMemory",
         "code": "for (int i = 0; i < 3; i++) {",
         "javaMemoryState": {
@@ -52,9 +52,9 @@
         }
       },
       {
-        "title": "低效的拼接（产生垃圾）",
-        "explanation": "**执行流程（每次迭代）：**\n1. `bad` + `i` -> 创建新对象。\n2. `bad` 指向新对象。\n3. 旧对象变成**垃圾（Garbage）**。\n\n**问题所在：**\n每次循环迭代都会创建一个一次性使用就丢弃的 String 对象。\n如果循环执行 1 万次，就会产生 1 万个垃圾对象。",
-        "keyInsight": "循环中拼接 String = 内存浪费（O(N^2)）",
+        "title": "비효율적인 연결 (쓰레기 투척)",
+        "explanation": "**실행 순서 (반복):**\n1. `bad` + `i` -> 새로운 객체 생성.\n2. `bad`가 새 객체를 가리킴.\n3. 이전 객체는 **버려짐(Garbage)**.\n\n**문제점:**\n루프가 돌 때마다 멀쩡한 String 객체들이 1회용으로 쓰고 버려집니다.\n루프가 1만 번 돌면 쓰레기도 1만 개가 생깁니다.",
+        "keyInsight": "String Loop 연결 = 메모리 낭비(O(N²))",
         "visualizationType": "javaMemory",
         "code": "bad = bad + i;",
         "javaMemoryState": {
@@ -93,14 +93,14 @@
               "new": true
             }
           ],
-          "warning": "中间对象不断被丢弃！",
+          "warning": "중간 객체들이 계속 버려지고 있습니다!",
           "stringPool": null
         }
       },
       {
-        "title": "创建 StringBuilder",
-        "explanation": "**执行流程：**\n1. 在堆上创建 `StringBuilder` 对象（0x100）。\n2. 内部包含一个容量充足的字符数组（Buffer）。\n\n`StringBuilder` 是一个**可变（Mutable）**对象。\n可以把它想象成一块可以随意擦写的"白板"。",
-        "keyInsight": "StringBuilder = 可擦写的白板",
+        "title": "StringBuilder 생성",
+        "explanation": "**실행 순서:**\n1. Heap에 `StringBuilder` 객체(0x100) 생성.\n2. 내부에 넉넉한 크기의 문자 배열(Buffer)을 가짐.\n\n`StringBuilder`는 **가변(Mutable)** 객체입니다.\n즉, 내용물을 마음대로 고칠 수 있는 '화이트보드'와 같습니다.",
+        "keyInsight": "StringBuilder = 수정 가능한 화이트보드",
         "visualizationType": "javaMemory",
         "code": "StringBuilder good = new StringBuilder();",
         "javaMemoryState": {
@@ -123,9 +123,9 @@
         }
       },
       {
-        "title": "高效的 append()",
-        "explanation": "**执行流程（每次迭代）：**\n1. 调用 `good.append(i)`。\n2. 在 `0x100` 对象内部数组的空位上填入数字。\n\n**优势：**\n不创建新对象，而是在**同一个对象**内持续更新内容。\n完全不会产生垃圾。",
-        "keyInsight": "对象复用 = 速度快 + 节省内存",
+        "title": "효율적인 append()",
+        "explanation": "**실행 순서 (반복):**\n1. `good.append(i)` 호출.\n2. `0x100` 객체 내부의 배열 빈칸에 숫자를 채움.\n\n**장점:**\n새 객체를 만들지 않고, **하나의 객체** 안에서 내용을 계속 업데이트합니다.\n쓰레기가 전혀 생기지 않습니다.",
+        "keyInsight": "객체 재사용 = 속도 빠름 + 메모리 절약",
         "visualizationType": "javaMemory",
         "code": "good.append(i);",
         "javaMemoryState": {
@@ -140,8 +140,8 @@
         }
       },
       {
-        "title": "用 toString() 完成转换",
-        "explanation": "**执行流程：**\n1. 调用 `good.toString()`。\n2. 基于当前完成的内容**仅创建一次** String 对象。\n3. 存储到 `result` 中。\n\n所有操作（修改）都在白板（StringBuilder）上完成，最后才把成品放到盘子（String）里端出来。",
+        "title": "toString()으로 완성",
+        "explanation": "**실행 순서:**\n1. `good.toString()` 호출.\n2. 현재까지 완성된 내용을 바탕으로 **딱 한 번** String 객체 생성.\n3. `result`에 저장.\n\n요리(수정)는 화이트보드(StringBuilder)에서 실컷 하고, 마지막에 완성된 요리만 접시(String)에 담아 내는 방식입니다.",
         "visualizationType": "javaMemory",
         "code": "String result = good.toString();",
         "javaMemoryState": {
@@ -172,22 +172,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "在循环中需要反复拼接字符串时，最好的做法是什么？",
+    "question": "在循环中不断添加字符串的最佳方法是什么？",
     "options": [
-      "直接使用 + 运算符。",
+      "只需使用 + 运算符即可。",
       "使用 String.concat() 方法。",
       "使用 StringBuilder 或 StringBuffer。",
-      "不断调用 new String()。"
+      "继续调用new String()。"
     ],
     "correctIndex": 2,
-    "explanation": "在循环内使用 `+` 运算符会创建大量临时对象（垃圾），导致性能极差。\n应使用 `StringBuilder` 在单个对象内进行修改。"
+    "explanation": "循环中的“+”操作性能最差，因为它会创建大量临时对象（垃圾）。\n您必须使用“StringBuilder”在单个对象内修改它。"
   },
   "misconceptions": [
     {
-      "wrong": "现代 Java 会自动优化 + 运算符，所以没关系。",
-      "correct": "编译器会优化简单的一次性拼接，但在**循环**中有局限性。",
-      "why": "在循环中，往往会被转换为每次迭代都创建和丢弃一个 `new StringBuilder`，仍然很慢。\n在循环中请显式使用 `StringBuilder`。"
+      "wrong": "요즘 Java는 + 연산자 써도 컴파일러가 최적화해준다?",
+      "correct": "단순 한두 번 연결은 최적화해주지만, **반복문(Loop)** 안에서는 최적화에 한계가 있습니다.",
+      "why": "반복문마다 `new StringBuilder`를 만들었다 버리는 식으로 변환되기 십상이라 여전히 느립니다.\n루프에선 명시적으로 `StringBuilder`를 쓰세요."
     }
   ],
-  "keyTakeaway": "在循环中拼接字符串时，务必使用 `StringBuilder`！性能差距可达 100 倍以上。"
+  "keyTakeaway": "루프 돌며 문자열 조립할 땐 무조건 `StringBuilder`! 성능 차이가 100배 이상 날 수 있다."
 }

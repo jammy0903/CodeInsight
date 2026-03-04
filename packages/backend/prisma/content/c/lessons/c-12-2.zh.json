@@ -1,13 +1,13 @@
 {
   "lessonId": "c-12-2",
-  "title": "阶乘递归与返回值传播",
-  "concept": "递归函数的返回值沿着调用栈逆序传递",
+  "title": "阶乘递归和返回值传播",
+  "concept": "递归函数的返回值以相反的顺序通过调用堆栈传递。",
   "content": {
     "code": "#include <stdio.h>\n\nint factorial(int n) {\n    if (n <= 1) {\n        return 1;\n    }\n    return n * factorial(n - 1);\n}\n\nint main() {\n    int result = factorial(4);\n    printf(\"4! = %d\\n\", result);\n    return 0;\n}",
     "steps": [
       {
         "title": "包含头文件",
-        "explanation": "通过 **`#include <stdio.h>`** 包含标准输入输出库以使用 `printf`。\n\n本课学习递归的第二个核心——**返回值的传播**。",
+        "explanation": "使用 **`#include <stdio.h>`** 包含标准输入/输出库，以便与 `printf` 一起使用。\n\n在本课中，我们学习递归的第二个关键——**返回值传播**。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始 - 调用 factorial(4)",
-        "explanation": "**`int result = factorial(4);`** -- `result` 的声明、调用 `factorial(4)` 和存储返回值都在一行中，但实际上 `result` 要等到 `factorial(4)` 执行完才会被赋值。",
+        "title": "启动主函数 - 调用阶乘(4)",
+        "explanation": "**`int result = Factorial(4);`** --- 虽然声明 `result`、调用 `factorial(4)` 和存储返回值都在一行，但 `result` 实际上直到 `factorial(4)` 结束才被填充。",
         "visualizationType": "cMemory",
         "code": "int result = factorial(4);",
         "highlightOffset": [
@@ -53,8 +53,8 @@
         ]
       },
       {
-        "title": "factorial(4) -> factorial(3) -> factorial(2) 调用",
-        "explanation": "**`return n * factorial(n - 1);`** -- factorial(4) 试图计算 `return 4 * factorial(3)`，但还不知道 factorial(3) 的结果。factorial(3) 也试图计算 `return 3 * factorial(2)`，同样需要等待 factorial(2) 的结果。这条延迟计算的链不断将栈推高。",
+        "title": "调用阶乘(4) -> 阶乘(3) -> 阶乘(2)",
+        "explanation": "**`return n * Factorial(n - 1);`** --- 我们正在尝试从 Factorial(4) 计算 `return 4 * Factorial(3)`，但我们还不知道 Factorial(3) 的结果。 Factorial(3) 还尝试计算 `return 3 * Factorial(2)`",
         "visualizationType": "cMemory",
         "code": "return n * factorial(n - 1);",
         "highlightOffset": [
@@ -117,8 +117,8 @@
         ]
       },
       {
-        "title": "factorial(1) - 到达终止条件（Base Case）！",
-        "explanation": "当 factorial(2) 调用 factorial(1) 时，`n <= 1` 变为**真**——终于到达了**终止条件**！不再调用自身，直接返回值 `1`。",
+        "title": "阶乘(1) - 达到终止条件（基本情况）！",
+        "explanation": "当我们从阶乘(2)调用阶乘(1)时，`n <= 1`为**真** --- 我们终于达到了**终止条件**！它立即返回值“1”，而不对其自身进行任何进一步的调用。",
         "visualizationType": "cMemory",
         "code": "return 1;",
         "stack": [
@@ -191,7 +191,7 @@
       },
       {
         "title": "返回值传播：1 -> 2 -> 6",
-        "explanation": "返回值逆序传播——这是递归最优美的部分。当 factorial(1) 返回 **1** 时，factorial(2) 计算 `2 * 1 = 2`，factorial(3) 计算 `3 * 2 = 6`，帧逐个被 Pop。",
+        "explanation": "返回值以相反的顺序传播——这是递归中最美妙的部分。如果factorial(1)返回**1**，factorial(2)返回`2 * 1 = 2`，factorial(3)返回`3 * 2 = 6`，并且帧被一一弹出。",
         "visualizationType": "cMemory",
         "code": "return n * factorial(n - 1);",
         "occurrence": 2,
@@ -225,8 +225,8 @@
         ]
       },
       {
-        "title": "最终返回：factorial(4) = 24",
-        "explanation": "factorial(4) 返回 `4 * 6` = **24**，值被存储到 main 的 `result` 中。\n\n递归通常分两个阶段理解：向下拆分问题的阶段（Winding），和从终止条件带着值向上合成的阶段（Unwinding）。",
+        "title": "最终返回：阶乘(4) = 24",
+        "explanation": "Factorial(4) 通过 `return 4 * 6` 返回 **24**，该值存储在 main 的 `result` 中。\n\n递归通常可以理解为两个阶段：向下阶段，问题被分解（缠绕）；向上阶段，从终止条件获得的值被提取并合成（解绕）。",
         "visualizationType": "cMemory",
         "code": "return n * factorial(n - 1);",
         "occurrence": 3,
@@ -247,8 +247,8 @@
         ]
       },
       {
-        "title": "输出结果",
-        "explanation": "**`printf(\"4! = %d\\n\", result);`** -- 用 `%d` 输出 `result` 的值 `24`，屏幕显示 `4! = 24`。\n\n总结递归返回值的传递过程：进入时将大问题逐步拆小（4!->3!->2!->1!），返回时将小答案合成大答案。",
+        "title": "结果输出",
+        "explanation": "**`printf(\"4!= %d\\n\", result);`** --- 将 `result` 中的 `24` 打印为 `%d` 并显示 `4!'在屏幕上。\n\n总结一下递归传递返回值的过程：进入时，将大问题分解成越来越小的部分（4！->3！->2！->1！），退出时，组合较小的答案以创建更大的答案。",
         "visualizationType": "terminal",
         "code": "printf(\"4! = %d\\n\", result);",
         "stdout": "4! = 24"
@@ -257,27 +257,27 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "调用 factorial(5) 时，factorial 函数总共被调用几次？",
+    "question": "调用阶乘(5)时，阶乘函数总共被调用了多少次？",
     "options": [
-      "4 次",
-      "5 次（factorial(5)、factorial(4)、factorial(3)、factorial(2)、factorial(1)）",
-      "6 次",
+      "4号",
+      "数字 5（阶乘 (5)、阶乘 (4)、阶乘 (3)、阶乘 (2)、阶乘 (1)）",
+      "6号",
       "无限次"
     ],
     "correctIndex": 1,
-    "explanation": "factorial(5) -> factorial(4) -> factorial(3) -> factorial(2) -> factorial(1) 共调用 5 次。\n在 factorial(1) 处到达终止条件，不再继续调用。"
+    "explanation": "总共调用了5次：factorial(5) -> Factorial(4) -> Factorial(3) -> Factorial(2) -> Factorial(1)。\nFactorial(1) 中已达到终止条件，不会再进行进一步的调用。"
   },
   "misconceptions": [
     {
-      "wrong": "递归函数会立即计算出结果",
-      "correct": "它将计算推迟到终止条件，然后在返回时逐层合并结果。",
-      "why": "factorial(4) 需要知道 factorial(3) 的结果才能计算，因此所有调用完成后结果才逆序传播。"
+      "wrong": "递归函数立即计算结果",
+      "correct": "它推迟计算，直到达到终止条件，并在返回时合并结果。",
+      "why": "由于只有在知道阶乘(3)的结果之后才能计算阶乘(4)，因此在所有调用之后结果以相反的顺序传播。"
     },
     {
       "wrong": "递归总是比循环慢",
-      "correct": "简单递归有函数调用开销，但如果应用了尾递归优化，性能与循环相同。",
-      "why": "编译器检测到尾递归（Tail Recursion）时可以将其转换为循环。但这个 factorial 使用 n*factorial(n-1) 的形式，不是尾递归。"
+      "correct": "简单递归有函数调用开销，但是当应用尾递归优化时，它具有与循环相同的性能。",
+      "why": "如果编译器检测到尾递归，它可以将其转换为循环。但是，该阶乘的形式为 n*factorial(n-1)，因此它不是尾递归。"
     }
   ],
-  "keyTakeaway": "递归的返回值从终止条件开始，沿着调用栈逆序传递。"
+  "keyTakeaway": "递归的返回值从终止条件开始以相反的顺序传递到调用堆栈。"
 }

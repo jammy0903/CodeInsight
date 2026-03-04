@@ -47,8 +47,8 @@ export function PlaygroundPage() {
     setStdin(e.target.value);
   }, [setStdin]);
 
-  // Flow/Memory 탭 상태
-  const [activeTab, setActiveTab] = useState<'flow' | 'memory'>('flow');
+  // Visualization 탭 상태
+  const [activeTab, setActiveTab] = useState<'flow' | 'memory' | 'jsMemory'>('flow');
 
   // 터미널 출력 (모든 언어 통합 - useLessonTerminal 훅)
   const terminalLines = useLessonTerminal({
@@ -58,14 +58,36 @@ export function PlaygroundPage() {
     diffMode: false,
   });
 
-  // Memory 탭 표시 여부 (Java, C만)
+  // 메모리 탭 표시 여부
   const showMemoryTab = language === 'java' || language === 'c' || language === 'cpp';
+  const showJsMemoryTab = language === 'javascript';
+  const canRenderVisualizer = (
+    language === 'c' ||
+    language === 'cpp' ||
+    language === 'python' ||
+    language === 'java' ||
+    language === 'javascript'
+  );
 
 
   // 페이지 제목 설정
   useEffect(() => {
     setPageTitle(t('playground.title'), t('playground.subtitle'));
   }, [setPageTitle, t]);
+
+  useEffect(() => {
+    setActiveTab('flow');
+  }, [language]);
+
+  useEffect(() => {
+    if (activeTab === 'memory' && !showMemoryTab) {
+      setActiveTab('flow');
+      return;
+    }
+    if (activeTab === 'jsMemory' && !showJsMemoryTab) {
+      setActiveTab('flow');
+    }
+  }, [activeTab, showMemoryTab, showJsMemoryTab]);
 
   // 키보드 좌우 화살표 키로 스텝 이동
   useStepGestures({
@@ -88,6 +110,19 @@ export function PlaygroundPage() {
     steps as LessonStep[],
     currentStepIndex
   );
+
+  const toJsMemoryStep = useCallback((step: LessonStep | undefined): LessonStep => {
+    const base = (step || {}) as LessonStep;
+    return {
+      ...base,
+      visualizationType: 'javascript',
+      eventLoopState: undefined,
+      scopeState: undefined,
+      thisState: undefined,
+      prototypeState: undefined,
+      promiseState: undefined,
+    };
+  }, []);
 
   // 모바일 레이아웃: PanelGroup 없이 단순 스택
   if (isMobile) {
@@ -234,6 +269,29 @@ export function PlaygroundPage() {
                 Memory
               </button>
             )}
+            {showJsMemoryTab && (
+              <button
+                onClick={() => setActiveTab('jsMemory')}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                  padding: '8px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  backgroundColor: activeTab === 'jsMemory' ? colors.accent : 'transparent',
+                  color: activeTab === 'jsMemory' ? '#fff' : colors.textMuted,
+                  border: 'none',
+                  borderRight: `1px solid ${colors.border}`,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                JS Memory
+              </button>
+            )}
             {hasSteps && (
               <span
                 style={{
@@ -258,9 +316,25 @@ export function PlaygroundPage() {
               <div style={{ padding: '10px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '6px' }}>
                 <p style={{ fontSize: '12px', color: colors.errorText }}>{error}</p>
               </div>
-            ) : (language === 'c' || language === 'cpp' || language === 'python' || language === 'java') && hasSteps ? (
+            ) : canRenderVisualizer && hasSteps ? (
               <>
-                {activeTab === 'flow' ? (
+                {activeTab === 'memory' ? (
+                  <LessonMemoryVisualizer
+                    step={currentStep as LessonStep}
+                    language={language}
+                    memoryState={memoryState}
+                    changedBlocks={changedBlocks}
+                  />
+                ) : activeTab === 'jsMemory' ? (
+                  <LessonFlowVisualizer
+                    step={toJsMemoryStep(currentStep as LessonStep | undefined)}
+                    prevStep={currentStepIndex > 0 ? toJsMemoryStep(steps[currentStepIndex - 1] as LessonStep | undefined) : null}
+                    language={language}
+                    fullCode={code}
+                    theme={currentTheme === 'dark' ? 'dark' : 'light'}
+                    stdout={currentStep?.stdout}
+                  />
+                ) : (
                   <LessonFlowVisualizer
                     step={currentStep as LessonStep}
                     prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] as LessonStep : null}
@@ -268,13 +342,6 @@ export function PlaygroundPage() {
                     fullCode={code}
                     theme={currentTheme === 'dark' ? 'dark' : 'light'}
                     stdout={currentStep?.stdout}
-                  />
-                ) : (
-                  <LessonMemoryVisualizer
-                    step={currentStep as LessonStep}
-                    language={language}
-                    memoryState={memoryState}
-                    changedBlocks={changedBlocks}
                   />
                 )}
               </>
@@ -520,6 +587,28 @@ export function PlaygroundPage() {
                 Memory
               </button>
             )}
+            {showJsMemoryTab && (
+              <button
+                onClick={() => setActiveTab('jsMemory')}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  padding: '12px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  backgroundColor: activeTab === 'jsMemory' ? colors.accent : 'transparent',
+                  color: activeTab === 'jsMemory' ? '#fff' : colors.textMuted,
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                JS Memory
+              </button>
+            )}
             {hasSteps && (
               <span
                 style={{
@@ -545,9 +634,25 @@ export function PlaygroundPage() {
               <div style={{ padding: '5px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '8px' }}>
                 <p style={{ fontSize: '14px', color: colors.errorText }}>{error}</p>
               </div>
-            ) : (language === 'c' || language === 'cpp' || language === 'python' || language === 'java') && hasSteps ? (
+            ) : canRenderVisualizer && hasSteps ? (
               <>
-                {activeTab === 'flow' ? (
+                {activeTab === 'memory' ? (
+                  <LessonMemoryVisualizer
+                    step={currentStep as LessonStep}
+                    language={language}
+                    memoryState={memoryState}
+                    changedBlocks={changedBlocks}
+                  />
+                ) : activeTab === 'jsMemory' ? (
+                  <LessonFlowVisualizer
+                    step={toJsMemoryStep(currentStep as LessonStep | undefined)}
+                    prevStep={currentStepIndex > 0 ? toJsMemoryStep(steps[currentStepIndex - 1] as LessonStep | undefined) : null}
+                    language={language}
+                    fullCode={code}
+                    theme={currentTheme === 'dark' ? 'dark' : 'light'}
+                    stdout={currentStep?.stdout}
+                  />
+                ) : (
                   <LessonFlowVisualizer
                     step={currentStep as LessonStep}
                     prevStep={currentStepIndex > 0 ? steps[currentStepIndex - 1] as LessonStep : null}
@@ -555,13 +660,6 @@ export function PlaygroundPage() {
                     fullCode={code}
                     theme={currentTheme === 'dark' ? 'dark' : 'light'}
                     stdout={currentStep?.stdout}
-                  />
-                ) : (
-                  <LessonMemoryVisualizer
-                    step={currentStep as LessonStep}
-                    language={language}
-                    memoryState={memoryState}
-                    changedBlocks={changedBlocks}
                   />
                 )}
               </>

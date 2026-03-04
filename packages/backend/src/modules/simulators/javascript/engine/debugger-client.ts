@@ -5,6 +5,13 @@ import { nodeSafeEnv } from '../../safe-env';
 export interface JavaScriptSnapshot {
   line: number;
   event: 'STEP' | 'ERROR';
+  code?: string;
+  stdout?: string;
+  eventLoopState?: unknown;
+  scopeState?: unknown;
+  thisState?: unknown;
+  prototypeState?: unknown;
+  promiseState?: unknown;
   stack: Array<{
     methodName: string;
     className: string;
@@ -37,16 +44,38 @@ export class JavaScriptDebuggerClient {
    * @param projectPath The project directory containing main.js
    * @returns Array of execution snapshots
    */
-  async run(projectPath: string): Promise<JavaScriptSnapshot[]> {
+  async run(
+    projectPath: string,
+    options: { signal?: AbortSignal } = {}
+  ): Promise<JavaScriptSnapshot[]> {
     const sourcePath = path.join(projectPath, 'main.js');
+    const signal = options.signal;
 
     const child = spawn('node', [this.AGENT_PATH, sourcePath], {
       cwd: projectPath,
       env: nodeSafeEnv(),
     });
+    let timedOut = false;
+    let aborted = false;
+
+    const onAbort = () => {
+      aborted = true;
+      if (!child.killed) {
+        child.kill('SIGKILL');
+      }
+    };
+
+    if (signal) {
+      if (signal.aborted) {
+        onAbort();
+      } else {
+        signal.addEventListener('abort', onAbort, { once: true });
+      }
+    }
 
     const timeout = setTimeout(() => {
       if (!child.killed) {
+        timedOut = true;
         child.kill('SIGKILL');
       }
     }, this.EXECUTION_TIMEOUT);
@@ -70,10 +99,17 @@ export class JavaScriptDebuggerClient {
 
     await Promise.all([stdoutPromise, stderrPromise, exitPromise]);
     clearTimeout(timeout);
+    if (signal) {
+      signal.removeEventListener('abort', onAbort);
+    }
 
     const exitCode = await exitPromise;
 
-    if (child.killed) {
+    if (aborted) {
+      throw new Error('Simulation aborted');
+    }
+
+    if (timedOut) {
       throw new Error('Time Limit Exceeded (10s)');
     }
 

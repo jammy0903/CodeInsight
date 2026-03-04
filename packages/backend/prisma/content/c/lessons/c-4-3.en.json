@@ -1,13 +1,13 @@
 {
   "lessonId": "c-4-3",
   "title": "Call by Reference (Pointer)",
-  "concept": "If you want to change the original, pass the variable's 'address'",
+  "concept": "If you want to change the original, pass the 'address' of the variable.",
   "content": {
     "code": "#include <stdio.h>\n\nvoid reallyChange(int *p) {\n    *p = 999;\n    printf(\"Inside func: Changed!\\n\");\n}\n\nint main() {\n    int a = 10;\n\n    printf(\"Before: %d\\n\", a);\n    reallyChange(&a);\n    printf(\"After:  %d\\n\", a);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including Header",
-        "explanation": "`#include <stdio.h>` enables the output functions.\n\nThis lesson covers the flow of modifying the original by passing an address (pointer).",
+        "title": "with header",
+        "explanation": "Use the output function with `#include <stdio.h>`.\n\nThis lesson covers the flow of modifying the original by passing an address (pointer).",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting the main Function",
-        "explanation": "The main frame is created, preparing to call `reallyChange(int *p)` which takes a pointer parameter.",
+        "title": "Start main function",
+        "explanation": "The main frame is created, ready to call the pointer parameter function `reallyChange(int *p)`.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Declaring and Initializing Variable a",
-        "explanation": "`int a = 10;` creates the original variable.\n\nThis time, we'll pass `a`'s address to the function, not its value.",
+        "title": "Declare and initialize variable a",
+        "explanation": "Create the original variable with `int a = 10;`.\n\nThis time, we pass the address of `a` to the function rather than the value.",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "stack": [
@@ -43,15 +43,15 @@
         ]
       },
       {
-        "title": "Printing the Before Value",
-        "explanation": "Prints `a=10` before the call.",
+        "title": "Before value output",
+        "explanation": "Prints `a=10` before calling.",
         "visualizationType": "cMemory",
         "code": "printf(\"Before: %d\\n\", a);",
         "stdout": "Before: 10"
       },
       {
-        "title": "Function Call with Address Passing",
-        "explanation": "In `reallyChange(&a);`, the address `&a` is passed so that `p` points to `a`.\n\nC still uses value copying, but since the copied value is an address, modifying the original becomes possible.",
+        "title": "Function call and address passing",
+        "explanation": "In `reallyChange(&a);`, the address `&a` is passed so that `p` points to `a`.\n\nC is still a value copy, but since the copy target is an address, modification of the original becomes possible.",
         "visualizationType": "cMemory",
         "code": "reallyChange(&a);",
         "highlightOffset": [
@@ -76,9 +76,9 @@
         ]
       },
       {
-        "title": "Modifying the Original via Dereferencing",
-        "keyInsight": "Pointer dereferencing (`*p`) modifies the actual memory it points to.",
-        "explanation": "`*p = 999;` stores 999 at the location `p` points to (`a`).\n\nThis means the function directly changes the original variable in main.",
+        "title": "Change the original by backreferencing",
+        "keyInsight": "A pointer dereference (`*p`) modifies the physical memory it points to.",
+        "explanation": "`*p = 999;` stores 999 in the actual location (`a`) pointed to by `p`.\n\nThat is, directly replace the original variable in main inside the function.",
         "visualizationType": "cMemory",
         "code": "*p = 999;",
         "stack": [
@@ -100,8 +100,8 @@
         ]
       },
       {
-        "title": "Printing Inside the Function",
-        "explanation": "Prints the change message.\n\nAt this point, the original `a` has already been changed to 999.",
+        "title": "Function internal output",
+        "explanation": "Prints a change message.\n\nAt this point, the original `a` value has already been changed to 999.",
         "visualizationType": "cMemory",
         "code": "printf(\"Inside func: Changed!\\n\");",
         "stack": [
@@ -123,8 +123,8 @@
         "stdout": "Before: 10\nInside func: Changed!"
       },
       {
-        "title": "Verifying the Change (After Output)",
-        "explanation": "Printing `a` after the call shows 999.\n\nAddress passing + dereferencing is the key mechanism that enables modifying the original.",
+        "title": "Confirm change (After output)",
+        "explanation": "If you print `a` after calling, you will get 999.\n\nAddress passing + dereferencing are the key mechanisms that created the original change.",
         "visualizationType": "cMemory",
         "code": "printf(\"After:  %d\\n\", a);",
         "stack": [
@@ -142,7 +142,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "To create a swap function that swaps the values of two variables a and b, what should the parameters be?",
+    "question": "To create a swap function that swaps the values ​​of two variables a and b, what are the parameters?",
     "options": [
       "void swap(int x, int y)",
       "void swap(int *x, int *y)",
@@ -150,14 +150,14 @@
       "int swap(int x, int y)"
     ],
     "correctIndex": 1,
-    "explanation": "In C, you need to accept pointers to modify the originals.\nCall it like `swap(&a, &b)`.\n(C++ has & references, but C does not)"
+    "explanation": "To change the original in C language, you must receive a pointer.\nCall it like this: `swap(&a, &b)`.\n(C++ has & references, C does not)"
   },
   "misconceptions": [
     {
-      "wrong": "Call by Reference means no memory copying happens",
-      "correct": "The 'address value' is actually being copied.",
-      "why": "Strictly speaking, C only has **Call by Value**.\nIt just passes 'an address as the value' to achieve a reference-like effect."
+      "wrong": "Call by Reference does not copy memory.",
+      "correct": "In fact, the 'address value' is copied.",
+      "why": "Strictly speaking, C only has **Call by Value**.\nIt only creates a reference effect by passing the 'address value'."
     }
   ],
-  "keyTakeaway": "To modify the original from a function, pass the address with `&` and receive it with `*` to make changes."
+  "keyTakeaway": "To change the original in a function, pass the address with `&` and receive it with `*` to change it."
 }

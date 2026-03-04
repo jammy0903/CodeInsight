@@ -1,13 +1,13 @@
 {
   "lessonId": "c-5-5",
   "title": "Dangling Pointers",
-  "concept": "Holding onto a receipt (pointer) for returned memory -- and then causing an accident",
+  "concept": "If you keep holding the returned address card (pointer), you will get into trouble.",
   "content": {
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = (int*)malloc(sizeof(int));\n    *p = 10;\n\n    free(p);\n\n\n    p = NULL;\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
-        "explanation": "Standard I/O header.\n\nThis lesson covers the dangling pointer problem -- a pointer that still references freed memory.",
+        "title": "Include stdio.h header",
+        "explanation": "This is the standard input/output header.\n\nThis lesson addresses the problem of dangling pointers that keep pointing to freed memory.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,14 +15,14 @@
         "stdout": ""
       },
       {
-        "title": "Including stdlib.h header",
-        "explanation": "This header is needed to use `malloc`/`free`.",
+        "title": "Include stdlib.h header",
+        "explanation": "Header for using `malloc`/`free`.",
         "visualizationType": "cMemory",
         "code": "#include <stdlib.h>"
       },
       {
-        "title": "Starting main function",
-        "explanation": "The main frame is created. We will follow the allocate -> free -> safe cleanup flow.",
+        "title": "Start main function",
+        "explanation": "The main frame is created, and the allocation -> deallocation -> safety processing flow is checked.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -35,8 +35,8 @@
         ]
       },
       {
-        "title": "Allocating heap memory",
-        "explanation": "We allocate space for one integer on the heap and store the address in pointer `p`.",
+        "title": "Heap memory allocation",
+        "explanation": "Allocate space for one integer in the heap and store its address in pointer `p`.",
         "visualizationType": "cMemory",
         "code": "int *p = (int*)malloc(sizeof(int));",
         "stack": [
@@ -56,8 +56,8 @@
         ]
       },
       {
-        "title": "Storing a value in heap memory",
-        "explanation": "`*p = 10;` completes initialization of the heap value.",
+        "title": "Store value in heap memory",
+        "explanation": "Complete heap value initialization with `*p = 10;`.",
         "visualizationType": "cMemory",
         "code": "*p = 10;",
         "heap": [
@@ -70,8 +70,8 @@
         ]
       },
       {
-        "title": "Freeing memory and creating a dangling pointer",
-        "explanation": "After `free(p)`, the heap block is freed but the value of `p` remains unchanged, leaving it in a dangling state.\n\nDereferencing this pointer causes Undefined Behavior.",
+        "title": "Memory release and dangling pointers occur",
+        "explanation": "After `free(p)`, the heap block is freed, but the `p` value remains and is in a dangling state.\n\nDereferencing this pointer will result in Undefined Behavior.",
         "visualizationType": "cMemory",
         "code": "free(p);",
         "stack": [
@@ -86,8 +86,8 @@
         "heap": []
       },
       {
-        "title": "Preventing dangling pointers (the fix)",
-        "explanation": "`p = NULL;` invalidates the pointer to reduce the risk of reuse.\n\nSetting to NULL immediately after freeing is the most basic defensive habit.",
+        "title": "Prevent dangling pointers (solution)",
+        "explanation": "Reduce the risk of reuse by invalidating pointers with `p = NULL;`.\n\nAssigning NULL immediately after release is the most basic defensive habit.",
         "visualizationType": "cMemory",
         "code": "p = NULL;",
         "stack": [
@@ -100,8 +100,8 @@
         ]
       },
       {
-        "title": "Program termination",
-        "explanation": "The program ends with `return 0;`.\n\nKey point: After free, immediately set the pointer to NULL.",
+        "title": "Program exit",
+        "explanation": "Exit with `return 0;`.\n\nKey point: After freeing, the pointer is immediately cleared to NULL.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -112,20 +112,20 @@
   "quiz": {
     "question": "What is a Dangling Pointer?",
     "options": [
-      "An uninitialized pointer",
-      "A NULL pointer",
-      "A pointer that still points to freed (invalid) memory",
-      "A void pointer"
+      "uninitialized pointer",
+      "NULL pointer",
+      "Pointer pointing to invalid (freed) memory",
+      "void pointer"
     ],
     "correctIndex": 2,
-    "explanation": "\"Dangling\" means hanging loosely.\nIt refers to a pointer that has lost its valid destination."
+    "explanation": "It means dangle.\nIt refers to a pointer that has no place to go."
   },
   "misconceptions": [
     {
-      "wrong": "After free(p), p automatically becomes NULL",
-      "correct": "C is not that kind.",
-      "why": "Manually writing `p = NULL;` is both good manners and a survival skill for C programmers."
+      "wrong": "When you free(p), p automatically becomes NULL.",
+      "correct": "The C language is not that friendly.",
+      "why": "Directly specifying `p = NULL;` is a C language programmer's manners and survival skill."
     }
   ],
-  "keyTakeaway": "After `free`, tear up the receipt (`p`) too -- set it to `NULL`."
+  "keyTakeaway": "After saying `free`, tear up the receipt (`p`) in your hand (`NULL`)."
 }

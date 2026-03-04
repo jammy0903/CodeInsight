@@ -1,13 +1,13 @@
 {
   "lessonId": "c-4-2",
   "title": "Call by Value",
-  "concept": "When you pass a variable to a function, a 'copy' is passed. The original stays safe.",
+  "concept": "When you pass a variable to a function, a ‘copy’ is passed. The original is safe.",
   "content": {
     "code": "#include <stdio.h>\n\nvoid tryToChange(int x) {\n    x = 999;\n    printf(\"Inside func: x=%d\\n\", x);\n}\n\nint main() {\n    int a = 10;\n\n    printf(\"Before: %d\\n\", a);\n    tryToChange(a);\n    printf(\"After:  %d\\n\", a);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Include header",
-        "explanation": "`#include <stdio.h>` provides access to output functions.",
+        "title": "with header",
+        "explanation": "Use the output function with `#include <stdio.h>`.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Start of main function",
-        "explanation": "The main frame is created.\n\nThe key point of this lesson is that when a regular variable is passed to a function, a copy of the value is passed — not the original.",
+        "title": "Start main function",
+        "explanation": "The main frame is created.\n\nThe key point this time is that when you pass a regular variable to a function, a copy of the value is passed, not the original.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,7 +30,7 @@
       },
       {
         "title": "Declare and initialize variable a",
-        "explanation": "`int a = 10;` prepares the original variable `a`.\n\nWe will compare this value before and after the function call to confirm Call by Value behavior.",
+        "explanation": "Prepare the original variable `a` with `int a = 10;`.\n\nCompare this value before and after calling the function to check Call by Value operation.",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "stack": [
@@ -49,15 +49,15 @@
         ]
       },
       {
-        "title": "Print the Before value",
-        "explanation": "Print the value of `a` before the call to establish a baseline.",
+        "title": "Before value output",
+        "explanation": "Before calling, print the value of `a` to record the reference state.",
         "visualizationType": "cMemory",
         "code": "printf(\"Before: %d\\n\", a);",
         "stdout": "Before: 10"
       },
       {
-        "title": "Function call and value copy",
-        "explanation": "When `tryToChange(a);` is called, only the value of `a` is copied to the parameter `x`.\n\n`a` and `x` are separate variables in different memory locations.",
+        "title": "Function calls and value copying",
+        "explanation": "When calling `tryToChange(a);`, only the value of `a` is copied to parameter `x`.\n\n`a` and `x` are separate variables in different memory spaces.",
         "visualizationType": "cMemory",
         "code": "tryToChange(a);",
         "highlightOffset": [
@@ -94,8 +94,8 @@
         ]
       },
       {
-        "title": "Modifying the copy x",
-        "explanation": "Even though `x=999` is assigned inside the function, only the copy is changed.\n\nThe original `a` is not affected.",
+        "title": "change copy x",
+        "explanation": "Changing `x=999` inside the function only changes the copy.\n\nThe original `a` is not affected.",
         "visualizationType": "cMemory",
         "code": "x = 999;",
         "stack": [
@@ -129,8 +129,8 @@
         ]
       },
       {
-        "title": "Output inside the function",
-        "explanation": "Inside the function, `x=999` is printed.\n\nThis is the result of the copy being changed.",
+        "title": "Function internal output",
+        "explanation": "Inside the function, `x=999` is output.\n\nThis is the result of the copy value being changed.",
         "visualizationType": "cMemory",
         "code": "printf(\"Inside func: x=%d\\n\", x);",
         "stack": [
@@ -164,8 +164,8 @@
         "stdout": "Before: 10\nInside func: x=999"
       },
       {
-        "title": "After output - the original is unchanged",
-        "explanation": "After the call, printing `a` still shows 10.\n\nIn Call by Value, the function cannot directly modify the original variable.",
+        "title": "After output - original as is",
+        "explanation": "If you print `a` after the call, it's still 10.\n\nIn Call by Value, the function cannot directly change the original variable.",
         "visualizationType": "cMemory",
         "code": "printf(\"After:  %d\\n\", a);",
         "stack": [
@@ -189,22 +189,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What is the value of a after this function call?\nvoid inc(int n) { n++; }\n...\nint a = 5; inc(a);",
+    "question": "What is the value of a after calling the following function?\nvoid inc(int n) { n++; }\n...\nint a = 5; inc(a);",
     "options": [
       "5",
       "6",
       "0",
-      "Error"
+      "error"
     ],
     "correctIndex": 0,
-    "explanation": "Only the copy `n` was incremented.\nThe original `a` remains unchanged at 5."
+    "explanation": "The only thing incremented is copy `n`.\nThe original `a` remains unchanged and remains 5."
   },
   "misconceptions": [
     {
-      "wrong": "Passing a variable to a function creates a connection to it",
-      "correct": "It's not a connection — it's a 'Ctrl+C, Ctrl+V' copy.",
-      "why": "This is the default behavior for data protection.\nIf you want to modify the original, you need to use pointers."
+      "wrong": "If you add a variable to a function, it will be connected.",
+      "correct": "It is not connected, but copied with ‘Ctrl+C, Ctrl+V’.",
+      "why": "This is the default behavior for data protection.\nIf you want to change it, you have to use a pointer."
     }
   ],
-  "keyTakeaway": "When you pass a variable to a function, only the value is copied. Want to modify the original?"
+  "keyTakeaway": "If you throw a variable into a function, only the value is copied. What if you want to change the original?"
 }

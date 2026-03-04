@@ -1,13 +1,13 @@
 {
   "lessonId": "java-7-4",
-  "title": "通配符与类型限定",
+  "title": "와일드카드와 타입 제한",
   "concept": "Core concept for Wildcards & Bounds",
   "content": {
     "code": "import java.util.List;\nimport java.util.ArrayList;\n\npublic class Main {\n    // Upper Bounded Wildcard: accept Number or its subclasses (Integer, Double...)\n    public static double sum(List<? extends Number> list) {\n        double sum = 0;\n        for (Number n : list) {\n            sum += n.doubleValue();\n        }\n        // list.add(10); // Error! Read-only (mostly)\n        return sum;\n    }\n\n    public static void main(String[] args) {\n        List<Integer> ints = new ArrayList<>();\n        ints.add(1);\n        ints.add(2);\n        \n        List<Double> doubles = new ArrayList<>();\n        doubles.add(3.5);\n        \n        // Both work thanks to wildcard\n        System.out.println(\"Sum Ints: \" + sum(ints));\n        System.out.println(\"Sum Doubles: \" + sum(doubles));\n    }\n}",
     "steps": [
       {
-        "title": "包导入",
-        "explanation": "**`import java.util.*;`**\n\n用于使用 `List` 和 `ArrayList` 的包声明。",
+        "title": "패키지 임포트",
+        "explanation": "**`import java.util.*;`**\n\n`List`와 `ArrayList`를 사용하기 위한 패키지 선언입니다.",
         "visualizationType": "javaMemory",
         "code": "import java.util.List;",
         "highlightOffset": [
@@ -21,14 +21,14 @@
         }
       },
       {
-        "title": "main 方法执行",
-        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。",
+        "title": "main 메서드 실행",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다.",
         "visualizationType": "javaMemory",
         "code": "public static void main(String[] args) {"
       },
       {
-        "title": "通配符方法定义",
-        "explanation": "**执行流程：**\n1. `sum` 方法被加载到内存中。\n2. `List<? extends Number>` 声明只接受 `Number` 及其子类。\n\n**守门人角色：**\n就像在门上贴了一个"仅限 Number 家族入内！"的牌子。\n像 String 这样的类型绝对进不来。",
+        "title": "와일드카드 메서드 정의",
+        "explanation": "**실행 순서:**\n1. `sum` 메서드가 메모리에 로드됩니다.\n2. `List<? extends Number>`는 `Number`와 그 자식들만 받겠다는 선언입니다.\n\n**문지기 역할:**\n\"Number 패밀리만 들어오세요!\"라고 문에 써붙인 것과 같아요.\nString 같은 건 절대 못 들어오죠.",
         "visualizationType": "javaMemory",
         "code": "public static double sum(List<? extends Number> list) {",
         "highlightOffset": [
@@ -51,8 +51,8 @@
         }
       },
       {
-        "title": "创建 Integer 列表",
-        "explanation": "**执行流程：**\n1. 在堆中创建 `ArrayList<Integer>` 对象。\n2. `ints` 变量引用该对象。\n",
+        "title": "Integer 리스트 생성",
+        "explanation": "**실행 순서:**\n1. `ArrayList<Integer>` 객체를 힙에 생성합니다.\n2. `ints` 변수가 참조합니다.\n",
         "visualizationType": "javaMemory",
         "code": "List<Integer> ints = new ArrayList<>();",
         "javaMemoryState": {
@@ -81,8 +81,8 @@
         }
       },
       {
-        "title": "添加数据（1, 2）",
-        "explanation": "**执行流程：**\n1. 向 `ints` 列表中添加 1 和 2。\n\n**准备数据：**\n为加法测试填入整数。",
+        "title": "데이터 추가 (1, 2)",
+        "explanation": "**실행 순서:**\n1. `ints` 리스트에 1과 2를 추가합니다.\n\n**데이터 준비:**\n더하기 테스트를 위해 정수들을 채워넣습니다.",
         "visualizationType": "javaMemory",
         "code": "ints.add(2);",
         "highlightOffset": [
@@ -101,8 +101,8 @@
         }
       },
       {
-        "title": "创建 Double 列表",
-        "explanation": "**执行流程：**\n1. 这次在堆中创建 `ArrayList<Double>` 对象。\n2. `doubles` 变量引用该对象。\n",
+        "title": "Double 리스트 생성",
+        "explanation": "**실행 순서:**\n1. 이번엔 `ArrayList<Double>` 객체를 힙에 생성합니다.\n2. `doubles` 변수가 참조합니다.\n",
         "visualizationType": "javaMemory",
         "code": "List<Double> doubles = new ArrayList<>();",
         "javaMemoryState": {
@@ -141,8 +141,8 @@
         }
       },
       {
-        "title": "添加数据（3.5）",
-        "explanation": "**执行流程：**\n1. 向 `doubles` 列表中添加 3.5。\n",
+        "title": "데이터 추가 (3.5)",
+        "explanation": "**실행 순서:**\n1. `doubles` 리스트에 3.5를 추가합니다.\n",
         "visualizationType": "javaMemory",
         "code": "doubles.add(3.5);",
         "javaMemoryState": {
@@ -162,8 +162,8 @@
         }
       },
       {
-        "title": "调用 sum(ints)",
-        "explanation": "**执行流程：**\n1. 调用 `sum(ints)`。\n2. `ints` 是 `Integer` 列表，但由于 `Integer` 是 `Number` 的子类，所以通过了通配符检查（`? extends Number`）。\n3. 返回总和 3.0 并输出。\n\n**灵活性：**\n`List<Integer>` 可以，`List<Double>` 也可以。\n这就是程序员喜爱通配符的原因！",
+        "title": "sum(ints) 호출",
+        "explanation": "**실행 순서:**\n1. `sum(ints)`를 호출합니다.\n2. `ints`는 `Integer` 리스트지만, `Integer`는 `Number`의 자식이므로 와일드카드(`? extends Number`)에 통과합니다.\n3. 합계 3.0이 반환되어 출력됩니다.\n\n**유연함:**\n`List<Integer>`도 OK, `List<Double>`도 OK.\n이것이 프로그래머들이 와일드카드를 사랑하는 이유입니다!",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"Sum Ints: \" + sum(ints));",
         "highlightOffset": [
@@ -196,8 +196,8 @@
         }
       },
       {
-        "title": "调用 sum(doubles)",
-        "explanation": "**执行流程：**\n1. 调用 `sum(doubles)`。\n2. `Double` 也属于 `Number` 家族，所以被接受。\n3. 输出总和 3.5。\n\n**总结：**\n借助上界通配符（`? extends`），我们创建了一个灵活的只读方法。",
+        "title": "sum(doubles) 호출",
+        "explanation": "**실행 순서:**\n1. `sum(doubles)`를 호출합니다.\n2. `Double` 역시 `Number` 패밀리이므로 환영받습니다.\n3. 합계 3.5가 출력됩니다.\n\n**마무리:**\n상한 경계 와일드카드(`? extends`) 덕분에 '읽기 전용'의 유연한 메서드가 완성되었습니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"Sum Doubles: \" + sum(doubles));",
         "highlightOffset": [
@@ -221,22 +221,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "List<? super Integer> 的含义是？",
+    "question": "列表<?超级整数> 是什么意思？",
     "options": [
-      "所有继承 Integer 的类",
-      "Integer 或其祖先（父）类",
-      "任何类型都可以",
-      "只能是 Integer"
+      "所有继承Integer的类",
+      "整数或其祖先（父）类",
+      "所有类型均可",
+      "仅整数"
     ],
     "correctIndex": 1,
-    "explanation": "`super` 设置下界（Lower Bound）。\n表示 Integer 本身或其上层父类（Number、Object 等）类型的列表，主要在存储（写入/消费）数据时使用。"
+    "explanation": "`super` 设置下限。\nInteger是指类型本身或其父类型（Number、Object等）的列表，主要在存储（Write/Consume）数据时使用。"
   },
   "misconceptions": [
     {
-      "wrong": "List<Object> 是 List<String> 的父类型。",
-      "correct": "不是！泛型是不变的（Invariant）。\n不能将 `List<String>` 赋值给 `List<Object>` 变量。\n这就是为什么需要通配符（`? extends Object`）。",
-      "why": "如果允许这样赋值，就可能出现将 Integer 放入 String 列表的事故。"
+      "wrong": "List<Object>는 List<String>의 부모다.",
+      "correct": "아닙니다! 제네릭은 불공변(Invariant)입니다.\n`List<Object>` 변수에 `List<String>`을 대입할 수 없습니다.\n그래서 와일드카드(`? extends Object`)가 필요한 것입니다.",
+      "why": "만약 대입이 되면, String 리스트에 Integer를 넣는 사고가 발생할 수 있기 때문입니다."
     }
   ],
-  "keyTakeaway": "要创建灵活的 API，就需要使用通配符。请记住公式：读取数据用 `extends`，写入数据用 `super`。"
+  "keyTakeaway": "유연한 API를 만들려면 와일드카드를 써야 합니다. 데이터를 읽을 땐 `extends`, 데이터를 쓸 땐 `super` 공식을 기억하세요."
 }

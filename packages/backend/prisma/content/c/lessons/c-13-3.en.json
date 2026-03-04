@@ -1,13 +1,13 @@
 {
   "lessonId": "c-13-3",
-  "title": "Implicit/Explicit Type Casting",
-  "concept": "When mixing different data types in C, automatic conversion (implicit) or manual conversion (explicit) occurs, and data loss must be watched for.",
+  "title": "Implicit/explicit type conversion",
+  "concept": "If you mix different data types in C, automatic conversion (implicit) or manual conversion (explicit) occurs, and you must be careful about data loss.",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int a = 7;\n    int b = 2;\n\n    double result1 = a / b;\n    printf(\"int/int: %f\\n\", result1);\n\n    double result2 = (double)a / b;\n    printf(\"(double)int/int: %f\\n\", result2);\n\n    double big = 1e18;\n    int truncated = (int)big;\n    printf(\"Overflow: %d\\n\", truncated);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
-        "explanation": "We include the standard I/O header with **`#include <stdio.h>`** to use `printf`.\n\nIn this lesson, we explore **type casting** that occurs when mixing different data types.",
+        "title": "Include stdio.h header",
+        "explanation": "Include standard input/output headers with **`#include <stdio.h>`** for use with `printf`.\n\nIn this lesson, we will learn about **Type Casting**, which occurs when mixing different data types.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting main function",
-        "explanation": "**`int main()`** -- The entry point of the program, a main stack frame is created.\n\nIn this lesson, we learn how conversions between types happen, and why **the same math operation can produce completely different results depending on the data type**.",
+        "title": "Start main function",
+        "explanation": "**`int main()`** --- The starting point of the program, the main stack frame is created.\n\nIn this lesson, you will learn how conversion between data types occurs and why the same mathematical operation can produce completely different results depending on the data type.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Declaring integer variables",
-        "explanation": "**`int a = 7;`**, **`int b = 2;`** -- Two integer variables are declared. `int` stores only integers and can never represent anything after the decimal point.",
+        "title": "Integer variable declaration",
+        "explanation": "**`int a = 7;`**, **`int b = 2;`** --- Declare two integer variables. `int` stores only integers and can never represent decimal places.",
         "visualizationType": "cMemory",
         "code": "int a = 7;",
         "highlightOffset": [
@@ -53,8 +53,8 @@
         ]
       },
       {
-        "title": "The trap of integer division",
-        "explanation": "**`double result1 = a / b;`** -- This is the most common pitfall for C beginners. Since both sides of `a / b` are `int`, **integer division** is performed first: `7 / 2 = 3` (the `.5` is **truncated**, not rounded).",
+        "title": "Pitfalls of integer division",
+        "explanation": "**`double result1 = a / b;`** --- This is the most common trap for C beginners. Since both sides of `a / b` are `int`, **integer division** is performed first, resulting in `7 / 2 = 3` (note that the decimal point `.5` is **truncated**, not rounded).",
         "visualizationType": "cMemory",
         "code": "double result1 = a / b;",
         "stack": [
@@ -79,15 +79,15 @@
         ]
       },
       {
-        "title": "Printing integer division result",
-        "explanation": "**`printf(\"int/int: %f\\n\", result1);`** -- `3.000000` is printed. Not the expected `3.500000` -- the fractional part was completely lost.",
+        "title": "Print integer division result",
+        "explanation": "**`printf(\"int/int: %f\\n\", result1);`** --- `3.000000` is printed. The result is not the expected `3.500000`, but the decimal point has completely disappeared.",
         "visualizationType": "cMemory",
         "code": "printf(\"int/int: %f\\n\", result1);",
         "stdout": "int/int: 3.000000"
       },
       {
-        "title": "Correct division with explicit casting",
-        "explanation": "**`double result2 = (double)a / b;`** -- `(double)a` is an **explicit cast** meaning \"convert the value of a to double\". When `7` becomes `7.0`, C automatically **promotes** the other operand `b` to double as well, resulting in `7.0 / 2.0 = 3.5`.",
+        "title": "Correct division with explicit type conversion",
+        "explanation": "**`double result2 = (double)a / b;`** --- `(double)a` is **Explicit Casting** that means “Convert the value of a to double.” When `7` is converted to `7.0`, C automatically promotes the other side `b` to double (Prom",
         "visualizationType": "cMemory",
         "code": "double result2 = (double)a / b;",
         "stack": [
@@ -118,15 +118,15 @@
         ]
       },
       {
-        "title": "Printing explicit cast result",
-        "explanation": "**`printf(\"(double)int/int: %f\\n\", result2);`** -- This time `3.500000` is printed correctly! Thanks to the `(double)` cast, the decimal part was preserved.",
+        "title": "Output explicit type conversion result",
+        "explanation": "**`printf(\"(double)int/int: %f\\n\", result2);`** --- This time, `3.500000` is printed correctly! The decimal point is preserved thanks to the `(double)` casting.",
         "visualizationType": "cMemory",
         "code": "printf(\"(double)int/int: %f\\n\", result2);",
         "stdout": "int/int: 3.000000\n(double)int/int: 3.500000"
       },
       {
-        "title": "Declaring a huge double value",
-        "explanation": "**`double big = 1e18;`** -- `1e18` is scientific notation for `1 x 10^18`, an astronomically large number (one quintillion). `double` (8 bytes) can represent up to about `10^308` so it stores this easily, but `int` (4 bytes) has a maximum of about 2.1 billion.",
+        "title": "Declare a huge double value",
+        "explanation": "**`double big = 1e18;`** --- `1e18` is an enormously large number, `1 x 10^18` in scientific notation, or **1 quintillion**. `double` (8 bytes) can be expressed up to about `10^308`, so it can be easily stored, but the maximum value of `int` (4 bytes) is about 2.1 billion.",
         "visualizationType": "cMemory",
         "code": "double big = 1e18;",
         "stack": [
@@ -163,8 +163,8 @@
         ]
       },
       {
-        "title": "Dangerous casting - overflow",
-        "explanation": "**`int truncated = (int)big;`** -- Force-casting the double value of one quintillion to `(int)`. Since the int maximum (2.1 billion) is 460 million times smaller, it obviously cannot hold this value. This is **undefined behavior**.",
+        "title": "Dangerous cast - overflow",
+        "explanation": "**`int truncated = (int)big;`** --- Forces 100 quintillion double values ​​to be converted to `(int)`. Since it is a value that is 460 million times larger than the maximum int value (2.1 billion), it obviously cannot be contained, and this is **Undefined Behavior**.",
         "visualizationType": "cMemory",
         "code": "int truncated = (int)big;",
         "stack": [
@@ -207,15 +207,15 @@
         ]
       },
       {
-        "title": "Checking overflow result and termination",
-        "explanation": "**`printf(\"Overflow: %d\\n\", truncated);`** -- In this environment, `-2147483648` (int minimum value) is printed. This number is completely unrelated to the original value of one quintillion, and on other systems `0` or other garbage values might appear.",
+        "title": "Check and terminate overflow results",
+        "explanation": "**`printf(\"Overflow: %d\\n\", truncated);`** --- In this environment, `-2147483648` (int minimum value) is output. It is a number that is completely unrelated to the original value of 100, and in other systems it may show `0` or other garbage values.",
         "visualizationType": "cMemory",
         "code": "printf(\"Overflow: %d\\n\", truncated);",
         "stdout": "int/int: 3.000000\n(double)int/int: 3.500000\nOverflow: -2147483648"
       },
       {
-        "title": "Program termination",
-        "explanation": "**`return 0;`** -- The program terminates normally, and as main's stack frame is deallocated, all local variables are returned to memory.\n\nKey takeaway: **Implicit casting** is performed automatically by the compiler (`int + double` -> double, while `int / int` -> int is a pitfall). **Explicit casting** uses `(type)` to manually specify conversion.",
+        "title": "Program exit",
+        "explanation": "**`return 0;`** --- The program terminates normally, and all local variables are returned from memory along with the main stack frame being released.\n\nKey point of this lesson: **Implicit type conversion** is performed automatically by the compiler (`int + double` -> double, `int / int` -> int is a trap)",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -224,22 +224,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "In `int x = 5; int y = 3; double z = x / y;`, what is the value of `z`?",
+    "question": "`int x = 5; int y = 3; What is the value of `z` in double z = x / y;`?",
     "options": [
       "1.666667",
       "1.000000",
       "2.000000",
-      "Compilation error"
+      "compile error"
     ],
     "correctIndex": 1,
-    "explanation": "`x / y` is int / int, so the result is also int.\n5 / 3 = 1 (decimal truncated), then this 1 is converted to double giving z = 1.000000.\nTo get the correct result, you need to cast with `(double)x / y`."
+    "explanation": "Since `x/y` are int/int, the result is also int.\n5 / 3 = 1 (truncate decimal points), then this 1 is converted to double, resulting in z = 1.000000.\nYou need to cast it to `(double)x / y` to get the correct result."
   },
   "misconceptions": [
     {
-      "wrong": "Writing double result = a / b; automatically gives a result with decimals.",
-      "correct": "Since division is executed first and then assigned, the integer division result (with decimals removed) is stored in the double.",
-      "why": "In C, operations are performed based on the types of the operands, and assignment happens afterwards."
+      "wrong": "double result = a / b; If you write, the result automatically appears up to the decimal point.",
+      "correct": "Because division is performed first and then assigned, the result of division between ints (decimal points removed) is stored in double.",
+      "why": "This is because in C, operations are performed according to the type of the operand, and assignment occurs after that."
     }
   ],
-  "keyTakeaway": "When dividing integers, the decimal part is truncated; if you need an accurate floating-point result, cast with (double) first."
+  "keyTakeaway": "When dividing between integers, the decimal point is discarded, so if you need an exact real number result, you must cast (double) first."
 }

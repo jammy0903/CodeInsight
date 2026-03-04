@@ -1,13 +1,13 @@
 {
   "lessonId": "c-4-1",
-  "title": "栈帧",
-  "concept": "每次函数调用时，栈上都会创建一个"属于自己的房间"",
+  "title": "堆栈帧",
+  "concept": "每次调用函数时，都会在堆栈上创建一个“自己的空间”。",
   "content": {
     "code": "#include <stdio.h>\n\nvoid funcB(int x) {\n    int b = x + 1;\n    printf(\"Inside funcB: b=%d\\n\", b);\n}\n\nvoid funcA() {\n    int a = 10;\n    funcB(a);\n}\n\nint main() {\n    funcA();\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含头文件",
-        "explanation": "`#include <stdio.h>` 启用输出函数。",
+        "title": "带标题",
+        "explanation": "将输出函数与“#include <stdio.h>”一起使用。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "程序启动时创建 main 栈帧。\n\n本课的核心是确认函数调用时帧被 push、结束时被 pop 的 LIFO 结构。",
+        "title": "启动主函数",
+        "explanation": "主堆栈帧是在程序启动时创建的。\n\n本课的关键是检查 LIFO 结构，即在调用函数时压入帧，在函数结束时弹出帧。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "调用 funcA（栈 Push）",
-        "explanation": "`funcA();` 调用将 funcA 的帧 push 到 main 上方。\n\n被调用的函数结束后控制权才会返回 main。",
+        "title": "调用 funcA（堆栈推送）",
+        "explanation": "通过调用“funcA();”将 funcA 帧推送到 main 上。\n\n仅当被调用函数完成后，控制权才会返回到 main。",
         "visualizationType": "cMemory",
         "code": "funcA();",
         "highlightOffset": [
@@ -53,8 +53,8 @@
         ]
       },
       {
-        "title": "funcA 内部：创建变量 a",
-        "explanation": "在 funcA 的帧中创建局部变量 `a=10`。\n\n局部变量仅在其所属函数帧中有效。",
+        "title": "在 funcA 内部：创建变量 a",
+        "explanation": "局部变量“a=10”是在“funcA”框架内创建的。\n\n局部变量仅在该函数框架中有效。",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "stack": [
@@ -79,8 +79,8 @@
         ]
       },
       {
-        "title": "调用 funcB（栈 Push）",
-        "explanation": "`funcB(a);` 调用时额外 push funcB 的帧。\n\n`a` 的值 10 被复制到参数 `x`。",
+        "title": "调用 funcB （堆栈推送）",
+        "explanation": "当调用“funcB(a);”时，会推送一个额外的 funcB 帧。\n\n“a”的值 10 被复制并作为参数“x”传递。",
         "visualizationType": "cMemory",
         "code": "funcB(a);",
         "highlightOffset": [
@@ -121,8 +121,8 @@
         ]
       },
       {
-        "title": "funcB 内部：创建变量 b",
-        "explanation": "计算 `b = x + 1` 存储 `b=11`。\n\n当前 funcB 帧中有 `x` 和 `b`。",
+        "title": "在 funcB 内部：创建变量 b",
+        "explanation": "计算“b = x + 1”存储“b=11”。\n\n目前，‘x’和‘b’存在于funcB框架中。",
         "visualizationType": "cMemory",
         "code": "int b = x + 1;",
         "stack": [
@@ -165,15 +165,15 @@
         ]
       },
       {
-        "title": "funcB：输出结果",
-        "explanation": "`printf` 输出 `b` 的值 11。\n\n输出发送到标准输出，与帧无关。",
+        "title": "funcB：结果输出",
+        "explanation": "`printf` 打印 `b` 值 11\n\n输出与帧分开定向到标准输出。",
         "visualizationType": "cMemory",
         "code": "printf(\"Inside funcB: b=%d\\n\", b);",
         "stdout": "Inside funcB: b=11"
       },
       {
-        "title": "funcB 结束（栈 Pop）",
-        "explanation": "funcB 结束时其帧被 pop，`x` 和 `b` 随之销毁。\n\n控制权返回调用者 funcA。",
+        "title": "退出 funcB（堆栈弹出）",
+        "explanation": "当 funcB 结束时，funcB 帧被弹出，并且 `x` 和 `b` 也被销毁。\n\n控制权返回给调用者 funcA。",
         "visualizationType": "cMemory",
         "code": "}",
         "stack": [
@@ -198,8 +198,8 @@
         ]
       },
       {
-        "title": "funcA 结束（栈 Pop）",
-        "explanation": "funcA 结束时其帧被 pop，`a` 也一起销毁。\n\n之后返回 main。",
+        "title": "退出 funcA（堆栈弹出）",
+        "explanation": "当 funcA 结束时，funcA 帧被弹出，并且 `a` 也被销毁。\n\n之后，返回主程序。",
         "visualizationType": "cMemory",
         "code": "}",
         "occurrence": 2,
@@ -213,8 +213,8 @@
         ]
       },
       {
-        "title": "程序结束",
-        "explanation": "`return 0;` 终止 main，最后的帧被清理。\n\n总结：函数调用 = push，函数返回 = pop。",
+        "title": "程序退出",
+        "explanation": "`return 0;` 终止 main 并清理最后一帧。\n\n总结：函数调用是push，函数退出是pop。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -223,22 +223,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "如果函数递归调用 10,000 次导致栈空间耗尽，会发生什么错误？",
+    "question": "如果一个函数递归调用10000次并且堆栈空间已满，会出现什么错误？",
     "options": [
-      "Heap Overflow",
-      "Stack Overflow",
-      "Memory Leak",
-      "Segmentation Fault"
+      "堆溢出",
+      "堆栈溢出",
+      "内存泄漏",
+      "分段错误"
     ],
     "correctIndex": 1,
-    "explanation": "超出栈空间（通常 1MB-8MB）时无法再 push 新帧，导致 Stack Overflow 错误。"
+    "explanation": "如果超出堆栈空间（通常为 1MB 到 8MB），则无法再堆栈更多帧，并且会发生堆栈溢出错误。"
   },
   "misconceptions": [
     {
-      "wrong": "funcA 的变量 a 可以在 funcB 中使用",
-      "correct": "看不到（作用域限制）。",
-      "why": "`funcB` 只能看到自己帧中的变量。\n`funcA` 的帧在不同层，无法访问。"
+      "wrong": "funcA 的变量 a 也可以在 funcB 中使用。",
+      "correct": "它是不可见的（范围）。",
+      "why": "`funcB` 只能​​看到自己框架内的变量。\n`funcA` 中的框架位于另一层，无法访问。"
     }
   ],
-  "keyTakeaway": "函数调用 = 栈帧 Push，返回 = Pop。每个函数只使用自己房间（帧）中的数据。"
+  "keyTakeaway": "函数调用 = 堆栈帧压入，返回 = 弹出。每个人只使用自己房间（框架）的数据。"
 }

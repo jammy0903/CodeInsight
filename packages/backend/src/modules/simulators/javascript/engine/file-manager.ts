@@ -23,6 +23,7 @@ export class JavaScriptFileManager {
 
     // 2. Write main.js file
     await fs.writeFile(path.join(projectPath, 'main.js'), code, 'utf-8');
+    await fs.writeFile(path.join(projectPath, 'ci-runtime-hook.js'), RUNTIME_HOOK_SOURCE, 'utf-8');
 
     return projectPath;
   }
@@ -51,3 +52,77 @@ export class JavaScriptFileManager {
     }
   }
 }
+
+const RUNTIME_HOOK_SOURCE = `'use strict';
+
+const MARK = '__CI_EVT__';
+let timerSeq = 0;
+let microSeq = 0;
+
+function emit(event) {
+  try {
+    const payload = JSON.stringify(event);
+    // Use debug channel and filter this marker on backend.
+    console.debug(MARK + payload);
+  } catch {}
+}
+
+function fnName(fn, fallback) {
+  if (typeof fn === 'function' && fn.name) return fn.name;
+  return fallback;
+}
+
+const originalSetTimeout = globalThis.setTimeout;
+globalThis.setTimeout = function wrappedSetTimeout(callback, delay, ...args) {
+  const id = 't' + (++timerSeq);
+  const label = fnName(callback, 'timeout');
+  const ms = typeof delay === 'number' ? delay : Number(delay || 0);
+  emit({ kind: 'webapi_add', id, api: 'setTimeout', label, delay: ms });
+
+  const wrapped = function (...cbArgs) {
+    emit({ kind: 'webapi_fire', id, api: 'setTimeout', label, delay: ms });
+    emit({ kind: 'task_enqueue', id, label });
+    emit({ kind: 'task_dequeue', id, label });
+    return callback.apply(this, cbArgs);
+  };
+  return originalSetTimeout(wrapped, delay, ...args);
+};
+
+const originalQueueMicrotask = globalThis.queueMicrotask;
+if (typeof originalQueueMicrotask === 'function') {
+  globalThis.queueMicrotask = function wrappedQueueMicrotask(callback) {
+    const id = 'm' + (++microSeq);
+    const label = fnName(callback, 'microtask');
+    emit({ kind: 'microtask_enqueue', id, label });
+    return originalQueueMicrotask(function (...cbArgs) {
+      emit({ kind: 'microtask_dequeue', id, label });
+      return callback.apply(this, cbArgs);
+    });
+  };
+}
+
+const originalThen = Promise.prototype.then;
+Promise.prototype.then = function wrappedThen(onFulfilled, onRejected) {
+  const wrappedFulfilled = typeof onFulfilled === 'function'
+    ? function (...args) {
+        const id = 'm' + (++microSeq);
+        const label = fnName(onFulfilled, 'promise.then');
+        emit({ kind: 'microtask_enqueue', id, label });
+        emit({ kind: 'microtask_dequeue', id, label });
+        return onFulfilled.apply(this, args);
+      }
+    : onFulfilled;
+
+  const wrappedRejected = typeof onRejected === 'function'
+    ? function (...args) {
+        const id = 'm' + (++microSeq);
+        const label = fnName(onRejected, 'promise.catch');
+        emit({ kind: 'microtask_enqueue', id, label });
+        emit({ kind: 'microtask_dequeue', id, label });
+        return onRejected.apply(this, args);
+      }
+    : onRejected;
+
+  return originalThen.call(this, wrappedFulfilled, wrappedRejected);
+};
+`;

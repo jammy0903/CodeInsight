@@ -1,13 +1,13 @@
 {
   "lessonId": "c-4-4",
   "title": "数组参数",
-  "concept": "数组体积太大无法完整传递，所以只发送"首地址"给函数",
+  "concept": "将数组传递给函数时，它太大，因此仅发送“第一个地址”。",
   "content": {
     "code": "#include <stdio.h>\n\nvoid printArr(int arr[], int len) {\n    for (int i = 0; i < len; i++) {\n        printf(\"%d \", arr[i]);\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    int data[3] = {10, 20, 30};\n\n    printArr(data, 3);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含头文件",
-        "explanation": "`#include <stdio.h>` 启用输出函数。\n\n本课讲解数组作为函数参数传递时衰减为地址的行为。",
+        "title": "带标题",
+        "explanation": "将输出函数与“#include <stdio.h>”一起使用。\n\n本课程介绍传递数组参数时要解决的数组衰减行为。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,14 +15,14 @@
         "stdout": ""
       },
       {
-        "title": "printArr 函数定义",
-        "explanation": "在 `printArr(int arr[], int len)` 中，`arr[]` 在函数参数中作为指针运作。\n\n因此必须另外接收长度 `len` 才能安全遍历。",
+        "title": "printArr函数定义",
+        "explanation": "在 printArr(int arr[], int len) 中，arr[] 的行为类似于函数参数中的指针。\n\n因此，您只需单独接收长度“len”即可安全地遍历。",
         "visualizationType": "cMemory",
         "code": "void printArr(int arr[], int len) {"
       },
       {
-        "title": "main 函数开始",
-        "explanation": "创建 main 帧并准备数组 `data`。",
+        "title": "启动主函数",
+        "explanation": "主框架已创建并准备数组“data”。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -35,8 +35,8 @@
         ]
       },
       {
-        "title": "数组声明与初始化",
-        "explanation": "`data` 数组在连续内存中存储 10、20、30。\n\n数组名充当表示首元素地址的起始点。",
+        "title": "数组声明和初始化",
+        "explanation": "将 10、20 和 30 存储在“data”数组的连续内存中。\n\n数组名称用作第一个元素的地址的起点。",
         "visualizationType": "cMemory",
         "code": "int data[3] = {10, 20, 30};",
         "stack": [
@@ -50,8 +50,8 @@
         ]
       },
       {
-        "title": "传递数组（Array Decay）",
-        "explanation": "调用 `printArr(data, 3);` 时，`data` 衰减为起始地址进行传递。\n\n函数基于原始位置进行访问，而非数组副本。",
+        "title": "传递数组（数组衰减）",
+        "explanation": "当调用“printArr(data, 3);”时，“data”被衰减到起始地址。\n\n也就是说，函数基于原始位置而不是数组的副本进行访问。",
         "visualizationType": "cMemory",
         "code": "printArr(data, 3);",
         "highlightOffset": [
@@ -80,8 +80,8 @@
         ]
       },
       {
-        "title": "for 循环遍历",
-        "explanation": "`arr[i]` 按顺序输出元素。\n\n内部来说等同于指针访问 `*(arr+i)`。",
+        "title": "for循环遍历",
+        "explanation": "使用“arr[i]”按顺序打印元素。\n\n在内部，它与“*(arr+i)”指针访问具有相同的含义。",
         "visualizationType": "cMemory",
         "code": "for (int i = 0; i < len; i++) {",
         "highlightOffset": [
@@ -118,8 +118,8 @@
         "stdout": "10 20 30 "
       },
       {
-        "title": "程序结束",
-        "explanation": "`return 0;` 结束程序。\n\n要点：传递数组参数时必须同时管理地址和长度。",
+        "title": "程序退出",
+        "explanation": "使用“return 0;”退出。\n\n要点：在数组参数传递中，地址和长度必须一起管理。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -128,22 +128,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "声明 void func(int a[100]) 时编译器如何解释？",
+    "question": "如果声明 void func(int a[100])，编译器如何解释它？",
     "options": [
-      "复制一个 100 个元素的数组",
-      "解释为 void func(int *a)（指针）",
-      "报错",
-      "分配 100 字节内存"
+      "复制 100 个项目的数组",
+      "解释为 void func(int *a) （指针）",
+      "抛出错误",
+      "分配100字节内存"
     ],
     "correctIndex": 1,
-    "explanation": "方括号中的数字被忽略。\n函数参数中的数组声明始终等同于指针声明。"
+    "explanation": "方括号中的数字将被忽略。\n代替函数参数的数组声明无条件等同于指针声明。"
   },
   "misconceptions": [
     {
-      "wrong": "数组可以通过值传递（Call by Value）",
-      "correct": "数组本身不行。",
-      "why": "如果确实想复制，可以将数组放入结构体（struct）中传递，这样会产生副本（小技巧）。"
+      "wrong": "数组可以通过按值调用来传递。",
+      "correct": "数组本身是不可能的。",
+      "why": "如果您确实想这样做，请将数组放入结构中并传递该结构以复制它（提示）。"
     }
   ],
-  "keyTakeaway": "数组参数实质上是指针。所以原始数据可被修改，长度必须另外传递。"
+  "keyTakeaway": "数组参数实际上是指针。所以原来的要修改，长度也要单独处理。"
 }

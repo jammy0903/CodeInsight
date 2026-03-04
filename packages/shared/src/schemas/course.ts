@@ -270,6 +270,10 @@ export const LessonStepSchema = z.object({
   })).optional(),
   // JavaScript 시각화 (이벤트 루프, 클로저 등)
   eventLoopState: z.unknown().optional(),
+  // 통일된 JS 개념 상태 키 (Playground 동적 탭용)
+  scopeState: z.unknown().optional(),
+  thisState: z.unknown().optional(),
+  promiseState: z.unknown().optional(),
   callStackState: z.unknown().optional(),
   closureState: z.unknown().optional(),
   thisBindState: z.unknown().optional(),

@@ -1,13 +1,13 @@
 {
   "lessonId": "py-10-4",
-  "title": "asyncio 模式：并发收集结果 (gather)",
-  "concept": "使用 `asyncio.gather` 同时运行多个异步任务，在所有结果准备好时一次性收集。",
+  "title": "asyncio 패턴: 동시에 모으기 (gather)",
+  "concept": "`asyncio.gather`를 사용하여 여러 개의 비동기 작업을 동시에 실행하고, 모든 결과가 준비되면 한 번에 모아서 받습니다.",
   "content": {
     "code": "import asyncio\nimport time\n\nasync def fetch_data(id, delay):\n    print(f\"Fetching data {id}...\")\n    await asyncio.sleep(delay)\n    print(f\"Data {id} fetched!\")\n    return {\"id\": id, \"data\": f\"Sample data {id}\"}\n\nasync def main():\n    start = time.time()\n    \n    results = await asyncio.gather(\n        fetch_data(1, 2),\n        fetch_data(2, 1),\n        fetch_data(3, 3)\n    )\n\n    print(f\"\\nResults: {results}\")\n    print(f\"Total time: {time.time() - start:.4f}s\")\n\nasyncio.run(main())",
     "steps": [
       {
-        "title": "导入模块",
-        "explanation": "**`import asyncio` / `import time`** -- 导入异步I/O框架和时间测量工具。\n\n在上一课中，我们学习了使用 `create_task()` 和 `await` 逐个调度和等待任务的方法。这次，我们将学习一个更强大的工具：`asyncio.gather()`。gather同时运行多个任务，并将**所有结果收集到列表中**返回。\n\n可以这样理解：上一课中，餐厅服务员一张一张地将点菜单递给厨房，而这次是**一次性递上多张点菜单，说"都做好了一起端上来"**。厨房（事件循环）同时做多道菜，最后一道做好时，用一个托盘一起端出来。\n\n**实际应用**：在Web应用中，当需要同时调用多个API来渲染一个页面时，gather是最自然的模式。例如：同时调用用户信息API + 订单历史API + 推荐商品API。",
+        "title": "모듈 임포트",
+        "explanation": "**`import asyncio` / `import time`** — 비동기 I/O 프레임워크와 시간 측정 도구를 가져옵니다.\n\n이전 레슨에서 `create_task()`와 `await`를 사용해 작업을 하나씩 스케줄링하고 기다리는 방법을 배웠습니다. 이번에는 더 강력한 도구인 `asyncio.gather()`를 배웁니다. gather는 여러 작업을 한꺼번에 실행하고, **모든 결과를 리스트로 모아서** 돌려주는 편리한 패턴입니다.",
         "visualizationType": "pythonMemory",
         "code": "import asyncio",
         "highlightOffset": [
@@ -16,7 +16,7 @@
         ],
         "pythonMemoryState": {
           "output": [],
-          "note": "asyncio 准备就绪。",
+          "note": "asyncio 준비 완료.",
           "names": [
             {
               "name": "asyncio",
@@ -36,8 +36,8 @@
         }
       },
       {
-        "title": "定义异步任务函数",
-        "explanation": "**`async def fetch_data(id, delay):`** -- 模拟实际I/O操作（API调用、数据库查询等）的协程函数。\n\n这个函数按顺序执行三件事：\n1. `print(f\"Fetching data {id}...\")` -- 通知任务开始\n2. `await asyncio.sleep(delay)` -- 模拟delay秒的I/O等待\n3. `return {\"id\": id, \"data\": ...}` -- 以字典形式返回结果\n\n与上一课的 `say_after()` 不同，`fetch_data()` 会**返回一个字典**。这个返回值就是 `gather()` 收集的结果。在实际Web开发中，这个返回值会是API响应JSON或数据库查询结果。\n\n可以把这个函数想象成**一张菜单上的食谱**。每份菜单有不同的烹饪时间（delay），做好后把菜（字典）放到盘子里返回。\n\n**内部原理**：遇到 `await asyncio.sleep(delay)` 时，会在事件循环中注册一个"delay秒后叫醒我"的定时器回调。在此期间，事件循环运行其他协程。在实际代码中，`asyncio.sleep()` 会被替换为 `aiohttp.get()`、`asyncpg.fetch()` 等实际I/O操作。\n\n**常见错误**：使用 `time.sleep(delay)` 会阻塞整个线程，破坏并发性。在异步代码中必须使用 `asyncio.sleep()` 等异步版本。",
+        "title": "비동기 작업 함수 정의",
+        "explanation": "**`async def fetch_data(id, delay):`** — 실제 I/O 작업(API 호출, DB 쿼리 등)을 시뮬레이션하는 코루틴 함수입니다.\n\n이 함수는 세 가지를 순서대로 수행합니다:\n1. `print(f\"Fetching data {id}...\")` — 작업 시작을 알립니다\n2. `await asyncio.sleep(delay)` — delay초 동안 I/O 대기를 시뮬레이션합니다\n3. `return {\"id\": id, \"data\": ...}` — 딕셔너리 형태로 결과를 반환합니다",
         "visualizationType": "pythonMemory",
         "code": "async def fetch_data(id, delay):",
         "highlightOffset": [
@@ -48,7 +48,7 @@
           4
         ],
         "pythonMemoryState": {
-          "note": "协程函数 fetch_data 已定义。",
+          "note": "코루틴 함수 fetch_data 정의.",
           "names": [
             {
               "name": "fetch_data",
@@ -68,12 +68,12 @@
         }
       },
       {
-        "title": "定义主协程",
-        "explanation": "**`async def main():`** -- 定义异步程序的入口点协程。\n\n在这个 main() 函数中，我们将使用 `asyncio.gather()` 同时运行3个 fetch_data 任务。`time.time()` 记录开始时间，用于测量并发执行是否真正节省了时间。\n\n在上一课中，我们用 `create_task()` 创建单个Task，然后逐个 `await`：\n```python\ntask1 = asyncio.create_task(work1())\ntask2 = asyncio.create_task(work2())\nawait task1\nawait task2\n```\n这种模式在2-3个任务时还好，但到10个、100个时代码会非常繁琐。`gather()` 是一个**高级API**，将这个过程简化为一行。\n\n可以理解为：以前的方式是服务员一张一张递点菜单然后一个一个确认，而 `gather()` 是**一次性递上一叠点菜单说"全部做好了告诉我"**。\n\n**设计哲学**：asyncio同时提供低级API（`create_task`、`Future`）和高级API（`gather`、`wait`、`TaskGroup`）。大多数情况下，使用高级API代码更简洁，错误处理也更容易。",
+        "title": "메인 코루틴 정의",
+        "explanation": "**`async def main():`** — 비동기 프로그램의 진입점 코루틴을 정의합니다.\n\n이 main() 함수 안에서 `asyncio.gather()`를 사용하여 3개의 fetch_data 작업을 동시에 실행할 예정입니다. `time.time()`으로 시작 시간을 기록하여 동시 실행이 실제로 시간을 절약하는지 측정합니다.",
         "visualizationType": "pythonMemory",
         "code": "async def main():",
         "pythonMemoryState": {
-          "note": "main 协程已定义。",
+          "note": "main 코루틴 정의.",
           "names": [
             {
               "name": "main",
@@ -93,8 +93,8 @@
         }
       },
       {
-        "title": "并发执行与结果收集 (gather)",
-        "explanation": "**`results = await asyncio.gather(fetch_data(1, 2), fetch_data(2, 1), fetch_data(3, 3))`** -- **同时运行3个协程**，并将所有结果**收集到列表中**。\n\n让我们逐步追踪 gather() 的操作过程：\n1. 调用 `fetch_data(1, 2)` -> 创建协程对象（尚未运行）\n2. 调用 `fetch_data(2, 1)` -> 创建协程对象\n3. 调用 `fetch_data(3, 3)` -> 创建协程对象\n4. `gather()` 将三个协程分别包装成Task并注册到事件循环\n5. 遇到 `await`，main()暂停 -> 三个Task同时开始运行\n\n**gather() 的两个核心特征**：\n- **并发执行**：一次性调度所有传入的协程\n- **结果顺序保证**：按照协程传入的顺序返回结果列表。即使task_2最先完成，results[0] 仍然是 fetch_data(1,2) 的结果\n\n就像餐厅同时做3桌的菜，但将做好的菜**按桌号顺序**放到托盘上。即使2号桌的菜先做好，1号位置放的仍是1号桌的菜。\n\n**注意**：如果向gather传递非协程的普通值，该值会原样包含在结果中。",
+        "title": "동시 실행 및 결과 수집 (gather)",
+        "explanation": "**`results = await asyncio.gather(fetch_data(1, 2), fetch_data(2, 1), fetch_data(3, 3))`** — 3개의 코루틴을 **동시에 실행**하고, 모든 결과를 **리스트로 수집**합니다.\n\n`gather()`의 동작 과정을 단계별로 살펴봅시다:\n1. `fetch_data(1, 2)` 호출 → 코루틴 객체 생성 (아직 실행 안 됨)\n2. `fetch_data(2, 1)` 호출 → 코루틴 객체 생성\n3. `fetch_data(3, 3)` 호출 → 코루틴 객체 생성\n4. `gather()`가 세 코루틴을 각각 Task로 감싸서 이벤트 루프에 등록\n5. `await`를 만나 main()이 일시정지 → 세 Task가 동시에 실행 시작",
         "visualizationType": "pythonMemory",
         "code": "results = await asyncio.gather(",
         "highlightOffset": [
@@ -105,7 +105,7 @@
           4
         ],
         "pythonMemoryState": {
-          "note": "3个任务同时运行。",
+          "note": "3개의 태스크가 동시에 실행됩니다.",
           "names": [
             {
               "name": "task_1",
@@ -149,8 +149,8 @@
         }
       },
       {
-        "title": "gather 运行中（1秒后）",
-        "explanation": "**gather 内部执行中** -- 3个 `fetch_data` 任务在事件循环中**同时进行**。\n\n让我们详细追踪随时间的执行流程：\n- **0.0秒**：三个任务全部开始。各自打印 \"Fetching data N...\"\n- **0.0秒**：三个任务都遇到 `await asyncio.sleep(delay)` -> 全部让出\n- **1.0秒**：task_2（等待1秒）醒来 -> 打印 \"Data 2 fetched!\" -> 返回结果\n- task_1（等待2秒）和 task_3（等待3秒）仍在sleep中\n\n注意，最短的任务（task_2，1秒）**最先完成**。但gather还不会返回——因为它要等**所有任务都完成**才返回结果。\n\n就像同时做3道菜，沙拉（1分钟）先做好了。但不立即上菜，而是放在保温柜里——因为牛排和意面也要做好才能端托盘上桌。\n\n**内部原理**：gather内部维护一个计数器。每个Task完成时计数器减一，当计数器归零（所有Task完成）时，gather的Future被resolve。task_2的结果已经准备好，但临时存储在结果列表的[1]位置等待。\n\n**错误处理**：如果task_2抛出异常怎么办？默认情况下，gather会立即取消剩余任务并传播异常。设置 `return_exceptions=True` 可以将异常也包含在结果列表中返回。",
+        "title": "gather의 동작 (1초 후)",
+        "explanation": "**gather 내부 실행 중** — 3개의 `fetch_data` 작업이 이벤트 루프에서 **동시에 진행**됩니다.\n\n시간에 따른 실행 흐름을 자세히 추적해봅시다:\n- **0.0초**: 세 작업 모두 시작. 각각 \"Fetching data N...\" 출력\n- **0.0초**: 세 작업 모두 `await asyncio.sleep(delay)`를 만남 → 모두 양보\n- **1.0초**: task_2(1초 대기)가 깨어남 → \"Data 2 fetched!\" 출력 → 결과 반환\n- task_1(2초 대기)과 task_3(3초 대기)은 아직 sleep 중",
         "visualizationType": "pythonMemory",
         "code": "results = await asyncio.gather(",
         "pythonMemoryState": {
@@ -160,7 +160,7 @@
             "Fetching data 3...",
             "Data 2 fetched!"
           ],
-          "note": "1秒经过：Task 2 完成。",
+          "note": "1초 경과: Task 2 완료.",
           "names": [
             {
               "name": "task_1",
@@ -200,8 +200,8 @@
         }
       },
       {
-        "title": "查看结果（3秒后）",
-        "explanation": "**`print(f\"\\nResults: {results}\")`** -- 打印gather返回的结果列表。\n\n剩余时间线：\n- **2秒**：task_1（等待2秒）完成 -> 打印 \"Data 1 fetched!\"\n- **3秒**：task_3（等待3秒）完成 -> 打印 \"Data 3 fetched!\"\n- **3秒**：所有Task完成 -> gather返回结果列表！\n\n就像厨房里沙拉先做好，然后是牛排，最后是甜点。但托盘上按照点菜单的顺序摆放——牛排、沙拉、甜点。\n\n**实用技巧**：如果想以字典管理结果，可以使用 `results = dict(zip(ids, await asyncio.gather(*tasks)))` 模式。",
+        "title": "결과 확인 (3초 후)",
+        "explanation": "**`print(f\"\\nResults: {results}\")`** — gather가 반환한 결과 리스트를 출력합니다.\n\n나머지 시간 흐름:\n- **2초**: task_1(2초 대기) 완료 → \"Data 1 fetched!\" 출력\n- **3초**: task_3(3초 대기) 완료 → \"Data 3 fetched!\" 출력\n- **3초**: 모든 Task 완료 → gather가 결과 리스트를 반환!\n\n비유하면, 주방에서 샐러드가 먼저 나오고, 그 다음 스테이크, 마지막으로 디저트가 완성됩니다. 하지만 트레이에는 주문서에 적힌 순서대로 — 스테이크, 샐러드, 디저트 — 놓입니다.\n\n**실무 팁**: 결과를 딕셔너리로 관리하고 싶다면 `results = dict(zip(ids, await asyncio.gather(*tasks)))` 패턴을 사용할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"\\nResults: {results}\")",
         "pythonMemoryState": {
@@ -210,7 +210,7 @@
             "Data 1 fetched!",
             "Data 3 fetched!"
           ],
-          "note": "所有任务完成。结果已收集到列表中。",
+          "note": "모든 태스크 완료. 결과가 리스트로 모였습니다.",
           "names": [
             {
               "name": "results",
@@ -230,8 +230,8 @@
         }
       },
       {
-        "title": "查看总耗时",
-        "explanation": "**`print(f\"Total time: {time.time() - start:.4f}s\")`** -- 总耗时约为**3秒**。\n\n时间分析：\n- 顺序执行：2秒 + 1秒 + 3秒 = **6秒**\n- gather并发执行：max(2秒, 1秒, 3秒) = **3秒**\n- 节省时间：**3秒（减少50%！）**\n\n并发执行的总时间始终等于**最长任务的时间**。其余任务在这段时间内一起完成。即使任务数量增加，也只需要最慢任务的时间。\n\n就像100个人同时考试，总时间等于最慢的学生的时间。让他们一个接一个考试则要慢100倍。\n\n**gather vs create_task 对比总结**：\n- `create_task()`：逐个注册任务，逐个await。需要精细控制时使用\n- `gather()`：一次注册多个任务，一次await全部。将结果作为列表返回。代码更简洁\n- `TaskGroup()`（Python 3.11+）：gather的改进版。支持结构化错误处理和自动取消\n\n**实际选择标准**：对于大多数"同时调用多个API"的场景，gather最合适。如果需要按任务进行不同的错误处理，考虑create_task；如果是Python 3.11+，考虑TaskGroup。\n\n**注意**：asyncio仅对I/O密集型任务有效。对于CPU密集型任务（数值计算等），由于GIL的存在，即使使用asyncio也不会并行执行。CPU密集型任务应使用 `multiprocessing`。",
+        "title": "총 소요 시간 확인",
+        "explanation": "**`print(f\"Total time: {time.time() - start:.4f}s\")`** — 총 소요 시간은 약 **3초**입니다.\n\n시간 분석:\n- 순차 실행 시: 2초 + 1초 + 3초 = **6초**\n- gather 동시 실행 시: max(2초, 1초, 3초) = **3초**\n- 절약한 시간: **3초 (50% 단축!)**",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Total time: {time.time() - start:.4f}s\")",
         "pythonMemoryState": {
@@ -240,7 +240,7 @@
             "Results: ...",
             "Total time: 3.0012s"
           ],
-          "note": "总耗时3秒。",
+          "note": "총 3초 소요.",
           "names": [
             {
               "name": "time",
@@ -258,13 +258,13 @@
         }
       },
       {
-        "title": "运行事件循环",
-        "explanation": "**`asyncio.run(main())`** -- 创建事件循环并运行 `main` 协程。\n\n这一行是整个程序的**起点**也是**终点**。调用 `asyncio.run()` 时：\n1. 创建新的事件循环\n2. 在事件循环中运行 `main()` 协程\n3. main() 内部通过 gather() 同时运行3个任务\n4. 所有任务完成后 main() 返回\n5. 事件循环被清理并关闭\n\n追踪代码执行顺序：Python解释器从上到下执行，依次遇到 import -> 函数定义 -> 函数定义 -> `asyncio.run()`。函数定义只创建函数对象而不执行。所有逻辑真正执行是在到达 `asyncio.run(main())` 时。\n\n就像准备好所有食谱（函数定义），然后终于按下"开始营业！"（asyncio.run）按钮。从这一刻起，厨房开始运转，所有订单被处理。\n\n**本课总结**：asyncio.gather() 是**最常用、最强大的模式**，用于同时运行多个异步任务并按顺序收集结果。对于I/O密集型程序，与顺序执行相比能提供显著的性能提升。\n\n**后续学习**：在实际项目中，gather与asyncio兼容的库配合使用，如 `aiohttp`（HTTP客户端）、`asyncpg`（PostgreSQL）、`aiofiles`（文件I/O）。",
+        "title": "이벤트 루프 실행",
+        "explanation": "**`asyncio.run(main())`** — 이벤트 루프를 생성하고 `main` 코루틴을 실행합니다.\n\n이 줄은 프로그램 전체의 **시작점**이자 **종료점**입니다. `asyncio.run()`이 호출되면:\n1. 새로운 이벤트 루프가 생성됩니다\n2. `main()` 코루틴이 이벤트 루프에서 실행됩니다\n3. main() 안에서 gather()가 3개의 작업을 동시에 실행합니다\n4. 모든 작업이 완료되면 main()이 반환됩니다\n5. 이벤트 루프가 정리되고 닫힙니다",
         "visualizationType": "pythonMemory",
         "code": "asyncio.run(main())",
         "pythonMemoryState": {
           "output": [],
-          "note": "程序入口。",
+          "note": "프로그램 진입.",
           "names": [
             {
               "name": "time",
@@ -288,19 +288,19 @@
     "question": "`asyncio.gather(task1, task2)` 什么时候返回？",
     "options": [
       "当task1完成时",
-      "当task2完成时",
+      "当任务2完成时",
       "当其中任何一个完成时",
       "当task1和task2都完成时"
     ],
     "correctIndex": 3,
-    "explanation": "`gather` 等待所有传入的可等待对象完成后，将它们的结果收集到列表中返回。"
+    "explanation": "`gather` 等待传递的所有可等待对象完成，然后在列表中返回结果。"
   },
   "misconceptions": [
     {
-      "wrong": "`gather` 使用多线程工作。",
-      "correct": "不是的。`asyncio` 和 `gather` 在单线程中运行。",
-      "why": "不是使用多个线程，而是在单线程内利用多个任务的I/O等待时间高效切换，实现并发。"
+      "wrong": "`gather`는 멀티스레딩으로 동작한다.",
+      "correct": "아닙니다.\n`asyncio`와 `gather`는 단일 스레드에서 동작합니다.",
+      "why": "여러 스레드를 쓰는 대신, 하나의 스레드 내에서 여러 작업의 I/O 대기 시간을 활용하여 효율적으로 전환하며 동시성을 달성합니다."
     }
   ],
-  "keyTakeaway": "`gather` 在并行运行多个异步I/O任务并收集结果时非常有用。"
+  "keyTakeaway": "`gather`는 여러 비동기 I/O 작업을 병렬로 실행하고 그 결과를 취합할 때 매우 유용합니다."
 }

@@ -1,13 +1,13 @@
 {
   "lessonId": "c-1-3",
-  "title": "取址运算符（&）与 sizeof",
-  "concept": "每个变量都存在于内存的某个位置，并拥有自己的大小",
+  "title": "地址运算符 (&) 和 sizeof",
+  "concept": "每个变量都存在于内存中的某个位置并具有自己的大小。",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int num = 42;\n    char ch = 'A';\n\n    printf(\"Address of num: %p\\n\", &num);\n    printf(\"Address of ch:  %p\\n\", &ch);\n\n    printf(\"Size of num: %zu bytes\\n\", sizeof(num));\n    printf(\"Size of ch:  %zu bytes\\n\", sizeof(ch));\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "用于使用 ```printf``` 的标准输入输出头文件。在本课中，我们将直接查看变量的**内存地址**和**大小** — 这是之后学习**指针**的必备基础。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "与``printf````一起使用的标准输入/输出标头。在本课中，您将直接检查变量的**内存地址**和**大小**——这是稍后学习**指针**的重要基础。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "程序入口点。main 栈帧被创建，其中声明的变量将各自获得唯一的**地址（address）**。",
+        "title": "启动主函数",
+        "explanation": "程序起点。主堆栈框架已创建，其中要声明的变量均被赋予唯一的**地址**。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "声明整型变量",
-        "explanation": "`int num = 42;` 创建整型变量 num 并存储值。\n\n关键在于每个变量都有内存地址，下一步我们将用 `&num` 来查看它。",
+        "title": "整型变量声明",
+        "explanation": "`int num = 42;` 创建一个整型变量 num 并存储它的值。\n\n关键是每个变量都有一个内存地址，我们在下一步中用“&num”检查该地址。",
         "visualizationType": "cMemory",
         "code": "int num = 42;",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "声明字符变量",
-        "explanation": "`char ch = 'A';` 创建一个 1 字节的字符变量。\n\n字符在内部以数字编码存储。注意 `'A'`（字符）和 `\"A\"`（字符串）是不同的类型。",
+        "title": "字符变量声明",
+        "explanation": "`char ch = 'A';` 创建一个 1 字节字符变量。\n\n字符在内部存储为数字代码，“A”（字母）和“A”（字符串）是不同的类型。",
         "visualizationType": "cMemory",
         "code": "char ch = 'A';",
         "stack": [
@@ -63,36 +63,36 @@
         ]
       },
       {
-        "title": "输出 num 的地址",
-        "explanation": "`&num` 表示的是 num 的内存地址，而非它的值。\n\n使用 `%p` 格式说明符来输出地址。这个概念是学习指针的起点。",
+        "title": "打印num的地址",
+        "explanation": "`&num` 指的是内存地址，而不是 num 的值。\n\n`%p` 用于地址输出，这个概念是指针学习的起点。",
         "visualizationType": "cMemory",
         "code": "printf(\"Address of num: %p\\n\", &num);",
         "stdout": "Address of num: 0x1004"
       },
       {
-        "title": "输出 ch 的地址",
-        "explanation": "`&ch` 返回字符变量 `ch` 的内存地址。\n\n用 `%p` 输出地址可以看到它与 `num` 存储在不同的位置。",
+        "title": "ch 的地址输出",
+        "explanation": "`&ch` 返回字符变量 `ch` 的内存地址。\n\n如果使用“%p”打印地址，您可以看到它存储在与“num”不同的位置。",
         "visualizationType": "cMemory",
         "code": "printf(\"Address of ch:  %p\\n\", &ch);",
         "stdout": "Address of num: 0x1004\nAddress of ch:  0x1000"
       },
       {
-        "title": "输出 num 的大小（sizeof）",
-        "explanation": "`sizeof` 返回类型或变量的字节大小。`num` 是 `int` 类型，通常输出 4 字节。\n\n`sizeof` 的返回类型是 `size_t`，因此输出格式应使用 `%zu`。",
+        "title": "打印num的大小(sizeof)",
+        "explanation": "`sizeof` 返回目标类型/变量的大小（以字节为单位）。由于“num”是“int”，因此通常输出 4 个字节。\n\n由于`sizeof`的返回类型是`size_t`，所以使用`%zu`作为输出格式是正确的。",
         "visualizationType": "cMemory",
         "code": "printf(\"Size of num: %zu bytes\\n\", sizeof(num));",
         "stdout": "Address of num: 0x1004\nAddress of ch:  0x1000\nSize of num: 4 bytes"
       },
       {
-        "title": "输出 ch 的大小（sizeof）",
-        "explanation": "`sizeof(ch)` 返回 1。在 C 中，`char` 是字节的基准类型，大小始终为 1。\n\n总结：`&变量` 获取地址，`sizeof(变量)` 获取大小。学习指针之前务必区分清楚。",
+        "title": "输出ch的大小(sizeof)",
+        "explanation": "`sizeof(ch)` 为 1。在 C 中，`char` 是字节的基本类型，因此它的大小始终为 1。\n\n总而言之，“&variable”是地址，“sizeof(variable)”是大小。在学习指针之前一定要区分它们。",
         "visualizationType": "cMemory",
         "code": "printf(\"Size of ch:  %zu bytes\\n\", sizeof(ch));",
         "stdout": "Address of num: 0x1004\nAddress of ch:  0x1000\nSize of num: 4 bytes\nSize of ch:  1 bytes"
       },
       {
-        "title": "程序结束",
-        "explanation": "`return 0;` 正常终止程序。\n\n本课的重点是区分 `&`（地址）和 `sizeof`（大小）的作用。",
+        "title": "程序退出",
+        "explanation": "使用“return 0;”正常终止程序。\n\n本课的重点是区分“&”（地址）和“sizeof”（大小）的角色。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
@@ -102,22 +102,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "char 类型变量的大小（sizeof）是多少？",
+    "question": "char类型变量的大小（sizeof）是多少？",
     "options": [
-      "因编译器而异",
+      "不同的编译器",
       "始终为 1 字节",
-      "始终为 4 字节",
+      "始终为 4 个字节",
       "取决于操作系统"
     ],
     "correctIndex": 1,
-    "explanation": "C 标准规定 `char` 始终为 1 字节（最小存储单位）。\n`int` 和 `long` 在不同系统上可能有所不同。"
+    "explanation": "在 C 标准中，“char”始终定义为 1 个字节（最小存储单位）。\n“int”或“long”可能因系统而异。"
   },
   "misconceptions": [
     {
-      "wrong": "&变量会改变变量的值",
-      "correct": "& 只是"查看"地址，不会改变值。",
-      "why": "要改变值，需要使用赋值运算符（=）。"
+      "wrong": "&variable 改变变量的值",
+      "correct": "& 仅“检查”地址并且不更改值。",
+      "why": "要更改该值，必须使用赋值运算符 (=)。"
     }
   ],
-  "keyTakeaway": "`&` 是地址（住在哪里？），`sizeof` 是大小（占多少字节？）。"
+  "keyTakeaway": "“&”是地址（你住在哪里？），“sizeof”是大小（你住在多少坪？）。"
 }

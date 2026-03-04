@@ -1,18 +1,18 @@
 {
   "lessonId": "py-5-2",
   "title": "Instance Attributes",
-  "concept": "不是所有对象共享的，而是拥有"自己的数据"",
+  "concept": "모든 객체가 공유하는 게 아니라, '나만의 데이터'를 가진다",
   "content": {
     "code": "class Cat:\n    def set_name(self, n):\n        self.name = n\n\n    def meow(self):\n        print(f\"{self.name} says Meow!\")\n\ncat1 = Cat()\ncat1.set_name(\"Kitty\")\n\ncat2 = Cat()\ncat2.set_name(\"Nabi\")\n\ncat1.meow()\ncat2.meow()",
     "steps": [
       {
-        "title": "类定义（Cat）",
-        "explanation": "**`class Cat:`**\n\nPython 从上到下顺序执行代码。\n定义一个名为 `Cat` 的类（猫的设计图）。\n\n**本课目标**：上一课中，我们像 `my_dog.name = \"Buddy\"` 这样从对象**外部**添加属性。这次我们将学习**在方法内部使用 `self.属性`** 来添加属性的方法。这种方式更加系统化，也是实际开发中使用的方式。\n\n**Python 内部机制**：当 Python 遇到 `class Cat:` 时，它会执行类体来注册方法，然后创建 `Cat` 类对象。这个类将定义 `set_name` 和 `meow` 两个方法。\n\n**为什么是这个顺序？** 必须先定义类，之后才能添加方法并用这个设计图创建对象。\n\n**执行顺序**：执行 class Cat → 开始执行类体 → 开始注册 Cat 类 → 第2行",
+        "title": "클래스 정의 (Cat)",
+        "explanation": "**`class Cat:`**\n\n`Cat` 클래스를 정의합니다. 이전 레슨에서는 외부에서 속성을 추가했지만, 이번에는 **메서드 내부에서 `self.속성`으로** 속성을 설정하는 방식을 배웁니다. 더 체계적이고 실무적인 방법입니다.",
         "visualizationType": "pythonMemory",
         "code": "class Cat:",
         "pythonMemoryState": {
           "output": [],
-          "note": "类定义开始",
+          "note": "클래스 정의 시작",
           "names": [
             {
               "name": "Cat",
@@ -30,8 +30,8 @@
         }
       },
       {
-        "title": "方法定义（set_name）",
-        "explanation": "**`def set_name(self, n):`**\n\n**方法（Method）**：在类中定义的函数称为**方法**。它和普通函数几乎相同，但有一个特殊的规则。\n\n**self 参数——Python OOP 的核心！**\n每个实例方法的**第一个参数**必须是 `self`。\n- `self`：指向调用该方法的**"自身（对象）"**的引用\n- 调用方法时，Python 会**自动**将调用对象传递给 `self`\n\n**Python 的自动转换（非常重要！）：**\n```python\ncat1.set_name(\"Kitty\")     # 我们写的代码\n  |\nCat.set_name(cat1, \"Kitty\") # Python 内部转换\n```\n也就是说，`cat1` 会自动插入到 `self` 的位置！\n\n**为什么需要 self？** 因为多个对象共享同一份方法代码。需要 `self` 来区分"当前这个方法是在**哪个对象**上执行的"。cat1 和 cat2 使用相同的 `set_name` 代码，但因为 `self` 不同，各自产生不同的结果。\n\n**注意**：`self` 不是保留字，而是**约定（convention）**。改成 `this` 或 `me` 也能正常工作，但 Python 社区**一律使用 `self`**。\n\n**执行顺序**：执行 def set_name → 创建 set_name 函数对象 → 注册到 Cat 类 → 第5行",
+        "title": "메서드 정의 (set_name)",
+        "explanation": "**`def set_name(self, n):`**\n\n클래스 안에 정의된 함수를 **메서드**라고 합니다. 첫 번째 매개변수 `self`는 메서드를 호출한 객체 자신을 가리킵니다. `cat1.set_name(\"Kitty\")` 호출 시 Python이 자동으로 `cat1`을 `self`에 전달합니다.",
         "visualizationType": "pythonMemory",
         "code": "def set_name(self, n):",
         "highlightOffset": [
@@ -39,7 +39,7 @@
           1
         ],
         "pythonMemoryState": {
-          "note": "set_name 方法已定义（尚未执行）",
+          "note": "set_name 메서드 정의됨 (실행 안 됨)",
           "objects": [
             {
               "id": "class1",
@@ -51,8 +51,8 @@
         }
       },
       {
-        "title": "方法定义（meow）",
-        "explanation": "**`def meow(self):`**\n\n定义另一个方法 `meow`。这个方法实现了猫发出叫声的行为。\n\n**只有 self 的方法**：`meow(self)` 除了 `self` 之外没有其他参数。这意味着它不需要从外部接收额外数据，只使用**对象自身的数据（self.name）**来执行操作。\n\n**方法体 `print(f\"{self.name} says Meow!\")` 的关键**：通过 `self.name` 访问调用对象的 `name` 属性。当 cat1 调用时，读取 cat1 的 name；当 cat2 调用时，读取 cat2 的 name。相同的代码产生**不同的结果**——这就是 OOP 的魅力！\n\n**注意**：如果在调用 `set_name()` 之前先调用 `meow()`，会怎样？由于 `self.name` 尚不存在，会引发 `AttributeError`！为了防止这种问题，最好在 `__init__` 构造函数中预先初始化属性（下一课会学到）。\n\n**执行顺序**：执行 def meow → 创建 meow 函数对象 → 注册到 Cat 类 → Cat 类定义完成 → 第8行",
+        "title": "메서드 정의 (meow)",
+        "explanation": "**`def meow(self):`**\n\n`meow` 메서드를 정의합니다. `self`만 있는 메서드는 외부 데이터 없이 객체 자신의 속성(`self.name`)만 사용합니다. `set_name()` 호출 전에 `meow()`를 실행하면 `self.name`이 없어 `AttributeError`가 발생합니다.",
         "visualizationType": "pythonMemory",
         "code": "def meow(self):",
         "highlightOffset": [
@@ -60,7 +60,7 @@
           1
         ],
         "pythonMemoryState": {
-          "note": "meow 方法已定义（尚未执行）",
+          "note": "meow 메서드 정의됨 (실행 안 됨)",
           "objects": [
             {
               "id": "class1",
@@ -72,12 +72,12 @@
         }
       },
       {
-        "title": "创建第一个对象",
-        "explanation": "**`cat1 = Cat()`**\n\n调用 `Cat()` 创建**第一个 Cat 对象（实例）**。\n\n**Python 创建对象时内部发生的事情**：\n1. 调用 `Cat.__new__(Cat)` → 在内存中分配**空的 Cat 对象**空间（0x2000）\n2. 调用 `Cat.__init__(新对象)` → 初始化对象（没有 `__init__`，只进行默认初始化）\n3. 返回已初始化对象的**引用（地址 0x2000）**\n4. 变量 `cat1` 接收并绑定到这个引用\n\n**此时 cat1 对象的状态**：是一个没有任何属性的**空对象**！`cat1.__dict__` 是空字典 `{}`。`name` 属性尚不存在——需要调用 `set_name()` 方法才能添加。\n\n比喻：一只带着空白名牌的猫出生了。名字还没有确定。\n\n**为什么是这个顺序？** 类定义完成后才能用那个设计图创建对象。\n\n**执行顺序**：调用 Cat() → 通过 __new__ 创建对象 0x2000 → 将引用 0x2000 赋给 cat1 → 第9行",
+        "title": "첫 번째 객체 생성",
+        "explanation": "**`cat1 = Cat()`**\n\n첫 번째 Cat 인스턴스를 생성합니다. 이 시점에서 cat1은 속성이 없는 빈 객체입니다. `name` 속성은 `set_name()` 호출 후에야 생성됩니다.",
         "visualizationType": "pythonMemory",
         "code": "cat1 = Cat()",
         "pythonMemoryState": {
-          "note": "创建第一个 Cat 对象（0x2000）",
+          "note": "첫 번째 Cat 객체 생성 (0x2000)",
           "names": [
             {
               "name": "Cat",
@@ -107,12 +107,12 @@
         }
       },
       {
-        "title": "调用 cat1.set_name",
-        "explanation": "**`cat1.set_name(\"Kitty\")`**\n\n调用 `cat1` 对象的 `set_name` 方法。此时 Python **自动将 cat1 传递给 self**。\n\n**Python 的自动转换（再次确认！）：**\n```python\ncat1.set_name(\"Kitty\")       # 我们写的代码（1个参数）\n  |\nCat.set_name(cat1, \"Kitty\")  # Python 内部转换（2个参数！）\n```\n我们只传了1个参数（`\"Kitty\"`），但 Python 在内部自动将 `cat1` 放入**第一个参数（self）**的位置！\n\n**参数绑定**：\n- `self` = `cat1`（0x2000 对象）——**自动传递**\n- `n` = `\"Kitty\"` ——**我们传递的**\n\n比喻：就像告诉快递员（方法）"请把这个名牌（Kitty）挂在这只猫（cat1）身上"。快递员自动知道要在哪只猫（self）上操作。\n\n**执行流程**：在这一行，执行流**跳转到函数内部（第3行）**。方法执行完毕后会返回这里。\n\n**执行顺序**：第9行 → 创建 cat1.set_name 绑定方法 → 调用 → 跳转到第3行 → self=cat1, n=\"Kitty\"",
+        "title": "cat1.set_name 호출",
+        "explanation": "**`cat1.set_name(\"Kitty\")`**\n\n`cat1`의 `set_name` 메서드를 호출합니다. Python이 자동으로 `cat1`을 `self`에 전달하므로, `self = cat1`, `n = \"Kitty\"`로 바인딩됩니다.",
         "visualizationType": "pythonMemory",
         "code": "cat1.set_name(\"Kitty\")",
         "pythonMemoryState": {
-          "note": "调用 set_name → 即将跳转到第3行",
+          "note": "set_name 호출 → line 3으로 점프 예정",
           "names": [
             {
               "name": "Cat",
@@ -140,12 +140,12 @@
         }
       },
       {
-        "title": "执行 set_name（cat1）",
-        "explanation": "**`self.name = n`**\n\n这一行就是创建**实例属性（Instance Attribute）**的核心代码！它在 `self`（现在是 cat1 对象，0x2000）上添加一个名为 `name` 的新属性，并赋值为参数 `n` 的值 `\"Kitty\"`。\n\n**实例属性 vs 类属性**：实例属性是每个对象**各自拥有**的。cat1 的 name 和之后要创建的 cat2 的 name 是完全不同的变量。就像同一表格的学生证——每个学生在上面写自己的名字。\n\n**注意**：`self.name` 和 `name` 是不同的！只写 `name` 是局部变量，而写 `self.name` 才能将值永久保存到对象上。如果忘记写 `self.`，函数结束时值就会消失！",
+        "title": "set_name 실행 (cat1)",
+        "explanation": "**`self.name = n`**\n\n`self`(cat1 객체)에 `name` 인스턴스 변수를 생성하고 `\"Kitty\"`를 할당합니다. `self.`를 붙여야 객체에 영구 저장되며, 빠뜨리면 함수가 끝날 때 값이 사라집니다.",
         "visualizationType": "pythonMemory",
         "code": "self.name = n",
         "pythonMemoryState": {
-          "note": "仅给 cat1 对象添加了 name 属性",
+          "note": "cat1 객체에만 name 속성 추가",
           "names": [
             {
               "name": "Cat",
@@ -197,12 +197,12 @@
         }
       },
       {
-        "title": "创建第二个对象",
-        "explanation": "**`cat2 = Cat()`**\n\n现在创建**第二个 Cat 对象**。每次调用 `Cat()`，Python 都会在内存中创建一个**全新的对象**。\n\n**核心概念——对象的独立性**：cat1（0x2000）和 cat2（0x3000）是**完全独立的对象**。虽然都是用同一个设计图（Cat 类）创建的，但内存地址不同，内部数据也是独立的。\n\n**比喻**：可以把它们想象成同一个工厂（Cat 类）生产的两个玩偶。给一个玩偶贴上名牌（cat1.name = \"Kitty\"），另一个玩偶不会自动有名牌。\n\n**此时 cat2 对象的状态**：`cat2.__dict__` 是空字典 `{}`！添加到 cat1 的 name 属性对 cat2 完全没有影响。cat2 目前还没有名字。\n\n**Python 内部机制**：再次 `Cat.__new__(Cat)` → 分配新内存（0x3000）→ 默认 `__init__`（什么都不做）→ 将引用 0x3000 绑定到 cat2 变量。每次调用 `Cat()` 都会重复这个过程，诞生一个新对象。\n\n**为什么是这个顺序？** 之前的 set_name 方法调用完成返回到第10行后，按顺序执行下一行（第11行）。\n\n**执行顺序**：调用 Cat() → 通过 __new__ 创建新对象 0x3000 → 将引用 0x3000 赋给 cat2 → 第12行",
+        "title": "두 번째 객체 생성",
+        "explanation": "**`cat2 = Cat()`**\n\n두 번째 Cat 인스턴스를 생성합니다. cat1과 완전히 별개의 객체이며, cat1에 추가한 `name` 속성은 cat2에 영향을 주지 않습니다. cat2는 여전히 빈 상태입니다.",
         "visualizationType": "pythonMemory",
         "code": "cat2 = Cat()",
         "pythonMemoryState": {
-          "note": "创建第二个 Cat 对象（cat2 还没有 name）",
+          "note": "두 번째 Cat 객체 생성 (cat2에는 name 없음)",
           "names": [
             {
               "name": "Cat",
@@ -242,12 +242,12 @@
         }
       },
       {
-        "title": "调用 cat2.set_name",
-        "explanation": "**`cat2.set_name(\"Nabi\")`**\n\n这次调用 `cat2` 对象的 `set_name` 方法。Python 再次执行自动转换。\n\n**Python 的自动转换：**\n```python\ncat2.set_name(\"Nabi\")       # 我们写的代码（1个参数）\n  |\nCat.set_name(cat2, \"Nabi\")  # Python 内部转换（2个参数！）\n```\n\n**参数绑定：**\n- `self` = `cat2`（0x3000 对象）——**自动传递**（是 cat2 不是 cat1！）\n- `n` = `\"Nabi\"` ——**我们传递的**\n\n**相同的方法，不同的 self**：和之前调用 `cat1.set_name(\"Kitty\")` 时执行的是**完全相同的代码（第3行）**。但这次 self 指向 cat2，所以结果会存储在 cat2 对象上。这就是 OOP 中 `self` 如此重要的原因！\n\n**比喻**：使用同一台名牌打印机（set_name 方法），但这次给第二只猫（cat2）打印名牌。\n\n**为什么是这个顺序？** 创建第二个对象后，按顺序执行下一行。\n\n**执行顺序**：第12行 → 创建 cat2.set_name 绑定方法 → 调用 → 跳转到第3行 → self=cat2, n=\"Nabi\"",
+        "title": "cat2.set_name 호출",
+        "explanation": "**`cat2.set_name(\"Nabi\")`**\n\n이번에는 `cat2`의 `set_name`을 호출합니다. Python이 `cat2`를 `self`에 전달하므로, 같은 코드지만 결과는 cat2 객체에 저장됩니다.",
         "visualizationType": "pythonMemory",
         "code": "cat2.set_name(\"Nabi\")",
         "pythonMemoryState": {
-          "note": "调用 set_name → 即将跳转到第3行",
+          "note": "set_name 호출 → line 3으로 점프 예정",
           "names": [
             {
               "name": "Cat",
@@ -285,12 +285,12 @@
         }
       },
       {
-        "title": "执行 set_name（cat2）",
-        "explanation": "**`self.name = n`**\n\n和之前**完全相同的一行代码**，但这次 `self` 指向 cat2（0x3000），所以结果不同。给 cat2 对象添加 `name` 属性并赋值 `\"Nabi\"`。\n\n**Python 内部机制**：等价于 `cat2.__dict__['name'] = \"Nabi\"`。cat2 的 `__dict__` 从 `{}` 变为 `{'name': 'Nabi'}`。\n\n**让我们比较一下此时两个对象的状态：**\n- cat1（0x2000）：`__dict__` = `{'name': 'Kitty'}` —— 自己的 name\n- cat2（0x3000）：`__dict__` = `{'name': 'Nabi'}` —— 自己的 name\n- Cat 类：拥有 `set_name`、`meow` 方法——**代码是共享的**\n\n**核心理解**：方法代码（set_name）在 Cat 类中只存在**一份**，所有对象共享。但因为 `self` 指向调用对象，所以相同的代码可以在每个对象中存储**独立的数据**。共享代码但分离数据——这就是 OOP 的核心原理！\n\n**比喻**：工厂里只有一台盖章机（set_name），但根据你拿来的是哪个玩偶，盖章就盖在不同的玩偶上。\n\n**为什么这样工作？** self 指向**调用方法的对象**。调用 cat2.set_name() 时，self 就是 cat2。\n\n**执行顺序**：self.name = n → 向 cat2.__dict__ 添加 name=\"Nabi\" → 函数结束 → 返回第14行",
+        "title": "set_name 실행 (cat2)",
+        "explanation": "**`self.name = n`**\n\n이번에는 `self`가 cat2(0x3000)를 가리키므로 cat2에 `name = \"Nabi\"`가 추가됩니다. 같은 코드 한 줄이지만 `self`가 달라 결과가 다른 것이 OOP의 핵심입니다.",
         "visualizationType": "pythonMemory",
         "code": "self.name = n",
         "pythonMemoryState": {
-          "note": "仅给 cat2 对象添加了 name 属性（与 cat1 独立）",
+          "note": "cat2 객체에만 name 속성 추가 (cat1과 독립적)",
           "names": [
             {
               "name": "Cat",
@@ -352,12 +352,12 @@
         }
       },
       {
-        "title": "调用 cat1.meow",
-        "explanation": "**`cat1.meow()`**\n\n调用 `cat1` 对象的 `meow` 方法。现在两只猫都有了名字，meow 方法可以用各自的名字发出叫声了。\n\n**Python 的自动转换：**\n```python\ncat1.meow()       # 我们写的代码（0个参数）\n  |\nCat.meow(cat1)    # Python 内部转换（1个参数 = self！）\n```\n\n**参数绑定：**\n- `self` = `cat1`（0x2000 对象）——**自动传递**\n\n**执行预览**：在 meow 方法内部会读取 `self.name`。因为 self 是 cat1，所以会读取 cat1 的 name \"Kitty\"。cat2 的 name \"Nabi\" 完全无关。\n\n**Python 的属性查找顺序**：访问 `self.name` 时，Python 首先检查 cat1 对象的 `__dict__`。在 `{'name': 'Kitty'}` 中找到 name，返回 \"Kitty\"。\n\n**为什么是这个顺序？** 所有对象的名字设置完成后，按顺序执行下一行。\n\n**执行顺序**：第14行 → 创建 cat1.meow 绑定方法 → 调用 → 跳转到第6行 → self=cat1",
+        "title": "cat1.meow 호출",
+        "explanation": "**`cat1.meow()`**\n\ncat1의 `meow` 메서드를 호출합니다. 내부에서 `self.name`에 접근하는데, `self`가 cat1이므로 `\"Kitty\"`를 읽게 됩니다.",
         "visualizationType": "pythonMemory",
         "code": "cat1.meow()",
         "pythonMemoryState": {
-          "note": "调用 meow → 即将跳转到第6行",
+          "note": "meow 호출 → line 6으로 점프 예정",
           "names": [
             {
               "name": "Cat",
@@ -395,8 +395,8 @@
         }
       },
       {
-        "title": "执行 meow（cat1）",
-        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\n执行 meow 方法的方法体。访问 `self`（cat1）的 `name` 属性，用 f-string 组合后输出。\n\n**让我们一步步跟踪执行流程：**\n1. `self` → cat1 对象（0x2000）\n2. `self.name` → cat1.__dict__['name'] → \"Kitty\"\n3. f-string 求值：`f\"{self.name} says Meow!\"` → `\"Kitty says Meow!\"`\n4. 执行 `print(\"Kitty says Meow!\")` → 输出到屏幕！\n\n**为什么输出 \"Kitty\"？** 因为 self 指向 cat1（0x2000），而 cat1 的 `__dict__` 中存储着 `'name': 'Kitty'`。cat2 的 name \"Nabi\" 在 cat2（0x3000）的 `__dict__` 中，完全无关。\n\n**f-string 复习**：`f\"...{表达式}...\"` 将花括号中的表达式替换为其**计算结果**。这里 `{self.name}` 被替换为 `\"Kitty\"`。\n\n**这就是 OOP 的本质！** 当 cat1 调用同样的 meow 代码时输出 \"Kitty says Meow!\"，当 cat2 调用时输出 \"Nabi says Meow!\"。**一份代码，每个对象产生不同结果**——这就是面向对象编程的精髓。\n\n**执行顺序**：读取 self.name（\"Kitty\"）→ 求值 f-string → 执行 print → meow 函数结束 → 返回第15行",
+        "title": "meow 실행 (cat1)",
+        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\n`self`(cat1)의 `name` 속성인 `\"Kitty\"`를 f-string으로 조합해 출력합니다. `\"Kitty says Meow!\"`가 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"{self.name} says Meow!\")",
         "pythonMemoryState": {
@@ -453,12 +453,12 @@
         }
       },
       {
-        "title": "调用 cat2.meow",
-        "explanation": "**`cat2.meow()`**\n\n这次调用 `cat2` 对象的 `meow` 方法。上一步 cat1.meow() 输出了 \"Kitty says Meow!\"——这次会得到什么结果呢？\n\n**Python 的自动转换：**\n```python\ncat2.meow()       # 我们写的代码\n  |\nCat.meow(cat2)    # Python 内部转换\n```\n\n**参数绑定：**\n- `self` = `cat2`（0x3000 对象）——不是 cat1（0x2000）！\n\n**让我们预测一下**：meow 方法内部会读取 `self.name`。这次 self 是 cat2，所以在 cat2 的 `__dict__` 中找到 name，读取 \"Nabi\"。因此输出将是 \"Nabi says Meow!\"。\n\n**核心**：`cat1.meow()` 和 `cat2.meow()` 执行的是**同一份函数代码（Cat.meow）**。唯一的区别是 self 中传入了哪个对象。得益于 self，一份代码可以对不同对象产生不同行为。\n\n**为什么是这个顺序？** 前一个 cat1.meow() 调用完成后，按顺序执行下一行。\n\n**执行顺序**：第15行 → 创建 cat2.meow 绑定方法 → 调用 → 跳转到第6行 → self=cat2",
+        "title": "cat2.meow 호출",
+        "explanation": "**`cat2.meow()`**\n\ncat2의 `meow`를 호출합니다. `self`가 cat2이므로 `self.name`은 `\"Nabi\"`가 됩니다. 같은 메서드 코드가 다른 객체에서 다른 결과를 냅니다.",
         "visualizationType": "pythonMemory",
         "code": "cat2.meow()",
         "pythonMemoryState": {
-          "note": "调用 meow → 即将跳转到第6行",
+          "note": "meow 호출 → line 6으로 점프 예정",
           "names": [
             {
               "name": "Cat",
@@ -496,15 +496,15 @@
         }
       },
       {
-        "title": "执行 meow（cat2）",
-        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\n这里的关键是 `self` 是谁。\n在这次调用中，`self = cat2`，所以 `self.name` 是 `\"Nabi\"`。\n因此输出是 `Nabi says Meow!`。\n\n核心总结：\n- 方法代码在类中只有一份\n- 数据每个实例不同\n- `self` 指向当前调用对象，让相同的代码产生不同行为\n\n**比喻**：即使读同一份剧本，如果演员（实例）不同，台词的演绎也不同。\n\n注意：\n- 如果没有预先设置 `name`，可能会出现 `AttributeError`",
+        "title": "meow 실행 (cat2)",
+        "explanation": "**`print(f\"{self.name} says Meow!\")`**\n\n`self`가 cat2이므로 `self.name`은 `\"Nabi\"`이고, `\"Nabi says Meow!\"`가 출력됩니다. 메서드 코드는 클래스에 하나, 데이터는 각 인스턴스에 독립적으로 존재합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"{self.name} says Meow!\")",
         "pythonMemoryState": {
           "output": [
             "Nabi says Meow!"
           ],
-          "note": "每个对象输出自己的 name",
+          "note": "각 객체가 자신만의 name을 출력",
           "names": [
             {
               "name": "Cat",
@@ -557,22 +557,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "如果方法的第一个参数不写 `self` 会怎样？",
+    "question": "如果“self”不用作该方法的第一个参数怎么办？",
     "options": [
-      "会自动添加",
-      "发生错误（TypeError）",
+      "自动添加",
+      "发生错误（类型错误）",
       "引用全局变量",
-      "变成类方法"
+      "成为类方法"
     ],
     "correctIndex": 1,
-    "explanation": "调用方法时，Python 会自动将对象本身作为第一个参数传递。如果没有准备好接收它的参数（`self`），就会报"参数数量不匹配"的 TypeError。"
+    "explanation": "调用方法时，Python 会自动将对象本身作为第一个参数传递，但如果您不准备接收它（`self`），则会引发 TypeError，指出“参数数量不正确”。"
   },
   "misconceptions": [
     {
-      "wrong": "self 是保留字",
-      "correct": "实际上，将 `self` 改成其他名字（`this`、`me`）也能正常工作。",
-      "why": "但这是 Python 社区的**强烈约定（Convention）**，所以必须使用 `self`。\n不遵守这个约定会让其他人很难阅读你的代码。"
+      "wrong": "self는 예약어다",
+      "correct": "사실 `self` 이름은 마음대로 바꿔도(`this`, `me`) 동작은 합니다.",
+      "why": "하지만 파이썬 커뮤니티의 **강력한 약속(Convention)**이므로 무조건 `self`라고 써야 합니다.\n안 그러면 왕따 당합니다."
     }
   ],
-  "keyTakeaway": "方法的第一个参数必须是 `self`。用 `self.变量` 存储每个对象自己的数据。"
+  "keyTakeaway": "메서드 첫 인자는 무조건 `self`. `self.변수`로 나만의 데이터를 저장한다."
 }

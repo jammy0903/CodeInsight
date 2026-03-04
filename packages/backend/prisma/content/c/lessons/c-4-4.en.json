@@ -1,13 +1,13 @@
 {
   "lessonId": "c-4-4",
   "title": "Array Parameters",
-  "concept": "Arrays are too large to pass whole, so only the 'first address' is sent to the function",
+  "concept": "When passing an array to a function, it is too large, so only the ‘first address’ is sent.",
   "content": {
     "code": "#include <stdio.h>\n\nvoid printArr(int arr[], int len) {\n    for (int i = 0; i < len; i++) {\n        printf(\"%d \", arr[i]);\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    int data[3] = {10, 20, 30};\n\n    printArr(data, 3);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including Header",
-        "explanation": "`#include <stdio.h>` enables the output functions.\n\nThis lesson covers how arrays decay into addresses when passed as function arguments.",
+        "title": "with header",
+        "explanation": "Use the output function with `#include <stdio.h>`.\n\nThis lesson covers the behavior of array decay to address when passing array arguments.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,14 +15,14 @@
         "stdout": ""
       },
       {
-        "title": "printArr Function Definition",
-        "explanation": "In `printArr(int arr[], int len)`, `arr[]` acts as a pointer in the function parameter.\n\nThat's why we must receive the length `len` separately to iterate safely.",
+        "title": "printArr function definition",
+        "explanation": "In `printArr(int arr[], int len)`, `arr[]` behaves like a pointer in a function parameter.\n\nSo, you can safely traverse only by receiving the length `len` separately.",
         "visualizationType": "cMemory",
         "code": "void printArr(int arr[], int len) {"
       },
       {
-        "title": "Starting the main Function",
-        "explanation": "The main frame is created and the array `data` is prepared.",
+        "title": "Start main function",
+        "explanation": "The main frame is created and prepares the array `data`.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -35,8 +35,8 @@
         ]
       },
       {
-        "title": "Array Declaration and Initialization",
-        "explanation": "Array `data` stores 10, 20, 30 in contiguous memory.\n\nThe array name serves as a starting point representing the first element's address.",
+        "title": "Array declaration and initialization",
+        "explanation": "Store 10, 20, and 30 in contiguous memory in the `data` array.\n\nThe array name serves as a starting point for the address of the first element.",
         "visualizationType": "cMemory",
         "code": "int data[3] = {10, 20, 30};",
         "stack": [
@@ -50,8 +50,8 @@
         ]
       },
       {
-        "title": "Passing the Array (Array Decay)",
-        "explanation": "When `printArr(data, 3);` is called, `data` decays to its starting address.\n\nThe function accesses the original location, not a copy of the array.",
+        "title": "Passing an Array (Array Decay)",
+        "explanation": "When calling `printArr(data, 3);`, `data` is passed decayed to the starting address.\n\nThat is, the function accesses based on the original position rather than a copy of the array.",
         "visualizationType": "cMemory",
         "code": "printArr(data, 3);",
         "highlightOffset": [
@@ -80,8 +80,8 @@
         ]
       },
       {
-        "title": "Iterating with a for Loop",
-        "explanation": "`arr[i]` prints the elements in order.\n\nInternally, this is equivalent to pointer access `*(arr+i)`.",
+        "title": "for loop traversal",
+        "explanation": "Print elements in order with `arr[i]`.\n\nInternally, it has the same meaning as `*(arr+i)` pointer access.",
         "visualizationType": "cMemory",
         "code": "for (int i = 0; i < len; i++) {",
         "highlightOffset": [
@@ -118,8 +118,8 @@
         "stdout": "10 20 30 "
       },
       {
-        "title": "Program Termination",
-        "explanation": "`return 0;` ends the program.\n\nKey point: when passing arrays as arguments, you must manage both the address and the length together.",
+        "title": "Program exit",
+        "explanation": "Exit with `return 0;`.\n\nKey point: In array argument passing, address and length must be managed together.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -128,22 +128,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "When you declare void func(int a[100]), how does the compiler interpret it?",
+    "question": "If you declare void func(int a[100]), how does the compiler interpret it?",
     "options": [
-      "It copies a 100-element array",
-      "It interprets it as void func(int *a) (Pointer)",
-      "It throws an error",
-      "It allocates 100 bytes of memory"
+      "Copy an array of 100 items",
+      "Interpreted as void func(int *a) (Pointer)",
+      "throws an error",
+      "Allocate 100 bytes of memory"
     ],
     "correctIndex": 1,
-    "explanation": "The number inside the brackets is ignored.\nAn array declaration in a function parameter is always equivalent to a pointer declaration."
+    "explanation": "Numbers in square brackets are ignored.\nAn array declaration in place of a function parameter is unconditionally equivalent to a pointer declaration."
   },
   "misconceptions": [
     {
-      "wrong": "Arrays can be passed by Call by Value",
-      "correct": "The array itself cannot.",
-      "why": "If you really want to, you can wrap the array in a struct and pass the struct, which will create a copy (tip)."
+      "wrong": "Arrays can be passed by Call by Value.",
+      "correct": "Array itself is impossible.",
+      "why": "If you really want to do it, put an array in a struct and pass the struct to copy it (tip)."
     }
   ],
-  "keyTakeaway": "Array parameters are essentially pointers. That's why the original can be modified, and the length must be passed separately."
+  "keyTakeaway": "Array arguments are actually pointers. So the original has to be modified, and the length has to be taken care of separately."
 }

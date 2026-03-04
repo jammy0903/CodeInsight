@@ -1,45 +1,54 @@
 {
   "lessonId": "c-8-3",
   "title": "qsort and Comparators",
-  "concept": "qsort uses void pointers and a comparison callback to generically sort arrays of any type",
+  "concept": "qsort provides general-purpose sorting of arrays of various types with a void pointer and comparison callback.",
   "content": {
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint compare(const void *a, const void *b) {\n    int int_a = *(int*)a;\n    int int_b = *(int*)b;\n    return int_a - int_b;\n}\n\nint main() {\n    int arr[] = {42, 10, 5, 100};\n    int n = 4;\n\n    qsort(arr, n, sizeof(int), compare);\n\n    printf(\"Sorted: %d %d %d %d\\n\", arr[0], arr[1], arr[2], arr[3]);\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including required headers",
-        "explanation": "`stdio.h` provides output functions; `stdlib.h` provides the `qsort` declaration.",
+        "title": "Include required headers",
+        "explanation": "`stdio.h` provides the output, and `stdlib.h` provides the `qsort` declaration.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
-        "highlightOffset": [0, 1],
+        "highlightOffset": [
+          0,
+          1
+        ],
         "stack": [],
         "heap": [],
         "stdout": ""
       },
       {
-        "title": "Defining the comparator function",
-        "explanation": "`compare(const void*, const void*)` is the comparison callback signature that qsort requires.\n\nThe sign of the return value determines the sort order.",
+        "title": "Definition of comparison function (Comparator)",
+        "explanation": "`compare(const void*, const void*)` is the comparison callback signature required by qsort.\n\nThe return sign determines the sort order.",
         "visualizationType": "cMemory",
         "code": "int compare(const void *a, const void *b) {"
       },
       {
-        "title": "Extracting values (Casting & Dereferencing)",
-        "explanation": "The `void*` is cast to the actual type (`int*`) then dereferenced to read the value.\n\nIf the type does not match, incorrect results will occur.",
+        "title": "Value Extraction (Casting & Dereferencing)",
+        "explanation": "Cast `void*` to the actual type (`int*`) and then dereference it to read the value.\n\nIf the types do not match, you will get incorrect results.",
         "visualizationType": "cMemory",
         "code": "int int_a = *(int*)a;",
-        "highlightOffset": [0, 1]
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "title": "Returning the comparison result",
-        "explanation": "Returning negative/0/positive tells qsort the order: before/equal/after.",
+        "title": "Return comparison result",
+        "explanation": "Returns negative/0/positive to pass the preceding/equal/following order to qsort.",
         "visualizationType": "cMemory",
         "code": "return int_a - int_b;"
       },
       {
         "title": "main function and array declaration",
-        "explanation": "We prepare the array to sort and the element count.",
+        "explanation": "Prepare the array to be sorted and the number of elements.",
         "visualizationType": "cMemory",
         "code": "int main() {",
-        "highlightOffset": [0, 1],
+        "highlightOffset": [
+          0,
+          1
+        ],
         "stack": [
           {
             "name": "arr",
@@ -56,9 +65,9 @@
         ]
       },
       {
-        "title": "Calling qsort",
-        "explanation": "`qsort(arr, n, sizeof(int), compare)` sorts the array in-place.\n\nThe sorting criteria logic is provided by the compare function.",
-        "keyInsight": "qsort receives its sorting criteria from the outside through the comparison function.",
+        "title": "qsort call",
+        "explanation": "Sort an array in-place with `qsort(arr, n, sizeof(int), compare)`.\n\nSorting criteria logic is provided by the compare function.",
+        "keyInsight": "qsort receives sorting criteria externally through comparison functions.",
         "visualizationType": "cMemory",
         "code": "qsort(arr, n, sizeof(int), compare);",
         "stack": [
@@ -78,8 +87,8 @@
         ]
       },
       {
-        "title": "Printing the sorted result",
-        "explanation": "We print the array values after sorting to verify the result.",
+        "title": "Sort result output",
+        "explanation": "After sorting, print the array values ​​and check the results.",
         "visualizationType": "cMemory",
         "code": "printf(\"Sorted: %d %d %d %d\\n\", arr[0], arr[1], arr[2], arr[3]);",
         "stack": [
@@ -93,8 +102,8 @@
         "stdout": "Sorted: 5 10 42 100"
       },
       {
-        "title": "Program termination",
-        "explanation": "The program ends with `return 0;`.\n\nKey point: qsort's flexibility comes from the comparison callback.",
+        "title": "Program exit",
+        "explanation": "Exit with `return 0;`.\n\nBottom line: qsort's flexibility comes from its comparison callbacks.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -103,22 +112,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What does qsort do when the comparison function returns a positive value?",
+    "question": "How does qsort behave if its comparison function returns a positive number (+)?",
     "options": [
-      "It determines that the first element (a) is greater than the second (b) and swaps them for ascending order.",
-      "It determines the two elements are equal.",
+      "It is determined that the first element (a) is greater than the second element (b), so its position is changed in ascending order.",
+      "It is judged that the two elements are equal.",
       "Nothing happens.",
-      "It raises an error."
+      "An error occurs."
     ],
     "correctIndex": 0,
-    "explanation": "In ascending sort, if a - b is positive then a > b, so a must be moved after b (swap)."
+    "explanation": "In ascending sorting, if a - b is a positive number, a > b, so a must be sent backwards (swap)."
   },
   "misconceptions": [
     {
-      "wrong": "You can declare the comparator parameters as `int a, int b`.",
-      "correct": "No. They must be `const void *a` format, and values must be read internally.",
-      "why": "qsort passes 'addresses of values', not the values themselves."
+      "wrong": "Comparison function parameters can be declared as `int a, int b`.",
+      "correct": "No.\nIt must be a pointer of type `const void *a`, and the value must be read internally.",
+      "why": "This is because qsort passes the 'address of the value' rather than the value itself."
     }
   ],
-  "keyTakeaway": "Writing comparison functions using void* casting is the core pattern for generic programming in C."
+  "keyTakeaway": "Writing comparison functions using void* casting is a core pattern in C language generic programming."
 }

@@ -1,13 +1,13 @@
 {
   "lessonId": "c-4-5",
   "title": "Returning Stack Addresses",
-  "concept": "Never hand out the key to a room that will disappear when the function ends (a fatal bug)",
+  "concept": "Don't hand out a room key that disappears when the function ends (fatal bug)",
   "content": {
     "code": "#include <stdio.h>\n\nint* dangerousFunc() {\n    int x = 100;\n    return &x;\n}\n\nint main() {\n    int *p = dangerousFunc();\n\n    printf(\"%d\\n\", *p);\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including Header",
-        "explanation": "`#include <stdio.h>` enables the output functions.\n\nThis example demonstrates why returning a local variable's address is dangerous.",
+        "title": "with header",
+        "explanation": "Use the output function with `#include <stdio.h>`.\n\nThis example is a counterexample that shows why returning the address of a local variable is dangerous.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting the main Function",
-        "explanation": "The main frame is created and prepares to call `dangerousFunc`.\n\nThe key question is: \"Is a local variable's address valid after the function returns?\"",
+        "title": "Start main function",
+        "explanation": "The main frame is created and ready to call `dangerousFunc`.\n\nThe key question is \"Is the address of a local variable valid after the function exits?\"",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Calling dangerousFunc",
-        "explanation": "The call creates a new frame with local variable `x=100` inside it.\n\nmain's `p` will receive the pointer value returned by the function.",
+        "title": "dangerousFunc call",
+        "explanation": "The call creates a new frame and creates an internal local variable `x=100`.\n\n`p` in main receives the pointer value that the function will return.",
         "visualizationType": "cMemory",
         "code": "int *p = dangerousFunc();",
         "highlightOffset": [
@@ -54,8 +54,8 @@
         ]
       },
       {
-        "title": "Dangerous Return - Address of a Local Variable",
-        "explanation": "`return &x;` returns the address of a local variable that is about to be destroyed.\n\nAfter the function ends, that address becomes a dangling pointer with no valid target.",
+        "title": "Dangerous return - address of local variable",
+        "explanation": "`return &x;` returns the address of a local variable that will soon be destroyed.\n\nAfter the function ends, the address becomes a dangling pointer with no valid target.",
         "visualizationType": "cMemory",
         "code": "return &x;",
         "stack": [
@@ -69,8 +69,8 @@
         ]
       },
       {
-        "title": "Dereferencing a Dangling Pointer - Undefined Behavior",
-        "explanation": "Reading `*p` at this point is Undefined Behavior.\n\nThe value might appear correct by chance, could be garbage, or might crash the program — it cannot be trusted.",
+        "title": "Dangling Pointer Dereference - Undefined Behavior",
+        "explanation": "The moment you read `*p`, the behavior is Undefined Behavior.\n\nThe values ​​may appear to be correct by chance, may produce garbage values, or may crash, so they are not reliable.",
         "visualizationType": "cMemory",
         "code": "printf(\"%d\\n\", *p);",
         "stack": [
@@ -88,22 +88,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What is the safe way to return data created inside a function?",
+    "question": "What is a safe way to return data generated from a function?",
     "options": [
-      "Return the address of a local variable",
-      "Use a global variable",
-      "Return the address of a static variable or malloc (dynamically allocated) memory",
-      "Just printf inside the function and be done"
+      "Returns the address of a local variable",
+      "Use global variables",
+      "Returns a static variable or malloc (dynamically allocated) address.",
+      "Print and exit with printf inside the function."
     ],
     "correctIndex": 2,
-    "explanation": "`static` variables are stored in the data segment, and `malloc` allocates in the heap — both persist after the function ends."
+    "explanation": "`static` variables are stored in the data area and `malloc` are stored in the heap area, so they do not disappear when the function ends."
   },
   "misconceptions": [
     {
-      "wrong": "C doesn't give a compile error for return &x",
-      "correct": "Most compilers only give a warning and let it pass.",
-      "why": "This is one of the most common mistakes beginners make.\nNever ignore the warning: \"Address of stack memory associated with local variable 'x' returned.\""
+      "wrong": "In C language, a compilation error does not occur even if you return &x.",
+      "correct": "In most cases, they just give a warning and move on.",
+      "why": "So, this is one of the most common mistakes beginners make.\nNever ignore the \"Address of stack memory associated with local variable 'x' returned\" warning."
     }
   ],
-  "keyTakeaway": "Never return the address of a local variable (&local) outside the function."
+  "keyTakeaway": "Never export the address (&local) of a local variable that will disappear."
 }

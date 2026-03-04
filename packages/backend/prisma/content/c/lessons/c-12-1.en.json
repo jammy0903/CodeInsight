@@ -1,13 +1,13 @@
 {
   "lessonId": "c-12-1",
-  "title": "How Recursive Functions Work",
-  "concept": "When a function calls itself, a new stack frame is pushed each time",
+  "title": "Principles of recursive functions",
+  "concept": "When a function calls itself, a new stack frame is built each time.",
   "content": {
     "code": "#include <stdio.h>\n\nvoid countdown(int n) {\n    if (n <= 0) {\n        printf(\"Launch!\\n\");\n        return;\n    }\n    printf(\"%d...\\n\", n);\n    countdown(n - 1);\n}\n\nint main() {\n    countdown(3);\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including header file",
-        "explanation": "We include the standard I/O library with **`#include <stdio.h>`** to use `printf`.\n\nThe topic of this lesson is the **recursive function** -- a structure where a function calls itself.",
+        "title": "Include header files",
+        "explanation": "Include the standard input/output library with **`#include <stdio.h>`** for use with `printf`.\n\nThe topic of this lesson is **Recursive Function** --- a structure in which a function calls itself.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting main function",
-        "explanation": "**`int main()`** -- The entry point of the program. A dedicated **stack frame** for main is created.\n\nThe `countdown` function defined above has not been called yet, so it has not executed.",
+        "title": "Start main function",
+        "explanation": "**`int main()`** --- The starting point of the program. A main-only **stack frame** is created.\n\nThe `countdown` function defined above will not be executed because it has not yet been called.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Calling countdown(3) - first recursive frame",
-        "explanation": "**`countdown(3);`** -- A **new stack frame** for `countdown` is pushed on top of main, and the parameter `n` receives a copy of `3`. main is paused here and waits until countdown(3) finishes.",
+        "title": "call countdown(3) - first recursive frame",
+        "explanation": "**`countdown(3);`** --- A **new stack frame** for `countdown` is stacked on top of main, with `3` copied to parameter `n`. main pauses here and waits for countdown(3) to finish.",
         "visualizationType": "cMemory",
         "code": "countdown(3);",
         "highlightOffset": [
@@ -60,15 +60,15 @@
         ]
       },
       {
-        "title": "n=3: Check termination condition and print",
-        "explanation": "Upon entering countdown, it first checks `if (n <= 0)`. Since `3 <= 0` is false, the if block is skipped, and **`printf(\"%d...\\n\", n)`** prints `\"3...\"`.",
+        "title": "n=3: Output after checking termination conditions",
+        "explanation": "When entering countdown, we first check `if (n <= 0)`. Since `3 <= 0` is false, we skip the if block and print `\"3...\"` with **`printf(\"%d...\\n\", n)`**.",
         "visualizationType": "cMemory",
         "code": "printf(\"%d...\\n\", n);",
         "stdout": "3..."
       },
       {
-        "title": "Calling countdown(2) - second recursive frame",
-        "explanation": "**`countdown(n - 1);`** -- Inside `countdown(3)`, `countdown(2)` is called. Another new stack frame is pushed on top, so now there are **3 frames** in total: main (waiting) -> countdown(n=3, waiting) -> countdown(n=2, active).",
+        "title": "call countdown(2) - second recursive frame",
+        "explanation": "**`countdown(n - 1);`** --- Call `countdown(2)` from within `countdown(3)`. Another new stack frame is piled on top, so there are now **3 frames** in total: main(wait) -> countdown(n=3, wait) -> countdown(n=",
         "visualizationType": "cMemory",
         "code": "countdown(n - 1);",
         "highlightOffset": [
@@ -112,8 +112,8 @@
         "stdout": "3..."
       },
       {
-        "title": "Calling countdown(1) - third recursive frame",
-        "explanation": "In countdown(2), `n <= 0` is also false -> prints `\"2...\"` -> calls **`countdown(1)`**, repeating the same process. The stack has now grown to **4 layers**. Looking at `n` in each frame: layer 2 `n=3`(0x1004), layer 3 `n=2`(0x1008), layer 4 `n=1`(0x100c) -- each has its own independent copy.",
+        "title": "call countdown(1) - third recursive frame",
+        "explanation": "The same process was repeated in countdown(2) with `n <= 0` false -> `\"2...\"` output -> **`countdown(1)`** call, raising the stack to **4th floor**. Looking at the `n` of each frame: 2nd floor `n=3`(0x1004), 3rd floor `n=2`(0x1008), 4th floor `n=1`(0",
         "visualizationType": "cMemory",
         "code": "countdown(n - 1);",
         "occurrence": 2,
@@ -171,8 +171,8 @@
         "stdout": "3...\n2..."
       },
       {
-        "title": "countdown(0) - base case reached!",
-        "explanation": "After countdown(1) prints `\"1...\"`, it calls `countdown(0)`. This time `0 <= 0` is **true** -- the **base case** has finally been reached!",
+        "title": "countdown(0) - End condition reached!",
+        "explanation": "After outputting `\"1...\"` from countdown(1), call `countdown(0)`. This time `0 <= 0` is **True** --- we have finally reached the **Base Case**!",
         "visualizationType": "cMemory",
         "code": "printf(\"Launch!\\n\");",
         "stack": [
@@ -238,8 +238,8 @@
         "stdout": "3...\n2...\n1...\nLaunch!"
       },
       {
-        "title": "Stack frame unwinding",
-        "explanation": "As countdown(0) returns, its frame is **popped**, and the waiting countdown(1) resumes. Since there is no remaining code, countdown(1) also returns, and in the same way countdown(2) -> countdown(3) -> main return in order.",
+        "title": "Unwinding the stack frame",
+        "explanation": "As countdown(0) returns, the frame becomes **Pop**, and the waiting countdown(1) resumes. Since there is no code left, countdown(1) also returns and returns in the same order as countdown(2) -> countdown(3) -> main.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [
@@ -256,27 +256,27 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "When countdown(3) is executed, what is the maximum number of countdown frames that exist on the stack simultaneously?",
+    "question": "When countdown(3) is executed, what is the maximum number of countdown frames that exist simultaneously on the stack?",
     "options": [
       "1",
       "3",
       "4 (countdown(3), countdown(2), countdown(1), countdown(0))",
-      "Infinite"
+      "infinite"
     ],
     "correctIndex": 2,
-    "explanation": "countdown(3) -> countdown(2) -> countdown(1) -> countdown(0) results in a total of 4 calls.\nWhen countdown(0) reaches the base case, 4 countdown frames exist on the stack simultaneously."
+    "explanation": "It is called a total of 4 times: countdown(3) -> countdown(2) -> countdown(1) -> countdown(0).\nWhen countdown(0) reaches its termination condition, there are four countdown frames on the stack simultaneously."
   },
   "misconceptions": [
     {
-      "wrong": "Recursive calls reuse the same stack frame since it's the same function",
-      "correct": "A completely new stack frame is created for every call.",
-      "why": "Even though it's the same function, separate memory space (a frame) is allocated for each call, so the n variable in each frame holds an independent value."
+      "wrong": "Since it is the same function when calling recursively, the same stack frame is reused.",
+      "correct": "Each call results in a completely new stack frame.",
+      "why": "Even if the same function is called, a separate memory space (frame) is allocated, so the n variables in each frame have independent values."
     },
     {
-      "wrong": "Recursion stops on its own without a base case",
-      "correct": "Without a base case, calls continue infinitely and a Stack Overflow occurs.",
-      "why": "Stack memory is finite (usually 1-8MB), so continuously pushing frames without a base case will exhaust the memory."
+      "wrong": "Recursion stops automatically without a base case.",
+      "correct": "If there is no termination condition, it will be called infinitely, resulting in Stack Overflow.",
+      "why": "Stack memory is finite (typically 1 to 8 MB), so if you continue to stack frames without a termination condition, you will run out of memory."
     }
   ],
-  "keyTakeaway": "A recursive function pushes a new stack frame with each call, and when the base case is reached, the frames unwind in reverse order."
+  "keyTakeaway": "Each time a recursive function is called, a new stack frame is accumulated, and when the termination condition (base case) is reached, it is unpacked in reverse order."
 }

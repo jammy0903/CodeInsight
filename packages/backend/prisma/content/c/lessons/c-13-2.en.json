@@ -1,13 +1,13 @@
 {
   "lessonId": "c-13-2",
-  "title": "Floating Point (float vs double)",
-  "concept": "Computers store real numbers as approximations; double is more precise than float but neither is perfect.",
+  "title": "floating point (float vs double)",
+  "concept": "Computers store real numbers as approximations, and although doubles are more precise than floats, they are not perfect.",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    float f = 0.1f;\n    double d = 0.1;\n\n    printf(\"float:  %.20f\\n\", f);\n    printf(\"double: %.20f\\n\", d);\n\n    float sum = 0.0f;\n    for (int i = 0; i < 10; i++) {\n        sum += 0.1f;\n    }\n    printf(\"0.1 * 10 = %.20f\\n\", sum);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
-        "explanation": "We include the standard I/O header with **`#include <stdio.h>`** to use `printf`.\n\nIn this lesson, we learn a surprising fact: **computers cannot store 0.1 exactly.** Integers (int, long) are stored perfectly accurately, but floating-point numbers are always approximations.",
+        "title": "Include stdio.h header",
+        "explanation": "Include standard input/output headers with **`#include <stdio.h>`** for use with `printf`.\n\nIn this lesson you will learn a shocking fact: **Computers cannot store 0.1 exactly.** Integers (int, long) can be stored perfectly accurately.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting main function",
-        "explanation": "**`int main()`** -- The entry point of the program, a main stack frame is created.\n\nIn this lesson we compare the two types for handling real numbers: `float` (4 bytes, 6-7 digits of precision) and `double` (8 bytes, 15-16 digits of precision), and explore **floating-point errors**.",
+        "title": "Start main function",
+        "explanation": "**`int main()`** --- The starting point of the program, the main stack frame is created.\n\nIn this lesson, we compare two data types for handling real numbers: `float` (4 bytes, 6 to 7 digits of precision) and `double` (8 bytes, 15 to 16 digits of precision). **",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Declaring float variable - 4-byte real number",
-        "explanation": "**`float f = 0.1f;`** -- `float` is a 4-byte (32-bit) floating-point type, typically providing 6-7 digits of precision.\n\nThe key point is that `0.1` is an infinitely repeating fraction in binary, so it **cannot be stored exactly**.",
+        "title": "float variable declaration - 4 byte real number",
+        "explanation": "**`float f = 0.1f;`** --- `float` is a 4-byte (32-bit) float type, usually providing 6 to 7 digits of precision.\n\nThe point is that `0.1` is an infinitely repeating decimal in binary, so it is **not stored correctly**.",
         "visualizationType": "cMemory",
         "code": "float f = 0.1f;",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "Declaring double variable - 8-byte real number",
-        "explanation": "**`double d = 0.1;`** -- `double` is 8 bytes (64 bits) and is much more precise than float (about 15-16 digits).\n\nHowever, it still cannot store `0.1` perfectly -- it simply stores a closer approximation.",
+        "title": "Double variable declaration - 8 byte real number",
+        "explanation": "**`double d = 0.1;`** --- `double` is 8 bytes (64 bits), which is much more precise than float (about 15-16 digits).\n\nHowever, this does not perfectly store `0.1`, but only stores a closer approximation.",
         "visualizationType": "cMemory",
         "code": "double d = 0.1;",
         "stack": [
@@ -63,22 +63,22 @@
         ]
       },
       {
-        "title": "Checking float's actual stored value",
-        "explanation": "**`printf(\"float:  %.20f\\n\", f);`** -- `%.20f` means \"print up to 20 decimal places\". Result: `0.10000000149011611938`.",
+        "title": "Check actual stored value of float",
+        "explanation": "**`printf(\"float: %.20f\\n\", f);`** --- `%.20f` means print to 20 decimal places. Result: `0.10000000149011611938`.",
         "visualizationType": "cMemory",
         "code": "printf(\"float:  %.20f\\n\", f);",
         "stdout": "float:  0.10000000149011611938"
       },
       {
-        "title": "Checking double's actual stored value",
-        "explanation": "**`printf(\"double: %.20f\\n\", d);`** -- The actual value of 0.1 stored as double: `0.10000000000000000555`. Much closer to 0.1 than float (0.1000000014...), but after the 16th digit the error `555` appears.",
+        "title": "Check actual stored value of double",
+        "explanation": "**`printf(\"double: %.20f\\n\", d);`** --- Actual value of 0.1 stored as double: `0.10000000000000000555`. It is much closer to 0.1 than float(0.1000000014...), but an error of `555` appears after 16 digits.",
         "visualizationType": "cMemory",
         "code": "printf(\"double: %.20f\\n\", d);",
         "stdout": "float:  0.10000000149011611938\ndouble: 0.10000000000000000555"
       },
       {
-        "title": "Error accumulation - starting the loop",
-        "explanation": "**`float sum = 0.0f;`** -- Let's experiment to see what problems floating-point errors cause in practice. If we add `0.1` ten times, will we get exactly `1.0`?",
+        "title": "Accumulation of errors - start of loop",
+        "explanation": "**`float sum = 0.0f;`** --- Experiment to see what problems floating point errors cause in practice. If you add `0.1` 10 times, will you get exactly `1.0`?",
         "visualizationType": "cMemory",
         "code": "float sum = 0.0f;",
         "stack": [
@@ -103,8 +103,8 @@
         ]
       },
       {
-        "title": "Adding 0.1 ten times",
-        "explanation": "**`for (int i = 0; i < 10; i++) { sum += 0.1f; }`** -- Adds `0.1f` ten times. With each addition, the approximation error accumulates little by little.",
+        "title": "Add 0.1 10 times",
+        "explanation": "**`for (int i = 0; i < 10; i++) { sum += 0.1f; }`** --- Add `0.1f` 10 times. With each addition, the error in the approximation accumulates little by little.",
         "visualizationType": "cMemory",
         "code": "for (int i = 0; i < 10; i++) {",
         "highlightOffset": [
@@ -140,15 +140,15 @@
         ]
       },
       {
-        "title": "Checking the accumulated result",
-        "explanation": "**`printf(\"0.1 * 10 = %.20f\\n\", sum);`** -- The result may not be exactly 1.0. This is because the approximation error of `0.1f` accumulates over 10 additions.",
+        "title": "Check accumulated results",
+        "explanation": "**`printf(\"0.1 * 10 = %.20f\\n\", sum);`** --- The result may appear to be a value other than 1.0. This is because the approximation error of `0.1f` is accumulated during 10 additions.",
         "visualizationType": "cMemory",
         "code": "printf(\"0.1 * 10 = %.20f\\n\", sum);",
         "stdout": "float:  0.10000000149011611938\ndouble: 0.10000000000000000555\n0.1 * 10 = 1.00000011920928955078"
       },
       {
-        "title": "Program termination",
-        "explanation": "**`return 0;`** -- The program terminates normally, and as main's stack frame is deallocated, all variables disappear from memory.\n\nKey takeaway of this lesson: Real numbers in computers are always **approximations**, and double (8B, 15 digits) is more precise than float (4B, 7 digits).",
+        "title": "Program exit",
+        "explanation": "**`return 0;`** --- The program terminates normally, and all variables disappear from memory along with the main stack frame being released.\n\nKey point of this lesson: In computers, real numbers are always **approximate**, and double(8B, 15 digits) is more precise than float(4B, 7 digits).",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -157,22 +157,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What is the result of this code? `float x = 0.1f; if (x == 0.1f) printf(\"Equal\"); else printf(\"Not equal\");`",
+    "question": "What is the result of the following code? `float x = 0.1f; if (x == 0.1f) printf(\"same\"); else printf(\"Different\");`",
     "options": [
-      "'Equal' is always printed",
-      "'Not equal' is always printed",
-      "'Equal' is printed, but 0.1f and mathematical 0.1 are not exactly the same",
+      "'Same' is always output",
+      "'Different' is always displayed",
+      "'equal' is printed, but 0.1f and mathematical 0.1 are not exactly equal.",
       "A compilation error occurs"
     ],
     "correctIndex": 2,
-    "explanation": "Since the same approximation values are being compared, 'Equal' is printed.\nHowever, the value stored in memory is not exactly 0.1 but an approximation.\nComparing `0.1f` with `0.1` (double) may produce a different result."
+    "explanation": "Since the same approximate values ​​are compared, 'equal' is output.\nHowever, the value stored in memory is not an exact 0.1, but an approximation.\nComparing `0.1f` and `0.1` (double) may produce different results."
   },
   "misconceptions": [
     {
       "wrong": "double stores real numbers exactly.",
-      "correct": "double also stores approximations; it is merely more precise than float, not free of error.",
-      "why": "Expressing decimal fractions in binary often produces infinitely repeating fractions, so finite bits cannot contain the exact value."
+      "correct": "Doubles also store approximate values, and are more precise than floats, but are not error-free.",
+      "why": "When decimal decimals are expressed in binary, they often become infinite decimals, so a finite number of bits cannot contain an exact value."
     }
   ],
-  "keyTakeaway": "Both float (4B) and double (8B) store approximations; when comparing floating-point values, use an error tolerance (epsilon) instead of ==."
+  "keyTakeaway": "Both float(4B) and double(8B) store approximate values, and when comparing floating point numbers, you should use the margin of error (epsilon) instead of ==."
 }

@@ -1,0 +1,69 @@
+{
+  "lessonId": "cpp-2-2",
+  "title": "Internal structure of string",
+  "concept": "string stores data on the heap, and size and capacity are tracked separately.",
+  "content": {
+    "code": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string s = \"Hi\";\n    cout << \"size: \" << s.size() << endl;\n    cout << \"capacity: \" << s.capacity() << endl;\n\n    s += \" World!\";\n    cout << \"size: \" << s.size() << endl;\n    cout << \"capacity: \" << s.capacity() << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Create a short string",
+        "explanation": "`\"Hi\"` is a two-letter character, and in many implementations, Small String Optimization (SSO) is applied and stored inside the object without heap allocation.",
+        "visualizationType": "cMemory",
+        "code": "string s = \"Hi\";",
+        "stack": [
+          {
+            "name": "s",
+            "value": "Hi",
+            "type": "std::string",
+            "address": "0x3000"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "size and capacity",
+        "explanation": "`size` is the current number of characters (2), `capacity` is the maximum size it can hold without reallocation.\n\nCapacity is fixed within the SSO range (usually 15 to 22 bytes).",
+        "visualizationType": "terminal",
+        "code": "cout << \"size: \" << s.size() << endl;",
+        "stdout": "size: 2\ncapacity: 15"
+      },
+      {
+        "title": "string expansion",
+        "explanation": "`s += \" World!\"` makes the string longer. When the SSO scope is exceeded, it allocates a new buffer on the heap and copies the data.",
+        "visualizationType": "cMemory",
+        "code": "s += \" World!\";",
+        "stack": [
+          {
+            "name": "s",
+            "value": "Hi World!",
+            "type": "std::string",
+            "address": "0x3000",
+            "highlight": true
+          }
+        ],
+        "stdout": "size: 9\ncapacity: 15"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is Small String Optimization (SSO)?",
+    "options": [
+      "Optimization to always store strings on the heap",
+      "Optimization to avoid heap allocation by storing short strings inside objects",
+      "Optimization to make string comparisons faster",
+      "Optimization for compressed storage of strings"
+    ],
+    "correctIndex": 1,
+    "explanation": "SSO avoids unnecessary heap allocation by storing short strings (usually 15 to 22 bytes) in memory in the string object itself."
+  },
+  "misconceptions": [
+    {
+      "wrong": "string always uses heap memory",
+      "correct": "Thanks to SSO, short strings are stored on the stack (inside the object).",
+      "why": "Heap allocations are expensive, so we apply optimizations to short strings."
+    }
+  ],
+  "keyTakeaway": "String distinguishes between size (current length) and capacity (allocation size), and optimizes the performance of short strings with SSO."
+}

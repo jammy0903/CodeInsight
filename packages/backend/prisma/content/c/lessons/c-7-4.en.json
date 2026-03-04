@@ -1,13 +1,13 @@
 {
   "lessonId": "c-7-4",
   "title": "Void Pointers",
-  "concept": "A void pointer stores addresses type-independently, but proper casting is required when using it",
+  "concept": "A void pointer contains an address independent of the type, but correct type conversion is essential when using it.",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int a = 65;\n    float b = 3.14;\n\n    void *ptr;\n\n    ptr = &a;\n    printf(\"int: %d\\n\", *(int *)ptr);\n\n    ptr = &b;\n    printf(\"float: %.2f\\n\", *(float *)ptr);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
-        "explanation": "Standard I/O header for using `printf`.",
+        "title": "Include stdio.h header",
+        "explanation": "Standard input/output header for using `printf`.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting main function",
-        "explanation": "The main frame is created.\n\nThis lesson examines both the versatility and constraints of `void*`.",
+        "title": "Start main function",
+        "explanation": "The main frame is created.\n\nThis lesson examines the versatility and limitations of `void*`.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Declaring variables",
-        "explanation": "We prepare values of different types: `int a` and `float b`.\n\nThe same void pointer will alternately point to both types.",
+        "title": "variable declaration",
+        "explanation": "Prepare values ​​of different types, such as `int a` and `float b`.\n\nThe same void pointer points to both types alternately.",
         "visualizationType": "cMemory",
         "code": "int a = 65;",
         "highlightOffset": [
@@ -53,8 +53,8 @@
         ]
       },
       {
-        "title": "Declaring a void pointer",
-        "explanation": "`void *ptr` is a generic pointer that holds a type-unspecified address.\n\nIt cannot be dereferenced directly -- casting is required.",
+        "title": "void pointer declaration",
+        "explanation": "`void *ptr` is a general-purpose pointer that holds an untyped address.\n\nDirect dereferencing is not possible and requires casting.",
         "visualizationType": "cMemory",
         "code": "void *ptr;",
         "stack": [
@@ -79,8 +79,8 @@
         ]
       },
       {
-        "title": "Storing the int variable's address",
-        "explanation": "`ptr = &a;` stores the int address.\n\nA void pointer can accept addresses of various types.",
+        "title": "Storing the address of an int variable",
+        "explanation": "Store the int address as `ptr = &a;`.\n\nA void pointer can be assigned various type addresses.",
         "visualizationType": "cMemory",
         "code": "ptr = &a;",
         "stack": [
@@ -106,15 +106,15 @@
         ]
       },
       {
-        "title": "Casting then dereferencing (int)",
-        "explanation": "`(int*)ptr` specifies the type, then dereferencing reads the int value.",
+        "title": "Dereference after casting (int)",
+        "explanation": "After specifying the type with `(int*)ptr`, read the int value by dereferencing it.",
         "visualizationType": "cMemory",
         "code": "printf(\"int: %d\\n\", *(int *)ptr);",
         "stdout": "int: 65"
       },
       {
-        "title": "Storing the float variable's address",
-        "explanation": "The same `ptr` now stores `b`'s address, switching the target type.",
+        "title": "Storing the address of a float variable",
+        "explanation": "In the same `ptr`, this time we save the address of `b` and change the target type.",
         "visualizationType": "cMemory",
         "code": "ptr = &b;",
         "stack": [
@@ -140,15 +140,15 @@
         ]
       },
       {
-        "title": "Casting then dereferencing (float)",
-        "explanation": "`(float*)ptr` casts the pointer, then dereferencing reads the float value.\n\nCasting to the wrong type produces incorrect results.",
+        "title": "Dereferencing (float) after type conversion (Casting)",
+        "explanation": "After casting to `(float*)ptr`, read the float value by dereferencing it.\n\nCasting other than the actual type will produce incorrect results.",
         "visualizationType": "cMemory",
         "code": "printf(\"float: %.2f\\n\", *(float *)ptr);",
         "stdout": "int: 65\nfloat: 3.14"
       },
       {
-        "title": "Program termination",
-        "explanation": "The program ends with `return 0;`.\n\nKey point: Void pointers are flexible for storage, but reading/writing requires accurate type information.",
+        "title": "Program exit",
+        "explanation": "Exit with `return 0;`.\n\nBottom line: void pointers are flexible for storage, but require precise type information to read/write.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -157,7 +157,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "Which operation is impossible on a void pointer ptr?",
+    "question": "What operations are impossible on void pointer ptr?",
     "options": [
       "ptr = &num;",
       "ptr = malloc(10);",
@@ -165,14 +165,14 @@
       "(int *)ptr"
     ],
     "correctIndex": 2,
-    "explanation": "A void pointer does not know the target's byte size, so it cannot be dereferenced directly (*ptr) without casting."
+    "explanation": "Because the void pointer does not know the target size (byte size), it cannot be directly dereferenced (*ptr) without casting."
   },
   "misconceptions": [
     {
-      "wrong": "You can put any value into a void* (e.g., int or float values themselves).",
-      "correct": "It can only hold addresses.\nPutting a value directly causes it to be interpreted as an address.",
-      "why": "A pointer variable is not a container for values -- it is an arrow pointing to a location."
+      "wrong": "Any value can be placed in void * (e.g. int, float value itself).",
+      "correct": "Only 'address' can be entered.\nIf you enter the value itself, the value is interpreted as an address.",
+      "why": "A pointer variable is not a container for a value, but rather an arrow pointing to a location."
     }
   ],
-  "keyTakeaway": "Void pointers are essential for writing type-generic code (e.g., memcpy, qsort) by hiding data types."
+  "keyTakeaway": "Void pointers are essential when hiding data types and writing generalized code (e.g. memcpy, qsort)."
 }

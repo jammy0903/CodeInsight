@@ -1,0 +1,121 @@
+{
+  "lessonId": "cpp-6-1",
+  "title": "lvalue and rvalue",
+  "concept": "An lvalue is an addressed expression, and an rvalue is a temporary, unaddressed expression.",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x = 10;\n    int y = x + 5;\n\n    int& lref = x;\n    // int& bad = x + 5;  // 오류! rvalue에 lvalue 참조 불가\n    int&& rref = x + 5;\n\n    cout << lref << \" \" << rref << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "lvalue: a value with a name",
+        "explanation": "`x` is a **lvalue** because it has a memory address. You can get the address with `&x`.\n\nOn the other hand, `x + 5` is an **rvalue** that exists only briefly as the result of an operation.",
+        "visualizationType": "cMemory",
+        "code": "int x = 10;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "y",
+            "value": "15",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "lvalue reference",
+        "explanation": "`int& lref = x` is a reference to an lvalue. This is a common reference that you have already learned.",
+        "visualizationType": "cMemory",
+        "code": "int& lref = x;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "y",
+            "value": "15",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "lref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "x",
+            "isReference": true
+          }
+        ]
+      },
+      {
+        "title": "rvalue reference (&&)",
+        "explanation": "`int&& rref = x + 5` is an rvalue reference.\n\nThe lifetime of a temporary value (15) is extended by `rref`. This is the basis for movement semantics.",
+        "visualizationType": "cMemory",
+        "code": "int&& rref = x + 5;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "y",
+            "value": "15",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "lref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "x",
+            "isReference": true
+          },
+          {
+            "name": "rref",
+            "value": "15",
+            "type": "int&&",
+            "address": "0x1008",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "Check results",
+        "explanation": "`lref` prints `x` (10) and `rref` prints a temporary value (15).",
+        "visualizationType": "terminal",
+        "code": "cout << lref << \" \" << rref << endl;",
+        "stdout": "10 15"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "Which of the following is an rvalue?",
+    "options": [
+      "variable x",
+      "Array element arr[0]",
+      "expression x + 1",
+      "Reference ref"
+    ],
+    "correctIndex": 2,
+    "explanation": "x + 1 is a temporary value resulting from an operation and is an rvalue because it has no name and its address cannot be obtained."
+  },
+  "misconceptions": [
+    {
+      "wrong": "rvalue references are like regular references",
+      "correct": "rvalue references (&&) bind only temporary values, enabling move semantics.",
+      "why": "Plain references (&) bind only to named objects (lvalues)."
+    }
+  ],
+  "keyTakeaway": "lvalue is ‘addressable’, rvalue is ‘temporary’. rvalue references (&&) are at the heart of move semantics."
+}

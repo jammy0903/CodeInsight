@@ -15,12 +15,12 @@
 
 /** 시각화 필드 목록 (상속 대상) */
 const VIZ_FIELDS = [
-  'stack', 'heap', 'stdout',
-  'pythonMemoryState', 'javaMemoryState', 'memoryState',
+  'stack', 'heap', 'data', 'stdout', 'output',
+  'pythonMemoryState', 'pyNames', 'pyObjects', 'javaMemoryState', 'memoryState',
   'eventLoopState', 'scopeState', 'promiseState',
   'thisState', 'prototypeState',
   'memoryChanges', 'callStackState',
-  'algorithmState',
+  'algorithmState', 'conceptVisualizationType', 'conceptState',
 ] as const;
 
 /** deep merge 대상 (서브필드 단위 상속) */
@@ -28,7 +28,7 @@ const DEEP_MERGE_FIELDS = new Set([
   'pythonMemoryState', 'javaMemoryState', 'memoryState',
   'eventLoopState', 'scopeState', 'promiseState',
   'thisState', 'prototypeState',
-  'algorithmState',
+  'algorithmState', 'conceptState',
 ]);
 
 /**

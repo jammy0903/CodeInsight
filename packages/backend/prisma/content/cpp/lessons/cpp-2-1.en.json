@@ -1,0 +1,99 @@
+{
+  "lessonId": "cpp-2-1",
+  "title": "std::string basics",
+  "concept": "std::string is a safe string class that manages character data on the heap.",
+  "content": {
+    "code": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string greeting = \"Hello\";\n    string name = \"C++\";\n\n    string message = greeting + \", \" + name + \"!\";\n    cout << message << endl;\n    cout << \"length: \" << message.size() << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "string creation",
+        "explanation": "`string greeting = \"Hello\"` internally allocates character data on the heap.\n\nUnlike C's `char[]`, there is no need to preset the size, and memory is automatically managed.",
+        "visualizationType": "cMemory",
+        "code": "string greeting = \"Hello\";",
+        "stack": [
+          {
+            "name": "greeting",
+            "value": "Hello",
+            "type": "std::string",
+            "address": "0x2000"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "second string",
+        "explanation": "Each `string` object has independent memory.",
+        "visualizationType": "cMemory",
+        "code": "string name = \"C++\";",
+        "stack": [
+          {
+            "name": "greeting",
+            "value": "Hello",
+            "type": "std::string",
+            "address": "0x2000"
+          },
+          {
+            "name": "name",
+            "value": "C++",
+            "type": "std::string",
+            "address": "0x2020"
+          }
+        ]
+      },
+      {
+        "title": "string concatenation",
+        "explanation": "Concatenate strings with the `+` operator. In C, you had to use `strcat()`, but in C++, the intuitive `+` operation is possible.\n\nA new string object `message` contains the combined result.",
+        "visualizationType": "cMemory",
+        "code": "string message = greeting + \", \" + name + \"!\";",
+        "stack": [
+          {
+            "name": "greeting",
+            "value": "Hello",
+            "type": "std::string",
+            "address": "0x2000"
+          },
+          {
+            "name": "name",
+            "value": "C++",
+            "type": "std::string",
+            "address": "0x2020"
+          },
+          {
+            "name": "message",
+            "value": "Hello, C++!",
+            "type": "std::string",
+            "address": "0x2040",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "output and length",
+        "explanation": "Find the length of a string with `.size()`. Unlike C's `strlen()`, it returns immediately in O(1).",
+        "visualizationType": "terminal",
+        "code": "cout << message << endl;",
+        "stdout": "Hello, C++!\nlength: 11"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the correct difference between std::string and C's char[]?",
+    "options": [
+      "string has a fixed size",
+      "Strings can be connected with the + operator.",
+      "char[] is safer",
+      "string does not use the heap"
+    ],
+    "correctIndex": 1,
+    "explanation": "std::string intuitively supports + concatenation, == comparison, etc. through operator overloading."
+  },
+  "misconceptions": [
+    {
+      "wrong": "std::string is equivalent to a char array",
+      "correct": "string is a class that manages heap memory internally and is automatically resized.",
+      "why": "While char[] is a fixed size and requires manual memory management, string is automatically cleaned up with RAII."
+    }
+  ],
+  "keyTakeaway": "std::string is a safe alternative that solves the inconveniences of C strings (size management, concatenation, comparison)."
+}

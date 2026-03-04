@@ -1,0 +1,60 @@
+{
+  "lessonId": "cpp-1-2",
+  "title": "RAII and scope-based extinction",
+  "concept": "When a C++ object goes out of scope, its destructor is automatically called to clean up resources.",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nstruct Guard {\n    const char* name;\n    Guard(const char* n) : name(n) { cout << \"acquire \" << name << endl; }\n    ~Guard() { cout << \"release \" << name << endl; }\n};\n\nint main() {\n    Guard g(\"file\");\n    cout << \"working\" << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Create Guard object",
+        "explanation": "`g` is created and its constructor is called. It's time to acquire resources.",
+        "visualizationType": "cMemory",
+        "code": "Guard g(\"file\");",
+        "stack": [
+          {
+            "name": "g",
+            "value": "Guard{name=\"file\"}",
+            "type": "Guard",
+            "address": "0x2100"
+          }
+        ],
+        "heap": [],
+        "stdout": "acquire file"
+      },
+      {
+        "title": "get the job done",
+        "explanation": "Use resources safely while the object is alive.",
+        "visualizationType": "terminal",
+        "code": "cout << \"working\" << endl;",
+        "stdout": "working"
+      },
+      {
+        "title": "Scope termination and automatic cleanup",
+        "explanation": "`main` ends and `g`'s destructor is automatically called. This is the core of RAII.",
+        "visualizationType": "terminal",
+        "code": "return 0;",
+        "stdout": "release file"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the most correct core description of the RAII pattern?",
+    "options": [
+      "Release resources only manually",
+      "Automatic cleanup by tying resource management to object lifespan",
+      "Heap memory is never used",
+      "Destructors are never called in exception situations."
+    ],
+    "correctIndex": 1,
+    "explanation": "RAII reduces leakage by linking resource acquisition/release with object creation/destruction."
+  },
+  "misconceptions": [
+    {
+      "wrong": "You must call free/delete directly before the return statement.",
+      "correct": "The destructor of a stack object is automatically called when scope ends.",
+      "why": "This is because C++ provides object lifecycle-based resource management."
+    }
+  ],
+  "keyTakeaway": "RAII increases stability with the rule that 'resources are alive only as long as the object is alive.'"
+}

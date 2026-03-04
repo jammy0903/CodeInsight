@@ -1,13 +1,13 @@
 {
   "lessonId": "c-5-6",
   "title": "动态数组",
-  "concept": "大小在运行时（根据用户输入）确定的数组",
+  "concept": "其大小在运行时确定的数组（用户输入大小）",
   "content": {
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int size;\n    printf(\"How many numbers? \");\n    size = 5;\n\n    int *arr = (int*)malloc(sizeof(int) * size);\n\n    for(int i=0; i<size; i++) {\n        arr[i] = i * 10;\n        printf(\"%d \", arr[i]);\n    }\n\n    free(arr);\n    return 0;\n}",
     "steps": [
       {
         "title": "包含头文件",
-        "explanation": "我们包含 `stdio.h` 和 `stdlib.h`，分别用于输出和动态内存函数。\n\n本课讲解大小在运行时确定的动态数组。",
+        "explanation": "使用输出和动态内存函数，包括“stdio.h”和“stdlib.h”。\n\n本课程介绍动态数组，其大小在运行时确定。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "highlightOffset": [
@@ -19,8 +19,8 @@
         "stdout": ""
       },
       {
-        "title": "启动 main 函数",
-        "explanation": "创建 main 栈帧。\n\n与静态数组不同，动态数组在堆上分配，大小在运行时确定。",
+        "title": "启动主函数",
+        "explanation": "主框架已创建。\n\n与静态数组不同，动态数组按运行时大小在堆上分配。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -33,8 +33,8 @@
         ]
       },
       {
-        "title": "声明 size 变量",
-        "explanation": "我们声明一个 `size` 变量来存储数组长度。\n\n这个值稍后将用于计算 malloc 的大小。",
+        "title": "大小变量声明",
+        "explanation": "声明一个“size”变量来包含数组的长度。\n\n该值稍后将用于计算 malloc 大小。",
         "visualizationType": "cMemory",
         "code": "int size;",
         "stack": [
@@ -47,15 +47,15 @@
         ]
       },
       {
-        "title": "打印输入提示",
-        "explanation": "我们打印一条提示，询问数组长度。",
+        "title": "输入提示输出",
+        "explanation": "打印数组长度输入指南。",
         "visualizationType": "cMemory",
         "code": "printf(\"How many numbers? \");",
         "stdout": "How many numbers? "
       },
       {
-        "title": "设置 size（模拟输入）",
-        "explanation": "在本例中，我们用 `size = 5` 设置长度。\n\n实际应用中，这里会接收用户输入。",
+        "title": "设置大小（输入模拟）",
+        "explanation": "在示例中，我们将长度设置为“size = 5”。\n\n实际上，这是接收用户输入的地方。",
         "visualizationType": "cMemory",
         "code": "size = 5;",
         "stack": [
@@ -69,8 +69,8 @@
         ]
       },
       {
-        "title": "动态内存分配 (malloc)",
-        "explanation": "`malloc(sizeof(int) * size)` 在堆上创建一个可以存储 `size` 个整数的数组。\n\n返回的起始地址存储在指针 `arr` 中，可以像数组一样使用。",
+        "title": "动态内存分配（malloc）",
+        "explanation": "使用 malloc(sizeof(int) * size) 创建一个堆数组来存储 size 整数。\n\n将返回的起始地址存储在指针“arr”中，并像数组一样使用它。",
         "visualizationType": "cMemory",
         "code": "int *arr = (int*)malloc(sizeof(int) * size);",
         "stack": [
@@ -97,8 +97,8 @@
         "stdout": ""
       },
       {
-        "title": "用 for 循环初始化并打印数组",
-        "explanation": "我们使用 `arr[i]` 语法填充和打印值。\n\n动态数组使用与静态数组相同的索引访问方式。",
+        "title": "使用 for 循环初始化并打印数组",
+        "explanation": "使用“arr[i]”语法填写值并打印它。\n\n动态数组的索引方法与静态数组相同。",
         "visualizationType": "cMemory",
         "code": "for(int i=0; i<size; i++) {",
         "highlightOffset": [
@@ -137,8 +137,8 @@
         "stdout": "How many numbers? \n0 10 20 30 40 "
       },
       {
-        "title": "释放内存 (free)",
-        "explanation": "`free(arr)` 一次性归还整个堆内存块。\n\nfree 之后，堆内存被释放，但 `arr` 仍然保存着旧地址（悬空指针）。动态数组的模式是：分配、使用、最后释放。",
+        "title": "空闲内存",
+        "explanation": "使用 free(arr) 立即返回整个动态数组。\n\n动态数组模式是先分配，然后使用，最后释放。",
         "visualizationType": "cMemory",
         "code": "free(arr);",
         "stack": [
@@ -170,22 +170,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "哪个函数用于调整动态数组的大小？",
+    "question": "当你想增加动态数组的大小时，你使用什么函数？",
     "options": [
       "malloc_more",
-      "extend",
-      "realloc",
-      "resize"
+      "延长",
+      "重新分配",
+      "调整大小"
     ],
     "correctIndex": 2,
-    "explanation": "`realloc(ptr, new_size)` 函数在保留现有数据的同时调整内存大小（如果空间不足，甚至会重新分配位置）。"
+    "explanation": "`realloc(ptr, new_size)` 函数调整内存大小，同时维护现有数据（如果没有空间则移动）。"
   },
   "misconceptions": [
     {
-      "wrong": "动态数组需要多次调用 free",
-      "correct": "只需要调用一次 free。",
-      "why": "因为你通过一次 `malloc` 调用借用了整个内存块，所以只需一次 `free` 调用就能归还整个内存块。"
+      "wrong": "动态数组必须被释放多次。",
+      "correct": "您只需要做一次。",
+      "why": "由于我们通过调用一次“malloc”借用了整个内容，因此我们只调用一次“free”即可返回整个内容。"
     }
   ],
-  "keyTakeaway": "当大小未知时，使用 `malloc`。你可以像使用普通数组一样方便地使用数组语法 ([])。"
+  "keyTakeaway": "如果您不知道大小，请使用“malloc”。按原样使用数组语法（[]）可以轻松处理它。"
 }

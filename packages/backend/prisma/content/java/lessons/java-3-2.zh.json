@@ -1,13 +1,13 @@
 {
   "lessonId": "java-3-2",
-  "title": "对象引用传递（Reference Passing）",
-  "concept": "传递对象变量时，复制的是"地址值"。（Call by Value of Reference）",
+  "title": "객체 참조 전달 (Reference Passing)",
+  "concept": "객체 변수를 넘길 땐 '주소값'이 복사된다. (Call by Value of Reference)",
   "content": {
     "code": "class Dog {\n    String name;\n    Dog(String name) { this.name = name; }\n}\n\nvoid changeName(Dog d) {\n    d.name = \"Max\";\n}\n\nvoid reassign(Dog d) {\n    d = new Dog(\"Rex\");\n}\n\nDog myDog = new Dog(\"Buddy\");\nchangeName(myDog);\nSystem.out.println(myDog.name);\n\nreassign(myDog);\nSystem.out.println(myDog.name);",
     "steps": [
       {
-        "title": "创建 Dog 对象",
-        "explanation": "**执行顺序：**\n1. 在堆内存上创建 `Dog` 对象（\"Buddy\"）。\n2. 生成地址值（假设为 `0x100`）。\n3. 将地址 `0x100` 存储到栈上的 `myDog` 变量中。\n\n**内存状态：**\n`myDog` 是一个遥控器。\n它指向位于 0x100 地址的电视机（对象）。",
+        "title": "Dog 객체 생성",
+        "explanation": "**실행 순서:**\n1. Heap 메모리에 `Dog` 객체 생성 (\"Buddy\").\n2. 주소값(`0x100`이라 가정) 생성.\n3. Stack의 `myDog` 변수에 이 주소 `0x100` 저장.\n\n**메모리 상태:**\n`myDog`는 리모컨입니다.\n0x100번지에 있는 TV(객체)를 가리키고 있습니다.",
         "visualizationType": "javaMemory",
         "code": "Dog myDog = new Dog(\"Buddy\");",
         "javaMemoryState": {
@@ -30,9 +30,9 @@
         }
       },
       {
-        "title": "调用 changeName(myDog) - 复制遥控器",
-        "explanation": "**执行顺序：**\n1. 读取 `myDog` 的值（地址 `0x100`）。\n2. 复制到 `changeName` 的参数 `d`。\n\n**核心：**\n复制的不是对象，而是**指向对象的地址**。\n现在 `myDog` 和 `d` 是可以操控同一台电视的**两个遥控器**。",
-        "keyInsight": "复制地址 = 多了一个遥控器",
+        "title": "changeName(myDog) 호출 - 리모컨 복사",
+        "explanation": "**실행 순서:**\n1. `myDog`의 값(주소 `0x100`)을 읽음.\n2. `changeName`의 파라미터 `d`에 복사.\n\n**핵심:**\n객체가 복사된 게 아니라, **객체를 가리키는 주소**가 복사되었습니다.\n이제 `myDog`와 `d`는 같은 TV를 조작할 수 있는 **두 개의 리모컨**입니다.",
+        "keyInsight": "주소 복사 = 리모컨이 하나 더 생김",
         "visualizationType": "javaMemory",
         "code": "changeName(myDog);",
         "javaMemoryState": {
@@ -54,9 +54,9 @@
         }
       },
       {
-        "title": "修改对象内部（副作用）",
-        "explanation": "**执行顺序：**\n1. 用遥控器 `d` 访问 `0x100` 号对象（解引用）。\n2. 将 `name` 字段修改为 \"Max\"。\n\n**内存变化：**\n两个遥控器都在看同一台电视，所以用 `d` 换频道后，`myDog` 看到的画面也会改变。",
-        "keyInsight": "修改共享对象 = 原始值受到影响",
+        "title": "객체 내부 변경 (Side Effect)",
+        "explanation": "**실행 순서:**\n1. `d` 리모컨으로 `0x100`번 객체에 접속 (역참조).\n2. `name` 필드를 \"Max\"로 수정.\n\n**메모리 변화:**\n두 리모컨이 같은 TV를 보고 있으므로, `d`로 채널을 바꾸면 `myDog`가 보는 화면도 바뀝니다.",
+        "keyInsight": "공유된 객체 수정 = 원본 영향 받음",
         "visualizationType": "javaMemory",
         "code": "d.name = \"Max\";",
         "javaMemoryState": {
@@ -85,8 +85,8 @@
         }
       },
       {
-        "title": "查看第一次结果",
-        "explanation": "**执行顺序：**\n1. `changeName` 结束（d 被销毁）。\n2. 输出 `myDog.name`。\n\n因为电视频道被改变了，所以输出 \"Max\"。",
+        "title": "첫 번째 결과 확인",
+        "explanation": "**실행 순서:**\n1. `changeName` 종료 (d 소멸).\n2. `myDog.name` 출력.\n\nTV 채널이 바뀌었으므로 \"Max\"가 나옵니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(myDog.name);",
         "javaMemoryState": {
@@ -111,8 +111,8 @@
         }
       },
       {
-        "title": "调用 reassign(myDog)",
-        "explanation": "**执行顺序：**\n1. 再次读取 `myDog` 的地址 `0x100`。\n2. 复制到 `reassign` 方法的 `d`。\n\n又一次创建了指向同一台电视的复制遥控器 `d`。",
+        "title": "reassign(myDog) 호출",
+        "explanation": "**실행 순서:**\n1. 다시 `myDog`의 주소 `0x100`을 읽음.\n2. `reassign` 메서드의 `d`에 복사.\n\n또다시 같은 TV를 가리키는 복사본 리모컨 `d`가 생성되었습니다.",
         "visualizationType": "javaMemory",
         "code": "reassign(myDog);",
         "javaMemoryState": {
@@ -134,9 +134,9 @@
         }
       },
       {
-        "title": "变量重新赋值（新对象）",
-        "explanation": "**执行顺序：**\n1. 执行 `new Dog(\"Rex\")` -> 创建新对象（0x200）。\n2. 将新地址 `0x200` 赋值给变量 `d`。\n\n**重要：**\n遥控器 `d` 现在只是指向了一台**新电视**（`0x200`）。\n家里的原始遥控器（`myDog`）仍然指向旧电视（`0x100`）。",
-        "keyInsight": "变量重新赋值 = 只改变自己的连接（不影响原始值）",
+        "title": "변수 재할당 (New Object)",
+        "explanation": "**실행 순서:**\n1. `new Dog(\"Rex\")` 실행 -> 새 객체 생성 (0x200).\n2. 새 주소 `0x200`을 `d` 변수에 대입.\n\n**중요:**\n`d`라는 리모컨이 **새 TV**(`0x200`)를 가리키게 된 것뿐입니다.\n집에 있는 원래 리모컨(`myDog`)은 여전히 옛날 TV(`0x100`)를 가리키고 있습니다.",
+        "keyInsight": "변수 재할당 = 내 연결만 바뀜 (원본 무관)",
         "visualizationType": "javaMemory",
         "code": "d = new Dog(\"Rex\");",
         "javaMemoryState": {
@@ -171,8 +171,8 @@
         }
       },
       {
-        "title": "查看最终结果",
-        "explanation": "**执行顺序：**\n1. `reassign` 结束（d 被销毁）。\n2. 输出 `myDog.name`。\n\n`myDog` 仍然在看 `0x100` 号电视。\n因此输出 \"Max\"。",
+        "title": "최종 결과 확인",
+        "explanation": "**실행 순서:**\n1. `reassign` 종료 (d 소멸).\n2. `myDog.name` 출력.\n\n`myDog`는 여전히 `0x100`번 TV를 보고 있습니다.\n따라서 \"Max\"가 출력됩니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(myDog.name);",
         "occurrence": 2,
@@ -201,22 +201,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "在 Java 中将对象作为参数传递时，实际传递的是什么？",
+    "question": "在Java中将对象作为参数传递时实际上传递了什么？",
     "options": [
       "对象本身（创建副本）",
-      "对象所在内存的地址值（引用）",
-      "对象的第一个属性值",
-      "什么都不传递"
+      "对象所在内存的地址值（参考）",
+      "对象的第一个属性的值",
+      "什么都没有发生"
     ],
     "correctIndex": 1,
-    "explanation": "Java 始终是值传递（Call by Value）。\n对于对象，复制并传递的是变量持有的"地址值（Reference）"。"
+    "explanation": "Java 始终是按值调用。\n对于对象，复制并传递变量所保存的称为“地址值（Reference）”的值。"
   },
   "misconceptions": [
     {
-      "wrong": "Java 使用引用传递（Call by Reference）。",
-      "correct": "不是的。\n因为是"复制""地址值"，所以是**值传递（Call by Value）**。",
-      "why": "如果真的是引用传递，执行 `d = new Dog()` 时 `myDog` 也应该变成新的狗。\nJava 不会给你改变变量本身连接的权限。"
+      "wrong": "Java는 Call by Reference다.",
+      "correct": "아닙니다.\n'주소값'을 '복사'해서 주므로 **Call by Value**입니다.",
+      "why": "진짜 Call by Reference라면 `d = new Dog()` 했을 때 `myDog`도 새 강아지로 바뀌어야 합니다.\nJava에서는 변수 자체의 연결을 바꿀 권한은 주지 않습니다."
     }
   ],
-  "keyTakeaway": "对象参数是"遥控器的复制"。可以改变内部（频道），但不能替换遥控器本身（连接）。"
+  "keyTakeaway": "객체 파라미터는 '리모컨 복사'다. 내부(채널)는 바꿀 수 있지만, 리모컨 자체(연결)를 바꿀 순 없다."
 }

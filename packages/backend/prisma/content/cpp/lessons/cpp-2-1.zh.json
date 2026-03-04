@@ -1,0 +1,99 @@
+{
+  "lessonId": "cpp-2-1",
+  "title": "std::string 基础知识",
+  "concept": "std::string 是一个安全的字符串类，用于管理堆上的字符数据。",
+  "content": {
+    "code": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string greeting = \"Hello\";\n    string name = \"C++\";\n\n    string message = greeting + \", \" + name + \"!\";\n    cout << message << endl;\n    cout << \"length: \" << message.size() << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "字符串创建",
+        "explanation": "`stringgreeting = \"Hello\"` 在堆上内部分配字符数据。\n\n与C的`char[]`不同，不需要预设大小，内存是自动管理的。",
+        "visualizationType": "cMemory",
+        "code": "string greeting = \"Hello\";",
+        "stack": [
+          {
+            "name": "greeting",
+            "value": "Hello",
+            "type": "std::string",
+            "address": "0x2000"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "第二根弦",
+        "explanation": "每个“string”对象都有独立的内存。",
+        "visualizationType": "cMemory",
+        "code": "string name = \"C++\";",
+        "stack": [
+          {
+            "name": "greeting",
+            "value": "Hello",
+            "type": "std::string",
+            "address": "0x2000"
+          },
+          {
+            "name": "name",
+            "value": "C++",
+            "type": "std::string",
+            "address": "0x2020"
+          }
+        ]
+      },
+      {
+        "title": "字符串连接",
+        "explanation": "使用“+”运算符连接字符串。在 C 中，您必须使用“strcat()”，但在 C++ 中，可以使用直观的“+”操作。\n\n新的字符串对象“message”包含组合结果。",
+        "visualizationType": "cMemory",
+        "code": "string message = greeting + \", \" + name + \"!\";",
+        "stack": [
+          {
+            "name": "greeting",
+            "value": "Hello",
+            "type": "std::string",
+            "address": "0x2000"
+          },
+          {
+            "name": "name",
+            "value": "C++",
+            "type": "std::string",
+            "address": "0x2020"
+          },
+          {
+            "name": "message",
+            "value": "Hello, C++!",
+            "type": "std::string",
+            "address": "0x2040",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "输出和长度",
+        "explanation": "使用“.size()”查找字符串的长度。与 C 的 strlen() 不同，它在 O(1) 内立即返回。",
+        "visualizationType": "terminal",
+        "code": "cout << message << endl;",
+        "stdout": "Hello, C++!\nlength: 11"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "std::string 和 C 的 char[] 之间的正确区别是什么？",
+    "options": [
+      "字符串有固定的大小",
+      "字符串可以用 + 运算符连接。",
+      "char[] 更安全",
+      "字符串不使用堆"
+    ],
+    "correctIndex": 1,
+    "explanation": "std::string 通过运算符重载直观地支持 + 连接、== 比较等。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "std::string 相当于 char 数组",
+      "correct": "string是一个内部管理堆内存并自动调整大小的类。",
+      "why": "虽然 char[] 是固定大小并且需要手动内存管理，但字符串会使用 RAII 自动清理。"
+    }
+  ],
+  "keyTakeaway": "std::string 是一种安全的替代方案，它解决了 C 字符串的不便（大小管理、串联、比较）。"
+}

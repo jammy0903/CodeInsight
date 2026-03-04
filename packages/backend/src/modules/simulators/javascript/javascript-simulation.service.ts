@@ -29,10 +29,22 @@
  */
 
 import { JavaScriptFileManager } from './engine/file-manager';
+import * as path from 'path';
+import { pathToFileURL } from 'url';
 import {
   JavaScriptDebuggerClient,
   JavaScriptSnapshot,
 } from './engine/debugger-client';
+import { JavaScriptInspectorRunner } from './engine/inspector-runner';
+import {
+  DebuggerPausedEvent,
+  JavaScriptInspectorClient,
+} from './engine/inspector-client';
+import { JavaScriptInspectorSnapshotBuilder } from './engine/inspector-snapshot-builder';
+import { JavaScriptEventLoopStateTracker } from './engine/event-loop-state-tracker';
+import { JavaScriptScopeStateTracker } from './engine/scope-state-tracker';
+import { JavaScriptThisStateTracker } from './engine/this-state-tracker';
+import { JavaScriptPrototypeStateTracker } from './engine/prototype-state-tracker';
 import { normalizeJsSnapshots } from './normalizer';
 
 // ═══════════════════════════════════════════════════════
@@ -44,6 +56,8 @@ import { normalizeJsSnapshots } from './normalizer';
  * 시뮬레이션 에러 코드 (Enum)
  */
 export enum SimulationErrorCode {
+  INVALID_REQUEST = 'INVALID_REQUEST',          // 잘못된 요청 형식
+  ABORTED = 'ABORTED',                        // 요청 취소
   CODE_TOO_LONG = 'CODE_TOO_LONG',            // 코드 길이 초과 (10000자 or 500줄)
   DANGEROUS_CODE = 'DANGEROUS_CODE',          // 보안 정책 위반 (require, eval 등)
   SYNTAX_ERROR = 'SYNTAX_ERROR',              // 구문 오류 (파싱 실패)
@@ -51,6 +65,7 @@ export enum SimulationErrorCode {
   MAX_STEPS_EXCEEDED = 'MAX_STEPS_EXCEEDED',  // 최대 스텝 수 초과
   RUNTIME_ERROR = 'RUNTIME_ERROR',            // 런타임 에러 (예외 발생)
   FILE_SYSTEM_ERROR = 'FILE_SYSTEM_ERROR',    // 파일 시스템 에러
+  INTERNAL_ERROR = 'INTERNAL_ERROR',          // 내부 처리 오류
 }
 
 /**
@@ -78,8 +93,14 @@ export class SimulationError extends Error {
  */
 export interface JavaScriptSimulationResult {
   success: boolean;
+  engine?: 'legacy' | 'inspector';
   steps?: JavaScriptSnapshot[];
   normalizedSteps?: import('./normalizer').NormalizedJsStep[];
+  meta?: {
+    durationMs: number;
+    stepCount: number;
+    truncated?: boolean;
+  };
   error?: {
     code: SimulationErrorCode;
     message: string;
@@ -96,6 +117,10 @@ interface ValidationResult {
   code?: SimulationErrorCode;
 }
 
+interface SimulationOptions {
+  signal?: AbortSignal;
+}
+
 // ═══════════════════════════════════════════════════════
 // 상수
 // ═══════════════════════════════════════════════════════
@@ -103,6 +128,7 @@ interface ValidationResult {
 // 📏 코드 길이 제한 (서비스 거부 공격 방지)
 const MAX_CODE_LENGTH = 10000;  // 최대 10000자
 const MAX_LINES = 500;           // 최대 500줄
+const MAX_INSPECTOR_STEPS = 1000;
 
 // 🚨 위험한 패턴 목록 (정규식 + 설명)
 // 💡 보안상 차단해야 하는 JavaScript 코드 패턴
@@ -176,6 +202,8 @@ export class JavaScriptSimulationService {
 
   // 🐛 디버거 클라이언트 (vm + AST 계측)
   private debuggerClient: JavaScriptDebuggerClient;
+  private inspectorRunner: JavaScriptInspectorRunner;
+  private inspectorSnapshotBuilder: JavaScriptInspectorSnapshotBuilder;
 
   /**
    * 생성자 - 의존성 초기화
@@ -185,6 +213,8 @@ export class JavaScriptSimulationService {
   constructor() {
     this.fileManager = new JavaScriptFileManager();
     this.debuggerClient = new JavaScriptDebuggerClient();
+    this.inspectorRunner = new JavaScriptInspectorRunner();
+    this.inspectorSnapshotBuilder = new JavaScriptInspectorSnapshotBuilder();
   }
 
   /**
@@ -201,7 +231,7 @@ export class JavaScriptSimulationService {
    * ⚠️ 주의사항:
    *   - require, eval, new Function 등 위험 코드 차단
    *   - 코드 길이 제한 (10000자, 500줄)
-   *   - 타임아웃 30초 (무한 루프 방지)
+   *   - 타임아웃 10초 (무한 루프 방지)
    *   - ERROR 이벤트 스냅샷은 필터링 (에러는 catch에서 처리)
    *
    * 🔄 에러 처리:
@@ -220,9 +250,14 @@ export class JavaScriptSimulationService {
    * const result = await service.simulate('require("fs")');
    * // → { success: false, error: { code: 'DANGEROUS_CODE', ... } }
    */
-  public async simulate(sourceCode: string): Promise<JavaScriptSimulationResult> {
+  public async simulate(
+    sourceCode: string,
+    options: SimulationOptions = {}
+  ): Promise<JavaScriptSimulationResult> {
     // 📂 임시 프로젝트 경로 (cleanup용)
     let projectPath: string | null = null;
+    const startedAt = Date.now();
+    const selectedEngine = this.resolveEngine();
 
     try {
       // ═══════════════════════════════════════════════════════
@@ -237,6 +272,12 @@ export class JavaScriptSimulationService {
       if (!validation.valid) {
         return {
           success: false,
+          engine: selectedEngine,
+          steps: [],
+          meta: {
+            durationMs: Date.now() - startedAt,
+            stepCount: 0,
+          },
           error: {
             code: validation.code || SimulationErrorCode.DANGEROUS_CODE,
             message: validation.error || '코드 검증 실패',
@@ -257,7 +298,9 @@ export class JavaScriptSimulationService {
       // 💡 node main.js 실행
       //    각 라인마다 스냅샷 수집 (변수, 스택, 힙 상태)
       //    stdout을 통해 JSON 스냅샷 수신
-      const snapshots = await this.debuggerClient.run(projectPath);
+      const snapshots = selectedEngine === 'inspector'
+        ? await this.runWithInspector(projectPath, sourceCode, options.signal)
+        : await this.debuggerClient.run(projectPath, { signal: options.signal });
 
       // ═══════════════════════════════════════════════════════
       // 4️⃣ Post-process: 스냅샷 후처리
@@ -276,8 +319,13 @@ export class JavaScriptSimulationService {
       // 🎉 성공 반환 (기존 snapshot 보존 + normalizedEvents 추가)
       return {
         success: true,
+        engine: selectedEngine,
         steps: processedSnapshots,
         normalizedSteps,
+        meta: {
+          durationMs: Date.now() - startedAt,
+          stepCount: processedSnapshots.length,
+        },
       };
 
     } catch (error: unknown) {
@@ -288,12 +336,50 @@ export class JavaScriptSimulationService {
       // ═══════════════════════════════════════════════════════
 
       // ⏱️ 타임아웃 에러 (무한 루프) 또는 최대 실행 단계 초과
-      if (err.message?.includes('Time Limit') || err.message?.includes('timeout') || err.message?.includes('최대 실행 단계')) {
+      if (err.message?.toLowerCase().includes('aborted')) {
         return {
           success: false,
+          engine: selectedEngine,
+          steps: [],
+          meta: {
+            durationMs: Date.now() - startedAt,
+            stepCount: 0,
+          },
+          error: {
+            code: SimulationErrorCode.ABORTED,
+            message: '시뮬레이션이 취소되었습니다.',
+          },
+        };
+      }
+
+      if (err.message?.includes('최대 실행 단계')) {
+        return {
+          success: false,
+          engine: selectedEngine,
+          steps: [],
+          meta: {
+            durationMs: Date.now() - startedAt,
+            stepCount: 0,
+          },
           error: {
             code: SimulationErrorCode.MAX_STEPS_EXCEEDED,
             message: '실행 단계가 너무 많습니다. 무한 루프가 있는지 확인해주세요.',
+          },
+        };
+      }
+
+      if (err.message?.includes('Time Limit') || err.message?.includes('timeout')) {
+        return {
+          success: false,
+          engine: selectedEngine,
+          steps: [],
+          meta: {
+            durationMs: Date.now() - startedAt,
+            stepCount: 0,
+          },
+          error: {
+            code: SimulationErrorCode.TIMEOUT,
+            message: '코드 실행 시간이 초과되었습니다. 무한 루프가 없는지 확인해주세요.',
           },
         };
       }
@@ -302,6 +388,12 @@ export class JavaScriptSimulationService {
       if (err.message?.includes('Syntax') || err.message?.includes('parse')) {
         return {
           success: false,
+          engine: selectedEngine,
+          steps: [],
+          meta: {
+            durationMs: Date.now() - startedAt,
+            stepCount: 0,
+          },
           error: {
             code: SimulationErrorCode.SYNTAX_ERROR,
             message: err.message,
@@ -312,6 +404,12 @@ export class JavaScriptSimulationService {
       // 💥 런타임 에러 (기타 에러)
       return {
         success: false,
+        engine: selectedEngine,
+        steps: [],
+        meta: {
+          durationMs: Date.now() - startedAt,
+          stepCount: 0,
+        },
         error: {
           code: SimulationErrorCode.RUNTIME_ERROR,
           message: err.message || '알 수 없는 오류가 발생했습니다.',
@@ -328,6 +426,144 @@ export class JavaScriptSimulationService {
         await this.fileManager.cleanup(projectPath);
       }
     }
+  }
+
+  private resolveEngine(): 'legacy' | 'inspector' {
+    const raw = (process.env.JS_SIM_ENGINE || 'inspector').toLowerCase();
+    return raw === 'inspector' ? 'inspector' : 'legacy';
+  }
+
+  private async runWithInspector(
+    projectPath: string,
+    sourceCode: string,
+    signal?: AbortSignal
+  ): Promise<JavaScriptSnapshot[]> {
+    throwIfAborted(signal);
+    const session = await this.inspectorRunner.launch(projectPath, {
+      timeoutMs: 10000,
+      signal,
+    });
+    const client = new JavaScriptInspectorClient();
+
+    try {
+      throwIfAborted(signal);
+      await client.connect(session, { signal });
+      await client.enableDebugger();
+      await client.setAsyncCallStackDepth(64);
+      await client.setBlackboxPatterns([
+        '^node:internal\\/.*',
+        '^internal\\/.*',
+      ]).catch(() => {});
+      await this.installUserBreakpoints(client, sourceCode, session.sourcePath);
+
+      // Release initial --inspect-brk pause and switch to breakpoint-driven capture.
+      await client.runIfWaitingForDebugger();
+
+      const snapshots: JavaScriptSnapshot[] = [];
+      const eventLoopTracker = new JavaScriptEventLoopStateTracker();
+      const scopeTracker = new JavaScriptScopeStateTracker();
+      const thisTracker = new JavaScriptThisStateTracker();
+      const prototypeTracker = new JavaScriptPrototypeStateTracker();
+
+      for (let i = 0; i < MAX_INSPECTOR_STEPS; i++) {
+        throwIfAborted(signal);
+
+        const paused = await client.waitForPaused({ timeoutMs: 750, signal }).catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : String(error);
+          if (message.includes('Debugger.paused timeout')) {
+            return null;
+          }
+          if (signal?.aborted || message.toLowerCase().includes('aborted')) {
+            throw new Error('Simulation aborted');
+          }
+          if (message.includes('socket closed') || message.includes('not connected')) {
+            return null;
+          }
+          throw error;
+        });
+
+        if (!paused) {
+          break;
+        }
+
+        eventLoopTracker.applyMarkers(client.drainRuntimeMarkers());
+
+        if (this.isUserPaused(paused, client, session.sourcePath)) {
+          const userPaused = this.toUserPausedEvent(paused, client, session.sourcePath);
+          if (userPaused) {
+            eventLoopTracker.onPause(userPaused);
+            const snapshot = await this.inspectorSnapshotBuilder.build(userPaused, client, {
+              stdout: client.drainStdout(),
+            });
+            snapshot.eventLoopState = eventLoopTracker.getState();
+            snapshot.scopeState = await scopeTracker.build(userPaused, client);
+            snapshot.thisState = await thisTracker.build(userPaused, client);
+            snapshot.prototypeState = await prototypeTracker.build(userPaused, client);
+            snapshots.push(snapshot);
+          }
+        }
+
+        await client.resume().catch(() => {});
+      }
+
+      if (snapshots.length >= MAX_INSPECTOR_STEPS) {
+        throw new Error(`최대 실행 단계(${MAX_INSPECTOR_STEPS}회)를 초과했습니다.`);
+      }
+
+      return dedupeConsecutiveByLineAndCode(snapshots);
+    } finally {
+      await client.disconnect().catch(() => {});
+      await session.stop().catch(() => {});
+    }
+  }
+
+  private async installUserBreakpoints(
+    client: JavaScriptInspectorClient,
+    sourceCode: string,
+    sourcePath: string
+  ): Promise<void> {
+    const lines = sourceCode.split('\n');
+    const asFileUrl = pathToFileURL(path.resolve(sourcePath)).href;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (!line || !line.trim()) continue;
+      await client.setBreakpointByUrl(i, sourcePath).catch(() => {});
+      await client.setBreakpointByUrl(i, asFileUrl).catch(() => {});
+    }
+  }
+
+  private isUserPaused(
+    paused: DebuggerPausedEvent,
+    client: JavaScriptInspectorClient,
+    sourcePath: string
+  ): boolean {
+    const top = paused.params.callFrames[0];
+    if (!top) return false;
+    const scriptUrl = client.getScriptUrl(top.location.scriptId);
+    return isSameScript(scriptUrl, sourcePath);
+  }
+
+  private toUserPausedEvent(
+    paused: DebuggerPausedEvent,
+    client: JavaScriptInspectorClient,
+    sourcePath: string
+  ): DebuggerPausedEvent | null {
+    const userFrames = paused.params.callFrames.filter((frame) => {
+      const scriptUrl = client.getScriptUrl(frame.location.scriptId);
+      return isSameScript(scriptUrl, sourcePath);
+    });
+
+    if (userFrames.length === 0) {
+      return null;
+    }
+
+    return {
+      method: 'Debugger.paused',
+      params: {
+        reason: paused.params.reason,
+        callFrames: userFrames,
+      },
+    };
   }
 
   /**
@@ -493,4 +729,49 @@ export class JavaScriptSimulationService {
         };
       });
   }
+}
+
+function isSameScript(scriptUrl: string | undefined, sourcePath: string): boolean {
+  if (!scriptUrl) return false;
+
+  const normalizedSource = path.resolve(sourcePath);
+  if (scriptUrl.startsWith('file://')) {
+    try {
+      return path.resolve(new URL(scriptUrl).pathname) === normalizedSource;
+    } catch {
+      return false;
+    }
+  }
+  return path.resolve(scriptUrl) === normalizedSource;
+}
+
+function throwIfAborted(signal?: AbortSignal): void {
+  if (signal?.aborted) {
+    throw new Error('Simulation aborted');
+  }
+}
+
+function isAbortLikeError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.toLowerCase().includes('aborted');
+}
+
+function dedupeConsecutiveByLineAndCode(
+  snapshots: JavaScriptSnapshot[]
+): JavaScriptSnapshot[] {
+  if (snapshots.length <= 1) return snapshots;
+
+  const result: JavaScriptSnapshot[] = [snapshots[0]];
+  for (let i = 1; i < snapshots.length; i++) {
+    const prev = result[result.length - 1];
+    const curr = snapshots[i];
+    if (prev.line === curr.line && prev.code === curr.code) {
+      // Keep the newer snapshot to preserve latest variable/heap state.
+      result[result.length - 1] = curr;
+    } else {
+      result.push(curr);
+    }
+  }
+
+  return result;
 }

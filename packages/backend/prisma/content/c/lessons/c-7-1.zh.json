@@ -1,13 +1,13 @@
 {
   "lessonId": "c-7-1",
-  "title": "Double Pointers (int **)",
-  "concept": "二级指针存储指针的地址，通过额外一层间接访问原始值",
+  "title": "双指针（int **）",
+  "concept": "双指针存储指针的地址并通过间接步骤访问原始值。",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    int *p = &a;\n    int **pp = &p;\n\n    printf(\"a = %d\\n\", a);\n\n    **pp = 20;\n\n    printf(\"a = %d\\n\", a);\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 `printf` 所需的标准输入输出头文件。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用“printf”的标准输入/输出标头。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "创建 main 栈帧。\n\n接下来构建引用链 `a -> p -> pp`。",
+        "title": "启动主函数",
+        "explanation": "主框架已创建。\n\n然后我们创建一个引用链：`a -> p -> pp`。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "1. 声明整型变量",
-        "explanation": "`int a = 10;` 准备原始整数值。\n\n这个变量是指针链的最终目标。",
+        "title": "1.声明整型变量",
+        "explanation": "使用“int a = 10;”准备原始整数值。\n\n指针链的最终目的地就是这个变量。",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "2. 声明一级指针",
-        "explanation": "`p` 存储 `a` 的地址，使其指向 `a`。\n\n`p` 是一个保存位置信息而非值本身的变量。",
+        "title": "2. 单指针声明",
+        "explanation": "将“a”的地址存储在“p”中，使其指向“a”。\n\n`p` 是一个包含位置信息的变量，而不是一个值。",
         "visualizationType": "cMemory",
         "code": "int *p = &a;",
         "stack": [
@@ -64,8 +64,8 @@
         ]
       },
       {
-        "title": "3. 声明二级指针",
-        "explanation": "`pp` 存储 `p` 的地址，使其指向一个指针。\n\n这就完成了两级链：`pp -> p -> a`。",
+        "title": "3. 双指针声明",
+        "explanation": "将“p”的地址存储在“pp”中以将指针指向它。\n\n即完成了两步链`pp -> p -> a`。",
         "visualizationType": "cMemory",
         "code": "int **pp = &p;",
         "stack": [
@@ -92,15 +92,15 @@
         ]
       },
       {
-        "title": "输出初始值",
-        "explanation": "在修改前输出 `a` 的值，建立比较基准。",
+        "title": "初始值输出",
+        "explanation": "通过在更改之前打印“a”的值来创建比较标准。",
         "visualizationType": "cMemory",
         "code": "printf(\"a = %d\\n\", a);",
         "stdout": "a = 10"
       },
       {
-        "title": "通过双重解引用修改值",
-        "explanation": "`**pp = 20;` 沿着链路修改最终目标 `a`。\n\n中间地址（`p` 和 `pp` 的值）保持不变——只有原始数据被修改。",
+        "title": "通过双重解引用更改值",
+        "explanation": "`**pp = 20;` 改变了链上的最终目的地 `a` 值。\n\n中间地址（“p”、“pp”值）保持不变，仅更改原始数据。",
         "keyInsight": "`**pp` 沿着指针链到达最终的原始数据。",
         "visualizationType": "cMemory",
         "code": "**pp = 20;",
@@ -129,8 +129,8 @@
         ]
       },
       {
-        "title": "验证修改后的值",
-        "explanation": "再次输出确认 `a` 已变为 20。",
+        "title": "检查更改的值",
+        "explanation": "如果再次打印，可以看到`a`已经变成了20。",
         "visualizationType": "cMemory",
         "code": "printf(\"a = %d\\n\", a);",
         "occurrence": 2,
@@ -159,8 +159,8 @@
         "stdout": "a = 10\na = 20"
       },
       {
-        "title": "程序结束",
-        "explanation": "通过 `return 0;` 结束程序。\n\n要点：当需要间接控制指针本身时，二级指针很有用。",
+        "title": "程序退出",
+        "explanation": "使用“return 0;”退出。\n\n底线：双指针对于间接控制指针本身很有用。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -169,22 +169,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "给定 int val = 5; int *p = &val; int **pp = &p; 以下哪个不能读取 val 的值？",
+    "question": "整数值=5； int *p = &val; int **pp = &p;什么时候，什么不是读取 val 值的方法？",
     "options": [
-      "val",
+      "瓦尔",
       "*p",
-      "**pp",
+      "**页",
       "&p"
     ],
     "correctIndex": 3,
-    "explanation": "&p 是指针 p 的地址（pp 的值），所以不是 5。\nval == *p == **pp。"
+    "explanation": "&p 不是 5，因为它是指针 p 的地址（pp 的值）。\nval == *p == **pp。"
   },
   "misconceptions": [
     {
-      "wrong": "指针的指针是特殊的硬件功能。",
-      "correct": "它只是一个存储"存储地址的变量"的地址的变量。",
-      "why": "从内存角度看，所有指针都是相同大小（32/64 位）的整型变量。"
+      "wrong": "指针 指针是一种特殊的硬件功能。",
+      "correct": "它只是一个保存地址的变量，该变量保存地址。",
+      "why": "从内存角度来看，所有指针都是相同大小（32/64 位）的整数变量。"
     }
   ],
-  "keyTakeaway": "二级指针用于通过引用来改变指针变量的值。"
+  "keyTakeaway": "当您想通过“引用”更改指针变量的值时，请使用双指针。"
 }

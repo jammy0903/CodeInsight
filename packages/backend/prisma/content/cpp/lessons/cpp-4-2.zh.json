@@ -1,0 +1,106 @@
+{
+  "lessonId": "cpp-4-2",
+  "title": "内存泄漏",
+  "concept": "如果省略delete，则直到程序结束才释放堆内存。",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nvoid leaky() {\n    int* p = new int(999);\n    cout << *p << endl;\n    // delete p; 를 빠뜨림!\n}\n\nint main() {\n    leaky();\n    cout << \"leaky 종료\" << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "输入泄漏函数",
+        "explanation": "调用 `leaky()` 函数，创建一个新的堆栈帧。",
+        "visualizationType": "cMemory",
+        "code": "void leaky() {",
+        "stack": [
+          {
+            "type": "frame",
+            "func": "main",
+            "name": "main"
+          },
+          {
+            "type": "frame",
+            "func": "leaky",
+            "name": "leaky"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "堆分配",
+        "explanation": "使用 new int(999) 在堆上分配内存并将地址存储在指针 p 中。",
+        "visualizationType": "cMemory",
+        "code": "int* p = new int(999);",
+        "stack": [
+          {
+            "type": "frame",
+            "func": "main",
+            "name": "main"
+          },
+          {
+            "type": "frame",
+            "func": "leaky",
+            "name": "leaky"
+          },
+          {
+            "name": "p",
+            "value": "0x9000",
+            "type": "int*",
+            "address": "0x2000",
+            "frame": "leaky",
+            "points_to": "*p"
+          }
+        ],
+        "heap": [
+          {
+            "name": "*p",
+            "value": "999",
+            "type": "int",
+            "address": "0x9000"
+          }
+        ]
+      },
+      {
+        "title": "函数退出——泄漏！",
+        "explanation": "当“leaky()”完成时，指针“p”与堆栈帧一起消失。\n\n但由于我们没有调用“delete”，所以 **999 的堆仍然存在**。无法访问该内存——这是**内存泄漏**。",
+        "visualizationType": "cMemory",
+        "code": "cout << \"leaky 종료\" << endl;",
+        "stack": [
+          {
+            "type": "frame",
+            "func": "main",
+            "name": "main"
+          }
+        ],
+        "heap": [
+          {
+            "name": "???",
+            "value": "999",
+            "type": "int",
+            "address": "0x9000",
+            "highlight": true
+          }
+        ],
+        "stdout": "leaky 종료"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "什么原因导致内存泄漏？",
+    "options": [
+      "通过调用delete而不使用new",
+      "如果不删除堆上分配的内存而丢失指针，",
+      "创建太多堆栈变量",
+      "因为程序异常终止"
+    ],
+    "correctIndex": 1,
+    "explanation": "堆上分配的内存必须通过删除显式释放。当指针超出范围时，就无法访​​问该内存。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "当程序结束时，所有内存都会自动释放。",
+      "correct": "尽管操作系统会在进程终止时回收它，但泄漏对于长时间运行的服务器来说可能很严重。",
+      "why": "如果重复发生泄漏，可用内存将会越来越少，导致系统速度变慢或崩溃。"
+    }
+  ],
+  "keyTakeaway": "如果使用 new 分配，请务必使用 delete 释放它。更好的方法是使用智能指针。"
+}

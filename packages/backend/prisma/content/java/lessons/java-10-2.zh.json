@@ -1,13 +1,13 @@
 {
   "lessonId": "java-10-2",
-  "title": "同步：一个一个来！",
-  "concept": "当多个线程同时进入共享资源（就像一个单间卫生间）时会出事故。这时就需要"锁（synchronized）"。",
+  "title": "同步：一个接一个！",
+  "concept": "当多个线程同时进入共享资源（如卫生间隔间）时，就会发生意外。这时候需要的就是‘锁（同步）’。",
   "content": {
     "code": "class BankAccount {\n    private int balance = 1000;\n\n    public synchronized void withdraw(int amount) {\n        balance -= amount;\n        System.out.println(\"출금 완료! 잔액: \" + balance);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        BankAccount account = new BankAccount();\n        // 두 일꾼이 동시에 돈을 뽑으려 한다고 가정합시다.\n    }\n}",
     "steps": [
       {
-        "title": "main 方法开始",
-        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。\n创建银行账户并开始任务。",
+        "title": "启动主方法",
+        "explanation": "**`public static void main(String[] args)`**\n\n这是程序的入口点。\n创建一个银行账户并开始你的使命。",
         "visualizationType": "memory",
         "code": "public static void main(String[] args) {",
         "memoryState": {
@@ -17,14 +17,14 @@
               "value": "running"
             }
           ],
-          "note": "主线程启动",
+          "note": "메인 쓰레드 시작",
           "heap": [],
           "output": []
         }
       },
       {
         "title": "创建账户对象",
-        "explanation": "创建一个将作为共享资源使用的 `BankAccount` 对象。\n该对象内部有一把看不见的"监视器锁（钥匙）"。",
+        "explanation": "创建一个用作共享资源的“BankAccount”对象。\n这个物体的内部有一个看不见的‘监视器锁（钥匙）’。",
         "visualizationType": "memory",
         "code": "BankAccount account = new BankAccount();",
         "memoryState": {
@@ -46,7 +46,7 @@
       },
       {
         "title": "同步方法",
-        "explanation": "在方法前加上 `synchronized` 后，要执行此方法的线程必须先获得该对象（`account`）的钥匙才能进入。\n同一时间只有一个线程可以执行此方法。",
+        "explanation": "如果一个方法前面添加了“synchronized”，则尝试执行该方法的线程必须获得相应对象（“account”）的key才能进入。\n一次只有一个线程可以执行该方法。",
         "visualizationType": "memory",
         "code": "public synchronized void withdraw(int amount) {",
         "memoryState": {
@@ -59,9 +59,9 @@
         }
       },
       {
-        "title": "临界区（Critical Section）",
-        "explanation": "只有持有钥匙的线程才能安全地修改 `balance`。\n其他线程必须在外面等待，直到该操作完成。\n像这样同一时间只能由一个线程执行的代码区域被称为"临界区"。",
-        "keyInsight": "同步 = 保护数据完整性",
+        "title": "关键部分",
+        "explanation": "只有持有密钥的线程才能安全地改变“balance”。\n其他线程必须在外面等待，直到该任务完成。\n一次只能执行一个线程的代码区域称为“临界区域”。",
+        "keyInsight": "同步=保护数据完整性",
         "visualizationType": "memory",
         "code": "balance -= amount;",
         "memoryState": {
@@ -83,22 +83,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "一个 Java 对象可以拥有多少个锁（Lock）？",
+    "question": "一个Java对象可以有多少个锁？",
     "options": [
-      "1 个",
-      "2 个",
-      "与线程数量相同",
-      "无限制"
+      "1",
+      "2",
+      "随着线程数量",
+      "没有限制"
     ],
     "correctIndex": 0,
-    "explanation": "Java 中每个对象只有一把"监视器锁"。\n因此同一时间只有一个线程可以进入 synchronized 区域。"
+    "explanation": "Java 中的每个对象都只有一个“监视器锁”。\n所以一次只能有一个线程进入同步区。"
   },
   "misconceptions": [
     {
-      "wrong": "使用越多 synchronized 程序就越快。",
-      "correct": "不是的！同步会让线程排队，反而降低性能。",
-      "why": "因为会产生等待时间。\n只在真正需要保护的共享资源上最少量地使用。"
+      "wrong": "您使用的同步越多，程序就会变得越快。",
+      "correct": "不！同步实际上会降低性能，因为它会排列线程。",
+      "why": "这是因为出现了等待时间。\n您应该最少地使用它，并且仅在绝对必要的共享资源上使用它。"
     }
   ],
-  "keyTakeaway": "synchronized 是"保护数据不被破坏的防护盾"。记住：每个对象只有一把钥匙！"
+  "keyTakeaway": "同步是一个“保护数据不被扭曲的盾牌”。请记住，每个对象只有一个密钥！"
 }

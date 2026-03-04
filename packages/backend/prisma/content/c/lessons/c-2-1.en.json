@@ -1,13 +1,13 @@
 {
   "lessonId": "c-2-1",
-  "title": "Address Operator (&): Finding a Variable's Address",
-  "concept": "A memory address is like a home address. Use &variableName to find it.",
+  "title": "Address operator (&): Find your home address",
+  "concept": "A memory address is like a ‘home address’. & Search by variable name.",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int a = 100;\n\n    printf(\"Value of a: %d\\n\", a);\n\n    printf(\"Address of a: %p\\n\", &a);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h Header",
-        "explanation": "To use I/O functions like ```printf``` and ```scanf```, you must first include the **header file**.",
+        "title": "Include stdio.h header",
+        "explanation": "To use input/output functions such as ``printf```` and ````scanf````, you must first load the **manual (header)**.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Defining the main Function",
-        "explanation": "The program starts — this is the **entry point** that the OS calls first.\n\nAt this moment, ```main```'s **stack frame** is created on the stack, and the variables we declare will be placed inside this space. It's like a new employee arriving and being assigned their own desk.",
+        "title": "main function definition",
+        "explanation": "Program startup — This is the first **entry point** called by the OS.\n\nAt this moment, a **stack frame** of ``main``` is created on the stack, and the variables to be declared in the future are placed in this space. It's like a new employee coming to work and being assigned his own desk.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Variable Declaration and Value",
-        "explanation": "`int a = 100;` stores the value 100 in a variable.\n\nThe important point is that a variable has both a value and an address. `a` refers to the value, `&a` refers to the address.",
+        "title": "Declaration and values ​​of variables",
+        "explanation": "`int a = 100;` stores the value 100 in a variable.\n\nThe important thing is that variables have both a value and an address. `a` refers to the value and `&a` refers to the address.",
         "visualizationType": "cMemory",
         "code": "int a = 100;",
         "stack": [
@@ -43,22 +43,22 @@
         ]
       },
       {
-        "title": "Printing the Variable's Value",
-        "explanation": "```%d``` is a **format specifier** that tells printf to print an integer in decimal. ```printf``` inserts the value of ```a``` (100) at the ```%d``` position.\n\nIn this step, we only use the variable's **value**. In the next step, we'll print the same variable's **address** — compare the two.",
+        "title": "Print the value of a variable",
+        "explanation": "```%d``` is a **format specifier** that indicates to output an integer as a decimal number. ```printf``` inserts the value of ```a``` (100) in place of ```%d```.\n\nIn this step, only the **value** of the variable is used. In the next step, the **address** of the same variable is output, so let's compare the two.",
         "visualizationType": "cMemory",
         "code": "printf(\"Value of a: %d\\n\", a);",
         "stdout": "Value of a: 100"
       },
       {
-        "title": "Checking the Variable's Address (& Operator)",
-        "explanation": "`&a` returns the starting memory address of variable `a`. Use `%p` to print an address.\n\nIn other words, `a` is the data itself, and `&a` is the location of that data. A variable that stores this location information is called a pointer.",
+        "title": "Checking the address of a variable (& operator)",
+        "explanation": "`&a` returns the memory starting address of variable `a`. Use `%p` for address output.\n\nThat is, `a` is the data itself, and `&a` is the location where the data is located. The variable that stores this location information is a pointer.",
         "visualizationType": "cMemory",
         "code": "printf(\"Address of a: %p\\n\", &a);",
         "stdout": "Value of a: 100\nAddress of a: 0x1FF0"
       },
       {
-        "title": "Program Termination",
-        "explanation": "```return 0``` — the normal exit signal. As ```main```'s stack frame is removed, variable ```a``` also disappears from memory. Automatic cleanup when a function ends is a characteristic of **stack memory**.",
+        "title": "Program exit",
+        "explanation": "```return 0``` — Normal shutdown signal. When the stack frame of ```main``` is removed, the variable ```a``` also disappears from memory. The characteristic of **stack memory** is that it is automatically cleaned up when the function ends.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -67,7 +67,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "How do you get the address of `int money = 500;`?",
+    "question": "What is the code to get the address of the variable `int money = 500;`?",
     "options": [
       "money",
       "*money",
@@ -75,14 +75,14 @@
       "address(money)"
     ],
     "correctIndex": 2,
-    "explanation": "`&` (Ampersand) is the 'Address Of' operator.\nA helpful mnemonic: Ampersand = Address."
+    "explanation": "`&` (Ampersand) is the 'Address Of' operator.\nIn English-speaking countries, it is also memorized as 'Ampersand = Address'."
   },
   "misconceptions": [
     {
       "wrong": "The address value is always the same",
-      "correct": "It changes with every execution (due to ASLR and other security techniques).",
-      "why": "The operating system allocates available memory space dynamically each time."
+      "correct": "It changes every time you run it (ASLR security techniques, etc.).",
+      "why": "This is because the operating system allocates free memory space at a time."
     }
   ],
-  "keyTakeaway": "Every variable has an address. Use `&` to find it."
+  "keyTakeaway": "All variables have addresses. You can check with `&`."
 }

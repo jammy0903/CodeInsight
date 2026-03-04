@@ -5,6 +5,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { Chapter } from '@/types';
 import { Star, Target, Lock, ChevronRight, BookOpen, BookMarked } from 'lucide-react';
 
@@ -98,6 +99,7 @@ export function ChapterCard({
   isActive = false,
   needsLogin = false,
 }: ChapterCardProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const theme = LANGUAGE_THEMES[languageId] || DEFAULT_THEME;
   const isLessonOnly = LESSON_ONLY_CHAPTERS[languageId]?.has(chapter.id) ?? false;
@@ -190,31 +192,31 @@ export function ChapterCard({
             }}
           >
             <Target className="w-2.5 h-2.5 md:w-3 md:h-3" />
-            Current
+            {t('chapter_card.current')}
           </span>
         )}
         {isComplete && (
           <span className="inline-flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-600 border border-emerald-200">
             <Star className="w-2.5 h-2.5 md:w-3 md:h-3" />
-            Completed
+            {t('chapter_card.completed')}
           </span>
         )}
         {isLocked && (
           <span className="inline-flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wider bg-[var(--theme-dashboard-section-header-bg)] text-[var(--theme-dashboard-text-muted)] border border-[var(--theme-dashboard-card-border)]">
             <Lock className="w-2.5 h-2.5 md:w-3 md:h-3" />
-            Locked
+            {t('chapter_card.locked')}
           </span>
         )}
         {needsLogin && !isLocked && (
           <span className="inline-flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 border border-gray-200">
             <Lock className="w-2.5 h-2.5 md:w-3 md:h-3" />
-            Login
+            {t('chapter_card.login')}
           </span>
         )}
         {isLessonOnly && (
           <span className="inline-flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-600 border border-amber-200">
             <BookMarked className="w-2.5 h-2.5 md:w-3 md:h-3" />
-            Lesson Only
+            {t('chapter_card.lesson_only')}
           </span>
         )}
       </div>
@@ -239,7 +241,7 @@ export function ChapterCard({
       {/* 진행률 바 */}
       <div className="mb-2 md:mb-3 lg:mb-4">
         <div className="flex items-center justify-between text-[10px] md:text-xs text-[var(--theme-dashboard-text-muted)] mb-1">
-          <span>Progress</span>
+          <span>{t('chapter_card.progress')}</span>
           <span className="font-mono font-bold">{progressPercent}%</span>
         </div>
         <div className="h-1.5 md:h-2 bg-[var(--theme-dashboard-progress-bg)] rounded-full overflow-hidden">
@@ -259,7 +261,7 @@ export function ChapterCard({
       <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs lg:text-sm text-[var(--theme-dashboard-text-muted)]">
         <BookOpen className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4" />
         <span>
-          {completedCount} / {lessonCount} Lessons
+          {t('chapter_card.lessons_count', { completed: completedCount, total: lessonCount })}
         </span>
       </div>
     </button>

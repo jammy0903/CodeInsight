@@ -1,38 +1,140 @@
 {
   "lessonId": "c-10-4",
-  "title": "Binary Input/Output",
-  "concept": "二进制 I/O 按内存原始表示存取数据，快速处理结构化数据",
+  "title": "二进制输入/输出",
+  "concept": "二进制输入/输出通过按原样存储和读取内存表示来快速处理结构化数据。",
   "content": {
     "code": "#include <stdio.h>\n\nstruct Player {\n    int id;\n    double hp;\n};\n\nint main() {\n    struct Player saved = {1, 99.5};\n    struct Player loaded;\n\n    FILE *fp = fopen(\"save.bin\", \"wb\");\n    if (fp) {\n        fwrite(&saved, sizeof(struct Player), 1, fp);\n        fclose(fp);\n    }\n\n    fp = fopen(\"save.bin\", \"rb\");\n    if (fp) {\n        fread(&loaded, sizeof(struct Player), 1, fp);\n        printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);\n        fclose(fp);\n    }\n\n    return 0;\n}",
     "steps": [
-      {"title":"包含 stdio.h 头文件","explanation":"**`#include <stdio.h>`** -- 二进制文件 I/O 函数（`fwrite`、`fread`、`fopen`、`fclose`）所需的头文件。","visualizationType":"cMemory","code":"#include <stdio.h>","stack":[],"heap":[],"stdout":""},
-      {"title":"定义要保存的数据结构","explanation":"**`struct Player { int id; double hp; };`** -- 定义 `Player` 结构体作为存取数据的模板。由 `int id`（4 字节）和 `double hp`（8 字节）组成，编译器可能会插入**填充（Padding）**用于内存对齐。","visualizationType":"cMemory","code":"struct Player {","highlightOffset":[0,1,2,3]},
-      {"title":"main 函数与变量准备","explanation":"**`struct Player saved = {1, 99.5};`** 和 **`struct Player loaded;`** -- 栈上两个 `Player` 结构体。`saved` 是要写入的原始数据（`id: 1, hp: 99.5`），`loaded` 是从文件恢复数据的目标。","visualizationType":"cMemory","code":"int main() {","highlightOffset":[0,1],"stack":[{"name":"saved","type":"struct Player","value":"{id: 1, hp: 99.5}","address":"0x1000"},{"name":"loaded","type":"struct Player","value":"{id: ???, hp: ???}","address":"0x0ffc"}]},
-      {"title":"将内存内容写入文件（fwrite）","explanation":"**`fwrite(&saved, sizeof(struct Player), 1, fp);`** -- 将 `saved` 结构体的原始内存字节直接"转储"到文件中。4 个参数分别是：`&saved`（数据起始地址）、`sizeof(struct Player)`（一块的大小）、`1`（块数）、`fp`（目标文件）。","visualizationType":"cMemory","code":"fwrite(&saved, sizeof(struct Player), 1, fp);"},
-      {"title":"写入后关闭文件","explanation":"**`fclose(fp);`** -- 完成二进制数据写入并关闭文件。`save.bin` 中现在存储着 `struct Player` 的逐字节内存内容。","visualizationType":"cMemory","code":"fwrite(&saved, sizeof(struct Player), 1, fp);"},
-      {"title":"将文件内容读入内存（fread）","explanation":"**`fread(&loaded, sizeof(struct Player), 1, fp);`** -- 从文件读取字节并直接覆写到 `loaded` 结构体的内存空间。这是 `fwrite` 的逆操作。","visualizationType":"cMemory","code":"fread(&loaded, sizeof(struct Player), 1, fp);","stack":[{"name":"saved","type":"struct Player","value":"{id: 1, hp: 99.5}","address":"0x1000"},{"name":"loaded","type":"struct Player","value":"{id: 1, hp: 99.5}","highlight":true,"address":"0x0ffc"}]},
-      {"title":"验证恢复的数据","explanation":"**`printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);`** -- 输出为 `\"Loaded ID: 1, HP: 99.5\"`。放入 `saved` 的值通过文件完美恢复到 `loaded` 中。","visualizationType":"cMemory","code":"fread(&loaded, sizeof(struct Player), 1, fp);","stack":[{"name":"saved","type":"struct Player","value":"{id: 1, hp: 99.5}","address":"0x1000"},{"name":"loaded","type":"struct Player","value":"{id: 1, hp: 99.5}","address":"0x0ffc"}],"stdout":"Loaded ID: 1, HP: 99.5"},
-      {"title":"关闭文件并终止","explanation":"**`fclose(fp);`** 和 **`return 0;`** -- 完成所有文件操作并终止程序。\n\n二进制文件的致命缺点是**可移植性（Portability）**。","visualizationType":"cMemory","code":"printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);","highlightOffset":[0,3],"stack":[]}
+      {
+        "title": "包含 stdio.h 标头",
+        "explanation": "**`#include <stdio.h>`** — 使用二进制文件输入/输出函数的标头（`fwrite`、`fread`、`fopen`、`fclose`）。",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "定义要存储的数据结构",
+        "explanation": "**`struct Player { int id;双马力； };`** — 定义`Player`结构，它是保存和从文件加载数据的框架。它由`int id`（4字节）和`double hp`（8字节）组成，编译器在它们之间添加**padding**以进行内存对齐。",
+        "visualizationType": "cMemory",
+        "code": "struct Player {",
+        "highlightOffset": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "title": "准备主要函数和变量",
+        "explanation": "**`struct Player saving = {1, 99.5};`** 和 **`struct Player returned;`** — 在堆栈上准备两个 `Player` 结构。 `saved` 是要保存在文件中的原始数据（`id: 1, hp: 99.5`），而 `loaded` 是要从文件中恢复的数据。",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "highlightOffset": [
+          0,
+          1
+        ],
+        "stack": [
+          {
+            "name": "saved",
+            "type": "struct Player",
+            "value": "{id: 1, hp: 99.5}",
+            "address": "0x1000"
+          },
+          {
+            "name": "loaded",
+            "type": "struct Player",
+            "value": "{id: ???, hp: ???}",
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "将内存内容写入文件（fwrite）",
+        "explanation": "**`fwrite(&saved, sizeof(struct Player), 1, fp);`** — 将 `saved` 结构的内存字节转储到文件中。四个参数分别是：`&saved`（数据起始地址）、`sizeof(struct Player)`（块大小）、`1`",
+        "visualizationType": "cMemory",
+        "code": "fwrite(&saved, sizeof(struct Player), 1, fp);"
+      },
+      {
+        "title": "写入后关闭文件",
+        "explanation": "**`fclose(fp);`** — 完成写入二进制数据并关闭文件。 `save.bin` 以字节为单位存储 `struct Player` 的内存内容。",
+        "visualizationType": "cMemory",
+        "code": "fwrite(&saved, sizeof(struct Player), 1, fp);"
+      },
+      {
+        "title": "将文件内容读入内存（fread）",
+        "explanation": "**`fread(&loaded, sizeof(struct Player), 1, fp);`** — 从文件中读取字节并在 `loaded` 结构的内存空间中覆盖它们。这是“fwrite”的逆操作。",
+        "visualizationType": "cMemory",
+        "code": "fread(&loaded, sizeof(struct Player), 1, fp);",
+        "stack": [
+          {
+            "name": "saved",
+            "type": "struct Player",
+            "value": "{id: 1, hp: 99.5}",
+            "address": "0x1000"
+          },
+          {
+            "name": "loaded",
+            "type": "struct Player",
+            "value": "{id: 1, hp: 99.5}",
+            "highlight": true,
+            "address": "0x0ffc"
+          }
+        ]
+      },
+      {
+        "title": "检查恢复的数据",
+        "explanation": "**`printf(\"已加载 ID：%d，HP：%.1f\\n\"，loaded.id，已加载.hp);`** — 输出为 `\"已加载 ID：1，HP：99.5\"`。在“saved”中输入的值通过文件完美恢复为“loaded”。",
+        "visualizationType": "cMemory",
+        "code": "fread(&loaded, sizeof(struct Player), 1, fp);",
+        "stack": [
+          {
+            "name": "saved",
+            "type": "struct Player",
+            "value": "{id: 1, hp: 99.5}",
+            "address": "0x1000"
+          },
+          {
+            "name": "loaded",
+            "type": "struct Player",
+            "value": "{id: 1, hp: 99.5}",
+            "address": "0x0ffc"
+          }
+        ],
+        "stdout": "Loaded ID: 1, HP: 99.5"
+      },
+      {
+        "title": "读取后关闭并退出文件",
+        "explanation": "**`fclose(fp);`** 和 **`return 0;`** — 完成所有文件操作后终止程序。\n\n二进制文件的致命缺点是**可移植性**。",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Loaded ID: %d, HP: %.1f\\n\", loaded.id, loaded.hp);",
+        "highlightOffset": [
+          0,
+          3
+        ],
+        "stack": []
+      }
     ],
     "deltaFormat": true
   },
   "quiz": {
-    "question": "文本文件（\"w\"）和二进制文件（\"wb\"）I/O 最大的区别是什么？",
+    "question": "文本文件（“w”）和二进制文件（“wb”）输入和输出之间的最大区别是什么？",
     "options": [
       "文件扩展名",
-      "数据存储方式（是否进行转换）",
-      "可存储容量",
+      "数据如何存储（转换或不转换）",
+      "存储容量",
       "文件访问权限"
     ],
     "correctIndex": 1,
-    "explanation": "文本模式将数字转换为字符串（\"123\"），而二进制模式按内存中的原始位模式直接存储。"
+    "explanation": "文本模式将数字转换为字符串（“123”），而二进制模式将位模式按原样存储在内存中。"
   },
   "misconceptions": [
     {
-      "wrong": "二进制文件在其他电脑上总能正确读取。",
-      "correct": "字节序（大端/小端）或填充方式不同的系统可能会产生损坏的数据。",
-      "why": "为了可移植性，应使用序列化协议或文本格式（JSON）。"
+      "wrong": "二进制文件在其他计算机上始终可读。",
+      "correct": "在其他系统上，字节序（小/大字节序）或填充可能会被破坏。",
+      "why": "为了可移植性，您必须使用序列化协议或文本 (JSON)。"
     }
   ],
-  "keyTakeaway": "fread/fwrite 是最快最简便的数据保存方式，但需要注意跨平台兼容性。"
+  "keyTakeaway": "fread/fwrite是最快、最简单的数据存储方式，但需要注意跨平台兼容性。"
 }

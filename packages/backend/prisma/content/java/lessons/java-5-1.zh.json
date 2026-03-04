@@ -1,13 +1,13 @@
 {
   "lessonId": "java-5-1",
-  "title": "final 变量",
-  "concept": "final 变量不能重新赋值，但其引用的对象内部状态仍然可以修改。",
+  "title": "final 변수",
+  "concept": "final 변수는 재할당이 불가능하지만, 참조하는 객체의 내부는 수정 가능하다",
   "content": {
-    "code": "final int x = 10;\n// x = 20;  // 编译错误！\n\nfinal int[] arr = {1, 2, 3};\narr[0] = 100;  // OK!\n// arr = new int[]{4, 5, 6};  // 编译错误！\n\nfinal StringBuilder sb = new StringBuilder(\"Hello\");\nsb.append(\" World\");  // OK!\n// sb = new StringBuilder();  // 编译错误！",
+    "code": "final int x = 10;\n// x = 20;  // 컴파일 에러!\n\nfinal int[] arr = {1, 2, 3};\narr[0] = 100;  // OK!\n// arr = new int[]{4, 5, 6};  // 컴파일 에러!\n\nfinal StringBuilder sb = new StringBuilder(\"Hello\");\nsb.append(\" World\");  // OK!\n// sb = new StringBuilder();  // 컴파일 에러!",
     "steps": [
       {
-        "title": "final 基本类型",
-        "explanation": "**执行流程：**\n1. 遇到声明 `final int x = 10;`。\n2. 在栈内存上为变量 `x` 分配空间。\n3. 存储值 `10`，并标记为"只读（Read-only）"。\n\n**焊死的盒子：**\n就像把 `10` 放进标有 `x` 的盒子里，然后把盖子**焊死了**。\n内容再也无法更改。",
+        "title": "final 기본 타입",
+        "explanation": "**실행 순서:**\n1. `final int x = 10;` 선언을 만납니다.\n2. 스택 메모리에 변수 `x`를 위한 공간을 할당합니다.\n3. 값 `10`을 저장하고, '수정 불가(Read-only)' 표시를 남깁니다.\n\n**용접된 상자:**\n`x`라는 상자에 `10`을 넣고 뚜껑을 **용접**해버린 것과 같습니다.\n이제 내용물을 바꿀 수 없습니다.",
         "visualizationType": "javaMemory",
         "code": "final int x = 10;",
         "javaMemoryState": {
@@ -25,8 +25,8 @@
         }
       },
       {
-        "title": "final 数组引用",
-        "explanation": "**执行流程：**\n1. 在栈上创建 `final int[] arr` 变量。\n2. 在堆上创建数组对象 `{1, 2, 3}`（`0x001`）。\n3. 设置 `arr` 指向 `0x001`，并锁定这个"箭头"。\n\n**锁定的箭头：**\n现在 `arr` 只能永远指向那个对象（`0x001`）。",
+        "title": "final 배열 참조",
+        "explanation": "**실행 순서:**\n1. `final int[] arr` 변수를 스택에 생성합니다.\n2. 힙 메모리에 `{1, 2, 3}` 배열 객체(`0x001`)를 만듭니다.\n3. `arr`가 `0x001`을 가리키도록 설정하고, 이 '화살표'를 고정합니다.\n\n**고정된 화살표:**\n이제 `arr` 변수는 오직 저쪽 집(`0x001`)만 가리킬 수 있습니다.",
         "visualizationType": "javaMemory",
         "code": "final int[] arr = {1, 2, 3};",
         "javaMemoryState": {
@@ -57,8 +57,8 @@
         }
       },
       {
-        "title": "修改数组元素（OK!）",
-        "explanation": "**执行流程：**\n1. 通过 `arr` 的引用找到堆地址 `0x001`。\n2. 将索引 0 处的值修改为 `100`。\n\n**内部是自由的：**\n"箭头"不能改，但箭头指向的**对象内部内容**可以随意修改。\n不能搬家，但可以重新装修！",
+        "title": "배열 요소 수정 (OK!)",
+        "explanation": "**실행 순서:**\n1. `arr`가 가리키는 힙 메모리의 `0x001` 주소를 찾아갑니다.\n2. 그 집의 0번째 방 내용을 `100`으로 바꿉니다.\n\n**내부는 자유:**\n'화살표'는 못 바꾸지만, 화살표가 가리키는 **집 안의 내용물**은 마음대로 바꿀 수 있습니다.\n이사는 못 가지만 인테리어 공사는 되는 거죠!",
         "visualizationType": "javaMemory",
         "code": "arr[0] = 100;  // OK!",
         "javaMemoryState": {
@@ -74,7 +74,7 @@
       },
       {
         "title": "final StringBuilder",
-        "explanation": "**执行流程：**\n1. 在堆上创建 `StringBuilder` 对象（`0x002`）。\n2. 设置栈变量 `sb` 指向它，同样锁定箭头。",
+        "explanation": "**실행 순서:**\n1. 힙 메모리에 `StringBuilder` 객체(`0x002`)를 생성합니다.\n2. 스택의 `sb` 변수가 이를 가리키게 하고, 마찬가지로 화살표를 고정합니다.",
         "visualizationType": "javaMemory",
         "code": "final StringBuilder sb = new StringBuilder(\"Hello\");",
         "javaMemoryState": {
@@ -117,8 +117,8 @@
         }
       },
       {
-        "title": "修改内容（OK!）",
-        "explanation": "**执行流程：**\n1. 调用 `0x002` 对象的 `append` 方法。\n2. 内部字符串变为 \"Hello World\"。\n\n**关键点：**\n`sb` 这个箭头保持不变，但目标对象的状态可以自由改变。",
+        "title": "내용 수정 (OK!)",
+        "explanation": "**실행 순서:**\n1. `0x002` 객체 내부의 `append` 메서드를 호출합니다.\n2. 객체 내부 문자열이 \"Hello World\"로 변경됩니다.\n\n**핵심:**\n`sb`라는 화살표는 그대로지만, 도착지의 상태는 얼마든지 변할 수 있습니다.",
         "visualizationType": "javaMemory",
         "code": "sb.append(\" World\");  // OK!",
         "javaMemoryState": {
@@ -141,27 +141,27 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "对于 `final List list = new ArrayList();`，以下哪个代码是允许的？",
+    "question": "最终列表列表 = new ArrayList();什么代码可以？",
     "options": [
-      "list = new ArrayList()",
-      "list.add(\"item\")",
-      "list = null",
-      "list = List.of()"
+      "列表=新的ArrayList()",
+      "列表.add(\"项目\")",
+      "列表=空",
+      "列表 = List.of()"
     ],
     "correctIndex": 1,
-    "explanation": "final 只禁止变量的"重新赋值"。\n修改引用对象的内部（`list.add()`）完全没有问题。"
+    "explanation": "Final 仅禁止变量的“重新分配”。\n如果修改引用对象的内部（`list.add()`）也没关系。"
   },
   "misconceptions": [
     {
-      "wrong": "final 变量指向的对象是不可变的。",
-      "correct": "不是！只有变量（容器）被固定，内容（对象）仍然可以改变。",
-      "why": "要实现真正的不可变性，需要 `final` 类、所有字段标记为 `final`，且没有 setter（例如：String）。"
+      "wrong": "final 변수가 가리키는 객체는 불변(Immutable)이다",
+      "correct": "아닙니다! 변수(껍데기)만 고정될 뿐, 알맹이(객체)는 변할 수 있습니다.",
+      "why": "완전한 불변을 원하면 `final` 클래스에 모든 필드를 `final`로 만들고 setter를 없애야 합니다(예: String)."
     },
     {
-      "wrong": "给方法参数加 final 就不能修改值了。",
-      "correct": "确实不能重新赋值，但如果参数是引用类型，仍然可以修改对象的属性。",
-      "why": "在 `void func(final int[] a)` 中，`a = new...` 不行，但 `a[0] = 99` 是可以的。"
+      "wrong": "메서드 파라미터에 final을 붙이면 값을 못 바꾼다",
+      "correct": "맞지만, 참조형 파라미터라면 그 객체의 '속성'은 여전히 바꿀 수 있습니다.",
+      "why": "`void func(final int[] a)`에서 `a = new...`는 안 되지만 `a[0] = 99`는 됩니다."
     }
   ],
-  "keyTakeaway": "final 意味着"箭头被锁定"。它不会冻结所指向对象的内部。"
+  "keyTakeaway": "final은 '화살표 고정'이다. 가리키는 대상의 내부까지 얼리는 건 아니다."
 }

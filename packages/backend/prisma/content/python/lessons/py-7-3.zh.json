@@ -1,25 +1,25 @@
 {
   "lessonId": "py-7-3",
-  "title": "循环引用",
-  "concept": "对象互相引用时refcount永远不会变为0！引用计数的局限性！",
+  "title": "순환 참조",
+  "concept": "서로를 참조하면 refcount가 0이 안 됨! 참조 카운팅의 한계!",
   "content": {
     "code": "class Node:\n    def __init__(self, name):\n        self.name = name\n        self.next = None\n\na = Node(\"A\")\nb = Node(\"B\")\n\n# 순환 참조 만들기\na.next = b  # A → B\nb.next = a  # B → A (순환!)\n\ndel a  # a 삭제\ndel b  # b 삭제\n\n# 객체들은 아직 메모리에 있다!\n# 서로를 참조해서 refcount > 0",
     "steps": [
       {
-        "title": "Node类定义开始",
-        "explanation": "**`class Node:`**\n\n**定义Node类** -- 用于创建"链接节点"的蓝图。\nNode有一个`next`属性可以指向另一个Node，使它们能够**像链条一样连接**起来。\n\n**为什么需要Node类？**\n本课的目标是展示**循环引用(Circular Reference)**的问题。\n循环引用是两个对象**互相指向**的情况。\n当A -> B同时B -> A时，就像两个人互相拉着对方的手。\n\n**类比：火车车厢**\n把Node想象成火车的一节车厢。\n每节车厢(Node)有一个名字(`name`)和一个连接下一节车厢的挂钩(`next`)。\n通常它们像A -> B -> C这样排成一列，但如果最后一节车厢指回第一节呢？\n就创造了一辆永远循环行驶的火车，即**循环引用**！\n\n**为什么是这个顺序？** 在Python中，使用类之前必须先定义它。\n在创建Node对象之前先准备好蓝图。\n\n**执行顺序**：class关键字 -> 准备创建Node类对象 -> 等待执行类体",
+        "title": "Node 클래스 정의 시작",
+        "explanation": "**`class Node:`**\n\n**Node 클래스를 정의합니다** - \"연결 노드\"를 만들기 위한 설계도입니다.\nNode는 다른 Node를 가리킬 수 있는 `next` 속성을 가지고 있어, **체인처럼 연결**할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "class Node:",
         "pythonMemoryState": {
           "output": [],
-          "note": "Node类定义开始",
+          "note": "Node 클래스 정의 시작",
           "names": [],
           "objects": []
         }
       },
       {
-        "title": "进入类体",
-        "explanation": "**`class Node:`（整个类体）**\n\nPython读取整个类体来完成**Node类对象**。\n类体中定义了`__init__`方法。\n\n**什么是类体执行？**\nPython将`class Node:`下面的所有代码执行一次，以确定有哪些方法和属性。\n在此过程中，创建了一个名为`__init__`的函数对象，并注册到Node类中。\n\n**此时还没有创建任何Node对象（实例）！**\n现在只准备好了"可以创建这种形状对象"的**蓝图（类）**。\n\n**类比：制作饼干模具**\n还没有烤出任何饼干（实例），只是制作了饼干模具（类）。\n可以用这个模具压出多个饼干。\n\n**为什么是这个顺序？** 遇到类定义关键字(`class Node:`)后，执行类体来完成类。\n\n**执行顺序**：执行类体 -> 注册__init__方法 -> Node类完成",
+        "title": "클래스 본문 진입",
+        "explanation": "**`class Node:` (본문 전체)**\n\nPython이 클래스 본문 전체를 읽어 **Node 클래스 객체**를 완성합니다.\n클래스 본문에는 `__init__` 메서드가 정의되어 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "class Node:",
         "highlightOffset": [
@@ -29,12 +29,12 @@
           3
         ],
         "pythonMemoryState": {
-          "note": "正在执行类体"
+          "note": "클래스 본문 실행 중"
         }
       },
       {
-        "title": "__init__方法定义",
-        "explanation": "**`def __init__(self, name):`**\n\n定义Node类的**初始化方法**。\n当以`Node(\"A\")`的形式创建对象时，这个`__init__`会自动被调用。\n\n**方法做了什么（方法体预览）**：\n- `self.name = name`：给节点起名字（如\"A\"、\"B\"）\n- `self.next = None`：指向下一个节点的指针（初始为None = 不指向任何东西）\n\n**`self`是什么？**\n`self`指的是"正在被创建的实例本身"。\n调用`Node(\"A\")`时，Python创建一个新对象并将该对象作为`self`传递。\n\n**next = None的含义**：火车车厢还没有连接下一节车厢。\n之后可以用`a.next = b`来连接。\n\n**为什么是这个顺序？** 在类体内定义方法来完成类。\nNode类完成后会以'Node'的名称注册到全局命名空间中。\n\n**执行顺序**：创建__init__函数对象 -> 作为方法注册到Node类 -> Node类完成 (ID: 0x1000)",
+        "title": "__init__ 메서드 정의",
+        "explanation": "**`def __init__(self, name):`**\n\nNode 클래스의 **초기화 메서드**를 정의합니다.\n`Node(\"A\")` 형태로 객체를 만들면, 이 `__init__`이 자동으로 호출됩니다.",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self, name):",
         "highlightOffset": [
@@ -43,7 +43,7 @@
           2
         ],
         "pythonMemoryState": {
-          "note": "Node类定义完成 (ID: 0x1000)",
+          "note": "Node 클래스 정의 완료 (ID: 0x1000)",
           "names": [
             {
               "name": "Node",
@@ -63,12 +63,12 @@
         }
       },
       {
-        "title": "创建第一个节点",
-        "explanation": "**`a = Node(\"A\")`**\n\n调用Node类创建**第一个节点对象（实例）**。\n一个名为\"A\"的节点在内存(0x2000)中创建。\n\n**创建过程（内部工作原理）**：\n1. Python在内存中分配一个新的空对象(0x2000)\n2. 自动调用`__init__(self, \"A\")`\n3. `self.name = \"A\"` -> 设置节点的名字\n4. `self.next = None` -> 还没有下一个节点\n5. 将完成的对象连接到变量`a`\n\n**类比：建造第一节火车车厢**\n一节名牌上写着\"A\"的火车车厢已经建好了。\n后面还没有连接任何车厢(next = None)。\n\n**引用状态**：0x2000的refcount = 1（只有变量`a`引用它）\n\n**为什么是这个顺序？** 类定义完成后，该创建实际的实例了。\n创建循环引用至少需要两个对象，所以先创建第一个。\n\n**执行顺序**：调用Node(\"A\") -> 创建实例0x2000 -> 调用__init__ -> 初始化进行中...",
+        "title": "첫 번째 노드 생성",
+        "explanation": "**`a = Node(\"A\")`**\n\nNode 클래스를 호출하여 **첫 번째 노드 객체(인스턴스)**를 생성합니다.\n이름이 \"A\"인 노드가 메모리(0x2000)에 만들어집니다.",
         "visualizationType": "pythonMemory",
         "code": "a = Node(\"A\")",
         "pythonMemoryState": {
-          "note": "调用Node(\"A\") -> 创建实例0x2000，准备调用__init__",
+          "note": "Node(\"A\") 호출 → 인스턴스 0x2000 생성, __init__ 호출 준비",
           "names": [
             {
               "name": "Node",
@@ -86,19 +86,19 @@
         }
       },
       {
-        "title": "Node A初始化（1）",
-        "explanation": "**`self.name = name`**\n\n在`__init__`方法内部执行。\n将参数`name`接收到的字符串`\"A\"`存储到实例(0x2000)的`name`属性中。\n\n**self指向什么**：刚创建的新对象0x2000。\n`self.name = name`意思是"给0x2000对象添加一个名为name的属性，把\"A\"放进去"。\n\n**类比**：给火车车厢贴上名牌。"这节车厢的名字是A！"\n\n**为什么需要名字？** 后面创建循环引用时，需要区分哪个节点指向哪个节点。\n\n**为什么是这个顺序？** 在__init__内部，先设置self.name，然后再设置self.next。\n\n**执行顺序**：给self(0x2000)添加name属性 -> 赋值\"A\" -> 0x2000.name = \"A\"完成",
+        "title": "Node A 초기화 (1)",
+        "explanation": "**`self.name = name`**\n\n`__init__` 메서드 안에서 실행됩니다.\n매개변수 `name`으로 받은 문자열 `\"A\"`를 인스턴스(0x2000)의 `name` 속성에 저장합니다.\n\n**self가 가리키는 것**: 방금 만들어진 새 객체 0x2000입니다.\n`self.name = name`은 \"0x2000 객체에 name이라는 속성을 추가하고, 거기에 \"A\"를 넣어라\"라는 뜻입니다.\n\n**비유**: 기차 칸에 이름표를 붙이는 것입니다. \"이 칸의 이름은 A입니다!\"\n\n**왜 이름이 필요한가?** 나중에 순환 참조가 만들어졌을 때, 어떤 노드가 어떤 노드를 가리키는지 구분하기 위해서입니다.\n\n**왜 이 순서인가?** __init__ 안에서 self.name을 먼저 설정하고, 그 다음 self.next를 설정합니다.\n\n**실행 순서**: self(0x2000)에 name 속성 추가 → \"A\" 문자열 할당 → 0x2000.name = \"A\" 완료",
         "visualizationType": "pythonMemory",
         "code": "self.name = name",
         "pythonMemoryState": {
-          "note": "设置Node A的name属性 = 'A'",
+          "note": "Node A의 name 속성 = 'A' 설정",
           "names": [
             {
               "name": "Node",
               "pointsTo": "class1"
             },
             {
-              "name": "a (初始化中)",
+              "name": "a (초기화 중)",
               "pointsTo": "node1",
               "highlight": true
             }
@@ -121,12 +121,12 @@
         }
       },
       {
-        "title": "Node A初始化（2）",
-        "explanation": "**`self.next = None`**\n\n将实例(0x2000)的`next`属性设为`None`。\n`next`充当**指向下一个节点的指针**。\n`None`表示"还没有指向任何东西"。\n\n**类比：火车车厢的连接器**\n火车车厢(Node A)的后方连接器(next)是空的。\n之后可以用`a.next = b`连接另一节车厢。\n\n**此时Node A的完整状态**：\n- name = \"A\"（节点的名字）\n- next = None（尚未连接）\n- refcount = 1（只有变量`a`引用它）\n\n**为什么初始化为None？** 并非每个节点在创建时都需要与其他节点连接。\n需要时再连接即可。\n\n**为什么是这个顺序？** __init__完成后，变量`a`引用已完成的Node A对象。\n\n**执行顺序**：给self(0x2000)添加next属性 -> 赋值None -> __init__完成 -> a -> 0x2000 (refcount=1)",
+        "title": "Node A 초기화 (2)",
+        "explanation": "**`self.next = None`**\n\n인스턴스(0x2000)의 `next` 속성을 `None`으로 설정합니다.\n`next`는 **다음 노드를 가리키는 포인터** 역할을 합니다.\n`None`은 \"아직 아무것도 가리키지 않음\"을 의미합니다.",
         "visualizationType": "pythonMemory",
         "code": "self.next = None",
         "pythonMemoryState": {
-          "note": "Node A完成！a -> 0x2000 (refcount=1)",
+          "note": "Node A 완성! a → 0x2000 (refcount=1)",
           "names": [
             {
               "name": "Node",
@@ -156,12 +156,12 @@
         }
       },
       {
-        "title": "创建第二个节点",
-        "explanation": "**`b = Node(\"B\")`**\n\n在内存(0x3000)中创建一个名为\"B\"的**第二个节点对象**。\n创建循环引用至少需要**两个对象**，所以创建第二个节点。\n\n**到目前为止的情况**：\n- Node A (0x2000): name=\"A\", next=None, refcount=1 (变量a)\n- Node B (0x3000): 正在创建... refcount=1 (变量b)\n- 两个节点仍然是**独立的**（没有相互连接）\n\n**类比**：两节火车车厢并排放置，但还没有用挂钩连接起来。\n\n**为什么是这个顺序？** 创建了Node A之后，该创建循环引用的对象Node B了。\n下一步会将A和B互相连接。\n\n**执行顺序**：调用Node(\"B\") -> 创建实例0x3000 -> 调用__init__(self, \"B\") -> 初始化进行中...",
+        "title": "두 번째 노드 생성",
+        "explanation": "**`b = Node(\"B\")`**\n\n이름이 \"B\"인 **두 번째 노드 객체**를 메모리(0x3000)에 생성합니다.\n순환 참조를 만들려면 **최소 두 개의 객체**가 필요하므로, 두 번째 노드를 만듭니다.\n\n**현재까지의 상황**:\n- Node A (0x2000): name=\"A\", next=None, refcount=1 (변수 a)\n- Node B (0x3000): 지금 생성 중... refcount=1 (변수 b)\n- 두 노드는 아직 **독립적**입니다 (서로 연결 X)\n\n**비유**: 기차 칸 두 개가 나란히 놓여 있지만, 아직 연결 고리로 이어지지 않은 상태입니다.\n\n**왜 이 순서인가?** Node A를 만든 후, 순환 참조를 위한 상대 노드 B를 만들 차례입니다.\n다음 스텝에서 A와 B를 서로 연결하게 됩니다.\n\n**실행 순서**: Node(\"B\") 호출 → 인스턴스 0x3000 생성 → __init__(self, \"B\") 호출 → 초기화 진행...",
         "visualizationType": "pythonMemory",
         "code": "b = Node(\"B\")",
         "pythonMemoryState": {
-          "note": "调用Node(\"B\") -> 创建实例0x3000，准备调用__init__",
+          "note": "Node(\"B\") 호출 → 인스턴스 0x3000 생성, __init__ 호출 준비",
           "names": [
             {
               "name": "Node",
@@ -189,12 +189,12 @@
         }
       },
       {
-        "title": "Node B初始化（1）",
-        "explanation": "**`self.name = name`**\n\n这次将Node B(0x3000)的`name`属性设为`\"B\"`。\n是同一个`__init__`方法，但这次`self`指向0x3000(Node B)。\n\n**同一个类，不同的实例**：\n- Node A的__init__时：self = 0x2000, name = \"A\"\n- Node B的__init__时：self = 0x3000, name = \"B\" <-- 现在是这个！\n\n类是一个蓝图，但用它创建的每个实例拥有独立的数据。\n\n**类比**：同一个工厂（类）生产的火车车厢，但每节车厢上贴着不同的名牌。\n\n**为什么是这个顺序？** 在Node B的__init__内部，先设置name属性。\n\n**执行顺序**：给self(0x3000)添加name属性 -> 赋值\"B\" -> 0x3000.name = \"B\"完成",
+        "title": "Node B 초기화 (1)",
+        "explanation": "**`self.name = name`**\n\n이번에는 Node B(0x3000)의 `name` 속성을 `\"B\"`로 설정합니다.\n같은 `__init__` 메서드이지만, 이번에 `self`는 0x3000(Node B)를 가리킵니다.\n\n**같은 클래스, 다른 인스턴스**:\n- Node A의 __init__ 때: self = 0x2000, name = \"A\"\n- Node B의 __init__ 때: self = 0x3000, name = \"B\" ← 지금 이것!\n\n클래스는 하나의 설계도이지만, 이 설계도로 만든 각 인스턴스는 독립적인 데이터를 가집니다.\n\n**비유**: 같은 공장(클래스)에서 만든 기차 칸이지만, 각 칸에는 다른 이름표가 붙습니다.\n\n**왜 이 순서인가?** Node B의 __init__ 안에서 name 속성을 먼저 설정합니다.\n\n**실행 순서**: self(0x3000)에 name 속성 추가 → \"B\" 할당 → 0x3000.name = \"B\" 완료",
         "visualizationType": "pythonMemory",
         "code": "self.name = name",
         "pythonMemoryState": {
-          "note": "设置Node B的name属性 = 'B'",
+          "note": "Node B의 name 속성 = 'B' 설정",
           "names": [
             {
               "name": "Node",
@@ -205,7 +205,7 @@
               "pointsTo": "node1"
             },
             {
-              "name": "b (初始化中)",
+              "name": "b (초기화 중)",
               "pointsTo": "node2",
               "highlight": true
             }
@@ -234,12 +234,12 @@
         }
       },
       {
-        "title": "Node B初始化（2）",
-        "explanation": "**`self.next = None`**\n\n将Node B(0x3000)的`next`属性初始化为`None`。\n和Node A一样，创建时不与其他节点连接。\n\n**现在两个独立的节点已准备就绪：**\n```\na -> Node A (0x2000): name=\"A\", next=None, refcount=1\nb -> Node B (0x3000): name=\"B\", next=None, refcount=1\n```\n两个节点的`next`都是`None`，所以它们还不知道彼此的存在。\n\n**下一步预览**：现在我们将用`a.next = b`和`b.next = a`将两个节点互相连接，创建循环结构！\n\n**类比**：火车车厢A和车厢B并排站着，但连接器还是空的。\n下一步会把它们钩在一起。\n\n**为什么是这个顺序？** 完成Node B的__init__。\n\n**执行顺序**：给self(0x3000)添加next属性 -> 赋值None -> __init__完成 -> b -> 0x3000 (refcount=1)",
+        "title": "Node B 초기화 (2)",
+        "explanation": "**`self.next = None`**\n\nNode B(0x3000)의 `next` 속성을 `None`으로 초기화합니다.\nNode A와 마찬가지로, 생성 시점에는 다른 노드와 연결되지 않습니다.",
         "visualizationType": "pythonMemory",
         "code": "self.next = None",
         "pythonMemoryState": {
-          "note": "Node B完成！a -> 0x2000, b -> 0x3000（各refcount=1）",
+          "note": "Node B 완성! a → 0x2000, b → 0x3000 (각 refcount=1)",
           "names": [
             {
               "name": "Node",
@@ -279,12 +279,12 @@
         }
       },
       {
-        "title": "建立从A到B的引用连接",
-        "explanation": "**`a.next = b`**\n\n将Node A的`next`属性设为指向Node B对象(0x3000)。\n现在**A -> B**方向的连接建立了！\n\n**引用计数变化（关键！）**：\n- Node B(0x3000)的refcount：1 -> **2**\n  - 现有引用：变量`b`（1个）\n  - 新增引用：`a.next`（增加1个！）\n  - 总计：2个\n\n**为什么这很重要**：现在即使用`del`删除变量`b`，`a.next`仍然引用着Node B，所以它的refcount变为1。不为0，所以不会被删除！\n\n**类比：连接火车车厢**\n火车车厢A的后方挂钩(next)已经钩住了车厢B。\n现在可以从A到B：`a.next.name` -> \"B\"\n\n**内存结构**：a -> Node A(next -> Node B) / b -> Node B\n\n**为什么是这个顺序？** 创建循环引用的第一个方向(A -> B)。下一行还会创建相反方向(B -> A)。\n\n**执行顺序**：访问a(0x2000)的next属性 -> 赋值b(0x3000) -> 0x3000的refcount 1->2（变量b + a.next）",
+        "title": "A에서 B로 참조 연결",
+        "explanation": "**`a.next = b`**\n\nNode A의 `next` 속성이 Node B 객체(0x3000)를 가리키도록 설정합니다.\n이제 **A → B** 방향의 연결이 만들어졌습니다!",
         "visualizationType": "pythonMemory",
         "code": "a.next = b  # A → B",
         "pythonMemoryState": {
-          "note": "A -> B已连接！0x3000 refcount=2（变量b + a.next）",
+          "note": "A → B 연결! 0x3000 refcount=2 (변수 b + a.next)",
           "names": [
             {
               "name": "Node",
@@ -324,12 +324,12 @@
         }
       },
       {
-        "title": "循环引用完成",
-        "explanation": "**`b.next = a`**\n\n将Node B的`next`属性设为指向Node A对象(0x2000)。\n现在**B -> A**方向的连接也建立了，**循环引用完成**！\n\n**循环引用就是这种状态：**\n```\nA.next -> B\nB.next -> A\n(A -> B -> A -> B -> A -> ... 无限循环！)\n```\n\n**引用计数变化**：\n- Node A(0x2000)的refcount：1 -> **2**（变量`a` + `b.next`）\n- Node B(0x3000)的refcount：之前已经是**2**（变量`b` + `a.next`）\n\n**类比：两个人互相拉手**\nA抓住了B的手(a.next=b)，B也抓住了A的手(b.next=a)。\n无论外面怎么喊"放手！"(del a, del b)，两人互相拉着手无法完全分开。\n这就是循环引用的问题！\n\n**为什么这是问题？** 在下一步中，即使执行`del a`、`del b`，由于对象互相引用，refcount永远不会变为0。\n\n**为什么是这个顺序？** 连接A->B后，添加B->A完成循环环路。\n\n**执行顺序**：访问b(0x3000)的next属性 -> 赋值a(0x2000) -> 循环引用完成：A <-> B（各refcount=2）",
+        "title": "순환 참조 완성",
+        "explanation": "**`b.next = a`**\n\nNode B의 `next` 속성이 Node A 객체(0x2000)를 가리키도록 설정합니다.\n이제 **B → A** 방향의 연결도 만들어져, **순환 참조가 완성**되었습니다!",
         "visualizationType": "pythonMemory",
         "code": "b.next = a  # B → A (순환!)",
         "pythonMemoryState": {
-          "note": "循环引用完成！A <-> B（各refcount=2）",
+          "note": "순환 참조 완성! A ⇄ B (각 refcount=2)",
           "names": [
             {
               "name": "Node",
@@ -369,12 +369,12 @@
         }
       },
       {
-        "title": "删除变量'a'",
-        "explanation": "**`del a`**\n\n删除变量`a`。但**Node A对象(0x2000)存活了下来！**\n\n**refcount变化**：\n- Node A(0x2000)的refcount：2 -> **1**\n  - 删除的引用：变量`a`（-1）\n  - 剩余的引用：`b.next`（仍然指向0x2000！）\n- refcount = 1 > 0，所以**对象不会被删除**\n\n**问题在这里开始显现！**\n即使删除了变量`a`，Node A对象仍然存活，因为Node B的`next`属性仍在引用着Node A。\n\n**类比：松开一只手**\n外面抓住A的那只手（变量a）松开了，但B仍然拉着A的手，所以A不会掉下去。\n\n**此时直接访问Node A的方法**：只能通过`b.next`。\n变量`a`已消失，`a.name`这样的直接访问会导致NameError！\n\n**为什么是这个顺序？** 循环引用完成后，用del删除变量来制造问题场景。\n\n**执行顺序**：从命名空间移除变量a -> 0x2000的refcount 2->1（只剩b.next）-> 对象保留",
+        "title": "변수 'a' 삭제",
+        "explanation": "**`del a`**\n\n변수 `a`를 삭제합니다. 하지만 **Node A 객체(0x2000)는 살아남습니다!**",
         "visualizationType": "pythonMemory",
         "code": "del a  # a 삭제",
         "pythonMemoryState": {
-          "note": "变量a已删除！但0x2000仍被b.next引用 (refcount=1)",
+          "note": "변수 a 삭제! 하지만 0x2000은 b.next가 참조 중 (refcount=1)",
           "names": [
             {
               "name": "Node",
@@ -402,12 +402,12 @@
         }
       },
       {
-        "title": "删除变量'b'与内存泄漏",
-        "explanation": "**`del b`**\n\n也删除了变量`b`。现在**完全没有办法访问这两个Node对象了！**\n但两个对象仍然在内存中。这就是**内存泄漏(Memory Leak)**！\n\n**refcount分析（关键！）**：\n- Node A(0x2000)：refcount = 1（Node B的next在引用它）\n- Node B(0x3000)：refcount = 1（Node A的next在引用它）\n- 两个对象的refcount都 > 0，所以都不会被删除！\n\n**引用计数的局限性暴露的瞬间：**\n```\n0x2000(A).next -> 0x3000(B)（给B的refcount +1）\n0x3000(B).next -> 0x2000(A)（给A的refcount +1）\n```\n两个对象互相引用，仅凭引用计数无法打破这个循环！\n从外面无法访问它们，但它们互相抓着对方无法被删除。\n\n**类比：漂浮在海上的两个人**\n两个人(A, B)在海上互相拉着手。\n与救生艇（变量a, b）的连接已被切断(del)，但由于互相拉着手，既不会沉下去（被删除）也无法被救援。\n没人能接近他们，他们继续漂浮在海上（内存中）。\n\n**解决方案**：Python的**垃圾收集器(gc模块)**会周期性地检测这些循环引用并清理内存。\n下一课(py-7-4)将学习gc模块！\n\n**执行顺序**：从命名空间移除变量b -> 0x3000的refcount 2->1 -> 两个对象都无法访问但存在于内存中 -> 程序结束",
+        "title": "변수 'b' 삭제와 메모리 누수",
+        "explanation": "**`del b`**\n\n변수 `b`도 삭제합니다. 이제 **두 Node 객체에 접근할 방법이 완전히 사라졌습니다!**\n하지만 두 객체는 여전히 메모리에 남아있습니다. 이것이 **메모리 누수(Memory Leak)**입니다!",
         "visualizationType": "pythonMemory",
         "code": "del b  # b 삭제",
         "pythonMemoryState": {
-          "note": "内存泄漏！0x2000 <-> 0x3000互相引用（各refcount=1），无法访问但不会被删除！",
+          "note": "메모리 누수! 0x2000 ⇄ 0x3000 서로 참조 (각 refcount=1), 접근 불가능하지만 삭제 안됨!",
           "names": [
             {
               "name": "Node",
@@ -430,25 +430,25 @@
   "quiz": {
     "question": "循环引用有什么问题？",
     "options": [
-      "会发生错误",
-      "程序会卡住",
-      "对象无法被删除，导致内存泄漏",
-      "对象会被删除两次"
+      "发生错误",
+      "程序冻结",
+      "由于对象未删除而导致内存泄漏",
+      "对象被删除两次"
     ],
     "correctIndex": 2,
-    "explanation": "循环引用的对象互相引用，所以refcount永远不会变为0。\n无法访问但也无法删除，导致内存泄漏！"
+    "explanation": "循环引用的对象相互引用，因此它们的引用计数不会变为 0。\n无法访问，更无法删除，导致内存泄漏！"
   },
   "misconceptions": [
     {
-      "wrong": "Python无法处理循环引用",
-      "correct": "Python的垃圾收集器(gc)会检测并清理循环引用",
-      "why": "仅靠引用计数无法捕获它们，所以单独的gc模块会周期性地查找并清理循环引用。"
+      "wrong": "파이썬은 순환 참조를 처리하지 못한다",
+      "correct": "파이썬의 가비지 컬렉터(gc)가 순환 참조를 감지하고 정리한다",
+      "why": "참조 카운팅만으론 못 잡아서 별도의 gc 모듈이 주기적으로 순환 참조를 찾아 정리합니다."
     },
     {
-      "wrong": "循环引用总是有问题的",
-      "correct": "gc会处理它们，但如果有__del__方法可能会出问题",
-      "why": "从3.4版本开始大多数情况会自动处理，但在特殊情况下建议使用weakref。"
+      "wrong": "순환 참조는 항상 문제다",
+      "correct": "gc가 정리하지만, __del__ 메서드가 있으면 문제가 될 수 있다",
+      "why": "3.4부터는 대부분 자동 처리되지만, 특수한 경우 weakref 사용을 권장합니다."
     }
   ],
-  "keyTakeaway": "循环引用 = 引用计数的局限性！gc模块单独处理它！"
+  "keyTakeaway": "순환 참조 = 참조 카운팅의 한계! gc 모듈이 별도로 처리!"
 }

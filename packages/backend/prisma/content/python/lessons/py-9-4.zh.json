@@ -1,18 +1,18 @@
 {
   "lessonId": "py-9-4",
-  "title": "类装饰器：记住状态的装饰器",
-  "concept": "通过在类中实现 `__call__` 方法，可以创建具有状态（state）的装饰器。",
+  "title": "클래스 데코레이터: 상태를 기억하는 장식",
+  "concept": "`__call__` 메서드를 구현한 클래스를 사용하여, 상태(state)를 가지는 데코레이터를 만들 수 있습니다.",
   "content": {
     "code": "class Counter:\n    def __init__(self, func):\n        self.func = func\n        self.count = 0\n\n    def __call__(self, *args, **kwargs):\n        self.count += 1\n        print(f\"'{self.func.__name__}' was called {self.count} time(s)\")\n        return self.func(*args, **kwargs)\n\n@Counter\ndef say_hello():\n    print(\"Hello!\")\n\nsay_hello()\nsay_hello()",
     "steps": [
       {
-        "title": "开始定义 Counter 类",
-        "explanation": "**`class Counter:`**\n\n**定义一个用作装饰器的类。** 在之前的课程中我们用函数制作装饰器，但类也可以充当装饰器。\n\n**为什么使用类装饰器？**\n- 函数装饰器必须通过闭包来管理状态\n- 类装饰器可以通过实例变量（`self.count`）更直观地管理状态\n- 适用于需要"状态"的装饰器，如追踪调用次数、缓存结果等\n\n**类比**：如果函数装饰器像是"在便条上记录"，那么类装饰器就像是"拥有专用笔记本的秘书"。秘书（实例）在自己的笔记本（实例变量）中记录和管理信息。\n\n**内部机制**：当 Python 遇到 `class` 语句时，创建一个类对象（0x1000），并在全局命名空间中以 `Counter` 名称注册。\n\n**为什么是这个顺序？** 必须先定义类，才能用 `@Counter` 使用它。\n\n**注意**：类本身是可调用的（callable），所以 `@Counter` 变成 `say_hello = Counter(say_hello)`。也就是说，它创建了一个实例。",
+        "title": "Counter 클래스 정의 시작",
+        "explanation": "**`class Counter:`**\n\n**데코레이터로 사용할 클래스를 정의합니다.** 이전 레슨에서는 함수로 데코레이터를 만들었지만, 클래스로도 만들 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "class Counter:",
         "pythonMemoryState": {
           "output": [],
-          "note": "Counter 类（0x1000）已被定义。",
+          "note": "Counter 클래스(0x1000)가 정의되었습니다.",
           "names": [
             {
               "name": "Counter",
@@ -32,8 +32,8 @@
         }
       },
       {
-        "title": "进入类主体",
-        "explanation": "**`class Counter:`（主体）**\n\n**进入类主体定义方法。** Python 从上到下执行类主体，注册方法。\n\n这个类有两个特殊方法（魔术方法）：\n- `__init__`：实例创建时自动调用（初始化）\n- `__call__`：当实例像函数一样用 `()` 调用时执行\n\n**类比**：这是雇佣秘书的过程。\n- `__init__` 是秘书的"入职培训"（负责哪个函数，计数器从 0 开始）\n- `__call__` 是"给秘书分配工作的方法"（每次调用时增加计数并执行原始函数）\n\n**内部机制**：Python 在单独的命名空间中执行类主体。在此定义的函数注册为类的属性（attribute）。\n\n**为什么是这个顺序？** 作为类定义的一部分，正在注册内部方法。\n\n**注意**：如果没有 `__call__`，实例就不能像函数一样被调用，因此不能用作装饰器。",
+        "title": "클래스 본문 진입",
+        "explanation": "**`class Counter:` (본문)**\n\n**클래스 본문으로 진입하여 메서드들을 정의합니다.** Python은 클래스 본문을 위에서 아래로 실행하면서 메서드를 등록합니다.",
         "visualizationType": "pythonMemory",
         "code": "class Counter:",
         "highlightOffset": [
@@ -47,7 +47,7 @@
           8
         ],
         "pythonMemoryState": {
-          "note": "Counter 类的方法正在被定义。",
+          "note": "Counter 클래스의 메서드들이 정의됩니다.",
           "names": [
             {
               "name": "Counter",
@@ -65,8 +65,8 @@
         }
       },
       {
-        "title": "定义 __init__ 方法",
-        "explanation": "**`def __init__(self, func):`**\n\n**定义初始化方法。** 当创建实例时（如 `Counter(say_hello)`）自动调用。\n\n**参数说明：**\n- `self`：新创建的实例本身\n- `func`：装饰器要包装的原始函数\n\n**函数体中做的事：**\n- `self.func = func` -> 将原始函数存储在实例中\n- `self.count = 0` -> 将调用计数初始化为 0\n\n**类比**：秘书入职第一天。\n- "你要负责的工作是这个函数（func）"\n- "从 0 开始记录工作次数（count）"\n\n**内部机制**：`__init__` 函数对象（0x1100）被创建，并注册为 `Counter` 类的 `__init__` 属性。\n\n**为什么是这个顺序？** 方法按类主体的执行顺序注册。`__init__` 先被定义。\n\n**注意**：`__init__` 是"初始化"实例的方法，不是"创建"实例的方法。真正的创建由 `__new__` 负责，但大多数情况下只需定义 `__init__` 就够了。",
+        "title": "__init__ 메서드 정의",
+        "explanation": "**`def __init__(self, func):`**\n\n**초기화 메서드를 정의합니다.** `Counter(say_hello)`처럼 인스턴스를 만들 때 자동으로 호출됩니다.",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self, func):",
         "highlightOffset": [
@@ -75,7 +75,7 @@
           2
         ],
         "pythonMemoryState": {
-          "note": "__init__ 方法已定义。",
+          "note": "__init__ 메서드 정의.",
           "names": [
             {
               "name": "__init__",
@@ -95,8 +95,8 @@
         }
       },
       {
-        "title": "定义 __call__ 方法",
-        "explanation": "**`def __call__(self, *args, **kwargs):`**\n\n**定义当实例像函数一样被调用时执行的方法。** 这是类装饰器的核心。\n\n**为什么 `__call__` 重要？**\n- 通常不能像 `obj()` 那样给对象加括号来调用\n- 但如果定义了 `__call__` 方法就可以了！\n- `say_hello()` 会被转换为 `Counter.__call__(say_hello)`\n\n**函数体中做的事：**\n- `self.count += 1` -> 增加调用次数\n- `print(...)` -> 输出调用次数日志\n- `return self.func(...)` -> 执行原始函数并返回结果\n\n**类比**：定义"给秘书分配工作"的方式。分配工作时，秘书自动记录次数并执行实际任务。\n\n**内部机制**：`__call__` 函数对象（0x1200）被创建，并注册为 `Counter` 类的 `__call__` 属性。\n\n**为什么是这个顺序？** `__call__` 在 `__init__` 之后定义。\n\n**注意**：接收 `*args, **kwargs` 并传递给 `self.func(*args, **kwargs)` 的模式与之前函数装饰器的 `wrapper` 完全相同。",
+        "title": "__call__ 메서드 정의",
+        "explanation": "**`def __call__(self, *args, **kwargs):`**\n\n**인스턴스를 함수처럼 호출할 때 실행될 메서드를 정의합니다.** 이것이 클래스 데코레이터의 핵심입니다.",
         "visualizationType": "pythonMemory",
         "code": "def __call__(self, *args, **kwargs):",
         "highlightOffset": [
@@ -106,7 +106,7 @@
           3
         ],
         "pythonMemoryState": {
-          "note": "__call__ 方法已定义。",
+          "note": "__call__ 메서드 정의.",
           "names": [
             {
               "name": "__call__",
@@ -126,8 +126,8 @@
         }
       },
       {
-        "title": "应用 @Counter 装饰器",
-        "explanation": "**`@Counter` + `def say_hello():`**\n\n**`@Counter` 等同于 `say_hello = Counter(say_hello)`。** 语法与函数装饰器相同，但工作机制不同。\n\n**函数装饰器 vs 类装饰器：**\n- 函数装饰器：`logger(say_hello)` -> 返回 wrapper 函数\n- 类装饰器：`Counter(say_hello)` -> 返回 Counter 实例\n\n也就是说，`say_hello` 现在不是函数，而是一个 **Counter 类的实例**！\n\n执行过程：\n1. 创建原始 `say_hello` 函数对象（0x2000）\n2. 调用 `Counter(0x2000)` -> 执行 `__init__`\n3. 原始函数传递给 `func` 参数\n\n**类比**：雇佣一位秘书（创建实例），并指示"请负责 say_hello 工作"。\n\n**内部机制**：调用 `Counter.__init__` 初始化实例。原始函数存储在 `self.func` 中。\n\n**为什么是这个顺序？** 在装饰器应用时创建实例，并将原始函数存储其中。\n\n**注意**：`@Counter` 之后，`say_hello` 的类型不是 `function` 而是 `Counter`！打印 `type(say_hello)` 会显示 `<class 'Counter'>`。",
+        "title": "@Counter 데코레이터 적용",
+        "explanation": "**`@Counter` + `def say_hello():`**\n\n**`@Counter`는 `say_hello = Counter(say_hello)`와 동일합니다.** 이전의 함수 데코레이터와 문법은 같지만, 동작 방식이 다릅니다.",
         "visualizationType": "pythonMemory",
         "code": "@Counter",
         "highlightOffset": [
@@ -136,7 +136,7 @@
           2
         ],
         "pythonMemoryState": {
-          "note": "开始创建 Counter 实例。",
+          "note": "Counter 인스턴스 생성을 시작합니다.",
           "names": [
             {
               "name": "func",
@@ -156,12 +156,12 @@
         }
       },
       {
-        "title": "__init__ 执行（1）",
-        "explanation": "**`self.func = func`**\n\n**将原始 `say_hello` 函数存储到实例变量 `self.func` 中。**\n\n这与函数装饰器中闭包将 `func` 存储在 Cell 中的作用相同。\n区别在于使用实例变量代替了闭包。\n\n**类比**：秘书说"我已经把 say_hello 登记到我的任务清单了"。\n原始函数被记录在秘书的笔记本（实例）中。\n\n**内部机制**：\n1. 由 `__new__` 创建新的 Counter 实例（0x3000）\n2. 调用 `__init__`，`self` 指向这个新实例\n3. 将原始 `say_hello` 函数对象赋值给 `self.func`\n\n**为什么是这个顺序？** `__init__` 的第一个工作是存储原始函数。之后 `__call__` 需要能调用这个函数。\n\n**注意**：`self.func` 是实例的"属性（attribute）"。与闭包的 Cell 不同，可以从外部通过 `say_hello.func` 直接访问。",
+        "title": "__init__ 실행 (1)",
+        "explanation": "**`self.func = func`**\n\n**원본 `say_hello` 함수를 인스턴스 변수 `self.func`에 저장합니다.**",
         "visualizationType": "pythonMemory",
         "code": "self.func = func",
         "pythonMemoryState": {
-          "note": "实例（0x3000）存储了原始函数。",
+          "note": "인스턴스(0x3000)가 원본 함수를 저장합니다.",
           "names": [
             {
               "name": "self",
@@ -193,12 +193,12 @@
         }
       },
       {
-        "title": "__init__ 执行（2）",
-        "explanation": "**`self.count = 0`**\n\n**将调用计数器初始化为 0。** 这就是类装饰器核心的"状态（state）"。\n\n**为什么状态重要？**\n- 在函数装饰器中要计数调用次数，需要使用 nonlocal 变量或可变对象（不方便）\n- 在类装饰器中，用 `self.count` 就可以简单地管理状态\n\n`__init__` 执行完毕后：\n- `self.func` = 原始 say_hello 函数\n- `self.count` = 0\n- 这个实例被赋值给 `say_hello` 名称\n\n**类比**：秘书翻开新的工作记录本，记下从 0 开始。\n\n**内部机制**：`count: 0` 存储在实例的 `__dict__` 中。`__init__` 完成后实例被返回并绑定到 `say_hello` 名称。\n\n**为什么是这个顺序？** 所有初始化完成后，`say_hello` 现在指向这个 Counter 实例。\n\n**注意**：`say_hello` 现在不是函数而是 Counter 实例。但由于定义了 `__call__`，仍然可以像 `say_hello()` 这样调用。",
+        "title": "__init__ 실행 (2)",
+        "explanation": "**`self.count = 0`**\n\n**호출 횟수 카운터를 0으로 초기화합니다.** 이것이 클래스 데코레이터의 핵심인 '상태(state)'입니다.",
         "visualizationType": "pythonMemory",
         "code": "self.count = 0",
         "pythonMemoryState": {
-          "note": "say_hello 现在是 Counter 实例，不再是函数。",
+          "note": "say_hello는 이제 함수가 아니라 Counter 인스턴스입니다.",
           "names": [
             {
               "name": "self.count",
@@ -230,12 +230,12 @@
         }
       },
       {
-        "title": "第一次调用 say_hello()",
-        "explanation": "**`say_hello()`**\n\n**调用 `say_hello`。** 但由于 `say_hello` 是 Counter 实例，Python 自动执行 `__call__` 方法。\n\n**内部发生的事情：**\n- `say_hello()` -> `Counter.__call__(say_hello)` -> `say_hello.__call__()`\n- `self` 指向 `say_hello`（Counter 实例）\n\n**类比**：对秘书说"干活！"。秘书知道自己该做什么：记录次数并执行原始任务。\n\n**内部机制**：Python 检查 `say_hello` 是否可调用。由于 Counter 类有 `__call__` 方法，所以调用 `say_hello.__call__()`。\n\n**为什么是这个顺序？** 装饰器设置完成后，这是实际使用被装饰函数的阶段。\n\n**注意**：调用方不需要区分 `say_hello()` 是函数调用还是实例调用。这就是 Python 的鸭子类型（duck typing）哲学——"如果可以调用，就当函数用。"",
+        "title": "첫 번째 say_hello() 호출",
+        "explanation": "**`say_hello()`**\n\n**`say_hello`를 호출합니다.** 하지만 `say_hello`는 Counter 인스턴스이므로, Python은 자동으로 `__call__` 메서드를 실행합니다.",
         "visualizationType": "pythonMemory",
         "code": "say_hello()",
         "pythonMemoryState": {
-          "note": "调用实例，触发 __call__。",
+          "note": "인스턴스를 호출하여 __call__이 실행됩니다.",
           "names": [
             {
               "name": "self",
@@ -253,12 +253,12 @@
         }
       },
       {
-        "title": "__call__ 执行 - 增加 count（1）",
-        "explanation": "**`self.count += 1`**\n\n**将调用次数增加 1。** `self.count` 从 0 变为 1。\n\n这是类装饰器的核心优势：\n- 状态存储在实例变量（`self.count`）中\n- 每次调用时更新此状态\n- 状态随实例永久保持\n\n**类比**：秘书在记录本上打勾。"第1次执行任务！"\n\n**内部机制**：`self.count += 1` 实际上是 `self.count = self.count + 1`。由于 Python 的 int 是不可变的（immutable），会创建新的整数对象 `1`，`self.count` 指向它。\n\n**为什么是这个顺序？** 在执行原始函数之前先记录调用次数。\n\n**注意**：在函数装饰器中实现相同功能需要 `nonlocal count`，代码更复杂。类装饰器用 `self.count` 直观管理。",
+        "title": "__call__ 실행 - count 증가 (1)",
+        "explanation": "**`self.count += 1`**\n\n**호출 횟수를 1 증가시킵니다.** `self.count`가 0에서 1이 됩니다.",
         "visualizationType": "pythonMemory",
         "code": "self.count += 1",
         "pythonMemoryState": {
-          "note": "count 已增加到 1。",
+          "note": "count가 1로 증가했습니다.",
           "names": [
             {
               "name": "self.count",
@@ -278,15 +278,15 @@
         }
       },
       {
-        "title": "__call__ 执行 - 输出消息（1）",
-        "explanation": "**`print(f\"'{self.func.__name__}' was called {self.count} time(s)\")`**\n\n**输出包含调用次数的日志消息。** 输出 `\"'say_hello' was called 1 time(s)\"`。\n\n使用的实例变量：\n- `self.func.__name__` -> `\"say_hello\"`（原始函数的名称）\n- `self.count` -> `1`（当前调用次数）\n\n**类比**：秘书报告"第1次执行 say_hello 任务！"\n\n**内部机制**：从 `self.func` 获取原始函数对象，通过 `.__name__` 属性获取函数名字符串。f-string 组合这些值进行输出。\n\n**为什么是这个顺序？** 增加调用次数后输出日志。在执行原始函数之前留下记录。",
+        "title": "__call__ 실행 - 메시지 출력 (1)",
+        "explanation": "**`print(f\"'{self.func.__name__}' was called {self.count} time(s)\")`**\n\n**호출 횟수와 함께 로그 메시지를 출력합니다.** `\"'say_hello' was called 1 time(s)\"`가 출력됩니다.\n\n사용된 인스턴스 변수:\n- `self.func.__name__` -> `\"say_hello\"` (원본 함수의 이름)\n- `self.count` -> `1` (현재 호출 횟수)\n\n**비유**: 비서가 \"say_hello 업무를 1번째 수행합니다!\"라고 보고하는 것입니다.\n\n**내부 동작**: `self.func`에서 원본 함수 객체를 가져오고, `.__name__` 속성으로 함수 이름 문자열을 얻습니다. f-string이 이 값들을 조합하여 출력합니다.\n\n**왜 이 순서인가?** 호출 횟수를 증가시킨 후 로그를 출력합니다. 원본 함수 실행 전에 기록을 남기는 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"'{self.func.__name__}' was called {self.count} time(s)\")",
         "pythonMemoryState": {
           "output": [
             "'say_hello' was called 1 time(s)"
           ],
-          "note": "调用次数已输出。",
+          "note": "호출 횟수 출력.",
           "names": [
             {
               "name": "self.count",
@@ -306,12 +306,12 @@
         }
       },
       {
-        "title": "__call__ 执行 - 调用原始函数（1）",
-        "explanation": "**`return self.func(*args, **kwargs)`**\n\n**调用存储在实例中的原始 `say_hello` 函数。**\n\n`self.func` 是在 `__init__` 中保存的原始函数。\n通过 `*args, **kwargs` 将调用时传递的参数原样转发给原始函数。\n（本例中没有参数，所以等同于 `self.func()`）\n\n**类比**：秘书记录次数后，执行实际任务（原始函数）。\n\n**内部机制**：从 `self.func` 获取函数对象（0x2000）并调用。创建新的执行帧，原始 `say_hello` 的函数体开始执行。\n\n**为什么是这个顺序？** 记录日志后执行原始函数的实际工作。通过 `return` 透明地返回结果。\n\n**注意**：如果漏掉 `return`，原始函数的返回值会丢失。务必使用 `return self.func(...)` 传递结果。",
+        "title": "__call__ 실행 - 원본 함수 호출 (1)",
+        "explanation": "**`return self.func(*args, **kwargs)`**\n\n**인스턴스에 저장된 원본 `say_hello` 함수를 호출합니다.**\n\n`self.func`은 `__init__`에서 저장해둔 원본 함수입니다.\n`*args, **kwargs`를 통해 호출 시 전달된 인자를 그대로 원본 함수에 전달합니다.\n(이번 경우에는 인자가 없으므로 `self.func()`과 동일합니다)\n\n**비유**: 비서가 횟수를 기록한 뒤, 실제 업무(원본 함수)를 수행하는 것입니다.\n\n**내부 동작**: `self.func`에서 함수 객체(0x2000)를 가져와 호출합니다. 새로운 실행 프레임이 생성되어 원본 `say_hello`의 본문이 실행됩니다.\n\n**왜 이 순서인가?** 로그를 남긴 후 원본 함수의 실제 작업을 수행합니다. `return`으로 결과를 투명하게 반환합니다.\n\n**주의**: `return`을 빼먹으면 원본 함수의 반환값이 사라집니다. 항상 `return self.func(...)`로 결과를 전달해야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "return self.func(*args, **kwargs)",
         "pythonMemoryState": {
-          "note": "执行原始函数。",
+          "note": "원본 함수 실행.",
           "names": [
             {
               "name": "func",
@@ -329,15 +329,15 @@
         }
       },
       {
-        "title": "执行 say_hello 函数体（1）",
-        "explanation": "**`print(\"Hello!\")`**\n\n**原始 `say_hello` 函数输出 `\"Hello!\"`。**\n\n第一次调用的完整输出：\n1. `'say_hello' was called 1 time(s)`（来自 __call__）\n2. `Hello!`（来自原始函数）\n\n**关键要点**：装饰器添加的功能（调用次数追踪）和原始函数的功能协同工作。\n\n**类比**：秘书记录了次数（装饰器功能），并执行了实际任务（原始功能）。\n\n**内部机制**：原始 `say_hello` 的函数体执行，返回值（`None`）通过 `__call__` 传递给调用者。\n\n**为什么是这个顺序？** 这是 `self.func()` 调用执行原始函数体的结果。",
+        "title": "say_hello 본문 실행 (1)",
+        "explanation": "**`print(\"Hello!\")`**\n\n**원본 `say_hello` 함수가 `\"Hello!\"`를 출력합니다.**\n\n첫 번째 호출의 전체 출력:\n1. `'say_hello' was called 1 time(s)` (__call__에서 출력)\n2. `Hello!` (원본 함수에서 출력)\n\n**핵심 포인트**: 데코레이터가 추가한 기능(호출 횟수 추적)과 원본 함수의 기능이 함께 동작합니다.\n\n**비유**: 비서가 횟수를 기록하고(데코레이터 기능), 실제 업무를 처리한(원본 기능) 것입니다.\n\n**내부 동작**: 원본 `say_hello`의 본문이 실행되고, 반환값(`None`)이 `__call__`을 통해 호출자에게 전달됩니다.\n\n**왜 이 순서인가?** `self.func()` 호출의 결과로 원본 함수 본문이 실행되는 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(\"Hello!\")",
         "pythonMemoryState": {
           "output": [
             "Hello!"
           ],
-          "note": "第一次调用完成。",
+          "note": "첫 번째 호출 완료.",
           "names": [
             {
               "name": "func",
@@ -355,13 +355,13 @@
         }
       },
       {
-        "title": "第二次调用 say_hello()",
-        "explanation": "**`say_hello()`**（第二次调用）\n\n**同一个 Counter 实例的 `__call__` 再次被调用。** 关键在于这是**同一个实例**。\n\n**状态持久化的工作原理：**\n- 第一次调用时 `self.count` 从 0 -> 1\n- 第二次调用时 `self.count` 从 1 开始（不是 0）\n- 只要实例存在，状态（`self.count`）就会保持\n\n**类比**：再次给同一位秘书分配工作。秘书的记录本上已经有做了1次工作的记录。这次做完就是2次了。\n\n**内部机制**：`say_hello` 仍然指向同一个 Counter 实例（0x3000）。调用 `__call__`，`self` 引用同一个实例。\n\n**为什么是这个顺序？** 这是实际验证类装饰器"状态持久化"能力的阶段。\n\n**注意**：如果对另一个函数也应用 `@Counter`，那个函数会有自己独立的 Counter 实例，计数独立管理。",
+        "title": "두 번째 say_hello() 호출",
+        "explanation": "**`say_hello()`** (두 번째 호출)\n\n**같은 Counter 인스턴스의 `__call__`이 다시 호출됩니다.** 핵심은 **같은 인스턴스**라는 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "say_hello()",
         "occurrence": 2,
         "pythonMemoryState": {
-          "note": "同一个实例（0x3000）再次被调用。",
+          "note": "같은 인스턴스(0x3000)가 다시 호출됩니다.",
           "names": [
             {
               "name": "self",
@@ -379,15 +379,15 @@
         }
       },
       {
-        "title": "__call__ 执行 - 增加 count（2）",
-        "explanation": "**`self.count += 1`**\n\n**`self.count` 从 1 增加到 2。** 由于上次调用的状态被保留，起始值是 1 而不是 0。\n\n**这就是类装饰器的核心价值：**\n- 函数调用之间状态得以保持\n- 实例变量在实例的生命周期内一直存活\n- 每次调用不会重置，而是累积\n\n**类比**：秘书在记录本上打第二个勾。"第2次执行任务！"\n记录本不是每次重新创建的，而是在同一本记录本上持续记录。\n\n**内部机制**：`self.count = self.count + 1` -> `self.count = 1 + 1` -> `self.count = 2`。创建新的整数对象 `2` 并绑定到 `self.count`。\n\n**为什么是这个顺序？** 与之前相同的模式：增加调用次数 -> 输出日志 -> 调用原始函数。",
+        "title": "__call__ 실행 - count 증가 (2)",
+        "explanation": "**`self.count += 1`**\n\n**`self.count`가 1에서 2로 증가합니다.** 이전 호출의 상태가 그대로 유지되어 있기 때문에, 0이 아니라 1에서 시작합니다.\n\n**이것이 클래스 데코레이터의 핵심 가치입니다:**\n- 함수 호출 간에 상태가 유지됩니다\n- 인스턴스 변수는 인스턴스의 수명 동안 살아있습니다\n- 매 호출마다 초기화되지 않고 누적됩니다\n\n**비유**: 비서의 장부에 두 번째 체크 표시를 합니다. \"2번째 업무 수행!\"\n장부는 매번 새로 만드는 게 아니라, 같은 장부에 계속 기록합니다.\n\n**내부 동작**: `self.count = self.count + 1` -> `self.count = 1 + 1` -> `self.count = 2`. 새로운 정수 객체 `2`가 생성되어 `self.count`에 바인딩됩니다.\n\n**왜 이 순서인가?** 이전과 동일한 패턴: 호출 횟수 증가 -> 로그 출력 -> 원본 함수 호출.",
         "visualizationType": "pythonMemory",
         "code": "self.count += 1",
         "pythonMemoryState": {
           "output": [
             "..."
           ],
-          "note": "现有状态被保留，count 变为 2。",
+          "note": "기존 상태가 유지되어 count가 2가 되었습니다.",
           "names": [
             {
               "name": "self.count",
@@ -407,15 +407,15 @@
         }
       },
       {
-        "title": "__call__ 执行 - 输出消息（2）",
-        "explanation": "**`print(f\"'{self.func.__name__}' was called {self.count} time(s)\")`**\n\n**输出 `\"'say_hello' was called 2 time(s)\"`。** 由于 `self.count` 为 2，准确记录了已被调用两次。\n\n这个输出确认了状态持久化确实在工作。\n\n**类比**：秘书报告"第2次执行 say_hello 任务！"\n\n**内部机制**：与之前相同的 f-string 创建和输出过程。不过由于 `self.count` 变为 2，输出结果不同。\n\n**为什么是这个顺序？** 增加计数后输出日志。\n\n**实际应用**：这种模式对 API 调用次数限制（rate limiting）、函数使用统计、记忆化（memoization）等非常有用。",
+        "title": "__call__ 실행 - 메시지 출력 (2)",
+        "explanation": "**`print(f\"'{self.func.__name__}' was called {self.count} time(s)\")`**\n\n**`\"'say_hello' was called 2 time(s)\"`를 출력합니다.** `self.count`가 2이므로, 두 번 호출되었다는 것이 정확히 기록됩니다.\n\n이 출력을 통해 상태 유지가 실제로 작동하고 있음을 확인할 수 있습니다.\n\n**비유**: 비서가 \"say_hello 업무를 2번째 수행합니다!\"라고 보고합니다.\n\n**내부 동작**: 이전과 동일한 f-string 생성 및 출력 과정입니다. 다만 `self.count`의 값이 2로 변했으므로 출력 결과가 다릅니다.\n\n**왜 이 순서인가?** 카운트 증가 후 로그를 출력합니다.\n\n**실전 활용**: 이런 패턴은 API 호출 횟수 제한(rate limiting), 함수 사용 통계, 캐싱(memoization) 등에 유용합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"'{self.func.__name__}' was called {self.count} time(s)\")",
         "pythonMemoryState": {
           "output": [
             "'say_hello' was called 2 time(s)"
           ],
-          "note": "第2次调用日志。",
+          "note": "2번째 호출 로그.",
           "names": [
             {
               "name": "self.count",
@@ -435,12 +435,12 @@
         }
       },
       {
-        "title": "__call__ 执行 - 调用原始函数（2）",
-        "explanation": "**`return self.func(*args, **kwargs)`**\n\n**第二次调用原始 `say_hello` 函数。** 每次都使用存储在 `self.func` 中的同一个原始函数。\n\n**类比**：秘书再次执行实际任务。虽然是同样的任务，但次数记录在累积。\n\n**内部机制**：从 `self.func` 获取原始函数对象并调用。创建新的执行帧。\n\n**为什么是这个顺序？** 同一模式的最后一步：调用原始函数并返回结果。",
+        "title": "__call__ 실행 - 원본 함수 호출 (2)",
+        "explanation": "**`return self.func(*args, **kwargs)`**\n\n**두 번째로 원본 `say_hello` 함수를 호출합니다.** 매번 같은 `self.func`에 저장된 원본 함수를 사용합니다.\n\n**비유**: 비서가 다시 실제 업무를 수행합니다. 같은 업무지만, 횟수 기록은 누적되고 있습니다.\n\n**내부 동작**: `self.func`에서 원본 함수 객체를 가져와 호출합니다. 새 실행 프레임이 생성됩니다.\n\n**왜 이 순서인가?** 이전과 동일한 패턴의 마지막 단계: 원본 함수를 호출하고 결과를 반환합니다.",
         "visualizationType": "pythonMemory",
         "code": "return self.func(*args, **kwargs)",
         "pythonMemoryState": {
-          "note": "再次执行原始函数。",
+          "note": "원본 함수 재실행.",
           "names": [
             {
               "name": "self.count",
@@ -460,15 +460,15 @@
         }
       },
       {
-        "title": "执行 say_hello 函数体（2）",
-        "explanation": "**`print(\"Hello!\")`**\n\n**原始函数输出 `\"Hello!\"`。** 第二次调用完成。\n\n**最终完整输出：**\n1. `'say_hello' was called 1 time(s)`（第1次 __call__）\n2. `Hello!`（第1次原始函数）\n3. `'say_hello' was called 2 time(s)`（第2次 __call__）\n4. `Hello!`（第2次原始函数）\n\n**总结 - 类装饰器的优势：**\n- **直观的状态管理**：用 `self.count` 追踪调用次数\n- **同时管理多个状态**：可以使用 `self.func`、`self.count` 等多个实例变量\n- **外部可访问状态**：可以通过 `say_hello.count` 查看当前调用次数\n\n**实际应用**：类装饰器在需要复杂状态管理时特别有用。例如：结果缓存、执行时间统计、访问控制等。\n\n**注意**：类装饰器不能使用 `functools.wraps`，所以原始函数的元数据（`__name__`、`__doc__` 等）不会自动保留。",
+        "title": "say_hello 본문 실행 (2)",
+        "explanation": "**`print(\"Hello!\")`**\n\n**원본 함수가 `\"Hello!\"`를 출력합니다.** 두 번째 호출이 완료됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(\"Hello!\")",
         "pythonMemoryState": {
           "output": [
             "Hello!"
           ],
-          "note": "所有执行已完成。",
+          "note": "모든 실행이 완료되었습니다.",
           "names": [
             {
               "name": "self.count",
@@ -491,22 +491,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "要将类用作装饰器，需要实现什么方法？",
+    "question": "我需要实现哪些方法才能将我的类用作装饰器？",
     "options": [
-      "__init__",
-      "__decorator__",
-      "__call__",
-      "__wrapper__"
+      "__初始化__",
+      "__装饰器__",
+      "__称呼__",
+      "__包装__"
     ],
     "correctIndex": 2,
-    "explanation": "`__call__` 方法使类的实例可以像函数一样用 `()` 来调用。\n调用被装饰的函数实际上就是调用这个 `__call__` 方法。"
+    "explanation": "`__call__` 方法允许您像函数一样通过添加 `()` 来调用类的实例。\n调用应用了装饰器的函数意味着调用这个 __call__ 方法。"
   },
   "misconceptions": [
     {
-      "wrong": "装饰器必须是函数。",
-      "correct": "类也可以作为装饰器。",
-      "why": "任何可调用（callable）的对象——即拥有 `__call__` 方法的类的实例——都可以充当装饰器。"
+      "wrong": "데코레이터는 항상 함수여야 한다.",
+      "correct": "클래스도 데코레이터가 될 수 있습니다.",
+      "why": "호출 가능한(callable) 객체, 즉 `__call__` 메서드를 가진 클래스의 인스턴스는 모두 데코레이터로 동작할 수 있습니다."
     }
   ],
-  "keyTakeaway": "类装饰器在创建需要"状态"的装饰器时非常有用，例如统计函数调用次数。"
+  "keyTakeaway": "클래스 데코레이터는 함수 호출 횟수를 세는 등 '상태'가 필요한 데코레이터를 만들 때 유용합니다."
 }

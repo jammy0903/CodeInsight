@@ -1,0 +1,157 @@
+{
+  "lessonId": "cpp-1-3",
+  "title": "Reference vs Pointer",
+  "concept": "A reference is a safe alias that cannot be null and cannot be rebound.",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int a = 10;\n    int b = 20;\n\n    int& ref = a;\n    int* ptr = &a;\n\n    ptr = &b;\n    cout << ref << \" \" << *ptr << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Create variables a and b",
+        "explanation": "Two int variables are allocated on the stack.",
+        "visualizationType": "cMemory",
+        "code": "int a = 10;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "20",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "Create a reference ref",
+        "explanation": "`ref` is an alias for `a`. They share the same address, and once bound, they cannot be changed to other variables.",
+        "visualizationType": "cMemory",
+        "code": "int& ref = a;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "20",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "ref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "a",
+            "isReference": true
+          }
+        ]
+      },
+      {
+        "title": "Create pointer ptr",
+        "explanation": "`ptr` is a separate variable that stores the address of `a`. Unlike references, they occupy their own memory.",
+        "visualizationType": "cMemory",
+        "code": "int* ptr = &a;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "20",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "ref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "a",
+            "isReference": true
+          },
+          {
+            "name": "ptr",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1008",
+            "points_to": "a"
+          }
+        ]
+      },
+      {
+        "title": "Pointer reallocation",
+        "explanation": "With `ptr = &b` a pointer can point to another variable. On the other hand, `ref` still points only to `a`.",
+        "visualizationType": "cMemory",
+        "code": "ptr = &b;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "20",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "ref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "a",
+            "isReference": true
+          },
+          {
+            "name": "ptr",
+            "value": "0x1004",
+            "type": "int*",
+            "address": "0x1008",
+            "points_to": "b",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "Check results",
+        "explanation": "`ref` still outputs `a` (10) and `*ptr` outputs `b` (20).\n\n**Key difference**: Pointers can be reassigned, references cannot.",
+        "visualizationType": "terminal",
+        "code": "cout << ref << \" \" << *ptr << endl;",
+        "stdout": "10 20"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the difference between a reference and a pointer?",
+    "options": [
+      "References must be initialized when declared",
+      "Pointer can be nullptr",
+      "References can also be rebound to other variables later.",
+      "A pointer has its own memory address"
+    ],
+    "correctIndex": 2,
+    "explanation": "Once a reference is bound, it points to the same object until the end. Rebinding is not possible."
+  },
+  "misconceptions": [
+    {
+      "wrong": "References can be reassigned to other variables",
+      "correct": "ref = b copies the value of b to a pointed to by ref, not changing the target of ref.",
+      "why": "A reference is an alias, so all operations on ref apply to the original variable."
+    }
+  ],
+  "keyTakeaway": "A pointer is a variable that holds an address, and a reference is another name for the original. Choose according to your purpose."
+}

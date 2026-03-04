@@ -1,13 +1,13 @@
 {
   "lessonId": "java-5-4",
-  "title": "static 方法",
-  "concept": "static 方法是无需创建对象即可调用的"工具函数"。",
+  "title": "static 메서드",
+  "concept": "static 메서드는 객체 없이 호출 가능한 '유틸리티 함수'다.",
   "content": {
-    "code": "class MathUtil {\n    static int add(int a, int b) {\n        return a + b;\n    }\n    \n    int instanceValue = 10;\n    \n    static void tryAccess() {\n        // System.out.println(instanceValue); // 错误！\n    }\n}\n\nint result = MathUtil.add(3, 5);\nSystem.out.println(result);",
+    "code": "class MathUtil {\n    static int add(int a, int b) {\n        return a + b;\n    }\n    \n    int instanceValue = 10;\n    \n    static void tryAccess() {\n        // System.out.println(instanceValue); // 에러!\n    }\n}\n\nint result = MathUtil.add(3, 5);\nSystem.out.println(result);",
     "steps": [
       {
-        "title": "使用 static 方法",
-        "explanation": "**执行流程：**\n1. 调用 `MathUtil.add(3, 5)`。\n2. 栈上为 `add` 方法创建一个新的栈帧。\n3. `a=3`、`b=5` 存储在该栈帧中。\n\n**工具箱：**\n不需要创建 `MathUtil` 对象（`new`）。\n就像从工具箱（`MathUtil`）中直接取出工具（`add`）来使用。",
+        "title": "static 메서드 사용",
+        "explanation": "**실행 순서:**\n1. `MathUtil.add(3, 5)`를 호출합니다.\n2. Stack에 `add` 메서드를 위한 프레임이 새로 생깁니다.\n3. `a=3`, `b=5`가 그 안에 저장됩니다.\n\n**도구 상자:**\n`MathUtil` 객체를 만들(`new`) 필요가 없습니다.\n그냥 도구함(`MathUtil`)에서 도구(`add`)를 꺼내 쓰는 느낌입니다.",
         "visualizationType": "javaMemory",
         "code": "static int add(int a, int b) {",
         "highlightOffset": [
@@ -47,8 +47,8 @@
         }
       },
       {
-        "title": "返回结果并输出",
-        "explanation": "**执行流程：**\n1. 返回 `8`，`add` 栈帧被销毁。\n2. 值 `8` 存储到 `main` 栈帧的 `result` 变量中。\n3. 输出到屏幕。\n\n**干净退场：**\n因为不涉及任何对象状态，用完之后不留痕迹地消失。",
+        "title": "결과 반환 및 출력",
+        "explanation": "**실행 순서:**\n1. `8`을 반환하며 `add` 스택 프레임이 사라집니다.\n2. `main` 스택 프레임의 `result` 변수에 `8`이 저장됩니다.\n3. 화면에 출력합니다.\n\n**깔끔한 뒷정리:**\n객체 상태를 건드리지 않으니, 쓰고 나면 흔적도 없이 사라집니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(result);",
         "javaMemoryState": {
@@ -72,8 +72,8 @@
         }
       },
       {
-        "title": "访问限制（static -> instance）",
-        "explanation": "**执行流程：**\n1. 取消此行注释将导致编译错误。\n\n**存在的矛盾：**\n`tryAccess()` 不需要 `new` 就能运行，但 `instanceValue` 必须 `new` 之后才会存在。\n就像试图呼唤一个还没出生的朋友——不可能的事。",
+        "title": "접근 제한 (static -> instance)",
+        "explanation": "**실행 순서:**\n1. 이 줄의 주석을 풀면 컴파일 에러가 납니다.\n\n**존재의 모순:**\n`tryAccess()`는 `new` 없이도 실행되는데, `instanceValue`는 `new`를 해야만 태어나는 변수입니다.\n\"태어나지 않은 친구 이름을 부르는 격\"이라 불가능합니다.",
         "visualizationType": "javaMemory",
         "code": "static void tryAccess() {",
         "highlightOffset": [
@@ -89,27 +89,27 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "什么时候最适合使用 static 方法？",
+    "question": "什么时候最好使用静态方法？",
     "options": [
-      "需要修改每个对象的状态（字段）时。",
-      "仅基于输入值进行计算的工具函数。",
-      "通过重写（Overriding）实现多态时。",
-      "代替构造函数来初始化对象时。"
+      "当需要修改各个对象的状态（字段）时",
+      "当它是仅使用输入值进行计算的效用函数时",
+      "通过重写实现多态性时",
+      "当初始化对象而不是构造函数时"
     ],
     "correctIndex": 1,
-    "explanation": "像 `Math.max()`、`Arrays.sort()` 这样不依赖对象状态、仅基于输入值运行的函数，用 `static` 最为高效。"
+    "explanation": "将仅对输入值进行操作而不管对象状态如何的函数（例如“Math.max()”和“Arrays.sort()”）设置为“static”是高效的。"
   },
   "misconceptions": [
     {
-      "wrong": "在 static 方法中可以使用 this。",
-      "correct": "绝对不行。",
-      "why": "`this` 指的是"当前对象"，但在 `static` 方法执行时，可能根本就没有"当前对象"这个概念。"
+      "wrong": "static 메서드 안에서 this를 쓸 수 있다.",
+      "correct": "절대 못 씁니다.",
+      "why": "`this`는 '현재 객체'를 뜻하는데, `static` 메서드가 실행되는 시점에는 '현재 객체'라는 개념 자체가 없을 수도 있기 때문입니다."
     },
     {
-      "wrong": "static 方法可以被重写（Override）。",
-      "correct": "不能。\n只能被"隐藏（Hiding）"。",
-      "why": "重写依赖于运行时查看对象的实际类型，而 static 方法在编译时就根据变量的声明类型确定了。"
+      "wrong": "static 메서드는 오버라이딩 된다.",
+      "correct": "안 됩니다.\n'Hiding(가리기)'만 됩니다.",
+      "why": "오버라이딩은 런타임에 '객체 타입'을 보고 찾아가는 것인데, static은 컴파일 타임에 '변수 타입'만 보고 결정나기 때문입니다."
     }
   ],
-  "keyTakeaway": "static 方法是"独立的工具"。没有 this，也不能访问实例变量。"
+  "keyTakeaway": "static 메서드는 '독립적인 도구'다. this도 없고, 인스턴스 변수도 못 만진다."
 }

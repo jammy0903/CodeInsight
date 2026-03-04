@@ -1,13 +1,13 @@
 {
   "lessonId": "js-1-2",
-  "title": "setTimeout 与任务队列",
-  "concept": "即使 setTimeout(fn, 0) 也不会立即执行。它会通过 Web API 进入任务队列",
+  "title": "setTimeout과 Task Queue",
+  "concept": "setTimeout(fn, 0)도 즉시 실행되지 않는다. Web API를 거쳐 Task Queue로 이동한다",
   "content": {
     "code": "console.log('start');\n\nsetTimeout(() => {\n  console.log('timeout');\n}, 0);\n\nconsole.log('end');",
     "steps": [
       {
-        "title": "执行 console.log('start')",
-        "explanation": "程序开始运行，第一行同步代码 `console.log('start')` 被压入调用栈并立即执行。\n输出 'start'。",
+        "title": "console.log('start') 실행",
+        "explanation": "프로그램이 시작되어 첫 번째 동기 코드인 `console.log('start')`가 콜 스택에 추가되고 즉시 실행됩니다.\n'start'가 출력됩니다.",
         "visualizationType": "eventLoop",
         "code": "console.log('start');",
         "eventLoopState": {
@@ -20,9 +20,9 @@
         }
       },
       {
-        "title": "委托 setTimeout",
-        "explanation": "当 JS 引擎遇到 `setTimeout` 时，它会将计时器的设置和回调函数委托给浏览器的 Web API。\nJS 引擎不会等待计时器——它会立即执行下一行代码。\n\n**类比**：就像在餐厅点餐（setTimeout），拿到叫号器（回调函数），然后坐下来做其他事情（执行后续代码），同时厨房（Web API）准备你的食物。食物做好时叫号器会响。",
-        "keyInsight": "JavaScript 引擎自身不计时——它将这个工作交给浏览器。",
+        "title": "setTimeout 위임",
+        "explanation": "JS 엔진이 `setTimeout`을 만나면, 타이머 설정과 콜백 함수를 브라우저의 Web API에 위임합니다.\nJS 엔진은 타이머를 기다리지 않고 바로 다음 코드로 넘어갑니다.\n\n**비유**: 식당에서 주문(setTimeout)을 넣고 진동벨(Callback)을 받은 뒤, 자리에 앉아 다른 일(다음 코드 실행)을 하는 것과 같습니다.\n주방(Web API)에서 요리가 다 되면 진동벨이 울리겠죠.",
+        "keyInsight": "JavaScript 엔진은 타이머를 직접 세지 않고 브라우저에 떠넘깁니다.",
         "visualizationType": "eventLoop",
         "code": "setTimeout(() => {",
         "highlightOffset": [
@@ -41,8 +41,8 @@
         }
       },
       {
-        "title": "执行 console.log('end')",
-        "explanation": "因为 `setTimeout` 已经交给了 Web API，主线程不会阻塞——它立即执行下一行同步代码 `console.log('end')`。\n输出 'end'。",
+        "title": "console.log('end') 실행",
+        "explanation": "`setTimeout`이 Web API로 넘어갔기 때문에, 메인 스레드는 멈추지 않고 다음 동기 코드인 `console.log('end')`를 실행합니다.\n'end'가 출력됩니다.",
         "visualizationType": "eventLoop",
         "code": "console.log('end');",
         "eventLoopState": {
@@ -60,9 +60,9 @@
         }
       },
       {
-        "title": "执行回调函数",
-        "explanation": "当所有同步代码执行完毕且调用栈为空时，事件循环从任务队列中取出 `setTimeout` 回调函数并压入调用栈。\n此时回调内的 `console.log('timeout')` 才会执行。",
-        "keyInsight": "异步回调总是在所有同步代码执行完毕之后才运行。",
+        "title": "콜백 실행",
+        "explanation": "모든 동기 코드가 실행되어 콜 스택이 비워지면, 이벤트 루프가 Task Queue에 대기 중이던 `setTimeout`의 콜백 함수를 가져와 콜 스택에 올립니다.\n이제서야 콜백 안의 `console.log('timeout')`이 실행됩니다.",
+        "keyInsight": "비동기 콜백은 항상 모든 동기 코드가 끝난 후에 실행됩니다.",
         "visualizationType": "eventLoop",
         "code": "console.log('timeout');",
         "eventLoopState": {
@@ -85,20 +85,20 @@
   "quiz": {
     "question": "setTimeout(() => console.log('A'), 0) 和 console.log('B') 的输出顺序是什么？",
     "options": [
-      "A → B（setTimeout 是 0ms 所以先执行）",
-      "B → A（同步代码先执行）",
-      "同时打印",
-      "随机顺序"
+      "A→B（首先是因为setTimeout为0ms）",
+      "B → A（同步代码优先）",
+      "同时输出",
+      "随机的"
     ],
     "correctIndex": 1,
-    "explanation": "即使 setTimeout(fn, 0) 也需要经过 Web API → 任务队列的流程。\n只有当所有同步代码（console.log('B')）执行完毕后，任务队列中的回调才会执行。"
+    "explanation": "setTimeout(fn, 0) 也通过 Web API → 任务队列。\n任务队列的回调仅在所有同步代码（console.log('B')）执行完毕后才会执行。"
   },
   "misconceptions": [
     {
-      "wrong": "setTimeout(fn, 0) 会立即执行",
-      "correct": "不会。\n0ms 之后它只是进入了"任务队列"——它还需要等待。",
-      "why": "**运行至完成（Run-to-Completion）**：在调用栈上的所有代码**完全执行完毕**之前，事件循环无法将任何新任务压入栈中。\n即使是 0ms 也意味着"稍后执行"。"
+      "wrong": "setTimeout(fn, 0)은 즉시 실행된다",
+      "correct": "아닙니다.\n0ms 후 '대기열(Task Queue)'에 들어갈 뿐입니다.",
+      "why": "**Run-to-Completion**: 현재 스택에 있는 모든 코드가 **완전히 끝날 때까지** 이벤트 루프는 새로운 작업을 스택에 넣지 못합니다.\n0ms라도 '나중'입니다."
     }
   ],
-  "keyTakeaway": "setTimeout = 注册到 Web API → 计时器触发后进入任务队列 → 调用栈为空时执行"
+  "keyTakeaway": "setTimeout = Web API로 등록 → 타이머 완료 시 Task Queue → 콜 스택 비면 실행"
 }

@@ -1,14 +1,14 @@
 {
   "lessonId": "java-2-3",
-  "title": "Optional 使用方法",
-  "concept": "Optional 用来明确表示"值可能不存在"，替代 null",
+  "title": "Optional 사용법",
+  "concept": "Optional은 null 대신 '값이 없을 수 있음'을 명시적으로 표현한다",
   "content": {
     "code": "Optional<String> opt1 = Optional.of(\"hello\");\nOptional<String> opt2 = Optional.empty();\nOptional<String> opt3 = Optional.ofNullable(null);\n\nString value = opt1.get();\n\nif (opt2.isPresent()) {\n    System.out.println(opt2.get());\n}\n\nString result = opt3.orElse(\"default\");\n\nopt1.ifPresent(s -> System.out.println(s));",
     "steps": [
       {
-        "title": "Optional.of() - 创建盒子",
-        "explanation": "**执行顺序：**\n1. 调用 `Optional.of(\"hello\")`。\n2. 在堆上创建 `Optional` 对象（盒子）。\n3. 将 \"hello\" 值存储在内部。\n\n**内存中发生了什么：**\n在堆上创建了一个叫 `Optional` 的**坚固盒子（Wrapper）**，并将 \"hello\" 字符串安全地放入其中。\n\n**警告：** `of()` 绝对不允许 `null`。\n如果传入 null，盒子还没创建就会抛出 NPE。",
-        "keyInsight": "of() = 绝对不允许 null",
+        "title": "Optional.of() - 상자 만들기",
+        "explanation": "**실행 순서:**\n1. `Optional.of(\"hello\")` 호출.\n2. Heap에 `Optional` 객체(상자) 생성.\n3. 내부에 \"hello\" 값 저장.\n\n**메모리에서 일어나는 일:**\nHeap에 `Optional`이라는 **단단한 상자(Wrapper)**를 만들고, \"hello\" 문자열을 그 상자 안에 안전하게 넣습니다.\n\n**경고:** `of()`는 `null`을 절대 허용하지 않습니다.\nnull을 넣으면 상자를 만들기도 전에 NPE가 터집니다.",
+        "keyInsight": "of() = null 절대 불가",
         "visualizationType": "javaMemory",
         "code": "Optional<String> opt1 = Optional.of(\"hello\");",
         "javaMemoryState": {
@@ -35,9 +35,9 @@
         }
       },
       {
-        "title": "Optional.empty() - 空盒子",
-        "explanation": "**执行顺序：**\n1. 调用 `Optional.empty()`。\n2. 返回一个空的 `Optional` 对象。\n\n创建一个没有内容物的"空盒子"对象。\n这是一种替代使用 `null` 变量的方式，明确表示"盒子存在但里面是空的"。\n当方法返回 `Optional` 时，你立刻就能知道"哦，可能没有值"。",
-        "keyInsight": "empty() = 明确表示值不存在",
+        "title": "Optional.empty() - 빈 상자",
+        "explanation": "**실행 순서:**\n1. `Optional.empty()` 호출.\n2. 비어있는 `Optional` 객체 반환.\n\n내용물이 없는 '빈 상자' 객체를 만듭니다.\n`null` 변수를 쓰는 대신 \"상자는 있는데 내용은 없어\"라고 명확하게 말하는 방식입니다.\n`Optional`을 리턴하면 \"아, 없을 수도 있구나\"라고 바로 알 수 있습니다.",
+        "keyInsight": "empty() = 값 없음을 명시적으로 표현",
         "visualizationType": "javaMemory",
         "code": "Optional<String> opt2 = Optional.empty();",
         "javaMemoryState": {
@@ -67,8 +67,8 @@
         }
       },
       {
-        "title": "Optional.ofNullable() - 灵活的盒子",
-        "explanation": "**执行顺序：**\n1. 调用 `Optional.ofNullable(null)`。\n2. 检测到参数为 `null`。\n3. 内部返回 `Optional.empty()`。\n\n如果有值就放入盒子（`of`），如果为 `null` 就创建空盒子（`empty`）。\n这是实际开发中最常用的创建方式。",
+        "title": "Optional.ofNullable() - 유연한 상자",
+        "explanation": "**실행 순서:**\n1. `Optional.ofNullable(null)` 호출.\n2. 인자가 `null`임 확인.\n3. 내부적으로 `Optional.empty()` 반환.\n\n값이 있으면 상자에 넣고(`of`), `null`이면 빈 상자(`empty`)를 만듭니다.\n현실적으로 가장 많이 쓰이는 생성 방식입니다.",
         "visualizationType": "javaMemory",
         "code": "Optional<String> opt3 = Optional.ofNullable(null);",
         "javaMemoryState": {
@@ -86,13 +86,13 @@
               "refCount": 2
             }
           ],
-          "note": "传入 null 会变成 empty()"
+          "note": "null을 넣으면 empty()가 됨"
         }
       },
       {
-        "title": "get() - 强制取出（危险！！）",
-        "explanation": "**执行顺序：**\n1. 调用 `opt1.get()`。\n2. 确认值存在。\n3. 返回 \"hello\"。\n\n强行打开盒子。\n现在因为有值所以没问题，但如果对空盒子调用 `get()`，会爆出 **`NoSuchElementException`** 异常。\n\n**警告：** `get()` 是最后手段。\n尽量不要使用。",
-        "keyInsight": "推荐使用 orElse() 代替 get()",
+        "title": "get() - 강제로 꺼내기 (위험!!)",
+        "explanation": "**실행 순서:**\n1. `opt1.get()` 호출.\n2. 값 존재 확인.\n3. \"hello\" 반환.\n\n상자를 무작정 엽니다.\n지금은 값이 있어서 다행이지만, 비어있을 때 `get()`을 호출하면 **`NoSuchElementException`** 예외가 폭발합니다.\n\n**경고:** `get()`은 최후의 수단입니다.\n되도록 쓰지 마세요.",
+        "keyInsight": "get() 대신 orElse() 사용 권장",
         "visualizationType": "javaMemory",
         "code": "String value = opt1.get();",
         "javaMemoryState": {
@@ -107,18 +107,18 @@
         }
       },
       {
-        "title": "isPresent() - 检查",
-        "explanation": "**执行顺序：**\n1. 调用 `opt2.isPresent()`。\n2. `opt2` 为空，返回 **false**。\n3. 跳过 `if` 代码块。\n\n询问"盒子里有值吗？"（`isPresent`）。\n`opt2` 为空，所以返回 `false`，`if` 代码块不会执行。",
+        "title": "isPresent() - 확인하기",
+        "explanation": "**실행 순서:**\n1. `opt2.isPresent()` 호출.\n2. `opt2`는 empty이므로 **false** 반환.\n3. `if` 블록 건너뜀.\n\n\"상자에 값이 있나요?\"(`isPresent`) 라고 물어봅니다.\n`opt2`는 비어있으므로 `false`를 반환하고, `if` 블록은 실행되지 않습니다.",
         "visualizationType": "javaMemory",
         "code": "if (opt2.isPresent()) {",
         "javaMemoryState": {
-          "note": "opt2 为空所以返回 false，代码块不执行"
+          "note": "opt2는 empty이므로 false 반환, 블록 실행 안 됨"
         }
       },
       {
-        "title": "orElse() - 安全的默认值",
-        "explanation": "**执行顺序：**\n1. 调用 `opt3.orElse(\"default\")`。\n2. 确认 `opt3` 为空。\n3. 返回参数 `\"default\"`。\n\n**最推荐的方式：** "打开盒子。\n有值就用它，**空的话就用 'default' 代替。**"\n一行代码就能简洁安全地获取值。",
-        "keyInsight": "orElse() = 安全的默认值模式",
+        "title": "orElse() - 안전한 기본값 제공",
+        "explanation": "**실행 순서:**\n1. `opt3.orElse(\"default\")` 호출.\n2. `opt3`가 비어있음 확인.\n3. 인자로 넘긴 `\"default\"` 반환.\n\n**가장 권장하는 방식:** \"상자를 열어봐.\n값이 있으면 그거 쓰고, **비어있으면 'default'를 대신 써.**\"\n한 줄로 깔끔하고 안전하게 값을 얻을 수 있습니다.",
+        "keyInsight": "orElse() = 안전한 기본값 패턴",
         "visualizationType": "javaMemory",
         "code": "String result = opt3.orElse(\"default\");",
         "javaMemoryState": {
@@ -129,47 +129,47 @@
               "type": "String"
             }
           ],
-          "note": "opt3 为空所以返回 \"default\""
+          "note": "opt3가 empty이므로 \"default\" 반환"
         }
       },
       {
-        "title": "ifPresent() - 函数式风格",
-        "explanation": "**执行顺序：**\n1. 调用 `opt1.ifPresent(...)`。\n2. 确认 `opt1` 有值。\n3. 执行 lambda 函数 `s -> println(s)`。\n4. 输出 \"hello\"。\n\n"如果有值就执行这个函数（lambda）。\n没有的话就算了。"\n这是一种优雅的方式，不取出值，而是让盒子内部处理工作。",
-        "keyInsight": "ifPresent() = 有值时才执行",
+        "title": "ifPresent() - 함수형 스타일",
+        "explanation": "**실행 순서:**\n1. `opt1.ifPresent(...)` 호출.\n2. `opt1`에 값이 있음 확인.\n3. 람다 함수 `s -> println(s)` 실행.\n4. \"hello\" 출력.\n\n\"값이 있으면 이 함수(람다)를 실행 해줘.\n없으면 말고.\"\n값을 꺼내지 않고, 상자 안에서 작업을 처리하도록 시키는 세련된 방법입니다.",
+        "keyInsight": "ifPresent() = 값 있을 때만 실행",
         "visualizationType": "javaMemory",
         "code": "opt1.ifPresent(s -> System.out.println(s));",
         "javaMemoryState": {
           "output": [
             "hello"
           ],
-          "note": "opt1 有值所以 lambda 被执行"
+          "note": "opt1은 값이 있으므로 람다 실행됨"
         }
       }
     ],
     "deltaFormat": true
   },
   "quiz": {
-    "question": "Optional 不应该在哪里使用？",
+    "question": "哪些地方不应该使用Optional？",
     "options": [
       "方法返回类型",
       "类字段（成员变量）",
-      "局部变量",
-      "流（Stream）管道"
+      "局部变数",
+      "流管道"
     ],
     "correctIndex": 1,
-    "explanation": "Optional 仅为方法返回类型设计。\n用作字段会浪费内存并导致序列化（Serialization）问题。"
+    "explanation": "Optional 仅为方法返回而设计。\n如果将其用作字段，则会浪费大量内存并导致序列化问题。"
   },
   "misconceptions": [
     {
-      "wrong": "Optional 完全替代了 null 处理",
-      "correct": "不是的。\nOptional 变量本身也可能是 null（最糟糕的情况）。",
-      "why": "使用 Optional 时，绝对不要写 `Optional<String> opt = null;`。必须始终用 `Optional.empty()` 初始化。"
+      "wrong": "Optional은 null 처리를 완전히 대체한다",
+      "correct": "아닙니다.\nOptional 변수 자체가 null일 수도 있습니다(최악의 상황).",
+      "why": "Optional을 쓰려면 `Optional<String> opt = null;` 절대 이러지 말고, 항상 `Optional.empty()`로 초기화해야 합니다."
     },
     {
-      "wrong": "isPresent() + get() 是标准模式",
-      "correct": "使用 `orElse()` 或 `ifPresent()` 等方法才是 'Optional 式' 的用法。",
-      "why": "`if (opt.isPresent()) { ... get() }` 与 `if (x != null)` 没有区别，代码会变得冗长。\nOptional 的真正价值在于函数式风格。"
+      "wrong": "isPresent() + get() 패턴이 정석이다",
+      "correct": "`orElse()`나 `ifPresent()` 같은 메서드를 쓰는 게 'Optional스러운' 사용법입니다.",
+      "why": "`if (opt.isPresent()) { ... get() }`은 `if (x != null)`과 다를 바가 없어서 코드가 장황해집니다.\nOptional의 진가는 함수형 스타일에 있습니다."
     }
   ],
-  "keyTakeaway": "返回类型用 Optional，取值时用 orElse()！"
+  "keyTakeaway": "리턴 타입에는 Optional, 꺼낼 때는 orElse()!"
 }

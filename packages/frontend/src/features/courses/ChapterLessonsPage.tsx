@@ -202,7 +202,7 @@ export function ChapterLessonsPage() {
           className="group flex items-center gap-2 text-[var(--theme-dashboard-text-muted)] hover:text-[#FFD700] transition-colors mb-6"
         >
           <ChevronLeft className="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-2xl font-semibold tracking-wider uppercase">Back to Chapters</span>
+          <span className="text-2xl font-semibold tracking-wider uppercase">{t('chapter.back_to_chapters')}</span>
         </button>
 
         {/* 잠금 안내 */}
@@ -247,7 +247,7 @@ export function ChapterLessonsPage() {
         className="group flex items-center gap-2 text-[var(--theme-dashboard-text-muted)] hover:text-[#FFD700] transition-colors mb-6"
       >
         <ChevronLeft className="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
-        <span className="text-2xl font-semibold tracking-wider uppercase">Back to Chapters</span>
+        <span className="text-2xl font-semibold tracking-wider uppercase">{t('chapter.back_to_chapters')}</span>
       </button>
 
       {/* 챕터 헤더 - 언어 색상 기반 */}
@@ -297,7 +297,7 @@ export function ChapterLessonsPage() {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-emerald-500" />
-                <span className="text-xs text-emerald-600 font-mono uppercase">Progress</span>
+                <span className="text-xs text-emerald-600 font-mono uppercase">{t('courses.progress')}</span>
               </div>
               <span className="text-xs text-[var(--theme-dashboard-text-muted)] font-mono">
                 {isLoading ? t('chapter.calculating') : t('chapter.lessons_completed', { completed: completedLessons, total: totalLessons })}

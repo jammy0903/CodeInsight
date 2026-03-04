@@ -1,83 +1,83 @@
 {
   "lessonId": "py-3-6",
   "title": "Set Mutability",
-  "concept": "集合是可变的（Mutable）-- add、remove、discard 都是在同一个对象上操作！",
+  "concept": "세트는 수정 가능(Mutable) — add, remove, discard 모두 같은 객체를 변경한다!",
   "content": {
     "code": "fruits = {\"apple\", \"banana\"}\nprint(f\"id = {id(fruits)}\")\n\nfruits.add(\"cherry\")\nfruits.discard(\"banana\")\nprint(f\"After changes: {fruits}\")\nprint(f\"id = {id(fruits)}\")\n\n# frozenset is the immutable version\nfrozen = frozenset([1, 2, 3])\n# frozen.add(4)  # AttributeError!",
     "steps": [
       {
-        "title": "创建集合",
-        "explanation": "**`fruits = {\"apple\", \"banana\"}`** -- 使用花括号 `{}` 创建集合对象，并将名称 `fruits` 绑定到它。\n\nPython 从上到下按顺序执行代码。花括号 `{}` 中只有值（没有键值对）时创建**集合（set）**。一个包含2个字符串元素（\"apple\"、\"banana\"）的集合对象在堆内存中创建，`fruits` 名称指向该对象。\n\n**集合的3个核心特征：**\n\n**类比：** 集合就像'口袋里的弹珠'。可以放入弹珠（`add`）和取出弹珠（`discard`），但不能指定"第三颗弹珠"（无序）。而且同一颜色的弹珠只保留一颗（不允许重复）。\n\n**注意 -- `{}` vs `set()`：** 用 `{}` 创建空集合会得到**空字典**！空集合必须用 `set()` 创建。\n```python\nempty_dict = {}      # type: dict（字典！）\nempty_set = set()    # type: set（集合）\n```\n\n**Python 内部机制：** 集合使用与字典相同的**哈希表**结构。区别在于字典存储键值对，而集合只存储键。由于每个元素的 `hash()` 值决定其存储位置，`in` 运算（成员检查）为 **O(1)**，非常快。列表的 `in` 是 O(n)，因此对大量数据频繁检查成员资格时，集合远优于列表。\n\n**执行顺序**：line 1 -> 创建集合对象（哈希表，id: 0x7000）-> fruits = 0x7000 -> line 2",
+        "title": "세트 생성",
+        "explanation": "**`fruits = {\"apple\", \"banana\"}`**\n\n중괄호로 세트 객체를 만듭니다. 세트는 중복 불허·순서 없음·Mutable의 특성을 가집니다. 빈 세트는 `{}` 대신 `set()`으로 만들어야 합니다(`{}`는 딕셔너리).",
         "visualizationType": "terminal",
         "code": "fruits = {\"apple\", \"banana\"}"
       },
       {
-        "title": "检查对象 ID",
-        "explanation": "**`print(f\"id = {id(fruits)}\")`** -- 输出 `fruits` 集合对象的唯一 ID（内存地址）。\n\n`id()` 函数返回对象的**唯一标识号**。在 CPython 中，此值等于对象存储的内存地址。现在记录此 ID，之后修改集合后可以**确认是同一个对象还是不同对象**。\n\n**为什么检查 ID？** 为了直观证明 Mutable 和 Immutable 的区别：\n- **Mutable 对象**（列表、字典、集合）：内容改变但 **id 不变** -> 修改了同一个对象\n- **Immutable 对象**（int、str、tuple）：值改变时 **id 改变** -> 创建了新对象\n\n**类比：** id 就像房子的'地址'。即使更换了房内家具（内容），房子地址（id）不变。但搬到新房子（新对象）地址就变了。集合是可以换家具的房子（Mutable），所以修改内容后地址应该保持不变。\n\n**Python 内部机制：** `id(fruits)` 在 CPython 中将 `fruits` 对象的 C 结构体指针值作为整数返回。对象存活期间此值永不改变，同时存在的两个对象不可能有相同的 id。但对象销毁后，在同一内存位置创建的新对象可能复用同一 id。\n\n**执行顺序**：调用 id(fruits) -> 返回内存地址（如 140234567890）-> 组装 f-string -> print 输出 -> line 4",
+        "title": "객체 ID 확인",
+        "explanation": "**`print(f\"id = {id(fruits)}\")`**\n\n세트 객체의 고유 ID를 출력합니다. Mutable 객체는 내용을 변경해도 `id()`가 그대로입니다. 이 값을 수정 후와 비교하여 같은 객체임을 확인합니다.",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(fruits)}\")"
       },
       {
-        "title": "添加元素（add）",
-        "explanation": "**`add()`** 向集合添加元素。\n\n由于集合的特性，重复值会自动保持为一个。\n也就是说，对同一个值多次调用 `add` 结果不变。\n\n**类比**：即使在来宾名单上重复写某人的名字，名单也只记录一次。\n\n要点：\n- 集合擅长"去重 + 快速成员检查"\n- 作为可变（mutable）集合，修改在原地发生",
+        "title": "요소 추가 (add)",
+        "explanation": "**`fruits.add(\"cherry\")`**\n\n세트에 `\"cherry\"`를 추가합니다. 이미 있는 값을 `add()`해도 에러 없이 무시됩니다. 세트는 중복을 허용하지 않기 때문입니다. 기존 객체를 제자리에서 수정합니다.",
         "visualizationType": "terminal",
         "code": "fruits.add(\"cherry\")"
       },
       {
-        "title": "删除元素（discard）",
-        "explanation": "**`fruits.discard(\"banana\")`** -- 从集合中删除 `\"banana\"`。**直接修改**现有集合对象。\n\n`.discard()` 方法从集合中移除指定元素。与 `.add()` 一样，它在原地修改现有对象，不创建新对象。\n\n**discard() vs remove() -- 核心区别：**\n\n**类比：** `discard()` 就像说'如果有的话请移除'，而 `remove()` 就像命令'必须移除！没有的话我会生气！'\n\n```python\nfruits.discard(\"grape\")  # 不在？没关系 -> 不报错\nfruits.remove(\"grape\")   # 不在？-> KeyError: 'grape'\n```\n\n因此，**不确定元素是否存在时**，`discard()` 更安全。当删除"必须存在"的元素时使用 `remove()`（如果不存在说明是 bug，报错反而更好）。",
+        "title": "요소 삭제 (discard)",
+        "explanation": "**`fruits.discard(\"banana\")`**\n\n`\"banana\"`를 삭제합니다. `discard()`는 없는 값을 삭제해도 에러 없이 무시합니다. `remove()`는 없는 값 삭제 시 `KeyError`를 발생시키므로, 값이 있는지 확실하지 않을 때는 `discard()`가 더 안전합니다.",
         "visualizationType": "terminal",
         "code": "fruits.discard(\"banana\")"
       },
       {
-        "title": "查看变更后的内容",
-        "explanation": "**`print(f\"After changes: {fruits}\")`** -- 输出 `add(\"cherry\")` 和 `discard(\"banana\")` 后变更的集合当前内容。\n\n输出示例：`After changes: {'cherry', 'apple'}`（顺序可能不同）\n\n原来的 `{\"apple\", \"banana\"}` 通过 `add(\"cherry\")` 添加了 cherry，通过 `discard(\"banana\")` 移除了 banana，变为 `{\"apple\", \"cherry\"}`。所有更改都在**同一个对象**上完成。\n\n**集合的输出顺序 -- 为什么每次可能不同？**\n集合基于**哈希表**，元素存储位置由哈希值决定。输出时按哈希表槽位顺序出现，所以可能是 `{\"apple\", \"cherry\"}` 也可能是 `{\"cherry\", \"apple\"}`。这不是 bug -- 这是**集合的正常行为**。\n\n**注意 -- 保证顺序的数据结构：**\n\n只有集合不保证顺序。如果需要顺序，请使用列表。\n\n**类比：** 集合的输出顺序就像从口袋里掏弹珠的顺序。哪颗先出来每次都可能不同。\n\n**执行顺序**：组装 f-string（插入 fruits 内容）-> print 输出 -> line 7",
+        "title": "변경 후 내용 확인",
+        "explanation": "**`print(f\"After changes: {fruits}\")`**\n\n`add(\"cherry\")`와 `discard(\"banana\")` 이후 세트의 현재 내용을 출력합니다. 세트는 순서가 없으므로 출력 순서는 매번 다를 수 있습니다. 이것은 버그가 아닌 정상 동작입니다.",
         "visualizationType": "terminal",
         "code": "print(f\"After changes: {fruits}\")"
       },
       {
-        "title": "确认 ID 未变",
-        "explanation": "**id 保持不变**证明了"同一个对象被就地修改了"。\n\n如果添加/删除元素后 `id(fruits)` 仍保持不变，\n说明不是创建了新对象，而是更改了现有对象的内部。\n\n要点：\n- Mutable 对象（set/list/dict）：修改后 id 通常保持不变\n- Immutable 对象（int/str/tuple）：值改变时通常创建新对象\n\n**类比**：房子地址（id）不变，只是家具（内容）换了。\n\n掌握这个视角，就能清楚区分"重新赋值"和"就地修改"。",
+        "title": "ID 불변 확인",
+        "explanation": "**`print(f\"id = {id(fruits)}\")`**\n\n수정 후 `id()`가 처음과 동일합니다. add/remove/discard가 모두 **기존 객체를 제자리에서 수정**하는 Mutable 연산임을 증명합니다.",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(fruits)}\")",
         "occurrence": 2
       },
       {
-        "title": "frozenset：不可变集合",
-        "explanation": "**`frozen = frozenset([1, 2, 3])`** -- 使用 `frozenset()` 创建**不可变（Immutable）集合**。\n\n`frozenset` 是集合的 **Immutable 版本**。普通集合（`set`）的所有只读功能（成员检查、交集、并集等）都可以使用，但修改内容的方法（`add`、`remove`、`discard`、`clear` 等）**不存在**。\n\n**类比：** 正如 tuple 是列表的 Immutable 版本，frozenset 是集合的 Immutable 版本。\n\n**set vs frozenset：**\n\n**为什么需要 frozenset？**\n1. **字典键：** 字典的键必须是 Immutable（hashable）。普通集合是 Mutable 不能做键，但 frozenset 可以。\n2. **集合中嵌套集合：** 集合的元素也必须是 hashable。`{frozenset([1,2]), frozenset([3,4])}` -- 可以！\n3. **安全共享：** 即使从多处引用也没有被修改的风险。",
+        "title": "frozenset: 수정 불가능한 세트",
+        "explanation": "**`frozen = frozenset([1, 2, 3])`**\n\n`frozenset`은 세트의 **Immutable 버전**입니다. 읽기 기능(포함 확인, 교집합 등)은 사용 가능하지만 `add`·`remove` 등 수정 메서드가 없습니다. Immutable이므로 딕셔너리 키로 사용할 수 있습니다.",
         "visualizationType": "terminal",
         "code": "frozen = frozenset([1, 2, 3])"
       },
       {
-        "title": "尝试修改 frozenset（报错）",
-        "explanation": "**`# frozen.add(4)`** 取消注释会引发 `AttributeError`。\n\n原因很明确：`frozenset` 是不可变的，\n所以 `add`、`remove` 这样的"修改方法"本身就不存在。\n\n**类比**：这是一个密封的盒子，无法取出或添加内容。\n\n核心对比：\n- `set` = 可变\n- `frozenset` = 不可变\n\n因此 `frozenset` 特别适合\n"不能改变"的用途，比如字典键。",
+        "title": "frozenset 수정 시도 (에러)",
+        "explanation": "**`# frozen.add(4)  # AttributeError!`**\n\n주석을 해제하면 `AttributeError`가 발생합니다. `frozenset`은 수정 메서드 자체가 없기 때문입니다. 변경 불가가 보장되므로 딕셔너리 키나 세트의 원소로 사용할 수 있습니다.",
         "visualizationType": "terminal",
         "code": "# frozen.add(4)  # AttributeError!"
       }
     ]
   },
   "quiz": {
-    "question": "以下哪个可以用作字典键？",
+    "question": "什么可以用作字典键？",
     "options": [
-      "{1, 2, 3}",
-      "[1, 2, 3]",
-      "frozenset([1, 2, 3])",
-      "{'a': 1}"
+      "{1,2,3}",
+      "[1,2,3]",
+      "冻结集([1,2,3])",
+      "{'一'：1}"
     ],
     "correctIndex": 2,
-    "explanation": "只有不可变（Immutable）对象才能用作字典键。\n`frozenset` 是不可变的。\n普通集合、列表和字典是可变（Mutable）的，不能用作键。"
+    "explanation": "只有不可变对象才能用作字典键。\n`frozenset` 是不可变的。\n一般集合、列表和字典是可变的，不能用作键。"
   },
   "misconceptions": [
     {
-      "wrong": "集合中可以放列表",
-      "correct": "集合只能包含不可变（Hashable）对象。",
-      "why": "列表是可变的，无法被哈希。\n请改用元组。"
+      "wrong": "세트에 리스트를 넣을 수 있다",
+      "correct": "세트는 불변(Hashable) 객체만 담을 수 있습니다.",
+      "why": "리스트는 가변이라 해시할 수 없습니다.\n대신 튜플을 사용하세요."
     },
     {
-      "wrong": "`set()` 和 `{}` 是一样的",
-      "correct": "`{}` 创建空字典，`set()` 创建空集合。",
-      "why": "Python 对字典和集合都使用 `{}`，所以空集合必须用 `set()` 创建。"
+      "wrong": "`set()`과 `{}`는 같다",
+      "correct": "`{}`는 빈 딕셔너리를 만들고, `set()`은 빈 세트를 만듭니다.",
+      "why": "Python은 `{}`를 딕셔너리와 세트 모두에 사용하므로, 빈 세트는 반드시 `set()`으로 만들어야 합니다."
     }
   ],
-  "keyTakeaway": "集合是 Mutable -- add/remove 在原地修改。需要不可变集合请用 frozenset！"
+  "keyTakeaway": "세트는 Mutable — add/remove는 제자리에서 수정합니다. 불변 세트가 필요하면 frozenset을 사용하세요!"
 }

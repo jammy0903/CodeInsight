@@ -1,13 +1,13 @@
 {
   "lessonId": "java-7-1",
-  "title": "泛型基础：类型安全",
+  "title": "제네릭 기초: 타입 안전성",
   "concept": "Core concept for Generics Basics",
   "content": {
     "code": "// 1. Generic Class Definition\nclass Box<T> {\n    private T value;\n\n    public void set(T value) {\n        this.value = value;\n    }\n\n    public T get() {\n        return value;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // 2. Type Inference (Diamond Operator)\n        Box<String> stringBox = new Box<>();\n        stringBox.set(\"Hello Generics\");\n\n        // 3. Compile-time Type Safety\n        // stringBox.set(123); // Compile Error!\n\n        System.out.println(stringBox.get());\n        \n        Box<Integer> intBox = new Box<>();\n        intBox.set(42);\n        System.out.println(intBox.get());\n    }\n}",
     "steps": [
       {
-        "title": "泛型类声明",
-        "explanation": "**执行流程：**\n1. `Box<T>` 类定义被加载。\n2. 泛型类型 `T` 表示"稍后确定的类型"。\n\n**制作万能盒子：**\n`Box<T>` 就像一个可以装任何东西的魔法盒子的设计图。\n贴上名为 `T` 的标签，等到真正创建盒子时再指定"这是苹果盒"或"这是梨子盒"！",
+        "title": "제네릭 클래스 선언",
+        "explanation": "**실행 순서:**\n1. `Box<T>` 클래스 정의가 로드됩니다.\n2. 제네릭 타입 `T`는 '나중에 정해질 타입'을 의미합니다.\n\n**만능 상자 만들기:**\n`Box<T>`는 무엇이든 담을 수 있는 마법 상자 설계도예요.\n`T`라는 이름표를 붙여놓고, 나중에 실제 상자를 만들 때 \"이건 사과 상자\", \"이건 배 상자\"라고 정하는 것과 같죠!",
         "visualizationType": "javaMemory",
         "code": "class Box<T> {",
         "highlightOffset": [
@@ -35,8 +35,8 @@
         }
       },
       {
-        "title": "main 方法开始",
-        "explanation": "**`public static void main(String[] args)`**\n\n这是程序的入口点（Entry Point）。\n这是打开泛型实验室大门的地方。",
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램의 진입점(Entry Point)입니다.\n제네릭 실험실의 문을 여는 곳이죠.",
         "visualizationType": "javaMemory",
         "code": "public static void main(String[] args) {",
         "javaMemoryState": {
@@ -44,8 +44,8 @@
         }
       },
       {
-        "title": "创建 String Box",
-        "explanation": "**执行流程：**\n1. 执行 `new Box<>()`，在堆内存中创建一个 `Box` 对象。\n2. 此时 `T` 被确定为 `String`。\n3. `stringBox` 变量在栈上创建，指向该对象。\n\n**类型锁定：**\n现在这个盒子只能存放 `String` 类型的值。\n编译器会严格监控，所以可以放心使用！",
+        "title": "String Box 생성",
+        "explanation": "**실행 순서:**\n1. `new Box<>()`가 실행되어 힙 메모리에 `Box` 객체가 생성됩니다.\n2. 이때 `T`가 `String`으로 결정됩니다.\n3. `stringBox` 변수가 스택에 생겨 이 객체를 가리킵니다.\n\n**타입 확정:**\n이제 이 상자는 오직 `String`만 담을 수 있어요.\n컴파일러가 철저하게 감시해주니까 안심해도 됩니다!",
         "visualizationType": "javaMemory",
         "code": "Box<String> stringBox = new Box<>();",
         "javaMemoryState": {
@@ -74,8 +74,8 @@
         }
       },
       {
-        "title": "存储值（String）",
-        "explanation": "**执行流程：**\n1. 调用 `stringBox.set(\"Hello Generics\")`。\n2. 字符串被存储到堆内存中 `0x100` 对象的 `value` 字段中。\n\n**类型完美匹配：**\n放入的是 `String` 类型的值，完全没有问题。",
+        "title": "값 저장 (String)",
+        "explanation": "**실행 순서:**\n1. `stringBox.set(\"Hello Generics\")`가 호출됩니다.\n2. 힙 메모리의 `0x100` 객체 내부 `value` 필드에 문자열이 저장됩니다.\n\n**딱 맞는 타입:**\n`String` 타입의 값을 넣었으니 문제없이 쏙 들어갑니다.",
         "visualizationType": "javaMemory",
         "code": "stringBox.set(\"Hello Generics\");",
         "javaMemoryState": {
@@ -90,8 +90,8 @@
         }
       },
       {
-        "title": "输出值",
-        "explanation": "**执行流程：**\n1. 通过 `stringBox.get()` 取出值。\n2. 使用 `System.out.println` 输出到屏幕。\n\n**无需类型转换：**\n因为知道输出是 `String` 类型，所以不需要用 `(String)` 进行强制转换。\n代码变得更加简洁了！",
+        "title": "값 출력",
+        "explanation": "**실행 순서:**\n1. `stringBox.get()`으로 값을 꺼냅니다.\n2. `System.out.println`으로 화면에 출력합니다.\n\n**형변환 불필요:**\n`input`이 `String`인 걸 알기 때문에 `(String)`으로 강제 변환할 필요가 없어요.\n코드가 훨씬 깔끔해졌죠?",
         "visualizationType": "javaMemory",
         "code": "System.out.println(stringBox.get());",
         "javaMemoryState": {
@@ -108,8 +108,8 @@
         }
       },
       {
-        "title": "创建 Integer Box",
-        "explanation": "**执行流程：**\n1. 这次在堆上创建一个用于存放 `Integer` 类型的 `Box` 对象（`0x200`）。\n2. 栈上的 `intBox` 变量指向它。\n\n**不同用途的盒子：**\n虽然是同一个 `Box` 类，但这次是为了存放数字而诞生的。\n复用性真的非常出色！",
+        "title": "Integer Box 생성",
+        "explanation": "**실행 순서:**\n1. 이번엔 `Integer` 타입을 담을 `Box` 객체를 힙에 생성합니다(`0x200`).\n2. `intBox` 변수가 스택에서 이를 가리킵니다.\n\n**다른 용도의 상자:**\n같은 `Box` 클래스지만, 이번엔 숫자를 담기 위해 태어났어요.\n재사용성이 정말 뛰어나죠?",
         "visualizationType": "javaMemory",
         "code": "Box<Integer> intBox = new Box<>();",
         "javaMemoryState": {
@@ -148,8 +148,8 @@
         }
       },
       {
-        "title": "存储值（Integer）",
-        "explanation": "**执行流程：**\n1. 调用 `intBox.set(42)`。\n2. 值 42 被存储到 `0x200` 对象中。\n\n**自动装箱（Auto-boxing）：**\n基本类型 `int` 42 会自动包装成 `Integer` 对象后存储。",
+        "title": "값 저장 (Integer)",
+        "explanation": "**실행 순서:**\n1. `intBox.set(42)`를 호출합니다.\n2. `0x200` 객체에 42가 저장됩니다.\n\n**오토 박싱(Auto-boxing):**\n`int` 42가 자동으로 `Integer` 객체로 포장되어 저장됩니다.",
         "visualizationType": "javaMemory",
         "code": "intBox.set(42);",
         "javaMemoryState": {
@@ -169,8 +169,8 @@
         }
       },
       {
-        "title": "输出 Integer 值",
-        "explanation": "**执行流程：**\n1. 通过 `intBox.get()` 取出 42 并输出。\n\n**总结：**\n借助泛型，我们可以安全地编写代码，无需担心类型问题。",
+        "title": "Integer 값 출력",
+        "explanation": "**실행 순서:**\n1. `intBox.get()`으로 42를 꺼내 출력합니다.\n\n**마무리:**\n제네릭 덕분에 타입 걱정 없이 안전하게 코딩할 수 있게 되었습니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(intBox.get());",
         "javaMemoryState": {
@@ -195,22 +195,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "在 Java 泛型中，哪种类型不能用于 T？",
+    "question": "Java泛型中哪些类型不能输入T？",
     "options": [
-      "String",
-      "Object",
-      "int（基本类型）",
-      "List<String>"
+      "细绳",
+      "目的",
+      "int（原始类型）",
+      "列表<字符串>"
     ],
     "correctIndex": 2,
-    "explanation": "泛型类型参数只能使用引用类型（Reference Type）。\n必须使用 `Integer` 包装类来代替 `int`。"
+    "explanation": "泛型类型参数只能包含引用类型。\n您应该使用“Integer”包装类而不是“int”。"
   },
   "misconceptions": [
     {
-      "wrong": "使用泛型会提高程序运行速度。",
-      "correct": "泛型与运行速度无关。\n编译器会自动插入类型转换代码，因此运行时性能是相同的。",
-      "why": "泛型是用于"类型安全"的工具，而非性能优化。"
+      "wrong": "제네릭을 쓰면 실행 속도가 빨라진다.",
+      "correct": "실행 속도와는 관계없습니다.\n컴파일러가 캐스팅 코드를 자동으로 넣어주는 방식이라 런타임 성능은 동일합니다.",
+      "why": "제네릭은 성능 최적화가 아닌 '타입 안정성'을 위한 도구입니다."
     }
   ],
-  "keyTakeaway": "使用泛型可以在不编写显式类型转换代码的情况下获得强大的类型检查，从而防止运行时错误（如 ClassCastException）。"
+  "keyTakeaway": "제네릭을 사용하면 캐스팅(형변환) 코드 없이도 강력한 타입 체크를 받을 수 있어, 런타임 에러(ClassCastException)를 방지할 수 있습니다."
 }

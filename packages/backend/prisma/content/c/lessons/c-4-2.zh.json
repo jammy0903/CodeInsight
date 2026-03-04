@@ -1,13 +1,13 @@
 {
   "lessonId": "c-4-2",
-  "title": "值传递",
-  "concept": "当你将变量传递给函数时，传递的是"副本"。原始值保持不变。",
+  "title": "按价值呼叫",
+  "concept": "当您将变量传递给函数时，会传递一个“副本”。原版是安全的。",
   "content": {
     "code": "#include <stdio.h>\n\nvoid tryToChange(int x) {\n    x = 999;\n    printf(\"Inside func: x=%d\\n\", x);\n}\n\nint main() {\n    int a = 10;\n\n    printf(\"Before: %d\\n\", a);\n    tryToChange(a);\n    printf(\"After:  %d\\n\", a);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含头文件",
-        "explanation": "`#include <stdio.h>` 提供了输出函数的访问。",
+        "title": "带标题",
+        "explanation": "将输出函数与“#include <stdio.h>”一起使用。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "创建 main 栈帧。\n\n本课的关键点是：当普通变量被传递给函数时，传递的是值的副本——而不是原始值本身。",
+        "title": "启动主函数",
+        "explanation": "主框架已创建。\n\n这次的关键点是，当您将常规变量传递给函数时，传递的是值的副本，而不是原始值。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,17 +29,11 @@
         ]
       },
       {
-        "title": "声明并初始化变量 a",
-        "explanation": "`int a = 10;` 准备好原始变量 `a`。\n\n我们将在函数调用前后对比这个值，以确认值传递的行为。",
+        "title": "声明并初始化变量a",
+        "explanation": "使用“int a = 10;”准备原始变量“a”。\n\n比较调用函数之前和之后的该值以检查 Call by Value 操作。",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "stack": [
-          {
-            "name": "main",
-            "type": "frame",
-            "func": "main",
-            "value": "frame"
-          },
           {
             "name": "a",
             "value": "10",
@@ -49,15 +43,15 @@
         ]
       },
       {
-        "title": "打印调用前的值",
-        "explanation": "在调用之前打印 `a` 的值，建立基准线。",
+        "title": "值输出前",
+        "explanation": "在调用之前，打印`a`的值来记录引用状态。",
         "visualizationType": "cMemory",
         "code": "printf(\"Before: %d\\n\", a);",
         "stdout": "Before: 10"
       },
       {
-        "title": "函数调用与值拷贝",
-        "explanation": "当调用 `tryToChange(a);` 时，只有 `a` 的值被复制到参数 `x`。\n\n`a` 和 `x` 是位于不同内存位置的独立变量。",
+        "title": "函数调用和值复制",
+        "explanation": "当调用`tryToChange(a);`时，只有`a`的值被复制到参数`x`。\n\n`a` 和 `x` 是不同内存空间中的单独变量。",
         "visualizationType": "cMemory",
         "code": "tryToChange(a);",
         "highlightOffset": [
@@ -66,23 +60,11 @@
         ],
         "stack": [
           {
-            "name": "main",
-            "type": "frame",
-            "func": "main",
-            "value": "frame"
-          },
-          {
             "name": "a",
             "value": "10",
             "type": "int",
             "frame": "main",
             "address": "0x1000"
-          },
-          {
-            "name": "tryToChange",
-            "type": "frame",
-            "func": "tryToChange",
-            "value": "frame"
           },
           {
             "name": "x",
@@ -94,29 +76,17 @@
         ]
       },
       {
-        "title": "修改副本 x",
-        "explanation": "即使在函数内部赋值 `x=999`，被修改的也只是副本。\n\n原始的 `a` 不受影响。",
+        "title": "更改副本 x",
+        "explanation": "在函数内更改“x=999”只会更改副本。\n\n原来的“a”不受影响。",
         "visualizationType": "cMemory",
         "code": "x = 999;",
         "stack": [
-          {
-            "name": "main",
-            "type": "frame",
-            "func": "main",
-            "value": "frame"
-          },
           {
             "name": "a",
             "value": "10",
             "type": "int",
             "frame": "main",
             "address": "0x1000"
-          },
-          {
-            "name": "tryToChange",
-            "type": "frame",
-            "func": "tryToChange",
-            "value": "frame"
           },
           {
             "name": "x",
@@ -129,29 +99,17 @@
         ]
       },
       {
-        "title": "函数内部的输出",
-        "explanation": "在函数内部，打印出 `x=999`。\n\n这是副本被修改的结果。",
+        "title": "功能内部输出",
+        "explanation": "在函数内部，输出“x=999”。\n\n这是复制值被更改的结果。",
         "visualizationType": "cMemory",
         "code": "printf(\"Inside func: x=%d\\n\", x);",
         "stack": [
-          {
-            "name": "main",
-            "type": "frame",
-            "func": "main",
-            "value": "frame"
-          },
           {
             "name": "a",
             "value": "10",
             "type": "int",
             "frame": "main",
             "address": "0x1000"
-          },
-          {
-            "name": "tryToChange",
-            "type": "frame",
-            "func": "tryToChange",
-            "value": "frame"
           },
           {
             "name": "x",
@@ -164,17 +122,11 @@
         "stdout": "Before: 10\nInside func: x=999"
       },
       {
-        "title": "输出后——原始值未改变",
-        "explanation": "调用之后，打印 `a` 仍然显示 10。\n\n在值传递中，函数无法直接修改原始变量。",
+        "title": "输出后 - 原样",
+        "explanation": "如果你在调用后打印 `a`，它仍然是 10。\n\n在按值调用中，函数不能直接更改原始变量。",
         "visualizationType": "cMemory",
         "code": "printf(\"After:  %d\\n\", a);",
         "stack": [
-          {
-            "name": "main",
-            "type": "frame",
-            "func": "main",
-            "value": "frame"
-          },
           {
             "name": "a",
             "value": "10",
@@ -189,7 +141,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "这个函数调用后 a 的值是多少？\nvoid inc(int n) { n++; }\n...\nint a = 5; inc(a);",
+    "question": "调用以下函数后，a 的值是多少？\n无效 inc(int n) { n++; }\n...\n整数a=5；公司（一）；",
     "options": [
       "5",
       "6",
@@ -197,14 +149,14 @@
       "错误"
     ],
     "correctIndex": 0,
-    "explanation": "只有副本 `n` 被递增了。\n原始的 `a` 保持不变，仍为 5。"
+    "explanation": "唯一增加的是复制“n”。\n原来的“a”保持不变，仍然是5。"
   },
   "misconceptions": [
     {
-      "wrong": "将变量传递给函数会建立与它的连接",
-      "correct": "这不是连接——而是"Ctrl+C, Ctrl+V"式的复制。",
-      "why": "这是数据保护的默认行为。\n如果你想修改原始值，需要使用指针。"
+      "wrong": "如果将变量添加到函数中，它将被连接。",
+      "correct": "它没有连接，而是用“Ctrl+C、Ctrl+V”复制。",
+      "why": "这是数据保护的默认行为。\n如果你想改变它，你必须使用指针。"
     }
   ],
-  "keyTakeaway": "将变量传递给函数时，只复制了值。想修改原始值？"
+  "keyTakeaway": "如果将变量放入函数中，则仅复制值。如果想改原来的怎么办？"
 }

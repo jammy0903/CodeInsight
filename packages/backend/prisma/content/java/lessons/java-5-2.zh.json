@@ -1,13 +1,13 @@
 {
   "lessonId": "java-5-2",
-  "title": "final 类与方法",
-  "concept": "final 类禁止继承，final 方法禁止重写。",
+  "title": "final 클래스와 메서드",
+  "concept": "final 클래스는 상속을 금지하고, final 메서드는 오버라이딩을 금지한다.",
   "content": {
-    "code": "final class ImmutablePoint {\n    private final int x, y;\n    \n    public ImmutablePoint(int x, int y) {\n        this.x = x;\n        this.y = y;\n    }\n    \n    public final int getX() { return x; }\n}\n\n// class ExtendedPoint extends ImmutablePoint {}  // 错误！\n\nclass Parent {\n    public final void cannotOverride() {\n        System.out.println(\"Cannot override this!\");\n    }\n}\n\nclass Child extends Parent {\n    // public void cannotOverride() {}  // 错误！\n}",
+    "code": "final class ImmutablePoint {\n    private final int x, y;\n    \n    public ImmutablePoint(int x, int y) {\n        this.x = x;\n        this.y = y;\n    }\n    \n    public final int getX() { return x; }\n}\n\n// class ExtendedPoint extends ImmutablePoint {}  // 에러!\n\nclass Parent {\n    public final void cannotOverride() {\n        System.out.println(\"Cannot override this!\");\n    }\n}\n\nclass Child extends Parent {\n    // public void cannotOverride() {}  // 에러!\n}",
     "steps": [
       {
-        "title": "声明 final 类",
-        "explanation": "**执行流程：**\n1. `ImmutablePoint` 类被加载。\n2. 类的元数据被标记为"禁止继承（final）"。\n\n**到此为止：**\n`final class` 不能有子类。\n`String` 和 `System` 就是典型的例子。",
+        "title": "final 클래스 선언",
+        "explanation": "**실행 순서:**\n1. `ImmutablePoint` 클래스가 로드됩니다.\n2. 클래스 메타데이터에 '상속 금지(final)' 표시가 붙습니다.\n\n**내 대는 여기서 끝:**\n`final class`는 불임(?) 클래스입니다.\n자식을 낳을(상속할) 수 없죠.\n`String`이나 `System` 클래스가 대표적인 예입니다.",
         "visualizationType": "javaMemory",
         "code": "final class ImmutablePoint {",
         "highlightOffset": [
@@ -34,8 +34,8 @@
         }
       },
       {
-        "title": "初始化 final 字段",
-        "explanation": "**执行流程：**\n1. 创建对象（`new`）并调用构造函数。\n2. 在构造函数内部为字段 `x` 和 `y` 赋值。\n3. 构造函数结束的那一刻，这些字段就被"冻结"了，再也无法更改。\n\n**类比**：用铅笔写在纸上的（普通变量）可以用橡皮擦掉，但刻在石头上的（final）无法修改。\n\n**完美的不可变性：**\n没有 setter，所有字段都是 `final`，这个对象会永远保持创建时的状态。",
+        "title": "final 필드 초기화",
+        "explanation": "**실행 순서:**\n1. 객체를 생성(`new`)하며 생성자를 호출합니다.\n2. 생성자 내부에서 `x`, `y` 필드에 값을 할당합니다.\n3. 생성자가 끝나는 순간, 이 필드들은 '동결'되어 절대 바꿀 수 없게 됩니다.\n\n**비유**: 종이에 연필로 쓴 것(일반 변수)은 지우개로 지울 수 있지만, 돌에 새긴 것(final)은 고칠 수 없습니다.\n\n**완벽한 불변:**\nSetter도 없고 필드도 `final`이니, 이 객체는 생성될 때의 상태를 평생 간직합니다.",
         "visualizationType": "javaMemory",
         "code": "private final int x, y;",
         "highlightOffset": [
@@ -59,8 +59,8 @@
         }
       },
       {
-        "title": "声明 final 方法",
-        "explanation": "**执行流程：**\n1. 加载方法信息时，标记为"禁止重写（final）"。\n\n**固执的方法：**\n"我的逻辑是完美的——别动它！"子类虽然继承了这个方法，但不能修改其实现。",
+        "title": "final 메서드 선언",
+        "explanation": "**실행 순서:**\n1. 메서드 정보가 로드될 때 'Override 금지(final)' 표시가 붙습니다.\n\n**고집불통 메서드:**\n\"내 로직은 완벽하니 건드리지 마라!\" 자식 클래스가 이 메서드를 물려받긴 하지만, 내용을 뜯어고칠(재정의할) 수는 없습니다.",
         "visualizationType": "javaMemory",
         "code": "public final int getX() { return x; }",
         "javaMemoryState": {
@@ -73,8 +73,8 @@
         }
       },
       {
-        "title": "普通类中的 final 方法",
-        "explanation": "**执行流程：**\n1. `Parent` 是普通类，允许继承。\n2. 但 `cannotOverride` 方法是 `final` 的，子类无法更改其实现。\n\n**选择性保护：**\n不需要锁定整个类——当你只想保护特定核心功能时使用。",
+        "title": "일반 클래스의 final 메서드",
+        "explanation": "**실행 순서:**\n1. `Parent` 클래스는 일반 클래스라 상속이 가능합니다.\n2. 하지만 `cannotOverride` 메서드는 `final`이라 자식이 내용을 바꿀 수 없습니다.\n\n**부분적 통제:**\n클래스 전체를 막을 필요는 없고, 특정 핵심 기능만 보호하고 싶을 때 사용합니다.",
         "visualizationType": "javaMemory",
         "code": "class Parent {",
         "highlightOffset": [
@@ -99,27 +99,27 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "Java 中如何阻止继承？",
+    "question": "Java中如何防止继承？",
     "options": [
-      "将类声明为 private。",
-      "将类声明为 final。",
-      "将类声明为 static。",
-      "将类声明为 abstract。"
+      "声明该类为私有类。",
+      "宣布该课程为最终课程。",
+      "将类声明为静态类。",
+      "将类声明为抽象类。"
     ],
     "correctIndex": 1,
-    "explanation": "在类前面加上 `final` 意味着它是"最后一个类"——不能再有子类了。"
+    "explanation": "如果在类前面添加“final”，则意味着它是“最后一个类”，并且不能再生成（继承）子级。"
   },
   "misconceptions": [
     {
-      "wrong": "final 方法也不能重载（Overloading）。",
-      "correct": "重载是可以的！",
-      "why": "只是禁止了重写（Override，即覆盖相同方法签名），创建同名但参数不同的新方法（重载 Overloading）完全没问题。"
+      "wrong": "final 메서드는 오버로딩(Overloading)도 못 한다.",
+      "correct": "오버로딩은 가능합니다!",
+      "why": "오버라이딩(덮어쓰기)이 금지된 것이지, 이름만 같고 파라미터가 다른 새로운 메서드(오버로딩)를 만드는 것은 상관없습니다."
     },
     {
-      "wrong": "abstract 方法也可以加 final。",
-      "correct": "绝对不行。\n这是矛盾的。",
-      "why": "`abstract` 意味着"子类必须实现（重写）"，而 `final` 意味着"不要重写"。它们是完全相反的概念。"
+      "wrong": "abstract 메서드에도 final을 붙일 수 있다.",
+      "correct": "절대 안 됩니다.\n모순입니다.",
+      "why": "`abstract`는 \"자식이 구현해라(Override)\"이고, `final`은 \"Override 하지 마라\"이므로 서로 정반대 개념입니다."
     }
   ],
-  "keyTakeaway": "final 类断绝了继承关系，final 方法防止逻辑被修改。"
+  "keyTakeaway": "final 클래스는 가계도를 끊고, final 메서드는 로직 수정을 막는다."
 }

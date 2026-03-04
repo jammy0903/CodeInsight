@@ -1,0 +1,60 @@
+{
+  "lessonId": "cpp-1-2",
+  "title": "RAII 和基于范围的灭绝",
+  "concept": "当 C++ 对象超出范围时，会自动调用其析构函数来清理资源。",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nstruct Guard {\n    const char* name;\n    Guard(const char* n) : name(n) { cout << \"acquire \" << name << endl; }\n    ~Guard() { cout << \"release \" << name << endl; }\n};\n\nint main() {\n    Guard g(\"file\");\n    cout << \"working\" << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "创建守卫对象",
+        "explanation": "`g` 被创建并调用它的构造函数。是时候获取资源了。",
+        "visualizationType": "cMemory",
+        "code": "Guard g(\"file\");",
+        "stack": [
+          {
+            "name": "g",
+            "value": "Guard{name=\"file\"}",
+            "type": "Guard",
+            "address": "0x2100"
+          }
+        ],
+        "heap": [],
+        "stdout": "acquire file"
+      },
+      {
+        "title": "完成工作",
+        "explanation": "当对象存活时安全地使用资源。",
+        "visualizationType": "terminal",
+        "code": "cout << \"working\" << endl;",
+        "stdout": "working"
+      },
+      {
+        "title": "范围终止和自动清理",
+        "explanation": "`main` 结束，`g` 的析构函数被自动调用。这是RAII的核心。",
+        "visualizationType": "terminal",
+        "code": "return 0;",
+        "stdout": "release file"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "RAII模式最正确的核心描述是什么？",
+    "options": [
+      "只能手动释放资源",
+      "通过将资源管理与对象生命周期联系起来进行自动清理",
+      "堆内存从未被使用",
+      "在异常情况下永远不会调用析构函数。"
+    ],
+    "correctIndex": 1,
+    "explanation": "RAII 通过将资源获取/释放与对象创建/销毁联系起来来减少泄漏。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "您必须在 return 语句之前直接调用 free/delete。",
+      "correct": "当作用域结束时，会自动调用堆栈对象的析构函数。",
+      "why": "这是因为 C++ 提供了基于对象生命周期的资源管理。"
+    }
+  ],
+  "keyTakeaway": "RAII 通过“只有对象存活时资源才存活”的规则来提高稳定性。"
+}

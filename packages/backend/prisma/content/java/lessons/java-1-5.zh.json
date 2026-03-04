@@ -1,13 +1,13 @@
 {
   "lessonId": "java-1-5",
-  "title": "equals/hashCode 契约",
-  "concept": "如果重写 equals()，就必须同时重写 hashCode()",
+  "title": "equals/hashCode 合约",
+  "concept": "如果重写 equals()，则还必须重写 hashCode()。",
   "content": {
-    "code": "class Person {\n    String name;\n    Person(String name) { this.name = name; }\n\n    @Override\n    public boolean equals(Object obj) {\n        if (!(obj instanceof Person)) return false;\n        return name.equals(((Person) obj).name);\n    }\n    // hashCode() 缺失!\n}\n\nPerson p1 = new Person(\"Alice\");\nPerson p2 = new Person(\"Alice\");\n\nSystem.out.println(p1.equals(p2));\n\nSet<Person> set = new HashSet<>();\nset.add(p1);\nSystem.out.println(set.contains(p2));",
+    "code": "class Person {\n    String name;\n    Person(String name) { this.name = name; }\n\n    @Override\n    public boolean equals(Object obj) {\n        if (!(obj instanceof Person)) return false;\n        return name.equals(((Person) obj).name);\n    }\n    // hashCode() 누락!\n}\n\nPerson p1 = new Person(\"Alice\");\nPerson p2 = new Person(\"Alice\");\n\nSystem.out.println(p1.equals(p2));\n\nSet<Person> set = new HashSet<>();\nset.add(p1);\nSystem.out.println(set.contains(p2));",
     "steps": [
       {
-        "title": "定义 Person 类",
-        "explanation": "**执行顺序：**\n1. 加载 Person 类。\n2. 检测到 `equals` 已重写。\n3. 检测到 `hashCode` 缺失（警告）。\n\n`equals()` 已重写，但 `hashCode()` 遗漏了——这是一个"半成品"类。\n如果在 `HashSet` 或 `HashMap` 中使用这个类，将会引发**严重问题**。",
+        "title": "人员类别定义",
+        "explanation": "**执行顺序：**\n1. 加载Person类。\n2. 检查“等于”覆盖。\n3. 检查是否缺少“hashCode”（警告）。\n\n它是一个“半满”类，重新定义了“equals()”，但省略了“hashCode()”。\n如果你在`HashSet`或`HashMap`之类的东西中使用这个类，就会发生**大事故**。",
         "visualizationType": "javaMemory",
         "code": "class Person {",
         "highlightOffset": [
@@ -23,15 +23,15 @@
           9
         ],
         "javaMemoryState": {
-          "note": "equals() 已重写，hashCode() 缺失（危险！）",
+          "note": "equals()는 오버라이드, hashCode()는 누락 (위험!)",
           "stack": [],
           "heap": [],
           "output": []
         }
       },
       {
-        "title": "创建第一个 Person 对象",
-        "explanation": "**执行顺序：**\n1. 调用 `new Person(\"Alice\")`。\n2. 堆分配（0x001）。\n3. 生成默认 `hashCode`（例如：123）。\n\n该对象拥有唯一的内存地址（0x001）和基于该地址的默认哈希码（123）。",
+        "title": "创建您的第一个 Person 对象",
+        "explanation": "**执行顺序：**\n1. 调用 `new Person(\"Alice\")`。\n2. 堆分配（0x001）。\n3. 创建默认的“hashCode”（例如 123）。\n\n该对象具有唯一的内存地址（0x001）和基于它的默认哈希码（123）。",
         "visualizationType": "javaMemory",
         "code": "Person p1 = new Person(\"Alice\");",
         "javaMemoryState": {
@@ -54,7 +54,7 @@
       },
       {
         "title": "创建第二个 Person 对象",
-        "explanation": "**执行顺序：**\n1. 调用 `new Person(\"Alice\")`。\n2. 新的堆分配（0x002）。\n3. 生成新的默认 `hashCode`（例如：456）。\n\n即使内容相同，`p2` 也会获得与 `p1` 不同的哈希码。\n这是因为 `hashCode()` 没有被重写。",
+        "explanation": "**执行顺序：**\n1. 调用 `new Person(\"Alice\")`。\n2. 新的堆分配 (0x002)。\n3. 创建一个新的默认“hashCode”（例如 456）。\n\n即使内容相同，“p2”也将具有与“p1”不同的哈希码。\n这是因为 `hashCode()` 没有被覆盖。",
         "visualizationType": "javaMemory",
         "code": "Person p2 = new Person(\"Alice\");",
         "javaMemoryState": {
@@ -87,20 +87,20 @@
       },
       {
         "title": "equals() 比较",
-        "explanation": "**执行顺序：**\n1. 调用 `p1.equals(p2)`。\n2. 比较名字（\"Alice\"）。\n3. 匹配，所以是 **true**。\n\n到目前为止看起来没有问题。",
-        "keyInsight": "重写 equals() = 可以进行值比较",
+        "explanation": "**执行顺序：**\n1. 调用`p1.equals(p2)`。\n2. 比较名字（“Alice”）。\n3. 匹配，所以**真实**。\n\n到目前为止似乎还没有问题。",
+        "keyInsight": "equals() override = 可以比较值",
         "visualizationType": "javaMemory",
         "code": "System.out.println(p1.equals(p2));",
         "javaMemoryState": {
           "output": [
             "true"
           ],
-          "note": "equals() 正常工作"
+          "note": "equals()는 정상 작동"
         }
       },
       {
-        "title": "创建 HashSet",
-        "explanation": "**执行顺序：**\n1. 调用 `new HashSet<>()`。\n2. 创建初始桶（数组）。\n\n基于哈希的数据结构在存储和搜索对象时使用 `hashCode()`。",
+        "title": "创建哈希集",
+        "explanation": "**执行顺序：**\n1. 调用`new HashSet<>()`。\n2. 创建初始桶（数组）。\n\n基于哈希的数据结构使用“hashCode()”来存储和检索对象。",
         "visualizationType": "javaMemory",
         "code": "Set<Person> set = new HashSet<>();",
         "javaMemoryState": {
@@ -143,8 +143,8 @@
       },
       {
         "title": "将 p1 添加到 HashSet",
-        "explanation": "**执行顺序：**\n1. 调用 `set.add(p1)`。\n2. 计算 `p1.hashCode()` -> **123**。\n3. 将 `p1` 存储在 123 号桶中。",
-        "keyInsight": "HashSet/HashMap = 通过 hashCode() 分配房间",
+        "explanation": "**执行顺序：**\n1. 调用`set.add(p1)`。\n2. 计算`p1.hashCode()` -> **123**。\n3. 将`p1`保存到桶123中。",
+        "keyInsight": "HashSet/HashMap = 使用 hashCode() 分配房间",
         "visualizationType": "javaMemory",
         "code": "set.add(p1);",
         "javaMemoryState": {
@@ -159,9 +159,9 @@
         }
       },
       {
-        "title": "调用 contains(p2)（搜索失败）",
-        "explanation": "**执行顺序：**\n1. 调用 `set.contains(p2)`。\n2. 计算 `p2.hashCode()` -> **456**。\n3. 检查 456 号桶。\n4. **为空** -> 返回 **false**。\n\n即使 `equals()` 返回 `true`，由于 `hashCode()` 不同，搜索去了完全不同的桶。\n当然找不到。",
-        "keyInsight": "hashCode 不同 = 不同的桶 = 搜索失败",
+        "title": "调用 contains(p2) （搜索失败）",
+        "explanation": "**执行顺序：**\n1. 调用`set.contains(p2)`。\n2. 计算`p2.hashCode()` -> **456**。\n3. 检查铲斗 456。\n4. **空** -> **假** 返回。\n\n尽管“equals()”是“true”，但“hashCode()”不同，所以我搜索了一个完全不同的房间。\n你没有办法找到它。",
+        "keyInsight": "hashCode不同=桶不同=查找失败",
         "visualizationType": "javaMemory",
         "code": "System.out.println(set.contains(p2));",
         "javaMemoryState": {
@@ -173,7 +173,7 @@
               },
               {
                 "index": "hash(456)",
-                "content": "搜索位置",
+                "content": "검색 위치",
                 "searched": true
               }
             ]
@@ -181,29 +181,29 @@
           "output": [
             "false"
           ],
-          "warning": "equals() 为 true 但 contains() 为 false！"
+          "warning": "equals()는 true인데 contains()는 false!"
         }
       }
     ],
     "deltaFormat": true
   },
   "quiz": {
-    "question": "什么是 equals/hashCode 契约？",
+    "question": "什么是 equals/hashCode 合约？",
     "options": [
-      "如果 equals() 为 true，hashCode() 也必须相同",
-      "如果 hashCode() 相同，equals() 也必须为 true",
-      "两者必须始终返回相同的值",
-      "只需要重写其中一个"
+      "如果 equals() 为 true，则 hashCode() 也必须相同。",
+      "如果 hashCode() 相等，则 equals() 也必须为 true。",
+      "两者应始终返回相同的值",
+      "您只需要覆盖两者之一。"
     ],
     "correctIndex": 0,
-    "explanation": "务必记住：如果 equals() 返回 true，hashCode() 也必须相同！（反过来不一定成立。）"
+    "explanation": "请记住：如果 equals() 相等，那么 hashCode() 也必须相等！ （不一定要建站）"
   },
   "misconceptions": [
     {
-      "wrong": "只需要重写 equals() 就够了",
-      "correct": "必须同时重写 `hashCode()`。",
-      "why": "HashMap、HashSet 等数据结构使用 `hashCode` 进行一级分类（区域），然后在该桶内使用 `equals` 进行二级验证（地址）。\n如果区域不对，就永远找不到目标。"
+      "wrong": "只需重写 equals()",
+      "correct": "您还必须重写“hashCode()”。",
+      "why": "HashMap、HashSet等数据结构首先用`hashCode`进行分类（旧名），然后用`equals`进行二次确认（地址编号）。\n如果区名不同，你将永远找不到你的家。"
     }
   ],
-  "keyTakeaway": "重写 equals() 时，hashCode() 也是必须的。善用 IDE 的自动生成功能。"
+  "keyTakeaway": "当重写 equals() 时，还需要 hashCode()。利用 IDE 的自动生成功能。"
 }

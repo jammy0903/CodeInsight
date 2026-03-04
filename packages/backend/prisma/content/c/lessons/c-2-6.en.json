@@ -1,13 +1,13 @@
 {
   "lessonId": "c-2-6",
-  "title": "Pointer Types and Sizes",
-  "concept": "Pointers interpret data differently depending on the type they point to",
+  "title": "Pointer type and size",
+  "concept": "Pointers are interpreted differently depending on the type of object they point to.",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    char c = 'A';\n\n    int *pi = &a;\n    char *pc = &c;\n\n    printf(\"Size of int*:  %zu\\n\", sizeof(pi));\n    printf(\"Size of char*: %zu\\n\", sizeof(pc));\n\n    printf(\"Read int*:  %d\\n\", *pi);\n    printf(\"Read char*: %c\\n\", *pc);\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h Header",
-        "explanation": "Header for using ```printf```. ```sizeof``` is a **compile-time operator**, not a function, so it doesn't need a separate header — but ```stdio.h``` is needed to print its result.",
+        "title": "Include stdio.h header",
+        "explanation": "Header for using ``printf````. ```sizeof``` is not a function but a **compile-time operator**, so it does not require a separate header, but ```stdio.h``` is required to output the result.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting the main Function",
-        "explanation": "The program starts — ```main```'s **stack frame** is created on the stack. Four variables will be created inside: ```a```, ```c```, ```pi```, ```pc```.\n\nKey question: ```int*``` and ```char*``` point to targets of different sizes (4 bytes vs 1 byte). Are the pointers themselves different sizes too?",
+        "title": "Start main function",
+        "explanation": "Program startup — A **stack frame** of ```main``` is created on the stack. A total of four variables are created here: ````a```, ```c```, ```pi````, and ```pc```.\n\nKey question: ```int*``` and ```char*``` have different sizes of what they point to (4 bytes vs. 1 byte). Are the sizes of the pointers themselves different?",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Declaring Variables",
-        "explanation": "`int a = 10` and `char c = 'A'` prepare values of different types.\n\nThese two have different sizes and interpretation methods, serving as reference data to explain the difference in pointer types.",
+        "title": "variable declaration",
+        "explanation": "Prepare values ​​of different types as `int a = 10`, `char c = 'A'`.\n\nThese two have different sizes and interpretation methods, and serve as reference data to explain the difference in pointer types.",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "highlightOffset": [
@@ -53,8 +53,8 @@
         ]
       },
       {
-        "title": "Declaring Pointers",
-        "explanation": "`pi` stores `a`'s address, `pc` stores `c`'s address.\n\nBoth variables are pointers that hold addresses, but the size and interpretation method when dereferencing differs based on the type (`int*`/`char*`).",
+        "title": "pointer declaration",
+        "explanation": "`pi` stores the address of `a`, and `pc` stores the address of `c`.\n\nBoth variables are pointers that contain addresses, but when dereferenced, the read size and interpretation method vary depending on the type (`int*`/`char*`).",
         "visualizationType": "cMemory",
         "code": "int *pi = &a;",
         "highlightOffset": [
@@ -91,36 +91,36 @@
         ]
       },
       {
-        "title": "Size of an int Pointer",
-        "explanation": "`sizeof(pi)` gives the size of the pointer variable itself, not the target it points to.\n\nPointer size depends on the system architecture — on 64-bit systems, it's typically 8 bytes.",
+        "title": "size of int pointer",
+        "explanation": "`sizeof(pi)` is the size of the pointer variable itself, not what `pi` points to.\n\nThe pointer size depends on the system architecture, and is usually 8 bytes on 64-bit.",
         "visualizationType": "cMemory",
         "code": "printf(\"Size of int*:  %zu\\n\", sizeof(pi));",
         "stdout": "Size of int*:  8"
       },
       {
-        "title": "Size of a char Pointer",
-        "explanation": "`sizeof(pc)` is the same as `sizeof(pi)` on the same system.\n\nThis means pointer size is determined by the architecture's address size, not the target type.",
+        "title": "size of char pointer",
+        "explanation": "`sizeof(pc)` is also equivalent to `sizeof(pi)` in the same environment.\n\nThat is, the pointer size is determined by the address size of the architecture rather than the target type.",
         "visualizationType": "cMemory",
         "code": "printf(\"Size of char*: %zu\\n\", sizeof(pc));",
         "stdout": "Size of int*:  8\nSize of char*: 8"
       },
       {
-        "title": "Reading a Value via int Pointer",
-        "explanation": "`*pi` reads the data at that address as an integer (following `int*` rules) and gets the value 10.\n\nThe pointer type determines how data is interpreted when dereferencing.",
+        "title": "Reading value with int pointer",
+        "explanation": "`*pi` reads the address as an integer according to the `int*` rule and obtains the value 10.\n\nThe pointer type determines how the data will be interpreted when dereferenced.",
         "visualizationType": "cMemory",
         "code": "printf(\"Read int*:  %d\\n\", *pi);",
         "stdout": "Size of int*:  8\nSize of char*: 8\nRead int*:  10"
       },
       {
-        "title": "Reading a Value via char Pointer",
-        "explanation": "`*pc` reads the data as a character (following `char*` rules) and gets `A`.\n\nEven with the same address operation, different pointer types result in different read sizes and interpretations.",
+        "title": "Reading value with char pointer",
+        "explanation": "`*pc` reads a character according to the `char*` rule and obtains `A`.\n\nEven for the same address operation, if the pointer type is different, the read unit and interpretation result will be different.",
         "visualizationType": "cMemory",
         "code": "printf(\"Read char*: %c\\n\", *pc);",
         "stdout": "Size of int*:  8\nSize of char*: 8\nRead int*:  10\nRead char*: A"
       },
       {
-        "title": "Program Termination",
-        "explanation": "`return 0;` terminates the program and cleans up stack variables.\n\nTo summarize: pointer size depends on the environment, but the type determines the dereferencing interpretation rules.",
+        "title": "Program exit",
+        "explanation": "It ends with `return 0;` and stack variables are cleaned up.\n\nIn summary, pointer size is environment dependent, but type determines dereference resolution rules.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
@@ -130,7 +130,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "On a 64-bit system, what is sizeof(p) for `double *p;`?",
+    "question": "What is the size(sizeof(p)) of `double *p;` on a 64-bit system?",
     "options": [
       "4 bytes",
       "8 bytes",
@@ -138,14 +138,14 @@
       "Same as double type size (8)"
     ],
     "correctIndex": 1,
-    "explanation": "Regardless of whether the pointer points to a double or anything else, the pointer itself stores an 'address', so on a 64-bit system it's always 8 bytes."
+    "explanation": "Regardless of whether a pointer points to a double or something else, the pointer itself is an 'address' and therefore always 8 bytes on a 64-bit system."
   },
   "misconceptions": [
     {
       "wrong": "double* is larger than int*",
-      "correct": "No.\nAll pointer variables have the same size.",
-      "why": "Only the size of the target they point to differs — the length of the address itself is the same."
+      "correct": "no.\nAll pointer variables have the same size.",
+      "why": "The only difference is the size of the house being pointed to, but the length of the address itself is the same."
     }
   ],
-  "keyTakeaway": "All pointers are the same size, but the type acts as a map that determines 'how many bytes to read.'"
+  "keyTakeaway": "All pointer sizes are the same, but the type serves as a map to determine ‘how many bytes to read’."
 }

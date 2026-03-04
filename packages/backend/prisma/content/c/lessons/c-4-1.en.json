@@ -1,13 +1,13 @@
 {
   "lessonId": "c-4-1",
   "title": "Stack Frames",
-  "concept": "Every time a function is called, it gets its own 'room' on the stack",
+  "concept": "Every time a function is called, a ‘room of its own’ is created on the stack.",
   "content": {
     "code": "#include <stdio.h>\n\nvoid funcB(int x) {\n    int b = x + 1;\n    printf(\"Inside funcB: b=%d\\n\", b);\n}\n\nvoid funcA() {\n    int a = 10;\n    funcB(a);\n}\n\nint main() {\n    funcA();\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including Header",
-        "explanation": "`#include <stdio.h>` enables the output functions.",
+        "title": "with header",
+        "explanation": "Use the output function with `#include <stdio.h>`.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting the main Function",
-        "explanation": "The main stack frame is created when the program starts.\n\nThe key concept in this lesson is observing the LIFO structure where frames are pushed on call and popped on return.",
+        "title": "Start main function",
+        "explanation": "The main stack frame is created when the program starts.\n\nThe key to this lesson is to check the LIFO structure, where frames are pushed when a function is called and popped when it ends.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Calling funcA (Stack Push)",
-        "explanation": "The `funcA();` call pushes funcA's frame on top of main.\n\nControl won't return to main until the called function finishes.",
+        "title": "call funcA (stack push)",
+        "explanation": "The funcA frame is pushed onto main by calling `funcA();`.\n\nControl returns to main only after the called function has finished.",
         "visualizationType": "cMemory",
         "code": "funcA();",
         "highlightOffset": [
@@ -53,8 +53,8 @@
         ]
       },
       {
-        "title": "Inside funcA: Creating Variable a",
-        "explanation": "Local variable `a=10` is created inside funcA's frame.\n\nLocal variables are only valid within their function's frame.",
+        "title": "Inside funcA: Create variable a",
+        "explanation": "A local variable `a=10` is created within the `funcA` frame.\n\nLocal variables are only valid in that function frame.",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "stack": [
@@ -79,8 +79,8 @@
         ]
       },
       {
-        "title": "Calling funcB (Stack Push)",
-        "explanation": "The `funcB(a);` call pushes funcB's frame on top.\n\nThe value 10 from `a` is copied to parameter `x`.",
+        "title": "call funcB (stack push)",
+        "explanation": "When calling `funcB(a);`, an additional funcB frame is pushed.\n\nThe value 10 of `a` is copied and passed as parameter `x`.",
         "visualizationType": "cMemory",
         "code": "funcB(a);",
         "highlightOffset": [
@@ -121,8 +121,8 @@
         ]
       },
       {
-        "title": "Inside funcB: Creating Variable b",
-        "explanation": "The computation `b = x + 1` stores `b=11`.\n\nThe funcB frame now contains both `x` and `b`.",
+        "title": "Inside funcB: Create variable b",
+        "explanation": "The calculation `b = x + 1` stores `b=11`.\n\nCurrently, `x` and `b` exist in the funcB frame.",
         "visualizationType": "cMemory",
         "code": "int b = x + 1;",
         "stack": [
@@ -165,15 +165,15 @@
         ]
       },
       {
-        "title": "funcB: Printing the Result",
-        "explanation": "`printf` outputs the value of `b` (11).\n\nOutput goes to standard output, independent of the frame.",
+        "title": "funcB: Result output",
+        "explanation": "`printf` prints `b` value 11\n\nOutput is directed to standard output separately from the frame.",
         "visualizationType": "cMemory",
         "code": "printf(\"Inside funcB: b=%d\\n\", b);",
         "stdout": "Inside funcB: b=11"
       },
       {
-        "title": "funcB Returns (Stack Pop)",
-        "explanation": "When funcB ends, its frame is popped and `x`, `b` are destroyed.\n\nControl returns to the caller, funcA.",
+        "title": "exit funcB (stack pop)",
+        "explanation": "When funcB ends, the funcB frame is popped and `x` and `b` are also destroyed.\n\nControl returns to caller funcA.",
         "visualizationType": "cMemory",
         "code": "}",
         "stack": [
@@ -198,8 +198,8 @@
         ]
       },
       {
-        "title": "funcA Returns (Stack Pop)",
-        "explanation": "When funcA ends, its frame is popped and `a` is destroyed along with it.\n\nControl returns to main.",
+        "title": "exit funcA (stack pop)",
+        "explanation": "When funcA ends, the funcA frame is popped and `a` is also destroyed.\n\nAfterwards, return to main.",
         "visualizationType": "cMemory",
         "code": "}",
         "occurrence": 2,
@@ -213,8 +213,8 @@
         ]
       },
       {
-        "title": "Program Termination",
-        "explanation": "`return 0;` terminates main and the last frame is cleaned up.\n\nSummary: function call = push, function return = pop.",
+        "title": "Program exit",
+        "explanation": "`return 0;` terminates main and cleans up the last frame.\n\nSummary: Function call is push, function exit is pop.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -223,22 +223,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "If a function recursively calls itself 10,000 times and runs out of stack space, what error occurs?",
+    "question": "What error occurs if a function is called recursively 10,000 times and the stack space is full?",
     "options": [
       "Heap Overflow",
-      "Stack Overflow",
+      "StackOverflow",
       "Memory Leak",
       "Segmentation Fault"
     ],
     "correctIndex": 1,
-    "explanation": "When the stack space (typically 1MB-8MB) is exceeded, no more frames can be pushed, causing a Stack Overflow error."
+    "explanation": "If the stack space (usually 1MB to 8MB) is exceeded, no more frames can be stacked and a Stack Overflow error occurs."
   },
   "misconceptions": [
     {
-      "wrong": "funcA's variable a can be used inside funcB",
-      "correct": "It's not visible (Scope).",
-      "why": "`funcB` can only see variables within its own frame.\n`funcA`'s frame is on a different level and cannot be accessed."
+      "wrong": "The variable a of funcA can also be used in funcB.",
+      "correct": "It is not visible (Scope).",
+      "why": "`funcB` can only see variables within its own frame.\nThe frame in `funcA` is in another layer and cannot be accessed."
     }
   ],
-  "keyTakeaway": "Function call = stack frame Push, return = Pop. Each function only uses data in its own room (frame)."
+  "keyTakeaway": "Function call = Stack frame Push, return = Pop. Each person only uses data for their own room (frame)."
 }

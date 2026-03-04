@@ -1,13 +1,13 @@
 {
   "lessonId": "java-8-2",
-  "title": "HashMap：哈希函数的魔法",
-  "concept": "HashMap 就像一本魔法字典，给它一个"键（Key）"就能立即找到"值（Value）"。",
+  "title": "HashMap: 해시 함수의 마법",
+  "concept": "HashMap은 '키(Key)'를 넣으면 '값(Value)'을 즉시 찾아주는 마법의 사전과 같습니다.",
   "content": {
     "code": "import java.util.HashMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        HashMap<String, Integer> scores = new HashMap<>();\n        \n        scores.put(\"Alice\", 90);\n        scores.put(\"Bob\", 85);\n        \n        System.out.println(scores.get(\"Alice\")); // 90\n    }\n}",
     "steps": [
       {
-        "title": "包导入",
-        "explanation": "**`import java.util.HashMap;`**\n\n导入以键值对方式存储数据的 `HashMap`。",
+        "title": "패키지 임포트",
+        "explanation": "**`import java.util.HashMap;`**\n\n키-값 쌍으로 데이터를 저장하는 `HashMap`을 사용하기 위해 가져옵니다.",
         "visualizationType": "javaMemory",
         "code": "import java.util.HashMap;",
         "javaMemoryState": {
@@ -17,8 +17,8 @@
         }
       },
       {
-        "title": "main 方法开始",
-        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。\n让我们来使用魔法字典 `HashMap` 吧。",
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다.\n마법의 사전 `HashMap`을 사용해봅시다.",
         "visualizationType": "javaMemory",
         "code": "public static void main(String[] args) {",
         "javaMemoryState": {
@@ -32,8 +32,8 @@
         }
       },
       {
-        "title": "创建 HashMap",
-        "explanation": "**执行流程：**\n1. 在堆中创建 `HashMap` 对象。\n2. 内部准备好用于存储数据的"桶（Bucket）"数组。\n\n**魔法盒子：**\n它是一个给它键（Key）就能立即找到值（Value）的魔法字典。",
+        "title": "HashMap 생성",
+        "explanation": "**실행 순서:**\n1. `HashMap` 객체를 힙에 생성합니다.\n2. 내부적으로 데이터를 저장할 '버킷(Bucket)' 배열을 준비합니다.\n\n**마법 상자:**\n키(Key)를 주면 값(Value)을 즉시 찾아주는 마법의 사전입니다.",
         "visualizationType": "javaMemory",
         "code": "HashMap<String, Integer> scores = new HashMap<>();",
         "javaMemoryState": {
@@ -61,8 +61,8 @@
         }
       },
       {
-        "title": "存储 Alice 的分数",
-        "explanation": "**执行流程：**\n1. 计算 `Alice` 的哈希码（ID）。\n2. 根据这个 ID 确定放入第几个抽屉（Bucket）。\n3. 将 `{Key:'Alice', Value:90}` 存入该抽屉。\n\n**立即入住：**\n只需看标签（Key），就能立刻知道该放在哪里。",
+        "title": "Alice 점수 저장",
+        "explanation": "**실행 순서:**\n1. `Alice`의 해시코드(ID)를 계산합니다.\n2. 이 ID를 이용해 몇 번째 서랍(Bucket)에 넣을지 정합니다.\n3. 해당 서랍에 `{Key:'Alice', Value:90}` 세트를 저장합니다.\n\n**즉시 입주:**\n이름표(Key)만 보면 어디에 넣어야 할지 바로 알 수 있습니다.",
         "visualizationType": "javaMemory",
         "code": "scores.put(\"Alice\", 90);",
         "javaMemoryState": {
@@ -77,8 +77,8 @@
         }
       },
       {
-        "title": "存储 Bob 的分数",
-        "explanation": "**执行流程：**\n1. 计算 `Bob` 的哈希码，找到它的位置。\n2. 将 `{Key:'Bob', Value:85}` 存入指定的抽屉。\n\n**各有各的房间：**\n不同的键（Key）通常被分配到不同的房间。",
+        "title": "Bob 점수 저장",
+        "explanation": "**실행 순서:**\n1. `Bob`도 해시코드를 계산해서 자기 자리를 찾아갑니다.\n2. 지정된 서랍에 `{Key:'Bob', Value:85}`를 저장합니다.\n\n**각자의 방:**\n키(Key)가 다르면 보통 다른 방에 배정됩니다.",
         "visualizationType": "javaMemory",
         "code": "scores.put(\"Bob\", 85);",
         "javaMemoryState": {
@@ -93,8 +93,8 @@
         }
       },
       {
-        "title": "查询 Alice（get）",
-        "explanation": "**执行流程：**\n1. 重新计算 `Alice` 的哈希码。\n2. 立即跳转到之前存放的那个抽屉。\n3. 取出值 `90`。\n\n**光速查找（O(1)）：**\n即使有一百万条数据，只要知道哈希码就能立即定位，速度极快！",
+        "title": "Alice 조회 (get)",
+        "explanation": "**실행 순서:**\n1. `Alice`의 해시코드를 다시 계산합니다.\n2. 아까 넣었던 그 서랍으로 순간 이동합니다.\n3. 값 `90`을 꺼내옵니다.\n\n**광속 검색 (O(1)):**\n데이터가 100만 개여도, 해시코드만 알면 위치를 바로 알 수 있어 속도가 엄청 빠릅니다!",
         "visualizationType": "javaMemory",
         "code": "System.out.println(scores.get(\"Alice\")); // 90",
         "javaMemoryState": {
@@ -114,22 +114,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "在 HashMap 中用相同的 Key 再次 put() 数据会怎样？",
+    "question": "如果在HashMap中使用相同的Key再次put()数据会发生什么？",
     "options": [
-      "会报错",
-      "原有数据被新数据覆盖",
-      "两条数据都以列表形式存储",
-      "会被忽略"
+      "发生错误",
+      "现有数据将被新数据覆盖。",
+      "两种数据都存储为列表。",
+      "被忽略"
     ],
     "correctIndex": 1,
-    "explanation": "Map 中的 Key 必须是唯一的。\n用相同的 Key 存储时，原有的 Value 会被替换为新值。"
+    "explanation": "地图中的键必须是唯一的。\n如果使用相同的 Key 保存，现有的 Value 将被新值替换。"
   },
   "misconceptions": [
     {
-      "wrong": "HashMap 按照数据插入的顺序存储。",
-      "correct": "不是的！HashMap 不保证顺序。",
-      "why": "数据根据哈希函数的结果分散存储在不同位置（Bucket）中。\n如果需要保持顺序，应该使用 LinkedHashMap。"
+      "wrong": "HashMap은 데이터를 넣은 순서대로 저장한다.",
+      "correct": "아니요! HashMap은 순서를 보장하지 않습니다.",
+      "why": "해시 함수 결과값에 따라 임의의 위치(Bucket)에 분산 저장되기 때문입니다.\n순서가 중요하다면 LinkedHashMap을 써야 합니다."
     }
   ],
-  "keyTakeaway": "当你想用键值对光速查找数据时，HashMap 就是最佳选择！"
+  "keyTakeaway": "Key-Value 쌍으로 데이터를 광속으로 찾고 싶을 땐 HashMap이 정답입니다!"
 }

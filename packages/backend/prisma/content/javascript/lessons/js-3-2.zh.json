@@ -1,13 +1,13 @@
 {
   "lessonId": "js-3-2",
-  "title": "方法中的 this",
-  "concept": "作为方法调用时，this 指向拥有该方法的对象",
+  "title": "메서드에서의 this",
+  "concept": "메서드로 호출되면 this는 그 메서드를 소유한 객체를 가리킨다",
   "content": {
     "code": "const user = {\n  name: 'Alice',\n  greet() {\n    console.log(`Hello, ${this.name}`);\n  }\n};\n\nuser.greet();\n\nconst greetFn = user.greet;\ngreetFn();",
     "steps": [
       {
-        "title": "创建 user 对象",
-        "explanation": "创建一个包含 name 属性和 greet 方法的 user 对象。",
+        "title": "user 객체 생성",
+        "explanation": "name 속성과 greet 메서드를 가진 user 객체를 생성합니다.",
         "visualizationType": "thisBinding",
         "code": "const user = {",
         "highlightOffset": [
@@ -38,10 +38,10 @@
         }
       },
       {
-        "title": "调用 user.greet()",
-        "explanation": "将 greet 作为 user 对象的方法调用。\n点（.）前面的对象就是 this！",
-        "keyInsight": "以 obj.method() 方式调用时，this = obj",
-        "analogy": "点前面的对象成为函数的所有者。",
+        "title": "user.greet() 호출",
+        "explanation": "greet를 user의 메서드로 호출합니다.\n점(.) 앞의 객체가 this가 됩니다!",
+        "keyInsight": "obj.method() 형태로 호출하면 this = obj",
+        "analogy": "점(.) 앞에 있는 객체가 함수의 주인이 됩니다.",
         "visualizationType": "thisBinding",
         "code": "user.greet();",
         "thisState": {
@@ -60,8 +60,8 @@
         }
       },
       {
-        "title": "访问 this.name",
-        "explanation": "由于 this 指向 user，this.name 就是 'Alice'。",
+        "title": "this.name 접근",
+        "explanation": "this는 user를 가리키므로 this.name은 'Alice'입니다.",
         "visualizationType": "thisBinding",
         "code": "console.log(`Hello, ${this.name}`);",
         "thisState": {
@@ -73,9 +73,9 @@
         }
       },
       {
-        "title": "复制函数引用",
-        "explanation": "将 user.greet 赋值给 greetFn 变量。\n只复制了函数本身——与对象的连接被切断了！",
-        "keyInsight": "将函数存入变量会断开它与对象的连接。",
+        "title": "함수 참조 복사",
+        "explanation": "user.greet를 greetFn 변수에 할당합니다.\n함수 자체만 복사되고, 객체와의 연결은 끊어집니다!",
+        "keyInsight": "함수를 변수에 저장하면 객체와의 연결이 끊어집니다.",
         "visualizationType": "thisBinding",
         "code": "const greetFn = user.greet;",
         "thisState": {
@@ -101,7 +101,7 @@
               "value": "function (same as user.greet)"
             }
           ],
-          "warning": "与对象的连接已断开！",
+          "warning": "객체와의 연결 끊어짐!",
           "thisValue": null,
           "callStack": null,
           "output": null,
@@ -109,10 +109,10 @@
         }
       },
       {
-        "title": "调用 greetFn() — this 丢失！",
-        "explanation": "greetFn() 是一个普通函数调用。\n点前面没有对象，所以 this 是全局对象（或 undefined）！",
-        "keyInsight": "将方法存入变量再调用会丢失 this！",
-        "misconception": "很容易以为 this 仍然是 user，因为 greetFn 原本就是 user.greet。",
+        "title": "greetFn() 호출 - this 손실!",
+        "explanation": "greetFn()은 일반 함수 호출입니다.\n점(.) 앞에 객체가 없으므로 this는 전역(또는 undefined)입니다!",
+        "keyInsight": "메서드를 변수에 저장하고 호출하면 this를 잃어버립니다!",
+        "misconception": "greetFn이 원래 user.greet였으니 this도 user일 거라 착각하기 쉽습니다.",
         "visualizationType": "thisBinding",
         "code": "greetFn();",
         "thisState": {
@@ -128,9 +128,9 @@
         }
       },
       {
-        "title": "访问 this.name（this 丢失）",
-        "explanation": "在 greetFn 内部访问 `this.name`。\n但 this 是 window（或 undefined），所以 `this.name` 是 **undefined**！",
-        "keyInsight": "同样的代码（第4行），但 this 不同，所以结果不同。",
+        "title": "this.name 접근 (this 손실 상태)",
+        "explanation": "greetFn 내부에서 `this.name`에 접근합니다.\n하지만 this가 window(또는 undefined)이므로, `this.name`은 **undefined**입니다!",
+        "keyInsight": "같은 코드(line 4)인데 this가 달라서 결과가 다릅니다.",
         "visualizationType": "thisBinding",
         "code": "console.log(`Hello, ${this.name}`);",
         "thisState": {
@@ -140,34 +140,34 @@
             "Hello, undefined"
           ],
           "thisAccess": "this.name → undefined",
-          "warning": "this 是 window，所以没有 name！"
+          "warning": "this가 window라서 name이 없음!"
         }
       }
     ],
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下代码的输出是什么？\n\nconst obj = {\n  value: 42,\n  getValue() { return this.value; }\n};\nconst fn = obj.getValue;\nconsole.log(fn());",
+    "question": "以下代码的输出是什么？\n\n常量对象 = {\n  值：42，\n  getValue() { 返回 this.value; }\n};\nconst fn = obj.getValue;\n控制台.log(fn());",
     "options": [
       "42",
-      "undefined",
-      "null",
+      "不明确的",
+      "无效的",
       "发生错误"
     ],
     "correctIndex": 1,
-    "explanation": "fn() 是一个普通函数调用。\nthis 变为全局对象，全局对象上没有 value，所以返回 undefined。"
+    "explanation": "fn() 是常规函数调用。\n这成为一个全局对象，并且由于全局中没有值，因此返回 undefined。"
   },
   "misconceptions": [
     {
-      "wrong": "将方法赋值给变量后 this 仍然保留",
-      "correct": "不会。\n当你把 `obj.method` 存入变量的那一刻，它就失去了与 `obj` 的连接，变成了一个普通函数。",
-      "why": "在 JavaScript 中，函数**不与**对象绑定。\n只有通过点语法调用时，对象才被临时"借用"。"
+      "wrong": "메서드를 변수에 할당해도 this는 유지된다",
+      "correct": "유지되지 않습니다.\n`obj.method`를 변수에 넣는 순간 `obj`와의 연결이 끊어지고 일반 함수가 됩니다.",
+      "why": "JS에서 함수는 객체에 **묶여있지 않습니다(Not bound)**.\n점(.)을 통해 호출할 때만 잠시 빌려 쓰는 개념입니다."
     },
     {
-      "wrong": "this 指向定义函数的对象",
-      "correct": "this 指向调用函数的对象（点前面的对象）。",
-      "why": "同一个函数根据调用方式不同，可以有不同的 this。"
+      "wrong": "this는 함수가 정의된 객체를 가리킨다",
+      "correct": "this는 함수를 호출한 객체(점 앞의 객체)를 가리킵니다.",
+      "why": "같은 함수도 호출 방식에 따라 다른 this를 가집니다."
     }
   ],
-  "keyTakeaway": "obj.method() → this = obj，fn() → this = global（this 丢失）"
+  "keyTakeaway": "obj.method() → this = obj, fn() → this = 전역 (this 손실)"
 }

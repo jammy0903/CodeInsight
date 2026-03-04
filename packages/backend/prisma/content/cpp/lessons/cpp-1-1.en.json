@@ -1,0 +1,97 @@
+{
+  "lessonId": "cpp-1-1",
+  "title": "Reference Basic",
+  "concept": "A reference is not a copy but an alias attached to an existing variable.",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x = 10;\n    int& ref = x;\n\n    ref = 42;\n    cout << x << \" \" << ref << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Create x variable",
+        "explanation": "`x` is created on the stack and the value 10 is stored.",
+        "visualizationType": "cMemory",
+        "code": "int x = 10;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "Create a reference ref",
+        "explanation": "`ref` is an alias for `x`, not a new int object. Looking at the same address.",
+        "visualizationType": "cMemory",
+        "code": "int& ref = x;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "ref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "x"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "Modifying value via ref",
+        "explanation": "`ref = 42` modifies `x` itself, which is what it refers to.",
+        "visualizationType": "cMemory",
+        "code": "ref = 42;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "42",
+            "type": "int",
+            "address": "0x1000",
+            "highlight": true
+          },
+          {
+            "name": "ref",
+            "value": "42",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "x"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "Check output",
+        "explanation": "`x` and `ref` output the same value. This is because they both share the same memory location.",
+        "visualizationType": "terminal",
+        "code": "cout << x << \" \" << ref << endl;",
+        "stdout": "42 42"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "`int x = 1; int& r = x; r = 5;` What is the value of x after execution?",
+    "options": [
+      "1",
+      "5",
+      "compilation error",
+      "undefined value"
+    ],
+    "correctIndex": 1,
+    "explanation": "The reference `r` is an alias for `x`, so `r = 5` modifies `x` directly."
+  },
+  "misconceptions": [
+    {
+      "wrong": "References are just like pointers",
+      "correct": "A reference is an alias that must have a target when declared and cannot be null.",
+      "why": "Although the syntax looks similar, the memory model and usage restrictions are different."
+    }
+  ],
+  "keyTakeaway": "A reference is not a copy, but just another name for the original variable."
+}

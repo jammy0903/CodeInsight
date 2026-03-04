@@ -1,0 +1,75 @@
+{
+  "lessonId": "cpp-6-2",
+  "title": "std::move in action",
+  "concept": "std::move removes unnecessary overhead by transferring object resources without copying them.",
+  "content": {
+    "code": "#include <iostream>\n#include <string>\n#include <utility>\nusing namespace std;\n\nint main() {\n    string src = \"Hello, World!\";\n    cout << \"before: \" << src << endl;\n\n    string dst = std::move(src);\n    cout << \"dst: \" << dst << endl;\n    cout << \"src: [\" << src << \"]\" << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Create original string",
+        "explanation": "`src` adds \"Hello, World!\" to the heap. Allocates character data.",
+        "visualizationType": "cMemory",
+        "code": "string src = \"Hello, World!\";",
+        "stack": [
+          {
+            "name": "src",
+            "value": "Hello, World!",
+            "type": "std::string",
+            "address": "0x1000"
+          }
+        ],
+        "heap": [],
+        "stdout": "before: Hello, World!"
+      },
+      {
+        "title": "Transfer ownership with std::move",
+        "explanation": "`std::move(src)` casts `src` to an rvalue.\n\nThe move constructor of `dst` is called to get the internal pointer of `src` **without copying**.\n\nAfterwards, `src` will be in a valid but empty state (moved-from state).",
+        "visualizationType": "cMemory",
+        "code": "string dst = std::move(src);",
+        "stack": [
+          {
+            "name": "src",
+            "value": "",
+            "type": "std::string",
+            "address": "0x1000",
+            "highlight": true
+          },
+          {
+            "name": "dst",
+            "value": "Hello, World!",
+            "type": "std::string",
+            "address": "0x1020",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "Check results",
+        "explanation": "`dst` originally contains data from `src`, and `src` is an empty string.\n\n**Key**: Removed heap allocation/copy costs by moving instead of copying.",
+        "visualizationType": "terminal",
+        "code": "cout << \"dst: \" << dst << endl;",
+        "stdout": "dst: Hello, World!\nsrc: []"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is the state of the original object after std::move?",
+    "options": [
+      "deleted",
+      "Valid, but empty because the value has been moved (moved-from)",
+      "Keep the original value as is",
+      "becomes nullptr"
+    ],
+    "correctIndex": 1,
+    "explanation": "The moved-from object is valid, but its value is unspecified. Destroying or assigning a new value is safe."
+  },
+  "misconceptions": [
+    {
+      "wrong": "std::move actually moves data",
+      "correct": "std::move itself doesn't move anything. It just casts an lvalue to an rvalue, the actual move is done by the move constructor/assignment operator.",
+      "why": "Although the name is misleading, std::move is just a convenience function for static_cast<T&&>(x)."
+    }
+  ],
+  "keyTakeaway": "std::move is a key tool in modern C++ for moving resources without copying costs."
+}

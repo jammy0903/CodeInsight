@@ -1,14 +1,14 @@
 {
   "lessonId": "java-1-1",
-  "title": "== 与 .equals() 基础",
-  "concept": "== 比较引用（内存地址），而 .equals() 比较值",
+  "title": "== vs .equals() 기본",
+  "concept": "==는 참조(메모리 주소)를 비교하고, .equals()는 값을 비교한다",
   "content": {
     "code": "String a = new String(\"hello\");\nString b = new String(\"hello\");\n\nSystem.out.println(a == b);\nSystem.out.println(a.equals(b));\n\nString c = a;\nSystem.out.println(a == c);",
     "steps": [
       {
-        "title": "创建第一个 String 对象",
-        "explanation": "**执行顺序：**\n1. 调用 `new String(...)`（在堆上创建 \"hello\"）。\n2. 将对象地址（0x001）赋值给 `a`。\n\n**什么是堆（Heap）？**\n堆是程序运行期间可以自由存储数据的大型内存空间。\n所有通过 `new` 创建的对象都存放在这里。\n\n**什么是引用变量（a）？**\n它不保存对象本身，而只保存对象**所在位置**的地址（就像一个路标）。",
-        "keyInsight": "new = 始终在堆上创建新对象",
+        "title": "첫 번째 String 객체 생성",
+        "explanation": "**실행 순서:**\n1. `new String(...)` 호출 (Heap에 \"hello\" 생성).\n2. 객체 주소(0x001)를 `a`에 할당.\n\n**Heap이란?**\n프로그램 실행 중에 데이터를 자유롭게 저장할 수 있는 거대한 메모리 공간입니다.\n`new`로 만드는 모든 것은 여기로 갑니다.\n\n**참조 변수(a)란?**\n객체 자체가 아니라, 객체가 **어디에 있는지** 알려주는 주소(표지판)만 들고 있는 변수입니다.",
+        "keyInsight": "new = 항상 새 객체 생성 (Heap)",
         "visualizationType": "javaMemory",
         "code": "String a = new String(\"hello\");",
         "javaMemoryState": {
@@ -29,9 +29,9 @@
         }
       },
       {
-        "title": "创建第二个 String 对象",
-        "explanation": "**执行顺序：**\n1. 再次调用 `new String(...)`。\n2. 在堆上创建新对象（0x002）。\n3. 将地址赋值给 `b`。\n\nJVM 不会重用已有对象，而是无条件创建一个**全新的对象**。\n虽然两者的内容都是 \"hello\"，但它们的**地址（住所）**完全不同。\n就像一对双胞胎住在不同的房子里。",
-        "keyInsight": "内容相同但对象不同 = 地址不同",
+        "title": "두 번째 String 객체 생성",
+        "explanation": "**실행 순서:**\n1. `new String(...)` 또 호출.\n2. Heap에 새 객체(0x002) 생성.\n3. 주소를 `b`에 할당.\n\nJVM은 기존 것을 재사용하지 않고 무조건 **새로운 객체**를 만듭니다.\n내용은 둘 다 \"hello\"로 똑같지만, **사는 집(주소)**이 완전히 다릅니다.\n쌍둥이가 서로 다른 집에 사는 것과 같습니다.",
+        "keyInsight": "내용이 같아도 다른 객체 = 다른 주소",
         "visualizationType": "javaMemory",
         "code": "String b = new String(\"hello\");",
         "javaMemoryState": {
@@ -61,9 +61,9 @@
         }
       },
       {
-        "title": "== 比较（引用比较）",
-        "explanation": "**执行顺序：**\n1. 查找 a 的值（0x001）。\n2. 查找 b 的值（0x002）。\n3. 比较 `0x001 == 0x002` -> **false**。\n\n`==` 运算符非常简单直接。\n它只比较**变量中存储的值（地址）**。\n\n**什么是引用比较？**\n它只检查"包装纸（地址）"是否相同，而不会打开查看里面的"内容"。",
-        "keyInsight": "== 比较的是地址值",
+        "title": "== 비교 (참조 비교)",
+        "explanation": "**실행 순서:**\n1. a의 값(0x001) 조회.\n2. b의 값(0x002) 조회.\n3. `0x001 == 0x002` 비교 -> **false**.\n\n`==` 연산자는 매우 단순합니다.\n**변수 안에 들어있는 값(주소)**만 비교합니다.\n\n**참조 비교란?**\n'내용물'을 뜯어보는 게 아니라, '포장지(주소)'가 같은지만 확인하는 것입니다.",
+        "keyInsight": "== 는 주소값 비교",
         "visualizationType": "javaMemory",
         "code": "System.out.println(a == b);",
         "javaMemoryState": {
@@ -74,9 +74,9 @@
         }
       },
       {
-        "title": ".equals() 比较（值比较）",
-        "explanation": "**执行顺序：**\n1. 跳转到 a 指向的对象。\n2. 将其内容（\"hello\"）与 b 指向的对象进行比较。\n3. 内容一致 -> **true**。\n\n`.equals()` 非常细致。\n它会沿着地址找到对象，并检查其中的**实际内容**（\"hello\"）。\n\n**什么是值比较？**\n即使对象的内存位置不同，也会检查它们在逻辑上包含的数据是否相同。",
-        "keyInsight": ".equals() 比较的是实际内容",
+        "title": ".equals() 비교 (값 비교)",
+        "explanation": "**실행 순서:**\n1. a가 가리키는 객체로 이동.\n2. b가 가리키는 객체와 내용(\"hello\") 비교.\n3. 내용 일치 -> **true**.\n\n`.equals()`는 꼼꼼합니다.\n주소를 따라가서 그 안에 있는 **실제 내용물**(\"hello\")을 확인합니다.\n\n**값 비교(Value Comparison)란?**\n객체의 메모리 위치가 달라도, 논리적으로 담고 있는 데이터가 같은지 확인하는 것입니다.",
+        "keyInsight": ".equals()는 내용물 비교",
         "visualizationType": "javaMemory",
         "code": "System.out.println(a.equals(b));",
         "javaMemoryState": {
@@ -87,8 +87,8 @@
         }
       },
       {
-        "title": "赋值相同的引用",
-        "explanation": "**执行顺序：**\n1. 将 a 的值（0x001）复制给 c。\n2. c 现在也指向 0x001。\n\n`String c = a;`\n这段代码并不是复制对象。\n它只是将 `a` 持有的**地址（0x001）**复制给了 `c`。\n现在 `a` 和 `c` 指向**同一个房子**。\n\n**什么是别名（Aliasing）？**\n多个变量同时指向同一个对象的情况。\n`c` 只不过是 `a` 的另一个名字。",
+        "title": "같은 참조 할당",
+        "explanation": "**실행 순서:**\n1. a의 값(0x001)을 c에 복사.\n2. c도 0x001을 가리킴.\n\n`String c = a;`\n이 코드는 객체를 복사하는 게 아닙니다.\n`a`가 가지고 있던 **주소(0x001)**만 `c`에게 복사해줍니다.\n이제 `a`와 `c`는 **같은 집**을 가리키게 되었습니다.\n\n**별칭(Aliasing)이란?**\n하나의 객체를 여러 변수가 동시에 가리키는 상황입니다.\n`c`는 `a`의 또 다른 이름일 뿐입니다.",
         "visualizationType": "javaMemory",
         "code": "String c = a;",
         "javaMemoryState": {
@@ -126,9 +126,9 @@
         }
       },
       {
-        "title": "比较相同的引用",
-        "explanation": "**执行顺序：**\n1. 比较 a(0x001) == c(0x001)。\n2. 相同 -> **true**。\n\n**总结：**\n- `==`：你们住在**同一栋房子**吗？（地址比较）\n- `.equals()`：你们**长得一样（内容相同）**吗？（值比较）",
-        "keyInsight": "指向同一个对象时，== 也返回 true",
+        "title": "같은 참조 비교",
+        "explanation": "**실행 순서:**\n1. a(0x001) == c(0x001) 비교.\n2. 같음 -> **true**.\n\n**총정리:**\n- `==`: 너네 **같은 집**에 살아? (주소 비교)\n- `.equals()`: 너네 **생긴 것(내용)**이 똑같아? (값 비교)",
+        "keyInsight": "같은 객체를 가리키면 == 도 true",
         "visualizationType": "javaMemory",
         "code": "System.out.println(a == c);",
         "javaMemoryState": {
@@ -144,22 +144,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下代码的输出是什么？\n\nInteger x = new Integer(100);\nInteger y = new Integer(100);\nSystem.out.println(x == y);",
+    "question": "以下代码的输出是什么？\n\n整数 x = 新整数(100);\n整数 y = 新整数(100);\nSystem.out.println(x == y);",
     "options": [
-      "true",
-      "false",
+      "真的",
+      "错误的",
       "编译错误",
       "运行时错误"
     ],
     "correctIndex": 1,
-    "explanation": "new 关键字总是创建新的内存地址（新对象）。\n由于地址不同，== 返回 false。"
+    "explanation": "new关键字无条件创建一个新的内存地址（新对象）。\n由于地址不同，== 为 false。"
   },
   "misconceptions": [
     {
-      "wrong": "== 比较的是内容",
-      "correct": "== 比较的是引用（内存地址）。\n内容比较请使用 .equals()。",
-      "why": "容易与 C++ 的运算符重载或 Python 的 == 混淆，但在 Java 中，== 对对象只比较地址。"
+      "wrong": "==는 내용을 비교한다",
+      "correct": "==는 참조(메모리 주소)를 비교합니다.\n내용 비교는 .equals()입니다.",
+      "why": "C++의 연산자 오버로딩이나 Python의 ==와 헷갈리기 쉽지만, Java의 ==는 객체에 대해서는 오직 주소만 비교합니다."
     }
   ],
-  "keyTakeaway": "比较对象时务必使用 .equals()。== 仅用于基本类型（int、boolean 等）。"
+  "keyTakeaway": "객체 비교는 무조건 .equals()를 쓰세요. ==는 원시 타입(int, boolean 등)에만 씁시다."
 }

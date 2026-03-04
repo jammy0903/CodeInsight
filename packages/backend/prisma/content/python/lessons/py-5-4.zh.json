@@ -1,18 +1,18 @@
 {
   "lessonId": "py-5-4",
   "title": "Inheritance",
-  "concept": "继承父类的功能并重复使用（继承）",
+  "concept": "부모 클래스의 기능을 물려받아 재사용한다 (상속)",
   "content": {
     "code": "class Animal:\n    def speak(self):\n        print(\"...\")\n\nclass Dog(Animal):\n    def speak(self):\n        print(\"Bark!\")\n\nclass Cat(Animal):\n    pass\n\nd = Dog()\nc = Cat()\n\nd.speak() # Bark! (오버라이딩)\nc.speak() # ... (부모 꺼 그대로)",
     "steps": [
       {
-        "title": "父类定义（Animal）",
-        "explanation": "**`class Animal:`**\n\nPython 从上到下顺序执行代码。定义一个名为 `Animal` 的**父类（Parent Class，也叫基类 Base Class）**。\n\n**本课目标——继承（Inheritance）**：**继承并复用**已创建类的功能，只**添加或修改**需要的部分。这是编程中最强大的代码复用技术之一。\n\n**比喻**：类似于从父母那里继承基因。继承基本特征（Animal 的 speak），同时可以拥有自己的个性（Dog 说 \"Bark!\"，Cat 保持父类的默认值）。\n\n**Python 内部机制**：当 Python 遇到 `class Animal:` 时，会创建 Animal 类对象。这个类之后将作为 Dog 和 Cat 的**父类**。未指定父类时，Python 3 会自动继承 `object` 类（即 `class Animal:` = `class Animal(object):`）。\n\n**为什么是这个顺序？** 必须先定义父类，子类才能继承它。尝试继承一个尚不存在的类会引发 `NameError`。\n\n**执行顺序**：执行 class Animal → 开始创建 Animal 类对象 → 第2行",
+        "title": "부모 클래스 정의 (Animal)",
+        "explanation": "**`class Animal:`**\n\n**부모 클래스(Parent Class)**를 정의합니다. 상속(Inheritance)은 이미 만들어진 클래스의 기능을 물려받아 재사용하고, 필요한 부분만 추가하거나 변경하는 기법입니다. 부모 클래스를 먼저 정의해야 자식 클래스가 상속받을 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "class Animal:",
         "pythonMemoryState": {
           "output": [],
-          "note": "父类定义开始",
+          "note": "부모 클래스 정의 시작",
           "names": [
             {
               "name": "Animal",
@@ -30,8 +30,8 @@
         }
       },
       {
-        "title": "父类方法定义（speak）",
-        "explanation": "**`def speak(self):`**\n\n在父类 `Animal` 中定义 `speak` 方法。该方法通过 `print(\"...\")` 输出一个基本的声音（\"...\"）。\n\n**父类方法的两种命运**：在子类中，这个方法可以：\n1. **原样继承**——如果不重新定义，就直接使用父类的 speak（Cat 就是这种情况）\n2. **重写（Override）**——用相同的名字重新定义，子类的版本优先（Dog 就是这种情况）\n\n**比喻**：Animal.speak 是"动物会发声"的**基本设计**。由于每种具体动物的声音不同，子类可以根据需要重新定义。没有重新定义的动物会发出默认声音 \"...\"。\n\n**Python 内部机制**：`def speak(self):` 语句创建一个名为 speak 的函数对象，并注册到 Animal 的 `__dict__` 中。即 `Animal.__dict__['speak'] = <function>`。\n\n**为什么是这个顺序？** 在类体内按顺序定义方法。\n\n**执行顺序**：执行 def speak → 创建 speak 函数对象 → 注册为 Animal.speak → Animal 类定义完成 → 第5行",
+        "title": "부모 메서드 정의 (speak)",
+        "explanation": "**`def speak(self):`**\n\nAnimal의 `speak` 메서드를 정의합니다. 이 메서드는 자식 클래스에서 그대로 상속받거나(Cat), 같은 이름으로 재정의(오버라이딩, Dog)할 수 있습니다. 재정의하지 않은 경우 부모의 `print(\"...\")`가 사용됩니다.",
         "visualizationType": "pythonMemory",
         "code": "def speak(self):",
         "highlightOffset": [
@@ -39,7 +39,7 @@
           1
         ],
         "pythonMemoryState": {
-          "note": "Animal.speak 方法已定义",
+          "note": "Animal.speak 메서드 정의됨",
           "objects": [
             {
               "id": "class1",
@@ -51,12 +51,12 @@
         }
       },
       {
-        "title": "子类定义（Dog）",
-        "explanation": "**`class Dog(Animal):`**\n\n这就是**继承语法**！在括号 `(Animal)` 中写入**父类名称**，声明 Dog 继承自 Animal。\n\n**这一行让 Dog：**\n- 成为 Animal 的**子类（Child Class，也叫派生类 Derived Class）**\n- **自动继承** Animal 的所有方法和属性（不需要写一行代码！）\n- 可以根据需要**添加**新方法\n- 可以用相同的名字**重写（Override）**父类的方法\n\n**Python 内部机制**：执行 `class Dog(Animal):` 时，Python 创建 Dog 类对象，并在 Dog 的 `__bases__` 属性中存储 `(Animal,)` 元组。通过这个信息，之后在方法查找时可以执行"如果 Dog 中找不到就到 Animal 中找"。\n\n**为什么使用继承？**\n- **代码复用**：公共功能（speak）只在 Animal 中写一次，多个子类继承\n- **可扩展性**：可以在父类功能基础上添加新功能\n- **多态（Polymorphism）**：d.speak() 和 c.speak() 同名但可以有不同行为\n\n**比喻**：在动物（Animal）这个大类别下创建狗（Dog）这个具体种类。动物的基本特性自动继承，同时添加狗独有的特性。\n\n**为什么是这个顺序？** 父类必须先存在才能被继承。\n\n**执行顺序**：执行 class Dog(Animal) → 创建 Dog 类对象（继承 Animal）→ 第6行",
+        "title": "자식 클래스 정의 (Dog)",
+        "explanation": "**`class Dog(Animal):`**\n\n괄호 안에 부모 클래스를 써서 상속을 선언합니다. 이 한 줄로 Dog는 Animal의 모든 메서드와 속성을 자동으로 물려받습니다. 필요한 경우 새 메서드 추가나 기존 메서드 재정의도 가능합니다.",
         "visualizationType": "pythonMemory",
         "code": "class Dog(Animal):",
         "pythonMemoryState": {
-          "note": "Dog 类定义开始（继承 Animal）",
+          "note": "Dog 클래스 정의 시작 (Animal 상속)",
           "names": [
             {
               "name": "Animal",
@@ -86,8 +86,8 @@
         }
       },
       {
-        "title": "方法重写（Dog.speak）",
-        "explanation": "**`def speak(self):`**（Dog 类内部）\n\n这就是**方法重写（Method Overriding）**！父类 Animal 中已经有 `speak` 方法，子类 Dog 用**相同的名字重新定义**，**覆盖**了原有行为。\n\n**为什么要重写？** 父类的默认行为（\"...\"）太笼统了。狗应该叫 \"Bark!\"，所以 Dog 类将 speak 重新定义为适合自己的版本。关键在于**无需修改父类代码**就能改变行为！\n\n**比喻**：父母教你"打招呼时要鞠躬"，但在美国长大的你改成了"打招呼时握手"。接受了基本教育但选择了自己的方式。\n\n**注意**：即使重写了，Animal.speak 仍然存在。它不会被删除——只是在 Dog 实例调用时**优先级被降低**了。",
+        "title": "메서드 오버라이딩 (Dog.speak)",
+        "explanation": "**`def speak(self):`** (Dog 클래스 내부)\n\n**메서드 오버라이딩(Method Overriding)**입니다. 부모에도 `speak`가 있는데 자식에서 같은 이름으로 다시 정의하면, Dog 인스턴스 호출 시 자식 버전이 우선 실행됩니다. 부모 코드는 수정하지 않고 동작만 바꿀 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "def speak(self):",
         "occurrence": 2,
@@ -96,7 +96,7 @@
           1
         ],
         "pythonMemoryState": {
-          "note": "Dog.speak 已定义（重写 Animal.speak）",
+          "note": "Dog.speak 정의 (Animal.speak 오버라이딩)",
           "objects": [
             {
               "id": "class1",
@@ -115,12 +115,12 @@
         }
       },
       {
-        "title": "子类定义（Cat）",
-        "explanation": "**`class Cat(Animal):`**\n\n定义另一个子类 `Cat`。和 Dog 一样，在括号中写入 `Animal` 来声明继承。\n\n**Cat vs Dog——同样的父类，不同的策略：**\n- Dog：**重写**了 speak 方法，实现了自己的行为\n- Cat：**没有**重写 speak 方法——直接使用父类的行为！\n\n**Python 内部机制**：创建 Cat 类对象，`Cat.__bases__` = `(Animal,)` 被设置。在 Cat 中查找 speak 时，如果 Cat 自身没有，Python 就沿着 `__bases__` 信息到 Animal 中查找。\n\n**比喻**：Dog 是改变了父母方式的孩子，Cat 是完全遵循父母方式的孩子。两种方式都是有效的，可以根据情况选择。\n\n**为什么是这个顺序？** Dog 类定义完成后，按顺序定义下一个类。\n\n**执行顺序**：执行 class Cat(Animal) → 创建 Cat 类对象（继承 Animal）→ 第10行",
+        "title": "자식 클래스 정의 (Cat)",
+        "explanation": "**`class Cat(Animal):`**\n\nCat도 Animal을 상속받습니다. Dog는 `speak`를 오버라이딩했지만, Cat은 `pass`만 있어 아무것도 재정의하지 않습니다. Cat 인스턴스에서 `speak()`를 호출하면 Animal의 버전(`print(\"...\")`)이 그대로 실행됩니다.",
         "visualizationType": "pythonMemory",
         "code": "class Cat(Animal):",
         "pythonMemoryState": {
-          "note": "Cat 类定义开始（继承 Animal）",
+          "note": "Cat 클래스 정의 시작 (Animal 상속)",
           "names": [
             {
               "name": "Animal",
@@ -160,12 +160,12 @@
         }
       },
       {
-        "title": "pass（直接使用父类方法）",
-        "explanation": "**`pass`**\n\n`pass` 是 Python 的**空语句（no-op）**。什么都不做。当 Cat 类体为空时，需要 `pass` 来满足语法要求。\n\n**如果 Cat 只有 pass？** 它自己没有定义**任何方法**，但**继承了 Animal 的一切**！也就是说，Cat 实例也可以使用 `speak()` 方法——就是 Animal 的 speak 原样。\n\n**Dog vs Cat 对比：**\n- `Dog`：**重写**了 speak → `d.speak()` = \"Bark!\"（Dog 的新版本）\n- `Cat`：**没有**重写 speak → `c.speak()` = \"...\"（Animal 的原始版本）\n\n**这就是继承的灵活性：** 只重写需要的部分，其余的直接使用父类的版本。如果 Animal.speak 的默认行为（\"...\"）对 Cat 来说已经合适，就不需要重新编写代码。\n\n**比喻**：两个孩子继承了一份食谱（父类）。一个（Dog）按自己口味修改了食谱，另一个（Cat）按原始食谱做菜。\n\n**注意**：除了 `pass`，`...`（Ellipsis）也可以达到相同效果：`class Cat(Animal): ...`\n\n**执行顺序**：执行 pass（什么都不做）→ Cat 类定义完成 → 第12行",
+        "title": "pass (부모 메서드 그대로 사용)",
+        "explanation": "**`pass`**\n\nCat 클래스 본문이 비어있을 때 필요한 빈 문장입니다. Cat은 `speak`를 재정의하지 않았으므로 `c.speak()` 호출 시 Python이 자동으로 부모 Animal에서 메서드를 찾아 실행합니다.",
         "visualizationType": "pythonMemory",
         "code": "pass",
         "pythonMemoryState": {
-          "note": "Cat 原样继承 Animal.speak",
+          "note": "Cat은 Animal.speak 그대로 상속",
           "objects": [
             {
               "id": "class1",
@@ -190,12 +190,12 @@
         }
       },
       {
-        "title": "创建 Dog 对象",
-        "explanation": "**`d = Dog()`**\n\n创建 `Dog` 类的实例。调用 `Dog()` 会在内存中创建一个新的 Dog 对象。\n\n**这个对象的身份**：`d` 对象（0x4000）是 Dog 类的实例，同时也是具有 Animal 功能的对象。`isinstance(d, Dog)` = True，`isinstance(d, Animal)` = True 都成立！\n\n**d 对象可以使用的方法：**\n- `d.speak()` → 执行 Dog.speak（重写版本，输出 \"Bark!\"）\n- 如果 Animal 有其他方法，那些也可以使用\n\n**Python 内部机制**：Dog 类没有定义 `__init__`，所以 Python 在父类（Animal）中搜索 `__init__`。Animal 也没有，最终调用 `object.__init__` 只进行默认初始化。\n\n**为什么是这个顺序？** 所有类定义完成后，按顺序执行下一行。\n\n**执行顺序**：调用 Dog() → 通过 __new__ 创建新对象 0x4000 → 将引用 0x4000 赋给 d → 第13行",
+        "title": "Dog 객체 생성",
+        "explanation": "**`d = Dog()`**\n\nDog 인스턴스를 생성합니다. `d`는 Dog 클래스의 인스턴스이면서 Animal의 기능도 가집니다. `d.speak()`를 호출하면 Dog.speak(오버라이딩된 버전)가 실행됩니다.",
         "visualizationType": "pythonMemory",
         "code": "d = Dog()",
         "pythonMemoryState": {
-          "note": "Dog 实例已创建",
+          "note": "Dog 인스턴스 생성",
           "names": [
             {
               "name": "Animal",
@@ -245,12 +245,12 @@
         }
       },
       {
-        "title": "创建 Cat 对象",
-        "explanation": "**`c = Cat()`**\n\n创建 `Cat` 类的实例。\n\n**d 和 c 的区别：**\n- `d` = Dog 实例（0x4000）→ d.speak() 执行 **Dog.speak**（重写）\n- `c` = Cat 实例（0x5000）→ c.speak() 执行 **Animal.speak**（继承）\n\n**为什么 c.speak() 执行 Animal.speak？** Cat 类没有定义 speak 方法（只有 `pass`）。Python 在方法查找时，Cat 中找不到就到父类 Animal 中找。Animal 有 speak，所以使用它。\n\n**isinstance 检查：**\n```python\nisinstance(c, Cat)     # True - Cat 的实例\nisinstance(c, Animal)  # True - Animal 的后代，所以也是 Animal！\nisinstance(c, Dog)     # False - 和 Dog 没有关系\n```\n\n**为什么是这个顺序？** d 创建后，按顺序执行下一行。\n\n**执行顺序**：调用 Cat() → 通过 __new__ 创建新对象 0x5000 → 将引用 0x5000 赋给 c → 第15行",
+        "title": "Cat 객체 생성",
+        "explanation": "**`c = Cat()`**\n\nCat 인스턴스를 생성합니다. Cat에는 `speak`가 정의되지 않았으므로, `c.speak()` 호출 시 Python이 MRO에 따라 부모 Animal에서 `speak`를 찾아 실행합니다.",
         "visualizationType": "pythonMemory",
         "code": "c = Cat()",
         "pythonMemoryState": {
-          "note": "Cat 实例已创建",
+          "note": "Cat 인스턴스 생성",
           "names": [
             {
               "name": "Animal",
@@ -310,12 +310,12 @@
         }
       },
       {
-        "title": "调用 d.speak()",
-        "explanation": "**`d.speak()`**\n\n调用 Dog 对象 `d` 的 `speak` 方法。这里 Python 的**方法解析顺序（MRO - Method Resolution Order）**开始发挥作用。\n\n**Python 查找方法的顺序：**\n1. d 对象自身有 speak 吗？→ 没有（方法在类上）\n2. d 的类 **Dog** 有 speak 吗？→ **有！（重写版本）** → 搜索在此停止！\n3. 父类 **Animal** 不再搜索（已经找到了）\n\n**结果**：执行 Dog.speak。将执行 `print(\"Bark!\")`。\n\n**如何查看 MRO**：输出 `Dog.__mro__` 可以看到 `(<class 'Dog'>, <class 'Animal'>, <class 'object'>)` 的顺序。Python 按这个顺序搜索方法。\n\n**比喻**：在学校有问题时，先问班主任（Dog）。如果班主任知道答案（有 speak），就到此为止！不知道就问副校长（Animal），校长（object）。\n\n**为什么是这个顺序？** c 创建后，按顺序执行下一行。\n\n**执行顺序**：第15行 → 调用 d.speak() → 在 Dog 中找到 speak → 执行 Dog.speak → 跳转到第7行",
+        "title": "d.speak() 호출",
+        "explanation": "**`d.speak()`**\n\nPython의 메서드 탐색 순서(MRO)가 작동합니다. Dog 클래스에 `speak`가 있으므로 즉시 Dog.speak를 실행합니다. `print(\"Bark!\")`가 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "d.speak() # Bark! (오버라이딩)",
         "pythonMemoryState": {
-          "note": "调用 d.speak() → 即将跳转到 Dog.speak",
+          "note": "d.speak() 호출 → Dog.speak으로 점프 예정",
           "names": [
             {
               "name": "Animal",
@@ -373,15 +373,15 @@
         }
       },
       {
-        "title": "执行 Dog.speak（重写版本）",
-        "explanation": "**`print(\"Bark!\")`**\n\n**重写的 Dog.speak 方法执行了！** \"Bark!\" 输出到屏幕。\n\n**为什么不是 Animal.speak 的 \"...\"？** 因为 Dog 类**重写（Override）**了 speak。根据 Python 的 MRO，Dog.speak 的**优先级高于** Animal.speak。在 Dog 中找到 speak 的瞬间搜索就停止了，所以 Animal.speak 不会被执行。\n\n**重写的本质**：**无需修改父类代码**就能在子类中改变行为。Animal 类完全没有改变。Dog 只是定义了自己的 speak。这就是**开闭原则（Open-Closed Principle）**的基础——对扩展开放，对修改关闭。\n\n**参考**：如果 Dog 也想调用父类的 speak，可以使用 `super().speak()`。但在这个例子中，我们完全用不同的行为替代了它。\n\n**执行顺序**：执行 print(\"Bark!\") → 输出 \"Bark!\" 到屏幕 → Dog.speak 结束 → 返回第16行",
+        "title": "Dog.speak 실행 (오버라이딩된 버전)",
+        "explanation": "**`print(\"Bark!\")`**\n\n오버라이딩된 Dog.speak가 실행됩니다. MRO에 따라 Dog.speak가 Animal.speak보다 우선순위가 높으므로, `\"Bark!\"`가 출력됩니다. Animal 코드는 전혀 변경하지 않았습니다.",
         "visualizationType": "pythonMemory",
         "code": "print(\"Bark!\")",
         "pythonMemoryState": {
           "output": [
             "Bark!"
           ],
-          "note": "执行 Dog 重写的 speak",
+          "note": "Dog의 오버라이딩된 speak 실행",
           "names": [
             {
               "name": "Animal",
@@ -451,12 +451,12 @@
         }
       },
       {
-        "title": "调用 c.speak()",
-        "explanation": "**`c.speak()`**\n\n调用 Cat 对象 `c` 的 `speak` 方法。这次 MRO 产生了不同的结果！\n\n**Python 查找方法的顺序：**\n1. c 对象自身有 speak 吗？→ 没有\n2. c 的类 **Cat** 有 speak 吗？→ **没有！**（只有 pass）\n3. 父类 **Animal** 有 speak 吗？→ **有！** → 执行 Animal.speak！\n\n**d.speak() vs c.speak() 结果对比：**\n- `d.speak()`：在 Dog 中找到 speak → 执行 Dog.speak → 输出 \"Bark!\"\n- `c.speak()`：在 Cat 中未找到 speak → 在 Animal 中找到 speak → 执行 Animal.speak → 输出 \"...\"\n\n**这就是多态（Polymorphism）！** 调用同名的方法（`speak`），但**根据对象类型执行不同的行为**。Dog 输出 \"Bark!\"，Cat 输出 \"...\"。从外部看，两者都只是调用 `.speak()`，但内部执行的是不同的代码。\n\n**比喻**：电视遥控器上的"电源"按钮对任何电视都一样，但三星电视和 LG 电视各自有不同的开机方式。用户不需要知道其中的区别。\n\n**为什么是这个顺序？** d.speak() 调用完成后，按顺序执行下一行。\n\n**执行顺序**：第16行 → 调用 c.speak() → Cat 中未找到 speak → Animal 中找到 speak → 执行 Animal.speak → 跳转到第3行",
+        "title": "c.speak() 호출",
+        "explanation": "**`c.speak()`**\n\nCat의 MRO 탐색: Cat에 `speak`가 없으므로 부모 Animal에서 찾아 실행합니다. `d.speak()`와 `c.speak()` 모두 같은 이름을 호출하지만 객체 타입에 따라 다른 동작이 실행되는 것이 **다형성(Polymorphism)**입니다.",
         "visualizationType": "pythonMemory",
         "code": "c.speak() # ... (부모 꺼 그대로)",
         "pythonMemoryState": {
-          "note": "调用 c.speak() → Cat 中没有 → 即将跳转到 Animal.speak",
+          "note": "c.speak() 호출 → Cat에 없음 → Animal.speak으로 점프 예정",
           "names": [
             {
               "name": "Animal",
@@ -514,15 +514,15 @@
         }
       },
       {
-        "title": "执行 Animal.speak（父类版本）",
-        "explanation": "**`print(\"...\")`**\n\n**父类 Animal 的原始 speak 方法**执行了。\"...\" 输出到屏幕。\n\n**本课最终总结——继承的核心：**\n- `d.speak()` → 执行 Dog.speak → 输出 \"Bark!\"（**重写**：子类重新定义）\n- `c.speak()` → 执行 Animal.speak → 输出 \"...\"（**继承**：原样使用父类的）\n\n**继承的三大核心概念：**\n1. **代码复用**：Cat 一行代码都没写，但可以使用 speak 方法\n2. **方法重写**：Dog 将父类的 speak 重新定义为适合自己的版本\n3. **多态（Polymorphism）**：同名 `.speak()` 调用，根据对象类型产生不同结果\n\n**为什么多态重要？** 以后即使添加 Bird、Fish 等新动物，也只需继承 Animal 并重写 speak 即可。不需要修改现有代码（Animal、Dog、Cat）！\n\n**后续预览**：本课只学习了简单的继承。在实际开发中，使用 `super()` 函数调用父类方法，或在 `__init__` 中调用父类初始化的模式非常重要。将在第6章更深入地学习。\n\n**执行顺序**：执行 print(\"...\") → 输出 \"...\" 到屏幕 → Animal.speak 结束 → 程序结束",
+        "title": "Animal.speak 실행 (부모 버전)",
+        "explanation": "**`print(\"...\")`**\n\n부모 Animal.speak가 실행되어 `\"...\"`가 출력됩니다. Cat은 코드를 한 줄도 쓰지 않고 speak 기능을 사용했습니다(코드 재사용). Dog는 오버라이딩으로 다른 동작을 구현했습니다.",
         "visualizationType": "pythonMemory",
         "code": "print(\"...\")",
         "pythonMemoryState": {
           "output": [
             "..."
           ],
-          "note": "Cat 执行了父类（Animal）的 speak",
+          "note": "Cat은 부모(Animal)의 speak 실행",
           "names": [
             {
               "name": "Animal",
@@ -595,22 +595,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "在子类中想调用父类的方法应该怎么做？",
+    "question": "如果想从子类中调用父类的方法怎么办？",
     "options": [
-      "parent.method()",
+      "父类.method()",
       "super().method()",
-      "Animal.method()",
+      "动物。方法（）",
       "this.parent.method()"
     ],
     "correctIndex": 1,
-    "explanation": "`super()` 函数返回父类对象。\n在调用父类构造函数时非常常用，如 `super().__init__()`。"
+    "explanation": "“super()”函数返回父对象。\n在调用父构造函数时经常使用，例如`super().__init__()`。"
   },
   "misconceptions": [
     {
-      "wrong": "Python 不支持多重继承",
-      "correct": "支持！`class Child(Mom, Dad):`",
-      "why": "Java 不支持，但 Python 和 C++ 支持。\n不过可能会变得复杂（菱形继承问题），需要谨慎使用。"
+      "wrong": "파이썬은 다중 상속이 안 된다",
+      "correct": "가능합니다! `class Child(Mom, Dad):`",
+      "why": "Java는 안 되지만 파이썬, C++은 됩니다.\n하지만 복잡해질 수 있어서(죽음의 다이아몬드) 조심히 써야 합니다."
     }
   ],
-  "keyTakeaway": "用括号 `(Parent)` 来继承。让代码复用和扩展变得简单。"
+  "keyTakeaway": "괄호 `(Parent)`로 상속받는다. 기능 재사용과 확장이 쉬워진다."
 }

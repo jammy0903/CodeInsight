@@ -1,13 +1,13 @@
 {
   "lessonId": "c-2-4",
-  "title": "解引用（写入）",
-  "concept": "知道地址就能从任何地方修改原始值（遥控器）",
+  "title": "解除引用（写作）",
+  "concept": "如果你知道地址，你可以从远处改变原始值（远程控制）",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int energy = 50;\n    int *remote = &energy;\n\n    printf(\"Before: %d\\n\", energy);\n\n    *remote = 100;\n\n    printf(\"After:  %d\\n\", energy);\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 ```printf``` 等输入输出函数的头文件。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用输入/输出函数（例如“printf”）的标头。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "程序启动 — 栈上创建 ```main``` 的**栈帧**，```energy``` 和 ```remote``` 被放置其中。",
+        "title": "启动主函数",
+        "explanation": "程序启动——在栈上创建一个“main”的**栈帧**，并在其中放置“energy”和“remote”。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "声明变量和指针",
-        "explanation": "在 `energy` 中存储 50，在 `remote` 中存储 `energy` 的地址。\n\n也就是说 `remote` 是指向 `energy` 的指针，通过解引用可以修改原始值。",
+        "title": "变量和指针声明",
+        "explanation": "在`energy`中存储50，在`remote`中存储`energy`的地址。\n\n换句话说，“remote”是一个指向“energy”的指针，可以通过取消引用来更改原始值。",
         "visualizationType": "cMemory",
         "code": "int energy = 50;",
         "highlightOffset": [
@@ -54,16 +54,16 @@
         ]
       },
       {
-        "title": "修改前检查值",
-        "explanation": "输出 ```energy``` 的当前值 ```50``` — 这是通过指针修改**之前**的快照。\n\n记住这个值。下一步之后再次输出 ```energy``` 会发现值变了。明明没有写过 ```energy = 100;```，怎么会变？",
+        "title": "更改前检查值",
+        "explanation": "打印````energy````的当前值，````50```` - 将其更改为指针之前的快照。\n\n让我们记住这个值。如果在下一步之后再次打印“energy”，该值将会不同。我从来没有写过```energy = 100;```，那怎么办呢？",
         "visualizationType": "cMemory",
         "code": "printf(\"Before: %d\\n\", energy);",
         "stdout": "Before: 50"
       },
       {
-        "title": "通过解引用修改值",
-        "explanation": "`*remote = 100;` 将 100 存储到 remote 指向的位置（energy）。\n\n通过指针写入会直接修改原始数据，而不是副本。",
-        "keyInsight": "`*指针 = 值` 的意思是"将值存储到指向的地址"。",
+        "title": "通过取消引用更改值",
+        "explanation": "`*remote = 100;` 将 100 存储在远程指向的位置（能量）中。\n\n通过指针写入直接改变原始数据，而不是副本。",
+        "keyInsight": "`*pointer = value` 的意思是“将值存储在指向的地址处”。",
         "visualizationType": "cMemory",
         "code": "*remote = 100;",
         "stack": [
@@ -84,8 +84,8 @@
         ]
       },
       {
-        "title": "修改后检查值",
-        "explanation": "再次输出 `energy` 显示 100，确认原始值确实被修改了。\n\n要点是：`*p` 在右边是读取，`*p` 在左边是写入。",
+        "title": "检查更改后的值",
+        "explanation": "如果再次打印“energy”，则会出现 100，确认原来的内容确实已更改。\n\n重点是，如果`*p`在右边则读取，如果在左边则写入。",
         "visualizationType": "cMemory",
         "code": "printf(\"After:  %d\\n\", energy);",
         "stack": [
@@ -106,8 +106,8 @@
         "stdout": "Before: 50\nAfter:  100"
       },
       {
-        "title": "程序结束",
-        "explanation": "```return 0``` — 栈帧被移除，```energy``` 和 ```remote``` 都消失。\n\n核心：```*p``` 在右边 = 读取值，```*p``` 在左边 = 存储值。通过指针修改会直接改变**原始数据**。",
+        "title": "程序退出",
+        "explanation": "```return 0``` — 堆栈帧被删除，导致 ```energy``` 和 ```remote``` 消失。\n\n要点：读取 ```*p```（右）= 获取值，写入 ```*p```（左）= 存储值。通过指针的修改直接改变了**原始数据**。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
@@ -117,7 +117,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下代码执行后 a 的值是？\nint a = 10;\nint *p = &a;\n*p = 20;\na = 30;",
+    "question": "运行以下代码后a的值是多少？\n整数a = 10;\nint *p = &a;\n*p = 20；\na = 30；",
     "options": [
       "10",
       "20",
@@ -125,14 +125,14 @@
       "发生错误"
     ],
     "correctIndex": 2,
-    "explanation": "语句按顺序执行。\n10 ->（通过 *p）20 ->（通过直接赋值）30。最终值是 30。"
+    "explanation": "他们按顺序运行。\n10 ->（通过 *p）20 ->（通过直接赋值）30。最终值为 30。"
   },
   "misconceptions": [
     {
-      "wrong": "通过指针改值只改了副本",
-      "correct": "改的是原始值。",
-      "why": "指针持有原始数据的**地址**，所以写入该地址自然会修改原始数据。"
+      "wrong": "使用指针更改值只会更改副本。",
+      "correct": "原件已更换。",
+      "why": "由于指针有原来的**地址**，如果你到那个地址去写，原来的数据自然会改变。"
     }
   ],
-  "keyTakeaway": "`*p` 在左边意味着"将值存储到那个位置"。可以操作原始数据！"
+  "keyTakeaway": "如果它出现在“*p”的左侧，则意味着“将值存储在该位置。”可以进行原始操作！"
 }

@@ -1,13 +1,13 @@
 {
   "lessonId": "c-8-2",
-  "title": "Implementing Callbacks",
-  "concept": "回调模式通过将函数指针作为参数传递来委托执行时机",
+  "title": "实施回调",
+  "concept": "一种回调模式，通过传递函数指针作为参数来委托执行时间。",
   "content": {
     "code": "#include <stdio.h>\n\nvoid greet() {\n    printf(\"Hello!\\n\");\n}\n\nvoid execute(void (*func)()) {\n    printf(\"Executing callback...\\n\");\n    func();\n}\n\nint main() {\n    execute(greet);\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 `printf` 等输出函数所需的标准头文件。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "这是使用“printf”等输出函数的标准标头。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,22 +15,30 @@
         "stdout": ""
       },
       {
-        "title": "定义回调目标函数",
-        "explanation": "`greet` 是将从其他函数中调用的回调目标函数。\n\n关键是传递函数地址，而不是直接调用。",
+        "title": "定义一个要回调的函数",
+        "explanation": "`greet` 是一个回调目标函数，稍后将从另一个函数调用。\n\n关键是传递函数地址，而不是直接调用它。",
         "visualizationType": "cMemory",
         "code": "void greet() {",
-        "highlightOffset": [0, 1, 2]
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "title": "定义接受回调的函数",
-        "explanation": "`execute` 接收一个函数指针参数，在内部逻辑之后调用 `func()`。\n\n根据传入的函数不同，执行行为也会改变。",
+        "title": "定义一个接收回调的函数",
+        "explanation": "`execute` 接受一个函数指针参数，并在内部逻辑之后调用 `func()`。\n\n根据传递的函数，可以更改执行行为。",
         "visualizationType": "cMemory",
         "code": "void execute(void (*func)()) {",
-        "highlightOffset": [0, 1, 2]
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "title": "从 main 调用 execute - 将函数作为参数传递",
-        "explanation": "调用 `execute(greet)` 时，`greet` 函数的地址作为 execute 的参数传递。\n\nmain 不直接决定执行时机，而是委托给 execute，由它在内部需要时调用回调。",
+        "title": "从 main 调用执行 - 将函数作为参数传递",
+        "explanation": "当调用`execute(greet)`时，`greet`函数的地址作为参数传递给`execute`。\n\n换句话说，main并不直接决定何时执行，而是委托execute在需要时在内部调用回调。",
         "visualizationType": "cMemory",
         "code": "execute(greet);",
         "stack": [
@@ -43,22 +51,22 @@
         ]
       },
       {
-        "title": "准备执行回调",
-        "explanation": "在执行回调之前输出消息的预处理步骤。",
+        "title": "准备回调执行",
+        "explanation": "这是一个预处理步骤，在执行回调之前输出一条消息。",
         "visualizationType": "cMemory",
         "code": "printf(\"Executing callback...\\n\");",
         "stdout": "Executing callback..."
       },
       {
         "title": "调用回调函数！",
-        "explanation": "`func();` 调用被传入的实际函数（greet）。\n\n这是回调模式的核心执行点。",
+        "explanation": "`func();` 调用传递的实际函数（greet）。\n\n这是回调模式的关键执行点。",
         "visualizationType": "cMemory",
         "code": "func();",
         "stdout": "Executing callback...\nHello!"
       },
       {
-        "title": "程序结束",
-        "explanation": "通过 `return 0;` 结束程序。\n\n要点：回调是将行为作为函数参数注入的模式。",
+        "title": "程序退出",
+        "explanation": "使用“return 0;”退出。\n\n底线：回调是一种将操作作为函数参数注入的模式。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -67,22 +75,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "将函数作为参数传递给另一个函数有什么好处？",
+    "question": "将一个函数作为参数传递给另一个函数有什么优点？",
     "options": [
-      "代码执行速度更快。",
-      "通过从外部注入行为来提高灵活性。",
-      "内存使用减半。",
-      "所有变量变成全局变量。"
+      "代码执行速度加快。",
+      "通过从外部注入函数的操作来提高灵活性。",
+      "将内存使用量减少一半。",
+      "所有变量都成为全局变量。"
     ],
     "correctIndex": 1,
-    "explanation": "这可以看作类似于依赖注入（Dependency Injection）的效果。\n无需修改函数内部逻辑就可以改变行为。"
+    "explanation": "这可以看作是与“依赖注入”类似的效果。\n您可以更改行为而不更改函数内部的逻辑。"
   },
   "misconceptions": [
     {
-      "wrong": "回调只用在事件监听器（点击等）中。",
-      "correct": "所有"行为参数化"都是回调。\n排序、过滤、树遍历等通用算法都需要回调。",
-      "why": "受 Web 开发的影响，容易认为只有异步事件处理器才是回调。"
+      "wrong": "回调仅用于事件监听器（点击等）。",
+      "correct": "所有“动作参数化”都是回调。\n它对于排序、过滤和树遍历等通用算法至关重要。",
+      "why": "由于Web开发的影响，人们很容易认为只有异步事件处理程序才是回调。"
     }
   ],
-  "keyTakeaway": "实现回调——像数据一样传递"代码地址"——是动态组合执行逻辑的核心技术。"
+  "keyTakeaway": "回调实现是一项核心技术，它通过交换“代码地址”（如数据）来动态配置执行逻辑。"
 }

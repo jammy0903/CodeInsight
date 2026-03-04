@@ -1,13 +1,13 @@
 {
   "lessonId": "py-12-1",
-  "title": "try-except 基础",
-  "concept": "即使发生错误也能让程序不崩溃的方法！",
+  "title": "try-except 기초",
+  "concept": "에러가 나도 프로그램이 멈추지 않게 하는 방법!",
   "content": {
     "code": "num = 10\ndivisor = 0\n\ntry:\n    result = num / divisor\n    print(f\"Result: {result}\")\nexcept ZeroDivisionError:\n    print(\"Cannot divide by zero!\")\n\nprint(\"Program continues!\")",
     "steps": [
       {
-        "title": "变量初始化",
-        "explanation": "**`num = 10`** -- 在内存中创建整数对象 `10`，并给它贴上 `num` 标签。\n\nPython从上到下按顺序执行。首先给被除数 `num` 赋值 **10**。\n\n**Python内部原理：** `int` 类型对象 `10` 存在于堆（heap）内存中，全局命名空间字典中添加了 `{\"num\": <10对象的地址>}`。在CPython中，-5到256范围内的整数在解释器启动时就预先创建（interning），所以不是创建新对象，而是给已有对象贴上标签。\n\n目前只是普通的变量赋值。错误要到后面才会发生！此时一切正常运行。\n\n**执行顺序：** `num = 10` 执行完毕 → 移到下一行",
+        "title": "변수 초기화",
+        "explanation": "**`num = 10`** -- 정수 객체 `10`을 메모리에 생성하고, `num`이라는 이름표(label)를 붙입니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. 먼저 나눌 숫자 `num`에 **10**을 할당합니다.\n\n**Python 내부 동작:** `int` 타입 객체 `10`이 힙(heap) 메모리에 존재하고, 전역 네임스페이스 딕셔너리에 `{\"num\": <10 객체의 주소>}`가 추가됩니다. CPython에서 -5 ~ 256 범위의 정수는 인터프리터 시작 시 미리 생성(interning)되어 있으므로, 새 객체를 만드는 것이 아니라 기존 객체에 이름표를 붙이는 것입니다.\n\n아직은 평범한 변수 할당입니다. 에러가 발생하는 건 나중의 일이에요! 이 시점에서는 모든 것이 정상적으로 작동합니다.\n\n**실행 순서:** `num = 10` 실행 완료 → 다음 줄로 이동",
         "visualizationType": "pythonMemory",
         "code": "num = 10",
         "pythonMemoryState": {
@@ -29,8 +29,8 @@
         }
       },
       {
-        "title": "设置除数 (0!)",
-        "explanation": "**`divisor = 0`** -- 给整数对象 `0` 贴上 `divisor` 标签。\n\n给除数 `divisor` 赋值 **0**。在数学中，任何数除以0是未定义的（趋向无穷大）。Python也一样——除以0会引发 **ZeroDivisionError** 异常。\n\n**类比：** 就像在路上埋地雷。埋地雷本身没有问题，但当有人踩上去的那一刻（执行除法的那一刻），就会爆炸！\n\n**Python内部原理：** 全局命名空间中添加了 `{\"divisor\": <0对象的地址>}`。`0` 也是驻留整数，所以复用已有对象。此时 `num` 和 `divisor` 各自指向独立的 `int` 对象。\n\n**注意：** 在变量中存储0本身完全没有问题！错误只在**执行除以0的运算时**才会发生。存储值和使用值是完全不同的步骤。\n\n**执行顺序：** `divisor = 0` 执行完毕 → 移到下一行（try块）",
+        "title": "나누는 수 설정 (0!)",
+        "explanation": "**`divisor = 0`** -- 정수 객체 `0`에 `divisor`라는 이름표를 붙입니다.\n\n나누는 수 `divisor`에 **0**을 할당합니다. 수학에서 어떤 수를 0으로 나누는 것은 정의되지 않습니다 (무한대로 발산). Python도 마찬가지로 0으로 나누면 **ZeroDivisionError**라는 예외(Exception)가 발생합니다.",
         "visualizationType": "pythonMemory",
         "code": "divisor = 0",
         "pythonMemoryState": {
@@ -64,13 +64,13 @@
         }
       },
       {
-        "title": "进入 try 块",
-        "explanation": "**`try:`** -- 进入异常监控块。意思是"监视这里面的错误！"\n\n`try` 是Python异常处理（Exception Handling）机制的起点。`try` 块中的代码是执行过程中可能引发错误的**危险代码**。\n\n**类比：** 就像在游乐园走钢丝表演时在下面装**安全网**。走钢丝（try块中的代码）时即使掉下来（发生错误），安全网（except块）也能接住你。没有安全网（没有try-except），掉下来的那一刻表演就结束了（程序终止）。\n\n**Python内部原理：** 进入 `try` 块时，Python解释器会在调用栈上注册一个**异常处理器（exception handler）**。这个处理器包含"如果发生错误应该跳转到哪里"的信息。原理类似于C语言的 `setjmp/longjmp`。\n\n**try-except 基本结构：**\n```python\ntry:\n    # 可能出错的代码（危险区域）\nexcept 错误类型:\n    # 出错时执行的代码（安全网）\n```\n\n**注意：** 最好在 `try` 块中只放**最少量的可能出错的代码**。放太多代码会难以判断错误发生在哪里。\n\n**执行顺序：** 进入 `try:` → 开始逐行执行try块内的代码",
+        "title": "try 블록 진입",
+        "explanation": "**`try:`** -- 예외 감시 블록에 진입합니다. \"이 안에서 에러가 발생할 수 있으니 감시해줘!\"라는 의미입니다.\n\n`try`는 Python의 예외 처리(Exception Handling) 메커니즘의 시작점입니다. `try` 블록 안에 들어가는 코드는 실행 도중 에러가 발생할 수 있는 **위험한 코드**입니다.",
         "visualizationType": "pythonMemory",
         "code": "try:",
         "pythonMemoryState": {
           "output": [],
-          "note": "进入try块 - 开始错误监控",
+          "note": "try 블록 진입 - 에러 감시 시작",
           "names": [
             {
               "name": "num",
@@ -98,13 +98,13 @@
         }
       },
       {
-        "title": "ZeroDivisionError 发生！",
-        "explanation": "**`result = num / divisor`** -- 尝试计算 `10 / 0`。但**除以零在数学上是不可能的**！\n\nPython执行 `/` 运算符的那一刻，检测到除数为 `0`，于是创建并抛出（raise）**ZeroDivisionError** 异常对象。\n\n**类比：** 就像厨师按照食谱（代码）做菜时遇到一个不可能的指示："用0升水来除"。厨师立即停下来喊"这不可能！"（异常抛出）。\n\n**注意：** 如果没有 `try-except` 会怎样？程序会输出错误信息并**立即终止**！`try-except` 阻止了这个悲剧。\n\n**Python内部原理：** 在CPython中，`/` 运算符内部调用 `__truediv__` 方法。执行 `int.__truediv__(10, 0)` 时，在C层面检查除数是否为0，如果是则调用 `PyErr_SetString(PyExc_ZeroDivisionError, \"division by zero\")`。此时在堆上创建 `ZeroDivisionError` 异常对象，解释器的错误标志被设置。",
+        "title": "ZeroDivisionError 발생!",
+        "explanation": "**`result = num / divisor`** -- `10 / 0`을 계산하려고 시도합니다. 하지만 **0으로 나누기는 수학적으로 불가능**합니다!\n\nPython이 `/` 연산자를 실행하는 순간, 나누는 수가 `0`임을 감지하고 **ZeroDivisionError** 예외 객체를 생성하여 발생(raise)시킵니다.",
         "visualizationType": "pythonMemory",
         "code": "    result = num / divisor",
         "pythonMemoryState": {
           "output": [],
-          "note": "ZeroDivisionError 发生！跳转到except块",
+          "note": "ZeroDivisionError 발생! except 블록으로 점프",
           "names": [
             {
               "name": "num",
@@ -139,15 +139,15 @@
         }
       },
       {
-        "title": "except块捕获了错误！",
-        "explanation": "**`except ZeroDivisionError:`** -- 检查try块中抛出的异常类型，如果匹配则执行此块。\n\ntry块中抛出了 **ZeroDivisionError**，而except恰好指定了这个错误类型，所以执行这个except块。\n\n**`print(\"Cannot divide by zero!\")`** -- 不是终止程序，而是向用户输出友好的错误信息。\n\n**类比：** 就像医院急诊室的分诊系统。当病人（错误）进来时，先分类是什么类型的病人，然后送到对应的专科（except块）。就像"骨折病人去骨科！"一样，`ZeroDivisionError` 被送到 `except ZeroDivisionError:` 块。\n\n**Python内部原理（except匹配过程）：**\n1. try块中发生错误 → 解释器检查已注册的异常处理器\n2. 用 `isinstance()` 检查比较抛出异常的类型（`ZeroDivisionError`）和except的类型\n3. `isinstance(错误, ZeroDivisionError)` 为 `True` → 执行此except块\n4. 如果类型不匹配，错误会沿调用栈**向上传播**\n\n**注意：** 像 `except Exception:` 这样范围太广的捕获会吞掉所有意外错误，使调试困难。最好始终指定**具体的异常类型**。\n\n**执行顺序：** except类型匹配 → 匹配成功！ → 执行 `print(\"Cannot divide by zero!\")` → except块完成",
+        "title": "except 블록이 에러를 잡았다!",
+        "explanation": "**`except ZeroDivisionError:`** -- try 블록에서 발생한 예외의 타입을 확인하고, 일치하면 이 블록을 실행합니다.\n\ntry 블록에서 **ZeroDivisionError**가 발생했고, except가 정확히 이 에러 타입을 지정하고 있으므로 이 except 블록이 실행됩니다.",
         "visualizationType": "pythonMemory",
         "code": "    print(\"Cannot divide by zero!\")",
         "pythonMemoryState": {
           "output": [
             "Cannot divide by zero!"
           ],
-          "note": "ZeroDivisionError 处理完毕！",
+          "note": "ZeroDivisionError 처리 완료!",
           "names": [
             {
               "name": "num",
@@ -175,15 +175,15 @@
         }
       },
       {
-        "title": "程序继续运行！",
-        "explanation": "关键在于 **`print(\"Program continues!\")`** 被执行了。\n\n即使发生了错误，用 `except` 处理后程序流程不会中断。\n\n**类比**：就像路被堵了走绕行路线一样——仍然可以到达目的地。\n\n这个模式之所以重要，是因为：\n- 用户输入错误\n- 文件不存在\n- 临时网络故障\n在这些情况下，可以防止整个应用崩溃。\n\n总结来说，try-except不是"消除错误的技术"，\n而是"控制错误让程序继续运行的技术"。",
+        "title": "프로그램이 계속 실행된다!",
+        "explanation": "**`print(\"Program continues!\")`**가 실행된다는 점이 핵심입니다.\n\n즉, 에러가 발생했어도 `except`에서 처리하면 프로그램 흐름이 끊기지 않습니다.\n\n**비유**: 길이 막혀도 우회로를 타면 목적지까지 갈 수 있는 것과 같습니다.\n\n이 패턴이 중요한 이유:\n- 사용자 입력 오류\n- 파일 없음\n- 일시적 네트워크 실패\n같은 상황에서 앱 전체가 종료되지 않게 만들 수 있습니다.\n\n정리하면, try-except는 \"에러를 없애는 기술\"이 아니라\n\"에러를 통제해서 프로그램을 계속 움직이게 하는 기술\"입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(\"Program continues!\")",
         "pythonMemoryState": {
           "output": [
             "Program continues!"
           ],
-          "note": "错误处理后正常执行继续！",
+          "note": "에러 처리 후 정상 실행 계속!",
           "names": [
             {
               "name": "num",
@@ -213,15 +213,15 @@
     ]
   },
   "quiz": {
-    "question": "当try块中发生错误时会怎样？",
+    "question": "如果 try 块中发生错误会发生什么？",
     "options": [
-      "执行完try块中所有剩余代码后再去except",
-      "在发生错误的那一行立即停止并跳转到except块",
+      "执行完 try 块中的所有剩余代码后，转到 except。",
+      "立即停在发生错误的行并跳转到 except 块。",
       "程序立即终止",
-      "忽略错误并执行下一行"
+      "忽略错误并运行下一行"
     ],
     "correctIndex": 1,
-    "explanation": "当try块中发生错误时，在出错的那一行立即停止执行，跳转到能处理该错误的except块。出错行之后的try块代码不会被执行。"
+    "explanation": "如果try块中发生错误，则执行立即在发生错误的行处停止，并跳转到可以处理错误的 except 块。错误行后面的try块代码不被执行。"
   },
-  "keyTakeaway": "try-except是即使发生错误也能防止程序崩溃的安全网。错误发生时立即跳转到except块！"
+  "keyTakeaway": "try-except는 에러가 발생해도 프로그램이 멈추지 않게 해주는 안전망이다. 에러가 나면 즉시 except 블록으로 점프한다!"
 }

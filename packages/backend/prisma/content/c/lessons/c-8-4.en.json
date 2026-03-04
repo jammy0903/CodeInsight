@@ -1,12 +1,12 @@
 {
   "lessonId": "c-8-4",
   "title": "Jump Tables",
-  "concept": "A jump table uses function pointer array indexing for O(1) dispatch without branching",
+  "concept": "Jump tables make O(1) calls without branching by indexing an array of function pointers.",
   "content": {
     "code": "#include <stdio.h>\n\nvoid item() { printf(\"Item Used\\n\"); }\nvoid map()  { printf(\"Map Opened\\n\"); }\nvoid save() { printf(\"Game Saved\\n\"); }\n\nint main() {\n    int choice = 1;\n\n    void (*actions[3])() = {item, map, save};\n\n    if (choice >= 0 && choice < 3) {\n        actions[choice]();\n    }\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
+        "title": "Include stdio.h header",
         "explanation": "Standard header for using `printf`.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
@@ -15,15 +15,19 @@
         "stdout": ""
       },
       {
-        "title": "Defining action functions",
-        "explanation": "We prepare action functions with the same signature.\n\nThey must share the same signature to be stored in a single pointer array.",
+        "title": "Action function definitions",
+        "explanation": "Prepare action functions with the same signature.\n\nThey must have the same signature to be stored in one pointer array.",
         "visualizationType": "cMemory",
         "code": "void item() { printf(\"Item Used\\n\"); }",
-        "highlightOffset": [0, 1, 2]
+        "highlightOffset": [
+          0,
+          1,
+          2
+        ]
       },
       {
-        "title": "Starting main function",
-        "explanation": "The main frame is created, preparing the jump table call flow.",
+        "title": "Start main function",
+        "explanation": "The main frame is created and prepares the jump table call flow.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -36,8 +40,8 @@
         ]
       },
       {
-        "title": "Declaring the choice variable",
-        "explanation": "`choice` represents the index of the function to call.\n\nIn practice, this would be determined by user input or state values.",
+        "title": "Optional variable declaration",
+        "explanation": "`choice` represents the function index to call.\n\nIn practice, it is determined by user input/state value.",
         "visualizationType": "cMemory",
         "code": "int choice = 1;",
         "stack": [
@@ -51,8 +55,8 @@
       },
       {
         "title": "Function pointer array (jump table)",
-        "explanation": "Function addresses are stored sequentially in the `actions` array.\n\nThe target function can be found instantly via indexing.",
-        "keyInsight": "A function name itself is the function's address.",
+        "explanation": "Store function addresses in order in the `actions` array.\n\nYou can find the target function directly by index.",
+        "keyInsight": "The function name itself is the address of the function.",
         "visualizationType": "cMemory",
         "code": "void (*actions[3])() = {item, map, save};",
         "stack": [
@@ -71,22 +75,22 @@
         ]
       },
       {
-        "title": "Bounds checking",
-        "explanation": "We verify the index is within the array bounds.\n\nCalling without this check risks accessing an invalid address.",
+        "title": "range check",
+        "explanation": "Verifies whether the index is within the range of the array.\n\nIf you call without checking, you risk accessing the wrong address.",
         "visualizationType": "cMemory",
         "code": "if (choice >= 0 && choice < 3) {"
       },
       {
-        "title": "Calling a function via the jump table",
-        "explanation": "`actions[choice]();` immediately calls the selected function.\n\nThis eliminates the need for long if-else chains.",
-        "keyInsight": "A single array index lookup selects the function to execute.",
+        "title": "Calling a function with a jump table",
+        "explanation": "Immediately calls the function selected with `actions[choice]();`.\n\nBranching becomes possible without long if-elses.",
+        "keyInsight": "Select the executable function with one step of array indexing.",
         "visualizationType": "cMemory",
         "code": "actions[choice]();",
         "stdout": "Map Opened"
       },
       {
-        "title": "Program termination",
-        "explanation": "The program ends with `return 0;`.\n\nKey point: Jump tables are a fast and easily extensible branching pattern.",
+        "title": "Program exit",
+        "explanation": "Exit with `return 0;`.\n\nBottom line: Jump tables are a fast and easy to scale branching pattern.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -95,22 +99,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What is the biggest advantage of a jump table (function pointer array)?",
+    "question": "What is the biggest advantage of jump tables (function pointer arrays)?",
     "options": [
-      "Memory savings",
-      "O(1) time complexity for branching",
-      "All functions can share the same name",
-      "The compiler generates it automatically"
+      "save memory",
+      "Branch handling with O(1) time complexity",
+      "All functions can have the same name",
+      "The compiler automatically generates"
     ],
     "correctIndex": 1,
-    "explanation": "Even with 100 cases, you can find the function to call with a single array indexing operation, which is much faster than sequential comparison (O(N)) with if-else."
+    "explanation": "Even if there are 100 cases, you can find the function to call with just one array indexing, which is much faster than if-else, which is a sequential comparison (O(N))."
   },
   "misconceptions": [
     {
-      "wrong": "A function pointer array can hold functions with different signatures (parameters/return types).",
-      "correct": "No. An array can only hold the same type, so all functions must have the same signature.",
-      "why": "It is the same principle as not being able to put a float into an int array."
+      "wrong": "A function pointer array can also contain functions of different types (parameters/return values).",
+      "correct": "no.\nSince arrays can only contain the same type, the signatures of all functions must be the same.",
+      "why": "It's the same as not being able to put floats in an int array."
     }
   ],
-  "keyTakeaway": "Jump tables are a standard pattern for optimizing branching logic in state machines (FSM), command processors, and more."
+  "keyTakeaway": "Jump tables are a standard pattern for optimizing branching logic in state machines (FSMs) or instruction processors."
 }

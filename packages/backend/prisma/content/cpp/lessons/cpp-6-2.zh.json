@@ -1,0 +1,75 @@
+{
+  "lessonId": "cpp-6-2",
+  "title": "std::move 的实际行动",
+  "concept": "std::move 通过传输对象资源而不复制它们来消除不必要的开销。",
+  "content": {
+    "code": "#include <iostream>\n#include <string>\n#include <utility>\nusing namespace std;\n\nint main() {\n    string src = \"Hello, World!\";\n    cout << \"before: \" << src << endl;\n\n    string dst = std::move(src);\n    cout << \"dst: \" << dst << endl;\n    cout << \"src: [\" << src << \"]\" << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "创建原始字符串",
+        "explanation": "`src` 添加了“你好，世界！”到堆。分配字符数据。",
+        "visualizationType": "cMemory",
+        "code": "string src = \"Hello, World!\";",
+        "stack": [
+          {
+            "name": "src",
+            "value": "Hello, World!",
+            "type": "std::string",
+            "address": "0x1000"
+          }
+        ],
+        "heap": [],
+        "stdout": "before: Hello, World!"
+      },
+      {
+        "title": "使用 std::move 转移所有权",
+        "explanation": "`std::move(src)` 将 `src` 转换为右值。\n\n调用“dst”的移动构造函数来获取“src”的内部指针**而不进行复制**。\n\n之后，`src` 将处于有效但空的状态（移出状态）。",
+        "visualizationType": "cMemory",
+        "code": "string dst = std::move(src);",
+        "stack": [
+          {
+            "name": "src",
+            "value": "",
+            "type": "std::string",
+            "address": "0x1000",
+            "highlight": true
+          },
+          {
+            "name": "dst",
+            "value": "Hello, World!",
+            "type": "std::string",
+            "address": "0x1020",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "检查结果",
+        "explanation": "`dst` 最初包含来自 `src` 的数据，而 `src` 是一个空字符串。\n\n**关键**：通过移动而不是复制来消除堆分配/复制成本。",
+        "visualizationType": "terminal",
+        "code": "cout << \"dst: \" << dst << endl;",
+        "stdout": "dst: Hello, World!\nsrc: []"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "std::move 后原始对象的状态是什么？",
+    "options": [
+      "已删除",
+      "有效，但为空，因为该值已被移动（移出）",
+      "保持原值不变",
+      "变成 nullptr"
+    ],
+    "correctIndex": 1,
+    "explanation": "移出的对象有效，但其值未指定。销毁或分配新值是安全的。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "std::move 实际上移动数据",
+      "correct": "std::move 本身不移动任何东西。它只是将左值转换为右值，实际的移动是由移动构造函数/赋值运算符完成的。",
+      "why": "尽管名称具有误导性，但 std::move 只是 static_cast<T&&>(x) 的一个便利函数。"
+    }
+  ],
+  "keyTakeaway": "std::move 是现代 C++ 中的一个关键工具，用于在不复制成本的情况下移动资源。"
+}

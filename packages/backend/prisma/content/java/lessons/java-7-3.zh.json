@@ -1,13 +1,13 @@
 {
   "lessonId": "java-7-3",
-  "title": "泛型方法与类型推断",
+  "title": "제네릭 메서드와 타입 추론",
   "concept": "Core concept for Generic Methods",
   "content": {
     "code": "public class Main {\n    // Generic Method: <T> before return type\n    public static <T> void printArray(T[] array) {\n        for (T element : array) {\n            System.out.print(element + \" \");\n        }\n        System.out.println();\n    }\n\n    public static void main(String[] args) {\n        Integer[] intArray = {1, 2, 3};\n        String[] strArray = {\"A\", \"B\", \"C\"};\n\n        System.out.print(\"Integer Array: \");\n        printArray(intArray); // T inferred as Integer\n\n        System.out.print(\"String Array: \");\n        printArray(strArray); // T inferred as String\n        \n        // printArray(new int[]{1, 2}); // Error! int is not T\n    }\n}",
     "steps": [
       {
-        "title": "泛型方法定义",
-        "explanation": "**执行流程：**\n1. 定义 `printArray` 方法。\n2. `<T>` 表示该方法被调用时才确定类型。\n\n**独立的泛型：**\n不需要将整个类都设为泛型，只让这一个方法使用泛型就行。\n非常适合创建工具函数！",
+        "title": "제네릭 메서드 정의",
+        "explanation": "**실행 순서:**\n1. `printArray` 메서드가 정의됩니다.\n2. `<T>`는 이 메서드 호출 시점에 타입이 결정됨을 의미합니다.\n\n**독립적인 제네릭:**\n클래스 전체가 아니라, 이 메서드 하나만 제네릭하게 만들 수 있어요.\n유틸리티 함수 만들 때 딱이죠!",
         "visualizationType": "javaMemory",
         "code": "public static <T> void printArray(T[] array) {",
         "highlightOffset": [
@@ -31,8 +31,8 @@
         }
       },
       {
-        "title": "main 方法开始",
-        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。",
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다.",
         "visualizationType": "javaMemory",
         "code": "public static void main(String[] args) {",
         "javaMemoryState": {
@@ -40,8 +40,8 @@
         }
       },
       {
-        "title": "创建数组（Integer、String）",
-        "explanation": "**`Integer[] intArray = {1, 2, 3};`**\n\n在堆中创建 `Integer` 数组和 `String` 数组。\n`intArray` 和 `strArray` 变量分别引用它们。\n\n**类比**：`intArray` 就像准备一个"数字积木箱"，`strArray` 就像准备一个"字母积木箱"。",
+        "title": "배열 생성 (Integer, String)",
+        "explanation": "**`Integer[] intArray = {1, 2, 3};`**\n\n`Integer` 배열과 `String` 배열을 힙에 생성합니다.\n각각 `intArray`, `strArray` 변수가 참조합니다.\n\n**비유**: `intArray`는 '숫자 블록 박스', `strArray`는 '글자 블록 박스'를 준비하는 것과 같습니다.",
         "visualizationType": "javaMemory",
         "code": "Integer[] intArray = {1, 2, 3};",
         "highlightOffset": [
@@ -85,8 +85,8 @@
         }
       },
       {
-        "title": "方法调用（T = Integer）",
-        "explanation": "**`printArray(intArray);`**\n\n调用 `printArray`。\n编译器查看 `intArray` 的类型，将 `T` 推断为 `Integer`（类型推断）。\n\n**类比**：就像把"数字纸"放进"万能打印机"（`printArray`），打印机自动识别"哦，这是数字"并切换到数字模式。",
+        "title": "함수 호출 (T = Integer)",
+        "explanation": "**`printArray(intArray);`**\n\n`printArray`를 호출합니다.\n컴파일러가 `intArray`의 타입을 보고 `T`를 `Integer`로 추론(Type Inference)합니다.\n\n**비유**: '만능 프린터'(`printArray`)에 '숫자 종이'를 넣으면, 프린터가 알아서 \"아, 이건 숫자구나\" 하고 숫자 모드로 작동하는 것과 같습니다.",
         "visualizationType": "javaMemory",
         "code": "printArray(intArray); // T inferred as Integer",
         "highlightOffset": [
@@ -142,8 +142,8 @@
         }
       },
       {
-        "title": "方法调用（T = String）",
-        "explanation": "**执行流程：**\n1. 调用 `printArray(strArray)`。\n2. 这次参数是 `String[]`，所以 `T` 被确定为 `String`。\n3. 创建新的栈帧并执行。\n\n**复用性：**\n一段代码既能打印数字数组，也能打印字符串数组！这就是泛型的力量。",
+        "title": "함수 호출 (T = String)",
+        "explanation": "**실행 순서:**\n1. `printArray(strArray)`를 호출합니다.\n2. 이번엔 인자가 `String[]`이므로 `T`가 `String`으로 결정됩니다.\n3. 새로운 스택 프레임이 생성되어 실행됩니다.\n\n**재사용성:**\n코드 하나로 숫자 배열도 찍고, 문자열 배열도 찍고! 이게 바로 제네릭의 힘입니다.",
         "visualizationType": "javaMemory",
         "code": "printArray(strArray); // T inferred as String",
         "highlightOffset": [
@@ -187,8 +187,8 @@
         }
       },
       {
-        "title": "基本类型限制",
-        "explanation": "**执行流程：**\n1. 如果取消这行注释，将会产生编译错误。\n\n**注意事项：**\n`int[]` 是基本类型数组，不是对象数组，因此无法赋值给 `T[]`。\n请记住：泛型只能处理引用类型（Object）！",
+        "title": "원시 타입 제한",
+        "explanation": "**실행 순서:**\n1. 이 줄의 주석을 풀면 컴파일 에러가 발생합니다.\n\n**주의할 점:**\n`int[]`는 객체 배열이 아니라 원시 타입 배열이라 `T[]`에 대입될 수 없습니다.\n제네릭은 오직 '참조 타입(Object)'만 다룬다는 점, 잊지 마세요!",
         "visualizationType": "javaMemory",
         "code": "// printArray(new int[]{1, 2}); // Error! int is not T",
         "javaMemoryState": {
@@ -207,22 +207,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "泛型方法的类型参数 <T> 的作用域（有效范围）是？",
+    "question": "泛型方法的类型参数<T>的范围（有效范围）是多少？",
     "options": [
-      "整个类",
-      "整个包",
-      "该方法内部",
-      "整个程序"
+      "全班",
+      "全套",
+      "在该方法内部",
+      "整个节目"
     ],
     "correctIndex": 2,
-    "explanation": "泛型方法的 `<T>` 仅在该方法执行期间有效，即使与类的泛型类型 `<T>` 同名，它们也是完全不同的独立存在（遮蔽/Shadowing）。"
+    "explanation": "泛型方法的“<T>”仅在方法执行时有效，尽管它与类的泛型类型“<T>”同名，但它是一个完全独立的实体（影子）。"
   },
   "misconceptions": [
     {
-      "wrong": "static 方法可以使用类的泛型类型 T。",
-      "correct": "不可以。\nstatic 方法在对象创建之前就加载到内存中，而类的 T 是在对象创建时（如 `new Box<Integer>`）才确定的。\n因此需要单独声明泛型方法。",
-      "why": "static 上下文（类级别）和实例上下文（对象级别）的生命周期不同。"
+      "wrong": "static 메서드는 클래스의 제네릭 타입 T를 사용할 수 있다.",
+      "correct": "불가능합니다.\nstatic 메서드는 객체 생성 전에 메모리에 올라가는데, 클래스의 T는 객체 생성 시(`new Box<Integer>`)에 정해지기 때문입니다.\n그래서 제네릭 메서드로 따로 선언해야 합니다.",
+      "why": "static 문맥(Class level)과 인스턴스 문맥(Object level)의 생명주기가 다르기 때문입니다."
     }
   ],
-  "keyTakeaway": "不需要将整个类都设为泛型，可以通过 `<T>` 只让特定方法变得灵活。static 方法同样可以毫无问题地使用泛型！"
+  "keyTakeaway": "클래스 전체를 제네릭으로 만들지 않아도, 특정 메서드만 `<T>`를 사용하여 유연하게 만들 수 있습니다. 이때 `static` 메서드도 문제없이 제네릭을 사용할 수 있죠!"
 }

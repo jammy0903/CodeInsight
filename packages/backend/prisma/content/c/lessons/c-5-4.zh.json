@@ -1,13 +1,13 @@
 {
   "lessonId": "c-5-4",
-  "title": "Memory Leaks",
-  "concept": "内存泄漏：借了内存却不归还，导致剩余内存耗尽",
+  "title": "内存泄漏",
+  "concept": "内存泄漏：由于借用而不还钱而导致剩余内存耗尽的现象。",
   "content": {
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nvoid leak() {\n    int *p = (int*)malloc(sizeof(int));\n    *p = 10;\n}\n\nint main() {\n    for(int i=0; i<3; i++) {\n        leak();\n        printf(\"Memory leaked %d times\\n\", i+1);\n    }\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 `printf` 所需的头文件。\n\n本示例故意制造内存泄漏作为反面教材。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用“printf”的标头。\n\n这个例子是一个故意造成内存泄漏的反例。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,19 +16,19 @@
       },
       {
         "title": "包含 stdlib.h 头文件",
-        "explanation": "使用 `malloc` 所需的头文件。\n\n省略 `free` 会导致泄漏不断累积。",
+        "explanation": "使用“malloc”的标头。\n\n如果省略“free”，泄漏将会累积。",
         "visualizationType": "cMemory",
         "code": "#include <stdlib.h>"
       },
       {
-        "title": "定义 leak 函数",
-        "explanation": "`leak` 函数分配了堆内存但从未释放。\n\n即使函数结束后指针消失，堆块仍然存在——造成泄漏。",
+        "title": "泄漏函数定义",
+        "explanation": "“leak”函数分配堆内存但不释放它。\n\n即使函数结束后指针消失，堆块仍然存在并导致泄漏。",
         "visualizationType": "cMemory",
         "code": "void leak() {"
       },
       {
-        "title": "main 函数开始",
-        "explanation": "创建 main 栈帧，准备重复调用 `leak`。",
+        "title": "启动主函数",
+        "explanation": "主框架已创建并准备好重复调用“leak”。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -41,8 +41,8 @@
         ]
       },
       {
-        "title": "循环开始 (i=0)",
-        "explanation": "重复调用制造泄漏累积的场景。\n\n每次迭代都会增加一个无法回收的堆块。",
+        "title": "开始循环（i=0）",
+        "explanation": "重复调用会造成泄漏累积的情况。\n\n不可恢复堆块的数量随着迭代次数的增加而增加。",
         "visualizationType": "cMemory",
         "code": "for(int i=0; i<3; i++) {",
         "stack": [
@@ -55,8 +55,8 @@
         ]
       },
       {
-        "title": "leak() 函数调用 #1",
-        "explanation": "第一次调用分配了一个新的堆块。\n\n此时仍可通过函数内部的指针访问。",
+        "title": "泄漏()函数调用#1",
+        "explanation": "第一次调用时，会分配一个新的堆块。\n\n仍然可以通过函数内部的指针来访问它。",
         "visualizationType": "cMemory",
         "code": "leak();",
         "stack": [
@@ -82,8 +82,8 @@
         ]
       },
       {
-        "title": "leak() 函数返回 #1",
-        "explanation": "函数未释放就结束了，第一次泄漏确定。\n\n指向该堆块的指针已经消失。",
+        "title": "退出leak()函数#1",
+        "explanation": "该函数在未发布的情况下结束，并确认了第一次泄漏。\n\n这是因为指向该堆块的指针已经消失。",
         "visualizationType": "cMemory",
         "code": "}",
         "stack": [
@@ -104,15 +104,15 @@
         ]
       },
       {
-        "title": "输出泄漏消息 #1",
-        "explanation": "输出第一次泄漏发生的状态。",
+        "title": "漏水消息输出 #1",
+        "explanation": "输出第一次漏水的状态。",
         "visualizationType": "cMemory",
         "code": "printf(\"Memory leaked %d times\\n\", i+1);",
         "stdout": "Memory leaked 1 times"
       },
       {
-        "title": "循环继续 (i=1)",
-        "explanation": "进入第二次迭代。\n\n之前的泄漏仍未解决。",
+        "title": "继续循环（i=1）",
+        "explanation": "输入第二次迭代。\n\n现有的泄漏问题仍未得到解决。",
         "visualizationType": "cMemory",
         "code": "for(int i=0; i<3; i++) {",
         "stack": [
@@ -125,8 +125,8 @@
         ]
       },
       {
-        "title": "leak() 函数调用 #2",
-        "explanation": "额外分配了第二个堆块。",
+        "title": "调用leak()函数#2",
+        "explanation": "分配额外的第二个堆块。",
         "visualizationType": "cMemory",
         "code": "leak();",
         "stack": [
@@ -159,8 +159,8 @@
         "stdout": ""
       },
       {
-        "title": "leak() 函数返回 #2",
-        "explanation": "再次未释放就退出，第二次泄漏确定。\n\n泄漏总量持续累积。",
+        "title": "退出leak()函数#2",
+        "explanation": "它还会在没有释放的情况下终止，确认第二次泄漏。\n\n累积泄漏总量。",
         "visualizationType": "cMemory",
         "code": "}",
         "stack": [
@@ -187,15 +187,15 @@
         ]
       },
       {
-        "title": "输出泄漏消息 #2",
-        "explanation": "输出第二次泄漏累积状态。",
+        "title": "漏水消息输出#2",
+        "explanation": "输出第二泄漏累积状态。",
         "visualizationType": "cMemory",
         "code": "printf(\"Memory leaked %d times\\n\", i+1);",
         "stdout": "Memory leaked 1 times\nMemory leaked 2 times"
       },
       {
         "title": "循环继续 (i=2) ...",
-        "explanation": "相同的模式重复，泄漏持续增加。\n\n对于长时间运行的进程，这种累积可能是致命的。",
+        "explanation": "同样的模式不断重演，泄漏不断增加。\n\n这种积累对于长时间运行的进程来说是致命的。",
         "visualizationType": "cMemory",
         "code": "for(int i=0; i<3; i++) {",
         "stack": [
@@ -229,8 +229,8 @@
         "stdout": "Memory leaked 1 times\nMemory leaked 2 times\nMemory leaked 3 times"
       },
       {
-        "title": "程序结束",
-        "explanation": "即使程序结束时操作系统会回收内存，运行期间的泄漏仍会造成严重的性能和稳定性问题。\n\n原则很简单：`malloc` 了就必须 `free`。",
+        "title": "程序退出",
+        "explanation": "尽管操作系统在程序终止时回收内存，但执行期间的泄漏会造成主要的性能和稳定性问题。\n\n原理很简单：如果你“malloc”某个东西，你必须“释放”它。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
@@ -242,20 +242,20 @@
   "quiz": {
     "question": "如何防止内存泄漏？",
     "options": [
-      "只使用栈",
-      "变量名取短一些",
-      "每次 malloc 都必须调用 free",
-      "祈祷操作系统自动处理"
+      "仅使用堆栈",
+      "保持变量名称简短",
+      "每个 malloc 都必须调用 free",
+      "我希望操作系统能够解决这个问题。"
     ],
     "correctIndex": 2,
-    "explanation": "Java 和 Python 有垃圾回收器（GC），但 C 和 C++ 没有。\n程序员需要承担 100% 的责任。"
+    "explanation": "Java 和 Python 有垃圾收集器 (GC)，但 C 和 C++ 没有。\n程序员必须承担100%的责任。"
   },
   "misconceptions": [
     {
-      "wrong": "程序终止后泄漏的内存也无法回收",
-      "correct": "程序结束时操作系统会回收所有内存。",
-      "why": "但对于像服务器这样 24 小时运行的程序，或长时间运行的游戏，泄漏可能是致命的。"
+      "wrong": "当程序结束时，泄漏的内存不会返回。",
+      "correct": "一旦终止，操作系统将回收所有内容。",
+      "why": "但对于服务器等24小时开启的程序，或者长时间运行的游戏来说，漏水可能是致命的。"
     }
   ],
-  "keyTakeaway": "丢失的地址再也找不回来。`malloc` 了就要负责到底。"
+  "keyTakeaway": "丢失的地址无法再次找到。如果您执行了“malloc”，请承担全部责任。"
 }

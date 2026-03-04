@@ -1,0 +1,106 @@
+{
+  "lessonId": "cpp-4-2",
+  "title": "memory leak",
+  "concept": "If delete is omitted, heap memory will not be freed until the program ends.",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nvoid leaky() {\n    int* p = new int(999);\n    cout << *p << endl;\n    // delete p; 를 빠뜨림!\n}\n\nint main() {\n    leaky();\n    cout << \"leaky 종료\" << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Enter leaky function",
+        "explanation": "The `leaky()` function is called, creating a new stack frame.",
+        "visualizationType": "cMemory",
+        "code": "void leaky() {",
+        "stack": [
+          {
+            "type": "frame",
+            "func": "main",
+            "name": "main"
+          },
+          {
+            "type": "frame",
+            "func": "leaky",
+            "name": "leaky"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "heap allocation",
+        "explanation": "Allocate memory on the heap with `new int(999)` and store the address in pointer `p`.",
+        "visualizationType": "cMemory",
+        "code": "int* p = new int(999);",
+        "stack": [
+          {
+            "type": "frame",
+            "func": "main",
+            "name": "main"
+          },
+          {
+            "type": "frame",
+            "func": "leaky",
+            "name": "leaky"
+          },
+          {
+            "name": "p",
+            "value": "0x9000",
+            "type": "int*",
+            "address": "0x2000",
+            "frame": "leaky",
+            "points_to": "*p"
+          }
+        ],
+        "heap": [
+          {
+            "name": "*p",
+            "value": "999",
+            "type": "int",
+            "address": "0x9000"
+          }
+        ]
+      },
+      {
+        "title": "Function exits — leak!",
+        "explanation": "When `leaky()` finishes, the pointer `p` disappears along with the stack frame.\n\nBut since we didn't call `delete`, **999 of the heap remains**. There is no way to access this memory — this is a **memory leak**.",
+        "visualizationType": "cMemory",
+        "code": "cout << \"leaky 종료\" << endl;",
+        "stack": [
+          {
+            "type": "frame",
+            "func": "main",
+            "name": "main"
+          }
+        ],
+        "heap": [
+          {
+            "name": "???",
+            "value": "999",
+            "type": "int",
+            "address": "0x9000",
+            "highlight": true
+          }
+        ],
+        "stdout": "leaky 종료"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What causes memory leaks?",
+    "options": [
+      "By calling delete without new",
+      "If you do not delete the memory allocated on the heap and lose the pointer,",
+      "Creating too many stack variables",
+      "Because the program terminated abnormally"
+    ],
+    "correctIndex": 1,
+    "explanation": "Memory allocated on the heap must be explicitly freed with delete. When a pointer goes out of scope, there is no way to access that memory."
+  },
+  "misconceptions": [
+    {
+      "wrong": "When the program ends, all memory is automatically released.",
+      "correct": "Although the operating system reclaims it when the process terminates, the leak can be critical on long-running servers.",
+      "why": "If the leak repeats, there will be less and less available memory, causing the system to slow down or crash."
+    }
+  ],
+  "keyTakeaway": "If you allocate with new, be sure to free it with delete. A better way is to use smart pointers."
+}

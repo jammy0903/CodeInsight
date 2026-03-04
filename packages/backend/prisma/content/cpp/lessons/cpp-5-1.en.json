@@ -1,0 +1,68 @@
+{
+  "lessonId": "cpp-5-1",
+  "title": "unique_ptr basics",
+  "concept": "unique_ptr guarantees sole ownership and is automatically deleted when the scope ends.",
+  "content": {
+    "code": "#include <iostream>\n#include <memory>\nusing namespace std;\n\nint main() {\n    unique_ptr<int> p = make_unique<int>(42);\n    cout << *p << endl;\n\n    // p가 스코프를 벗어나면 자동 delete\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "create unique_ptr",
+        "explanation": "`make_unique<int>(42)` allocates an int on the heap and wraps it in a unique_ptr.\n\n`unique_ptr` is a pointer to which RAII is applied. Since it has only one owner, it cannot be copied and is automatically `delete`ed upon destruction.",
+        "visualizationType": "cMemory",
+        "code": "unique_ptr<int> p = make_unique<int>(42);",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0xA000",
+            "type": "unique_ptr<int>",
+            "address": "0x1000",
+            "points_to": "*p"
+          }
+        ],
+        "heap": [
+          {
+            "name": "*p",
+            "value": "42",
+            "type": "int",
+            "address": "0xA000"
+          }
+        ]
+      },
+      {
+        "title": "Used as a backreference",
+        "explanation": "Access the value like a regular pointer with `*p`. The method of use is the same as the raw pointer.",
+        "visualizationType": "terminal",
+        "code": "cout << *p << endl;",
+        "stdout": "42"
+      },
+      {
+        "title": "auto release",
+        "explanation": "When `main` ends with `return 0;`, `p`'s destructor is called and the heap memory is automatically freed.\n\n**No need to call delete directly** — this is the core value of smart pointers.",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "heap": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "What is wrong with the description of unique_ptr?",
+    "options": [
+      "Automatically deleted when destroyed",
+      "Can be copied to another unique_ptr",
+      "It is recommended to create it with make_unique",
+      "Guarantees sole ownership"
+    ],
+    "correctIndex": 1,
+    "explanation": "unique_ptr cannot be copied because the copy constructor/assignment operator has been removed. To transfer ownership, you must use std::move."
+  },
+  "misconceptions": [
+    {
+      "wrong": "unique_ptr can be assigned to another variable.",
+      "correct": "Copying is prohibited, and ownership can only be transferred with std::move.",
+      "why": "Deleting the same memory in two places causes a double-free bug, so limit the owner to one."
+    }
+  ],
+  "keyTakeaway": "unique_ptr is the most basic smart pointer that fundamentally prevents memory leaks through RAII."
+}

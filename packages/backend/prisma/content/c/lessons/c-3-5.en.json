@@ -1,13 +1,13 @@
 {
   "lessonId": "c-3-5",
   "title": "Traversing with Pointers",
-  "concept": "Instead of an index (i), you can move a pointer (p) to traverse an array",
+  "concept": "You can scan the array by moving the pointer (p) instead of the index (i).",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int arr[] = {10, 20, 30, -1};\n    int *p = arr;\n\n    while (*p != -1) {\n        printf(\"%d \", *p);\n        p++;\n    }\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Include header",
-        "explanation": "`#include <stdio.h>` provides access to output functions.\n\nThis lesson covers the pattern of traversing an array using pointer movement (`p++`) instead of an index.",
+        "title": "with header",
+        "explanation": "Use the output function with `#include <stdio.h>`.\n\nThis lesson covers patterns for traversing an array using pointer movement (`p++`) without an index.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Start of main function",
-        "explanation": "After creating the main frame, the array and pointer are prepared.\n\nNext, `p` will be moved one slot at a time to read values.",
+        "title": "Start main function",
+        "explanation": "After creating the main frame, prepare the array and pointer.\n\nAfterwards, `p` is moved one space at a time and the value is read.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Array declaration",
-        "explanation": "The `-1` at the end of `arr` is a sentinel value that signals the end of traversal.\n\nUsing a sentinel lets you determine the end without needing a separate length variable.",
+        "title": "array declaration",
+        "explanation": "The `-1` at the end of `arr` is a sentinel value that signals the end of the traversal.\n\nUsing Sentinel, you can determine the end without having to set a separate length variable.",
         "visualizationType": "cMemory",
         "code": "int arr[] = {10, 20, 30, -1};",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "Pointer initialization",
-        "explanation": "`p = arr` makes `p` point to the first element.\n\nNow in the loop, we can read `*p` and move to the next element with `p++`.",
+        "title": "pointer initialization",
+        "explanation": "`p = arr` makes `p` point to the first element.\n\nNow you can read `*p` in a loop and move to the next element with `p++`.",
         "visualizationType": "cMemory",
         "code": "int *p = arr;",
         "stack": [
@@ -64,8 +64,8 @@
         ]
       },
       {
-        "title": "Condition check: *p is 10 (not -1)",
-        "explanation": "`*p` is 10, which is not `-1`, so the loop body executes.\n\nThe pointer starts at `arr[0]` (address `0x1000`).",
+        "title": "while (*p != -1)",
+        "explanation": "The condition checks whether the current value is a sentinel (`-1`).\n\nRepeat until you encounter a Sentinel, at which point you immediately end your traversal.",
         "visualizationType": "cMemory",
         "code": "while (*p != -1) {",
         "stack": [
@@ -86,15 +86,15 @@
         ]
       },
       {
-        "title": "Iteration 1: Print *p (10)",
-        "explanation": "`*p` dereferences the pointer to read the value at `0x1000`, which is `10`.\n\nThe pointer reads the value without modifying the array.",
+        "title": "p++ (Pointer Increment)",
+        "explanation": "`p++` moves to the next element, the amount of movement is `sizeof(int)`.\n\nPointers can be incremented, but array names cannot be incremented.",
         "visualizationType": "cMemory",
         "code": "printf(\"%d \", *p);",
         "stdout": "10 "
       },
       {
-        "title": "Iteration 1: p++ moves to next element",
-        "explanation": "`p++` advances the pointer by `sizeof(int)` (4 bytes): `0x1000` -> `0x1004`.\n\nNow `p` points to `arr[1]` which holds `20`.",
+        "title": "Output value by dereference",
+        "explanation": "Printing `*p` in each iteration will output 10, 20, and 30 in that order.\n\nThe key is to keep the three elements of \"read(`*p`) + move(`p++`) + termination condition\" stable.",
         "visualizationType": "cMemory",
         "code": "p++;",
         "stack": [
@@ -205,22 +205,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What should you watch out for when traversing an array with a pointer p?",
+    "question": "What should I pay attention to when iterating an array with pointer p?",
     "options": [
-      "It's slower than using an index",
-      "There's a risk of going out of bounds",
-      "p++ only moves by 1 byte",
-      "It cannot be used"
+      "slower than index",
+      "There is a risk of going out of bounds.",
+      "p++ only moves 1 byte at a time",
+      "cannot use"
     ],
     "correctIndex": 1,
-    "explanation": "Pointers have no brakes.\nIf you get the termination condition wrong (reaching `length` or `NULL` character), it keeps reading past the end of the array, causing memory errors."
+    "explanation": "The pointer has no brakes.\nIf the termination condition (`length` reached or `NULL` character) is set incorrectly, reading continues beyond the end of the array and a memory error occurs."
   },
   "misconceptions": [
     {
-      "wrong": "Modern compilers make pointer traversal (p++) much faster than indexing (arr[i])",
-      "correct": "That used to be true, but nowadays compiler optimizations make them about the same.",
-      "why": "For readability, using indexing (`arr[i]`) is often the better choice.\nThere's no need to force pointer usage."
+      "wrong": "These days, compilers are much faster for pointers (p++) than for indexes (arr[i]).",
+      "correct": "It was like that in the past, but now it's similar because compiler optimization is good.",
+      "why": "For readability, it is often better to use an index (`arr[i]`).\nThere is no need to force yourself to use pointers."
     }
   ],
-  "keyTakeaway": "Traversing an array with `p++` is a classic C pattern. But beware of the cliff (out-of-bounds access)."
+  "keyTakeaway": "Scanning an array with `p++` is a dream of the C language. But beware of cliffs (exceeding the range)."
 }

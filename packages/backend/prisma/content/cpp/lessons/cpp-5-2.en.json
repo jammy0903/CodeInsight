@@ -1,0 +1,110 @@
+{
+  "lessonId": "cpp-5-2",
+  "title": "shared_ptr and reference counting",
+  "concept": "shared_ptr shares the same memory among multiple owners and is freed when the last owner disappears.",
+  "content": {
+    "code": "#include <iostream>\n#include <memory>\nusing namespace std;\n\nint main() {\n    shared_ptr<int> a = make_shared<int>(100);\n    cout << \"count: \" << a.use_count() << endl;\n\n    {\n        shared_ptr<int> b = a;\n        cout << \"count: \" << a.use_count() << endl;\n    }\n\n    cout << \"count: \" << a.use_count() << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "Create shared_ptr",
+        "explanation": "`make_shared<int>(100)` allocates an int and a reference counter together on the heap.\n\nThe current owner is one `a`, so `use_count() = 1`.",
+        "visualizationType": "cMemory",
+        "code": "shared_ptr<int> a = make_shared<int>(100);",
+        "stack": [
+          {
+            "name": "a",
+            "value": "0xB000",
+            "type": "shared_ptr<int>",
+            "address": "0x1000",
+            "points_to": "*a"
+          }
+        ],
+        "heap": [
+          {
+            "name": "*a",
+            "value": "100",
+            "type": "int",
+            "address": "0xB000"
+          }
+        ],
+        "stdout": "count: 1"
+      },
+      {
+        "title": "Share — Increase reference count",
+        "explanation": "With `shared_ptr<int> b = a`, `b` also becomes the owner of the same memory.\n\nThe reference count is increased to 2. Both `a` and `b` point to the same heap data.",
+        "visualizationType": "cMemory",
+        "code": "shared_ptr<int> b = a;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "0xB000",
+            "type": "shared_ptr<int>",
+            "address": "0x1000",
+            "points_to": "*a"
+          },
+          {
+            "name": "b",
+            "value": "0xB000",
+            "type": "shared_ptr<int>",
+            "address": "0x1008",
+            "points_to": "*a",
+            "highlight": true
+          }
+        ],
+        "heap": [
+          {
+            "name": "*a",
+            "value": "100",
+            "type": "int",
+            "address": "0xB000"
+          }
+        ],
+        "stdout": "count: 2"
+      },
+      {
+        "title": "b Vanish — Decrease count",
+        "explanation": "At the end of block `{}`, `b` is destroyed. The reference count is reduced to 1.\n\nSince the count is not 0, the heap memory has not been freed yet. `a` is still owned.",
+        "visualizationType": "cMemory",
+        "code": "cout << \"count: \" << a.use_count() << endl;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "0xB000",
+            "type": "shared_ptr<int>",
+            "address": "0x1000",
+            "points_to": "*a"
+          }
+        ],
+        "heap": [
+          {
+            "name": "*a",
+            "value": "100",
+            "type": "int",
+            "address": "0xB000"
+          }
+        ],
+        "stdout": "count: 1"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "When is the memory of shared_ptr freed?",
+    "options": [
+      "When the first shared_ptr is destroyed",
+      "When the last shared_ptr is destroyed and use_count becomes 0",
+      "When the program ends",
+      "When calling delete manually"
+    ],
+    "correctIndex": 1,
+    "explanation": "shared_ptr automatically frees memory the moment its reference count becomes 0."
+  },
+  "misconceptions": [
+    {
+      "wrong": "shared_ptr has no circular reference problem",
+      "correct": "If shared_ptr references each other as A→B and B→A, the count will never become 0, resulting in a memory leak.",
+      "why": "To fix this, you need to change one side to weak_ptr."
+    }
+  ],
+  "keyTakeaway": "shared_ptr manages shared ownership through reference counting and is automatically released when the last owner disappears."
+}

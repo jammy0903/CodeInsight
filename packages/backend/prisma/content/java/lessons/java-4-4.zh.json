@@ -1,13 +1,13 @@
 {
   "lessonId": "java-4-4",
-  "title": "字符串比较全攻略",
-  "concept": "比较字符串内容必须使用 equals()。== 是一颗地雷。",
+  "title": "문자열 비교 총정리",
+  "concept": "문자열 내용 비교는 무조건 equals()를 써야 한다. ==는 수류탄이다.",
   "content": {
     "code": "String a = \"Hello\";\nString b = new String(\"Hello\");\nString c = \"hello\";\n\nSystem.out.println(a == b);\nSystem.out.println(a.equals(b));\nSystem.out.println(a.equalsIgnoreCase(c));\nSystem.out.println(a.compareTo(\"Apple\"));\nSystem.out.println(\"Hello\".equals(a));",
     "steps": [
       {
-        "title": "字面量变量 a",
-        "explanation": "**执行流程：**\n1. 在 String Pool 中注册 `\"Hello\"`。\n2. `a` 引用它。\n\n`a` 指向 Pool 中的对象。",
+        "title": "리터럴 변수 a",
+        "explanation": "**실행 순서:**\n1. String Pool에 `\"Hello\"` 등록.\n2. `a`가 이를 참조.\n\n`a`는 Pool에 있는 객체를 가리킵니다.",
         "visualizationType": "javaMemory",
         "code": "String a = \"Hello\";",
         "javaMemoryState": {
@@ -30,8 +30,8 @@
         }
       },
       {
-        "title": "new String 变量 b",
-        "explanation": "**执行流程：**\n1. 在堆上创建新的 `\"Hello\"` 对象。\n2. `b` 引用它。\n\n内容相同，但 `a` 和 `b` 存在于不同的物理位置（地址）。",
+        "title": "new String 변수 b",
+        "explanation": "**실행 순서:**\n1. Heap에 새로운 `\"Hello\"` 객체 생성.\n2. `b`가 이를 참조.\n\n내용은 같지만, `a`와 `b`는 서로 다른 물리적 공간(주소)에 존재합니다.",
         "visualizationType": "javaMemory",
         "code": "String b = new String(\"Hello\");",
         "javaMemoryState": {
@@ -60,35 +60,35 @@
         }
       },
       {
-        "title": "== 比较（危险！）",
-        "explanation": "**执行流程：**\n1. 比较 `a` 的地址（Pool[0]）和 `b` 的地址（Heap[0]）。\n2. 不同 -> `false`。\n\n`==` 运算符不检查"内容"——它只检查内存地址是否相同。\n即使是完全相同的双胞胎也不行。\n因为它们的身份证号（地址）不同。",
-        "keyInsight": "== 比较的是地址（字符串比较中绝对不要使用）",
+        "title": "== 비교 (위험!)",
+        "explanation": "**실행 순서:**\n1. `a`의 주소(Pool[0])와 `b`의 주소(Heap[0]) 비교.\n2. 다름 -> `false`.\n\n`==` 연산자는 '내용'을 보는 게 아니라, '메모리 주소'가 같은지만 봅니다.\n\"쌍둥이인데 왜 다른 사람 취급하냐\"고 따져도 소용없습니다.\n주민등록번호(주소)가 다르니까요.",
+        "keyInsight": "== 는 주소값 비교 (절대 금지)",
         "visualizationType": "javaMemory",
         "code": "System.out.println(a == b);",
         "javaMemoryState": {
           "output": [
             "false"
           ],
-          "warning": "用 == 比较字符串会产生 bug！"
+          "warning": "문자열 비교에 == 를 쓰면 버그 발생!"
         }
       },
       {
-        "title": "equals() 比较（标准做法）",
-        "explanation": "**执行流程：**\n1. 读取 `a` 指向的字符串内容。\n2. 读取 `b` 指向的字符串内容。\n3. 逐字符比较 -> 匹配 -> `true`。\n\n`equals()` 比较的是**实际内容**，而不是地址。\n这才是我们通常需要的"比较"。",
-        "keyInsight": "equals() = 内容比较",
+        "title": "equals() 비교 (표준)",
+        "explanation": "**실행 순서:**\n1. `a`가 가리키는 문자열 내용 확인.\n2. `b`가 가리키는 문자열 내용 확인.\n3. 한 글자씩 비교 -> 일치 -> `true`.\n\n`equals()`는 주소가 아니라 **실제 내용물**을 비교합니다.\n우리가 일반적으로 원하는 '비교'입니다.",
+        "keyInsight": "equals() = 내용물 비교",
         "visualizationType": "javaMemory",
         "code": "System.out.println(a.equals(b));",
         "javaMemoryState": {
           "output": [
             "true"
           ],
-          "note": "内容比较成功",
+          "note": "내용물 비교 성공",
           "warning": null
         }
       },
       {
         "title": "equalsIgnoreCase()",
-        "explanation": "**执行流程：**\n1. 比较 `a`（\"Hello\"）和 `c`（\"hello\"）。\n2. 开启忽略大小写模式。\n3. H == h, E == e... -> `true`。\n\n在比较用户 ID 或电子邮件地址时非常实用。",
+        "explanation": "**실행 순서:**\n1. `a`(\"Hello\")와 `c`(\"hello\") 비교.\n2. 대소문자 무시 옵션 켜짐.\n3. H == h, E == e... -> `true`.\n\n사용자 ID나 이메일 주소 비교할 때 매우 유용합니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(a.equalsIgnoreCase(c));",
         "javaMemoryState": {
@@ -99,8 +99,8 @@
         }
       },
       {
-        "title": "compareTo() - 字典序排序",
-        "explanation": "**执行流程：**\n1. 从第一个字符开始比较 \"Hello\" 和 \"Apple\"。\n2. 'H'(72) - 'A'(65) = 7。\n3. 正数表示 \"Hello\" 排在 \"Apple\" 之后。\n\n主要用于排序算法中。",
+        "title": "compareTo() - 사전순 정렬",
+        "explanation": "**실행 순서:**\n1. \"Hello\"와 \"Apple\"을 앞에서부터 비교.\n2. 'H'(72) - 'A'(65) = 7.\n3. 양수이므로 \"Hello\"가 더 뒤에 옴.\n\n정렬(Sorting) 알고리즘에서 주로 사용됩니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(a.compareTo(\"Apple\"));",
         "javaMemoryState": {
@@ -110,38 +110,38 @@
         }
       },
       {
-        "title": "空值安全的比较（Yoda 条件式）",
-        "explanation": "**比较技巧：**\n使用 `\"常量\".equals(变量)` 代替 `变量.equals(\"常量\")`。\n\n如果 `a` 是 `null` 会怎样？\n- `a.equals(...)` -> **NullPointerException**（崩溃）\n- `\"Hello\".equals(a)` -> `false`（安全）",
-        "keyInsight": "\"字面量\".equals(变量) = 空值安全",
+        "title": "null-safe 비교 (요다 조건식)",
+        "explanation": "**비교 팁:**\n`변수.equals(\"상수\")` 대신 `\"상수\".equals(변수)`를 쓰세요.\n\n만약 `a`가 `null`이라면?\n- `a.equals(...)` -> **NullPointerException** (폭발)\n- `\"Hello\".equals(a)` -> `false` (안전)",
+        "keyInsight": "\"리터럴\".equals(변수) = 안전",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"Hello\".equals(a));",
         "javaMemoryState": {
           "output": [
             "true"
           ],
-          "note": "即使变量为 null 也不会报错"
+          "note": "변수가 null이어도 에러 안 남"
         }
       }
     ],
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下哪种字符串比较代码最安全？",
+    "question": "以下哪个字符串比较代码最安全？",
     "options": [
-      "if (input == \"EXIT\")",
+      "如果（输入==“退出”）",
       "if (input.equals(\"EXIT\"))",
-      "if (\"EXIT\".equals(input))",
+      "if (\"EXIT\".等于(输入))",
       "if (input.compareTo(\"EXIT\") == 0)"
     ],
     "correctIndex": 2,
-    "explanation": "选项 3 `\"EXIT\".equals(input)` 最安全，因为即使 `input` 为 `null`，也不会抛出异常，只会返回 `false`（空值安全）。"
+    "explanation": "第三个，`\"EXIT\".equals(input)`是最安全的（Null-safe），因为即使`input`为`null`，它也不会产生错误，只返回`false`。"
   },
   "misconceptions": [
     {
-      "wrong": "我测试的时候用 == 也没问题啊？",
-      "correct": "那只是运气好而已。\n你比较的是字面量，或者受益于 String Pool。",
-      "why": "通过用户输入、文件读取或数据库查询创建的字符串可能分配在堆上而非 Pool 中，这时 `==` 即使内容相同也会返回 `false`。"
+      "wrong": "== 써도 테스트 잘 통과하던데?",
+      "correct": "운이 좋았을 뿐입니다.\n리터럴끼리 비교했거나 String Pool 덕을 본 것입니다.",
+      "why": "사용자 입력, 파일 읽기, DB 조회 등으로 만들어진 문자열은 Pool이 아닌 Heap에 생길 수 있어서, `==`로 비교하면 내용이 같아도 `false`가 나옵니다."
     }
   ],
-  "keyTakeaway": "比较 String 内容必须使用 equals()！绝对不要使用地址比较（==）！"
+  "keyTakeaway": "String 내용 비교는 무조건 equals()! 주소 비교(==)는 절대 금지!"
 }

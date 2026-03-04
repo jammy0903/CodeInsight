@@ -1,0 +1,69 @@
+{
+  "lessonId": "cpp-2-2",
+  "title": "字符串的内部结构",
+  "concept": "string将数据存储在堆上，大小和容量是分开跟踪的。",
+  "content": {
+    "code": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string s = \"Hi\";\n    cout << \"size: \" << s.size() << endl;\n    cout << \"capacity: \" << s.capacity() << endl;\n\n    s += \" World!\";\n    cout << \"size: \" << s.size() << endl;\n    cout << \"capacity: \" << s.capacity() << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "创建一个短字符串",
+        "explanation": "“Hi”是一个两个字母的字符，在许多实现中，应用小字符串优化 (SSO) 并将其存储在对象内，而无需进行堆分配。",
+        "visualizationType": "cMemory",
+        "code": "string s = \"Hi\";",
+        "stack": [
+          {
+            "name": "s",
+            "value": "Hi",
+            "type": "std::string",
+            "address": "0x3000"
+          }
+        ],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "尺寸和容量",
+        "explanation": "`size` 是当前字符数 (2)，`capacity` 是无需重新分配即可容纳的最大大小。\n\n容量在 SSO 范围内是固定的（通常为 15 到 22 字节）。",
+        "visualizationType": "terminal",
+        "code": "cout << \"size: \" << s.size() << endl;",
+        "stdout": "size: 2\ncapacity: 15"
+      },
+      {
+        "title": "字符串扩展",
+        "explanation": "`s += \" World!\"` 使字符串变长。当超出 SSO 范围时，它会在堆上分配一个新缓冲区并复制数据。",
+        "visualizationType": "cMemory",
+        "code": "s += \" World!\";",
+        "stack": [
+          {
+            "name": "s",
+            "value": "Hi World!",
+            "type": "std::string",
+            "address": "0x3000",
+            "highlight": true
+          }
+        ],
+        "stdout": "size: 9\ncapacity: 15"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "什么是小字符串优化 (SSO)？",
+    "options": [
+      "优化以始终将字符串存储在堆上",
+      "通过在对象内存储短字符串来避免堆分配的优化",
+      "优化以使字符串比较更快",
+      "字符串压缩存储的优化"
+    ],
+    "correctIndex": 1,
+    "explanation": "SSO 通过在字符串对象本身的内存中存储短字符串（通常为 15 到 22 字节）来避免不必要的堆分配。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "字符串总是使用堆内存",
+      "correct": "由于 SSO，短字符串存储在堆栈上（对象内部）。",
+      "why": "堆分配的成本很高，因此我们对短字符串进行优化。"
+    }
+  ],
+  "keyTakeaway": "String区分大小（当前长度）和容量（分配大小），并通过SSO优化短字符串的性能。"
+}

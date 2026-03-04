@@ -1,0 +1,157 @@
+{
+  "lessonId": "cpp-1-3",
+  "title": "引用与指针",
+  "concept": "引用是一个安全的别名，不能为空，也不能被反弹。",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int a = 10;\n    int b = 20;\n\n    int& ref = a;\n    int* ptr = &a;\n\n    ptr = &b;\n    cout << ref << \" \" << *ptr << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "创建变量a和b",
+        "explanation": "堆栈上分配了两个 int 变量。",
+        "visualizationType": "cMemory",
+        "code": "int a = 10;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "20",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "创建参考文献",
+        "explanation": "`ref` 是 `a` 的别名。它们共享相同的地址，一旦绑定，就不能更改为其他变量。",
+        "visualizationType": "cMemory",
+        "code": "int& ref = a;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "20",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "ref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "a",
+            "isReference": true
+          }
+        ]
+      },
+      {
+        "title": "创建指针ptr",
+        "explanation": "`ptr` 是一个单独的变量，存储 `a` 的地址。与引用不同，它们占用自己的内存。",
+        "visualizationType": "cMemory",
+        "code": "int* ptr = &a;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "20",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "ref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "a",
+            "isReference": true
+          },
+          {
+            "name": "ptr",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1008",
+            "points_to": "a"
+          }
+        ]
+      },
+      {
+        "title": "指针重新分配",
+        "explanation": "使用 `ptr = &b` 指针可以指向另一个变量。另一方面，“ref”仍然只指向“a”。",
+        "visualizationType": "cMemory",
+        "code": "ptr = &b;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "b",
+            "value": "20",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "ref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "a",
+            "isReference": true
+          },
+          {
+            "name": "ptr",
+            "value": "0x1004",
+            "type": "int*",
+            "address": "0x1008",
+            "points_to": "b",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "检查结果",
+        "explanation": "`ref` 仍然输出 `a` (10)，而 `*ptr` 输出 `b` (20)。\n\n**主要区别**：指针可以重新分配，而引用则不能。",
+        "visualizationType": "terminal",
+        "code": "cout << ref << \" \" << *ptr << endl;",
+        "stdout": "10 20"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "引用和指针有什么区别？",
+    "options": [
+      "声明时必须初始化引用",
+      "指针可以为 nullptr",
+      "稍后也可以将引用反弹到其他变量。",
+      "指针有自己的内存地址"
+    ],
+    "correctIndex": 2,
+    "explanation": "一旦引用被绑定，它就指向同一个对象，直到结束。重新绑定是不可能的。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "引用可以重新分配给其他变量",
+      "correct": "ref = b 将 b 的值复制到 ref 指向的 a，但不更改 ref 的目标。",
+      "why": "引用是别名，因此对 ref 的所有操作都适用于原始变量。"
+    }
+  ],
+  "keyTakeaway": "指针是保存地址的变量，引用是原始变量的另一个名称。根据您的目的进行选择。"
+}

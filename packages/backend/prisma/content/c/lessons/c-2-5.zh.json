@@ -1,13 +1,13 @@
 {
   "lessonId": "c-2-5",
-  "title": "NULL 指针",
-  "concept": "没有指向目标时应设为 NULL 以确保安全",
+  "title": "空指针",
+  "concept": "当没有地方可以指向时，将其设置为 NULL 是安全的。",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int *ptr = NULL;\n\n    if (ptr != NULL) {\n        printf(\"Value: %d\\n\", *ptr);\n    } else {\n        printf(\"Pointer is NULL! Safe.\\n\");\n    }\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "用于 ```printf``` 函数和 **```NULL```** 宏的头文件。```NULL``` 通常定义为 ```(void *)0```。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用 ```printf``` 函数和 **```NULL```** 宏的标头。 “NULL”通常定义为“(void *)0”。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "程序启动 — 栈上创建 ```main``` 的**栈帧**。本课学习当指针没有指向任何东西时如何安全处理。\n\n对持有无效地址的指针进行解引用会导致程序**崩溃（crash）**。就像在没有设置目的地的导航上按"开始导航"一样会出错。",
+        "title": "启动主函数",
+        "explanation": "程序启动 - 在堆栈上创建“main”的 **堆栈帧**。在本课程中，您将学习如何安全地处理未指向任何内容的指针。\n\n如果您取消引用具有无效地址的指针，则程序**崩溃**。这就像当导航中没有目的地时按“开始导航”时会出现错误。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "将指针初始化为 NULL",
-        "explanation": "`int *ptr = NULL;` 明确表示"目前没有可指向的对象"。\n\n这比未初始化的指针安全得多，使用前应配合 `NULL` 检查。",
+        "title": "初始化指针为NULL",
+        "explanation": "`int *ptr = NULL;` 明确指出“此时没有什么可指向的”。\n\n它比未初始化的指针安全得多，并且应该与后续的“NULL”检查分支一起使用。",
         "visualizationType": "cMemory",
         "code": "int *ptr = NULL;",
         "stack": [
@@ -43,33 +43,33 @@
         ]
       },
       {
-        "title": "NULL 指针检查",
-        "explanation": "在解引用前检查 `ptr != NULL` 可以防止无效的内存访问。\n\n当前 `ptr` 为 NULL，条件为假，执行流转向 `else` 分支。",
+        "title": "空指针检查",
+        "explanation": "在取消引用之前检查 `ptr != NULL` 可以防止错误的内存访问。\n\n目前 `ptr` 为 NULL，所以条件为 false，我们转到 `else` 分支。",
         "visualizationType": "cMemory",
         "code": "if (ptr != NULL) {"
       },
       {
-        "title": "未执行的代码",
-        "explanation": "因为条件为假，这一行不会执行。\n\n如果对 `NULL` 进行解引用，程序可能因运行时错误（如 segfault）而终止。",
+        "title": "代码未运行",
+        "explanation": "由于条件为 false，因此不会执行该行。\n\n如果取消引用“NULL”，则可能会因运行时错误（例如段错误）而退出。",
         "visualizationType": "cMemory",
         "code": "printf(\"Value: %d\\n\", *ptr);"
       },
       {
-        "title": "执行 else 块",
-        "explanation": "因为 ```ptr != NULL``` 为假，所以进入 ```else``` 块。\n\n```if``` 分支 = 指针有效 -> 安全解引用，```else``` 分支 = 指针为 ```NULL``` -> 替代操作（错误消息、返回默认值等）。这种模式让程序**在任何情况下都不会异常终止**。",
+        "title": "else 块执行",
+        "explanation": "由于 ```ptr != NULL``` 为 false，因此进入 ```else``` 块。\n\n```if``` 分支 = 指针有效 → 安全地解引用，```else``` 分支 = 指针 ```NULL``` → 回退行为（错误消息、默认返回等）。通过这种模式，程序可以在任何情况下**运行而不会异常终止**。",
         "visualizationType": "cMemory",
         "code": "} else {"
       },
       {
-        "title": "通过安全路径输出",
-        "explanation": "通过 `else` 路径安全处理，程序继续运行。\n\n关键习惯是遵循"初始化 -> 检查 -> 使用"的顺序。",
+        "title": "输出到安全路径",
+        "explanation": "它被安全地视为“else”路径，并且程序继续运行。\n\n关键习惯是遵循“初始化->检查->启用”的顺序。",
         "visualizationType": "cMemory",
         "code": "printf(\"Pointer is NULL! Safe.\\n\");",
         "stdout": "Pointer is NULL! Safe."
       },
       {
-        "title": "程序结束",
-        "explanation": "```return 0``` — 得益于 ```NULL``` 检查，程序安全退出无错误。\n\n核心：```NULL``` 是明确表示"不指向任何东西"的值，比垃圾地址**安全得多**。解引用前**务必**检查 ```NULL```。",
+        "title": "程序退出",
+        "explanation": "```return 0``` — 由于 ```NULL``` 检查，它安全退出而没有错误。\n\n底线：“NULL”是一个指定“指向任何内容”的值，并且比垃圾地址**安全得多**。 **一定要**在取消引用之前检查“NULL”。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
@@ -79,22 +79,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "当指针不指向任何东西时应设为什么值？",
+    "question": "当指针指向空的时候我应该设置什么值？",
     "options": [
       "0",
-      "void",
-      "NULL",
-      "undefined"
+      "空白",
+      "无效的",
+      "不明确的"
     ],
     "correctIndex": 2,
-    "explanation": "C 标准使用 `NULL` 宏（通常定义为 0）。\n它是表示"无地址"的显式标记。"
+    "explanation": "C语言标准使用“NULL”宏（通常定义为0）。\n明确表示“无地址”。"
   },
   "misconceptions": [
     {
-      "wrong": "NULL 指针也是地址，所以可以读取",
-      "correct": "读取和写入都是非法的。",
-      "why": "地址 0 及其周围范围是操作系统保护的区域。\n访问时会产生 `Segmentation Fault`（段错误）。"
+      "wrong": "NULL 指针也可以读取，因为它们是地址。",
+      "correct": "读和写都是非法的。",
+      "why": "内存地址0是受操作系统保护的区域。\n访问时出现“SegmentationFault”错误。"
     }
   ],
-  "keyTakeaway": "上了保险的枪（NULL）比没有保险的枪（未初始化指针）更好。使用前务必检查！"
+  "keyTakeaway": "带安全锁（NULL）的枪比空枪（未初始化的指针）更好。写之前一定要检查！"
 }

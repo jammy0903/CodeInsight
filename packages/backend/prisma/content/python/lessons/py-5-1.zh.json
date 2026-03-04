@@ -1,18 +1,18 @@
 {
   "lessonId": "py-5-1",
   "title": "Class & Object",
-  "concept": "类是设计图，对象是产品",
+  "concept": "클래스는 설계도, 객체는 제품이다",
   "content": {
     "code": "# 1. 클래스 정의 (설계도)\nclass Dog:\n    pass\n\n# 2. 객체 생성 (제품)\nmy_dog = Dog()\nyour_dog = Dog()\n\n# 3. 속성 추가 (파이썬만의 특징)\nmy_dog.name = \"Buddy\"\n# your_dog에도 name이 있을까요?\n\nprint(my_dog.name)",
     "steps": [
       {
-        "title": "类定义（设计图）",
-        "explanation": "**`class Dog:`**\n\nPython 从上到下顺序执行代码。\n使用 `class` 关键字定义了一个名为 `Dog` 的**类（设计图）**。\n\n**什么是类？** 类是创建对象的**设计图（Blueprint）**。可以把它比喻为饼干模具——模具本身不是饼干，但使用这个模具可以**压出多个形状相同的饼干（对象）**。`Dog` 类是"狗"这个概念的设计图，通过这个设计图可以创建实际的狗对象。\n\n**Python 内部机制**：当 Python 遇到 `class Dog:` 语句时：\n1. **从上到下执行**类体（缩进的代码）\n2. 将执行结果收集起来，创建一个**类对象（class object）**\n3. 在当前命名空间中将其绑定到 `Dog` 这个名称\n4. 有趣的事实：在 Python 中，**类本身也是对象**！（是 `type` 元类的实例）\n\n**类命名规范（PEP 8）**：类名应使用 **PascalCase**（首字母大写）。例如 `Dog`、`MyClass`、`StudentGrade`。变量和函数使用 `snake_case`。\n\n**为什么是这个顺序？** 必须先定义（注册）类，之后才能用这个设计图创建对象。如果在定义之前调用 `Dog()`，会引发 `NameError`。\n\n**执行顺序**：执行 class Dog → 执行类体 → 创建 Dog 类对象 → 注册到命名空间 → 第3行",
+        "title": "클래스 정의 (설계도)",
+        "explanation": "**`class Dog:`**\n\n`class` 키워드로 `Dog`라는 클래스(설계도)를 정의합니다. 클래스는 객체를 만들기 위한 틀이며, 이 설계도로 여러 개의 독립적인 Dog 객체를 생성할 수 있습니다. 클래스 이름은 PascalCase 규칙을 따릅니다.",
         "visualizationType": "pythonMemory",
         "code": "class Dog:",
         "pythonMemoryState": {
           "output": [],
-          "note": "类定义开始",
+          "note": "클래스 정의 시작",
           "names": [
             {
               "name": "Dog",
@@ -30,12 +30,12 @@
         }
       },
       {
-        "title": "pass（空的类体）",
-        "explanation": "**`pass`**\n\n`pass` 是 Python 的**"什么都不做"**关键字。正如"pass（通过）"这个词的含义，它**什么都不做就直接跳过**。\n\n**为什么需要 `pass`？** Python 使用缩进来区分代码块。`class Dog:` 后面的类体**必须至少有一行**缩进的代码。如果类体为空，会引发 `IndentationError` 语法错误！`pass` 可以防止这个错误，同时表达"以后再添加代码"的意思。\n\n比喻：就像在建筑设计图中标记一个空房间。"这里有一个房间，但还没有布置家具。"\n\n**`pass` 的其他使用场景**：\n- 空函数：`def todo(): pass`\n- 空条件语句：`if condition: pass`\n- 空循环：`for i in range(10): pass`\n- 空异常处理：`except: pass`（但这是不推荐的！）\n\n**类定义完成**：`Dog` 类已在内存中注册。目前这个类没有属性也没有方法——是一个**空的设计图**。但即使是这个空设计图也可以创建对象！\n\n**执行顺序**：执行 pass（什么都不做）→ Dog 类体执行完毕 → 类注册完成 → 第6行",
+        "title": "pass (빈 본문)",
+        "explanation": "**`pass`**\n\nPython은 클래스 본문에 최소 한 줄의 코드가 필요합니다. `pass`는 \"아무것도 하지 않음\"을 의미하는 빈 문장으로, 지금은 내용 없는 빈 설계도를 만들어도 나중에 객체를 생성할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "pass",
         "pythonMemoryState": {
-          "note": "类体执行完毕（pass）",
+          "note": "클래스 본문 실행 완료 (pass)",
           "names": [
             {
               "name": "Dog",
@@ -53,12 +53,12 @@
         }
       },
       {
-        "title": "创建第一个对象",
-        "explanation": "**`my_dog = Dog()`**\n\n**实例化（Instantiation）**：调用 `Dog()` 创建一个**新的 Dog 对象（实例）**。这里的括号 `()` **非常重要**！\n\n**`Dog` vs `Dog()` —— 括号的区别**：\n- `Dog`（无括号）：引用类对象本身（查看设计图）\n- `Dog()`（有括号）：**调用**类来**创建**新实例（用设计图制造产品）\n\n**设计图 vs 产品**：\n- `Dog`（类，0x1000）：饼干模具——制造产品的设计图\n- `my_dog`（实例，0x2000）：用这个模具压出的**第一块饼干**\n\n**Python 内部机制**：调用 `Dog()` 时：\n1. 调用 `Dog.__new__(Dog)` → 在内存中分配一个**空对象**（0x2000）\n2. 调用 `Dog.__init__(新对象)` → 初始化对象（这里没有 `__init__`，所以只进行默认初始化）\n3. 返回已初始化对象的**引用（地址 0x2000）**\n4. 变量 `my_dog` 接收并绑定到这个引用\n\n**注意**：存储在 `my_dog` 中的不是对象本身，而是**指向对象的引用（地址）**。Python 中所有变量都存储引用。\n\n**执行顺序**：调用 Dog() → 通过 __new__ 创建对象 0x2000 → 执行 __init__（pass）→ 将引用 0x2000 赋给 my_dog → 第7行",
+        "title": "첫 번째 객체 생성",
+        "explanation": "**`my_dog = Dog()`**\n\n`Dog()`를 호출하여 새로운 Dog 인스턴스(객체)를 생성하고 `my_dog`에 할당합니다. 괄호 없는 `Dog`는 클래스 자체를 참조하고, 괄호 있는 `Dog()`는 클래스를 호출하여 새 객체를 만듭니다. `my_dog`에는 객체 자체가 아닌 객체를 가리키는 참조가 저장됩니다.",
         "visualizationType": "pythonMemory",
         "code": "my_dog = Dog()",
         "pythonMemoryState": {
-          "note": "创建第一个 Dog 对象（0x2000）",
+          "note": "첫 번째 Dog 객체 생성 (0x2000)",
           "names": [
             {
               "name": "Dog",
@@ -88,12 +88,12 @@
         }
       },
       {
-        "title": "创建第二个对象",
-        "explanation": "**`your_dog = Dog()`**\n\n调用 `Dog()` 创建**另一个新的 Dog 对象**。\n\n**核心概念——相同的设计图，不同的产品**：\n- `my_dog` → 0x2000（第一个狗对象）\n- `your_dog` → 0x3000（第二个狗对象）\n- 这两个是**完全不同的独立对象**！\n\n比喻：用同一个饼干模具（Dog 类）压两次饼干，虽然形状相同，但它们是**物理上完全不同的两块饼干**。吃掉一块饼干不会影响另一块。\n\n**一个类，无限个对象**：可以用同一个类（设计图）创建**任意数量**的对象（产品）。10个、100个、1000个都可以！这是类最大的优点。\n\n**Python 内部机制**：调用 `Dog()` 时，同样经过 `__new__` + `__init__` 过程，在**全新的内存空间（0x3000）**中创建对象。与之前的对象（0x2000）完全无关，是独立的对象。\n\n**`my_dog is your_dog` 的结果？** 是 `False`！因为它们指向不同的内存地址。\n\n**执行顺序**：调用 Dog() → 通过 __new__ 创建新对象 0x3000 → 将引用 0x3000 赋给 your_dog → 第10行",
+        "title": "두 번째 객체 생성",
+        "explanation": "**`your_dog = Dog()`**\n\n같은 설계도(Dog 클래스)로 또 다른 독립적인 객체를 생성합니다. `my_dog`와 `your_dog`는 완전히 서로 다른 객체로, 메모리 주소도 다르고 내부 데이터도 독립적입니다. 하나의 클래스로 원하는 만큼 객체를 만들 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "your_dog = Dog()",
         "pythonMemoryState": {
-          "note": "创建第二个 Dog 对象（0x3000，与 my_dog 不同）",
+          "note": "두 번째 Dog 객체 생성 (0x3000, my_dog와 다름)",
           "names": [
             {
               "name": "Dog",
@@ -133,12 +133,12 @@
         }
       },
       {
-        "title": "动态添加属性（Python 特性）",
-        "explanation": "**`my_dog.name = \"Buddy\"`**\n\n**动态属性（Dynamic Attribute）**：这是 Python 独有的特殊功能！即使在对象创建**之后**，也可以自由地添加属性（attribute）。\n\n比喻：就像在一个空盒子（对象）上贴一张"名字：Buddy"的标签。我们只在 `my_dog` 盒子上贴了标签，所以 `your_dog` 盒子上没有这个标签！\n\n**与其他语言的区别**：\n- **Java/C++**：只能使用在类中预先声明的属性（静态类型）\n- **Python**：可以**随时**给对象添加新属性（动态类型）\n- 但在实际开发中，**强烈建议**在 `__init__` 中预先定义属性！\n\n**点（`.`）运算符**：用于访问对象的属性：\n- `对象.属性 = 值` → **添加或修改**属性（写入）\n- `对象.属性` → **读取**属性值",
+        "title": "동적 속성 추가 (Python 특징)",
+        "explanation": "**`my_dog.name = \"Buddy\"`**\n\nPython은 객체 생성 후에도 속성을 동적으로 추가할 수 있습니다. `my_dog` 객체에만 `name` 속성이 추가되며, `your_dog`에는 영향을 주지 않습니다. 실무에서는 `__init__`에서 미리 속성을 정의하는 방식을 강하게 권장합니다.",
         "visualizationType": "pythonMemory",
         "code": "my_dog.name = \"Buddy\"",
         "pythonMemoryState": {
-          "note": "仅给 my_dog 添加了 name 属性（your_dog 没有）",
+          "note": "my_dog에만 name 속성 추가 (your_dog에는 없음)",
           "names": [
             {
               "name": "Dog",
@@ -178,15 +178,15 @@
         }
       },
       {
-        "title": "访问属性并输出",
-        "explanation": "**`print(my_dog.name)`**\n\n通过点（`.`）运算符访问 `my_dog` 对象的 `name` 属性，读取其值（`\"Buddy\"`）并打印输出。\n\n**为什么能正常工作？** 因为在第10行我们通过 `my_dog.name = \"Buddy\"` 添加了 `name` 属性。Python 在 `my_dog` 的 `__dict__` 中查找 `'name'` 键，返回 `\"Buddy\"`。\n\n**如果执行 `print(your_dog.name)` 会怎样？** 会得到 `AttributeError: 'Dog' object has no attribute 'name'` 错误！因为 `your_dog` 对象上**不存在** `name` 属性。这就是动态属性添加的**危险之处**——某些对象可能有某个属性，而其他对象没有。\n\n**Python 内部机制——属性查找顺序**：\n1. 首先在 `my_dog.__dict__`（实例字典）中搜索 `'name'`\n2. 如果没找到，在 `Dog.__dict__`（类字典）中搜索\n3. 如果没找到，在父类中搜索（继承链）\n4. 如果所有地方都没找到，引发 `AttributeError`！\n\n**本课核心总结**：\n- 用 `class` 创建设计图，用 `()` 创建产品（对象）\n- 可以用同一个设计图创建多个独立的对象\n- 在 Python 中可以动态地给对象添加属性（但建议使用 `__init__`！）\n- 每个对象的属性是**完全独立的**\n\n**执行顺序**：在 my_dog.__dict__ 中搜索 name → 返回 \"Buddy\" → 执行 print → 程序结束",
+        "title": "속성 접근 및 출력",
+        "explanation": "**`print(my_dog.name)`**\n\n점(`.`) 연산자로 `my_dog`의 `name` 속성에 접근하여 `\"Buddy\"`를 읽고 출력합니다. 만약 `print(your_dog.name)`을 실행하면 `your_dog`에는 `name` 속성이 없으므로 `AttributeError`가 발생합니다. 이것이 동적 속성 추가의 위험성입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(my_dog.name)",
         "pythonMemoryState": {
           "output": [
             "Buddy"
           ],
-          "note": "my_dog.name 访问成功（your_dog.name 会报错！）",
+          "note": "my_dog.name 접근 성공 (your_dog.name은 에러!)",
           "names": [
             {
               "name": "Dog",
@@ -227,22 +227,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "类命名推荐使用什么规范？",
+    "question": "推荐的类名约定是什么？",
     "options": [
-      "snake_case (my_class)",
-      "camelCase (myClass)",
-      "PascalCase (MyClass)",
-      "UPPER_CASE (MY_CLASS)"
+      "蛇箱（我的类）",
+      "驼峰式命名法（myClass）",
+      "帕斯卡命名法 (MyClass)",
+      "大写（MY_CLASS）"
     ],
     "correctIndex": 2,
-    "explanation": "类名使用首字母大写的 PascalCase。\n函数和变量使用 snake_case。"
+    "explanation": "类名使用 PascalCase，首字母大写。\n函数和变量使用snake_case。"
   },
   "misconceptions": [
     {
-      "wrong": "必须在类中预先声明所有变量",
-      "correct": "在 Python 中这不是必须的。",
-      "why": "但通常建议在 `__init__` 方法中预先定义属性。\n到处随意添加以后会造成混乱。"
+      "wrong": "클래스 안에 변수를 미리 다 선언해야 한다",
+      "correct": "파이썬은 필수는 아닙니다.",
+      "why": "하지만 보통은 `__init__` 메서드에서 미리 정의해주는 것이 좋습니다.\n여기저기서 막 추가하면 나중에 헷갈리니까요."
     }
   ],
-  "keyTakeaway": "用 `class` 创建设计图，用 `()` 创建对象。属性甚至可以之后再添加。"
+  "keyTakeaway": "클래스는 `class`, 객체 생성은 `()`. 속성은 나중에 붙일 수도 있다."
 }

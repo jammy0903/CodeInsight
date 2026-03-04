@@ -1,18 +1,18 @@
 {
   "lessonId": "py-7-1",
-  "title": "引用计数",
-  "concept": "对象在引用计数变为0时会被自动删除！使用sys.getrefcount()来查看！",
+  "title": "참조 카운팅",
+  "concept": "객체는 참조 횟수가 0이 되면 자동 삭제! sys.getrefcount()로 확인!",
   "content": {
     "code": "import sys\n\na = [1, 2, 3]\nprint(f\"a만 참조: {sys.getrefcount(a)}\")\n\nb = a  # 같은 객체 참조\nprint(f\"a, b 참조: {sys.getrefcount(a)}\")\n\nc = a  # 또 참조\nprint(f\"a, b, c 참조: {sys.getrefcount(a)}\")\n\ndel b  # 참조 제거\nprint(f\"del b 후: {sys.getrefcount(a)}\")",
     "steps": [
       {
-        "title": "导入sys模块",
-        "explanation": "**`import sys`**\n\n将Python的**内置系统模块`sys`**加载到内存中。\n`sys`模块包含与Python解释器相关的各种实用函数。\n\n**这行代码做了什么**：准备好使用一个名为`sys.getrefcount()`的特殊函数。\n这个函数以数字形式告诉我们**某个特定对象当前被多少个名称引用**。\n\n**类比：启动图书馆系统**\n就像在图书馆中查询"这本书目前有多少人在借阅？"之前需要先启动借阅系统一样，\n要查看引用计数，必须先导入`sys`模块。\n\n**为什么是这个顺序？** Python从上到下逐行执行代码。\n要在后面使用`sys.getrefcount()`，必须先执行`import sys`。\n\n**注意**：`import`在程序开始时只需执行一次。即使多次导入同一个模块，只有第一次会真正加载。\n\n**执行顺序**：import sys -> 加载sys模块 -> 在全局命名空间中注册'sys'名称 -> 第3行",
+        "title": "sys 모듈 임포트",
+        "explanation": "**`import sys`**\n\nPython의 **내장 시스템 모듈 `sys`**를 메모리에 로드합니다.\n`sys` 모듈에는 Python 인터프리터와 관련된 다양한 유틸리티 함수가 들어있습니다.",
         "visualizationType": "pythonMemory",
         "code": "import sys",
         "pythonMemoryState": {
           "output": [],
-          "note": "sys模块导入完成",
+          "note": "sys 모듈 임포트 완료",
           "names": [
             {
               "name": "sys",
@@ -30,12 +30,12 @@
         }
       },
       {
-        "title": "创建列表对象和第一个引用",
-        "explanation": "**`a = [1, 2, 3]`**\n\n**创建列表对象**：Python在内存(0x2000)中创建一个新的列表对象`[1, 2, 3]`，并将变量`a`连接为指向（引用）该对象。\n\n**什么是引用计数（Reference Counting）？**\nPython内部为每个对象维护一个数字："有多少个名称指向这个对象？"\n这个数字称为**引用计数（Reference Count）**。\n当前指向`[1, 2, 3]`对象的名称只有`a`一个，所以refcount = 1。\n\n**类比：图书馆借阅卡**\n想象一下附在书（对象）上的借阅卡。\n每当有人借走这本书，他们的名字就会被添加到卡上。\n现在只有`a`借走了它，所以卡上只有1个名字。\n如果卡上有0个名字呢？没人在读这本书，图书馆就会将其淘汰！\n\n**为什么是这个顺序？** sys模块导入完成后，按顺序执行下一行。\n\n**内存模型**：变量`a`不是对象本身，而是指向对象的**标签（名牌）**。\n可以把标签`a`想象成贴在内存地址0x2000处的列表上。\n\n**执行顺序**：创建[1, 2, 3]列表(0x2000) -> a = 0x2000 (refcount=1) -> 第4行",
+        "title": "리스트 객체 생성과 첫 참조",
+        "explanation": "**`a = [1, 2, 3]`**\n\n**리스트 객체 생성**: Python이 메모리(0x2000)에 `[1, 2, 3]`이라는 새로운 리스트 객체를 만들고, 변수 `a`가 이 객체를 가리키도록(참조하도록) 연결합니다.",
         "visualizationType": "pythonMemory",
         "code": "a = [1, 2, 3]",
         "pythonMemoryState": {
-          "note": "列表对象已创建，refcount=1",
+          "note": "리스트 객체 생성, refcount=1",
           "names": [
             {
               "name": "sys",
@@ -65,15 +65,15 @@
         }
       },
       {
-        "title": "查看引用计数（getrefcount）",
-        "explanation": "**`print(f\"a만 참조: {sys.getrefcount(a)}\")`**\n\n调用`sys.getrefcount(a)`来查看`a`所指向的列表对象(0x2000)的**引用计数**。\n\n**为什么输出2？（关键要点！）**\n实际上只有`a`引用了这个对象，应该是1才对，但输出的是**2**。\n原因是在调用`getrefcount(a)`时，为了作为函数参数传递，**会临时增加1个引用**。\n\n1. 实际引用：`a`（1个）\n2. 临时引用：`getrefcount()`函数参数（仅在调用期间+1）\n3. 总计：1 + 1 = **2**\n\n**类比：在图书馆查阅图书**\n当你问图书管理员"这本书有多少人在借？"时，管理员在查看期间需要暂时拿着这本书。\n所以显示的数字 = 实际借阅者 + 管理员（临时）。\n\n**注意（初学者容易混淆的点）**：`getrefcount()`的结果总是比**实际引用计数大1**！\n实际refcount = getrefcount()结果 - 1\n\n**为什么是这个顺序？** 刚创建完列表后，自然要确认引用计数是否真的为1。\n\n**执行顺序**：调用sys.getrefcount(a) -> 读取refcount(2) -> 计算f-string -> 执行print -> 第6行",
+        "title": "참조 횟수 확인 (getrefcount)",
+        "explanation": "**`print(f\"a만 참조: {sys.getrefcount(a)}\")`**\n\n`sys.getrefcount(a)`를 호출하여 `a`가 가리키는 리스트 객체(0x2000)의 **참조 횟수**를 확인합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"a만 참조: {sys.getrefcount(a)}\")",
         "pythonMemoryState": {
           "output": [
             "a만 참조: 2"
           ],
-          "note": "getrefcount() = 实际(1) + 临时(1) = 2",
+          "note": "getrefcount() = 실제(1) + 임시(1) = 2",
           "names": [
             {
               "name": "sys",
@@ -103,12 +103,12 @@
         }
       },
       {
-        "title": "添加第二个引用（b = a）",
-        "explanation": "**`b = a`**\n\n**核心概念**：这行代码**不会**创建新的列表！\n它将变量`b`连接为与`a`指向**完全相同的列表对象(0x2000)**。\n\n**引用计数变化**：\n- 之前：只有`a`引用 -> refcount = 1\n- 现在：`a`和`b`都引用 -> refcount = 2\n\n**类比：一栋房子上的两块门牌**\n房子（对象0x2000）只有一栋，但大门上挂了两块门牌（`a`、`b`）。\n无论通过`a`还是`b`访问，到达的都是同一栋房子。\n\n**为什么不是复制？**\n在Python中，`b = a`不会复制对象。它们共享相同的内存地址。\n如果执行`b.append(4)`，通过`a`查看也会变成`[1, 2, 3, 4]`！\n如果想要真正的副本，使用`b = a.copy()`或`b = a[:]`。\n\n**为什么是这个顺序？** 前一个print完成后，按顺序执行下一行。\n\n**执行顺序**：b = a -> b指向0x2000 -> refcount从1增加到2 -> 第7行",
+        "title": "두 번째 참조 추가 (b = a)",
+        "explanation": "**`b = a`**\n\n**핵심 개념**: 이 줄은 새로운 리스트를 만드는 것이 **아닙니다!**\n변수 `b`가 `a`와 **똑같은 리스트 객체(0x2000)**를 함께 가리키도록 연결하는 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "b = a  # 같은 객체 참조",
         "pythonMemoryState": {
-          "note": "执行b = a，refcount从1增加到2",
+          "note": "b = a 실행, refcount 1→2 증가",
           "names": [
             {
               "name": "sys",
@@ -143,15 +143,15 @@
         }
       },
       {
-        "title": "确认增加的引用计数（2个引用）",
-        "explanation": "**`print(f\"a, b 참조: {sys.getrefcount(a)}\")`**\n\n现在再次检查`a`所指向的对象(0x2000)的引用计数。\n由于`b = a`增加了一个引用，结果应该不同了。\n\n**计算**：\n1. 实际引用：`a`、`b`（2个）\n2. 临时引用：调用`getrefcount(a)`时参数传递+1\n3. 结果：2 + 1 = **3**\n\n**有趣的事实**：`sys.getrefcount(a)`和`sys.getrefcount(b)`都返回**相同的结果(3)**。\n因为`a`和`b`指向**同一个对象**！\nrefcount是属于**对象**的属性，不是变量的。\n\n**类比**：之前借阅卡上只有`a`，现在`b`也加上了。\n管理员查看后说"2个借阅者 + 我暂时拿着 = 3"。\n\n**为什么是这个顺序？** b = a执行完成后，自然要确认引用计数是否增加了。\n\n**执行顺序**：调用sys.getrefcount(a) -> 读取refcount(3) -> 计算f-string -> 执行print -> 第9行",
+        "title": "늘어난 참조 횟수 확인 (2개)",
+        "explanation": "**`print(f\"a, b 참조: {sys.getrefcount(a)}\")`**\n\n이제 `a`가 가리키는 객체(0x2000)의 참조 횟수를 다시 확인합니다.\n`b = a`로 참조가 하나 늘었으니, 결과도 달라져야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"a, b 참조: {sys.getrefcount(a)}\")",
         "pythonMemoryState": {
           "output": [
             "a, b 참조: 3"
           ],
-          "note": "getrefcount() = 实际(2) + 临时(1) = 3",
+          "note": "getrefcount() = 실제(2) + 임시(1) = 3",
           "names": [
             {
               "name": "sys",
@@ -183,12 +183,12 @@
         }
       },
       {
-        "title": "添加第三个引用（c = a）",
-        "explanation": "**`c = a`**\n\n变量`c`也被连接为指向**同一个列表对象(0x2000)**。\n现在可以通过`a`、`b`、`c`三个名称访问同一个列表对象。\n\n**引用计数变化**：\n- 之前：`a`、`b`（2个）-> refcount = 2\n- 现在：`a`、`b`、`c`（3个）-> refcount = 3\n\n**关键：列表仍然只有一个！**\n无论变量有多少个，内存中的列表`[1, 2, 3]`**只有一个**。\n所有变量都只是指向同一个内存地址(0x2000)的标签而已。\n\n**类比：一个人的多个昵称**\n"小明"、"明明"、"明哥"都是在叫同一个人。\n有3个名字并不意味着有3个人！\n\n**内存效率**：多个变量共享同一个对象可以节省内存。\n但要注意，通过一个变量修改对象，其他变量也会看到这个变化。\n\n**为什么是这个顺序？** 前一个输出完成后，按顺序执行下一行。\n\n**执行顺序**：c = a -> c指向0x2000 -> refcount从2增加到3 -> 第10行",
+        "title": "세 번째 참조 추가 (c = a)",
+        "explanation": "**`c = a`**\n\n변수 `c`도 **같은 리스트 객체(0x2000)**를 가리키도록 연결합니다.\n이제 하나의 리스트 객체를 `a`, `b`, `c` 세 개의 이름으로 접근할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "c = a  # 또 참조",
         "pythonMemoryState": {
-          "note": "执行c = a，refcount从2增加到3",
+          "note": "c = a 실행, refcount 2→3 증가",
           "names": [
             {
               "name": "sys",
@@ -227,15 +227,15 @@
         }
       },
       {
-        "title": "确认再次增加的引用计数（3个引用）",
-        "explanation": "**`print(f\"a, b, c 참조: {sys.getrefcount(a)}\")`**\n\n再次检查`a`所指向的对象(0x2000)的引用计数。\n第三个引用`c`已添加，数字应该又上升了。\n\n**计算**：\n1. 实际引用：`a`、`b`、`c`（3个）\n2. 临时引用：调用`getrefcount(a)`时+1\n3. 结果：3 + 1 = **4**\n\n**引用计数增长趋势总结**：\n```\na = [1, 2, 3]  -> 实际refcount = 1（getrefcount输出：2）\nb = a          -> 实际refcount = 2（getrefcount输出：3）\nc = a          -> 实际refcount = 3（getrefcount输出：4）\n```\n看到规律了吗？每增加一个引用，输出值恰好增加1。\n\n**类比**：我们正在观察借阅卡上的名字一个一个被添加的过程。\n\n**为什么是这个顺序？** c = a执行完成后，确认引用计数是否又增加了。\n\n**执行顺序**：调用sys.getrefcount(a) -> 读取refcount(4) -> 计算f-string -> 执行print -> 第12行",
+        "title": "다시 늘어난 참조 횟수 확인 (3개)",
+        "explanation": "**`print(f\"a, b, c 참조: {sys.getrefcount(a)}\")`**\n\n이제 `a`가 가리키는 객체(0x2000)의 참조 횟수를 또 확인합니다.\n세 번째 참조 `c`가 추가되었으니, 숫자가 또 올라갔을 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"a, b, c 참조: {sys.getrefcount(a)}\")",
         "pythonMemoryState": {
           "output": [
             "a, b, c 참조: 4"
           ],
-          "note": "getrefcount() = 实际(3) + 临时(1) = 4",
+          "note": "getrefcount() = 실제(3) + 임시(1) = 4",
           "names": [
             {
               "name": "sys",
@@ -271,12 +271,12 @@
         }
       },
       {
-        "title": "移除引用（del b）",
-        "explanation": "**`del b`**\n\n使用`del`关键字删除变量`b`。但这里有一个非常重要的区别！\n\n**del做了什么（准确理解）**：\n- 从命名空间中完全移除名称`b`。\n- 之后尝试使用`b`会引发`NameError`。\n\n**del没有做什么（初学者常见的误解）**：\n- 它**没有**删除列表对象`[1, 2, 3]`本身！\n- 对象仍在内存中，被`a`和`c`引用着。\n\n**引用计数变化**：\n1. `b`与它所指向的对象(0x2000)之间的连接被断开\n2. refcount减少：3 -> 2\n3. refcount不为0，所以对象存活（a和c仍在引用）\n\n**类比：从借阅卡上擦去名字**\n`b`归还了书。借阅卡上`b`的名字被擦掉了，但`a`和`c`还在借阅，所以书不会被淘汰。\n\n**如果所有引用都消失了呢？**\n如果`del a`、`del b`、`del c`都执行了，refcount变为0，CPython会**立即**释放内存！\n\n**为什么是这个顺序？** 确认了引用增加后，这个流程现在展示引用的减少。\n\n**执行顺序**：del b -> 从命名空间移除b -> refcount从3减少到2 -> 第13行",
+        "title": "참조 제거 (del b)",
+        "explanation": "**`del b`**\n\n`del` 키워드로 변수 `b`를 삭제합니다. 하지만 여기서 정말 중요한 구분이 있습니다!",
         "visualizationType": "pythonMemory",
         "code": "del b  # 참조 제거",
         "pythonMemoryState": {
-          "note": "执行del b，refcount从3减少到2（对象仍然存活！）",
+          "note": "del b 실행, refcount 3→2 감소 (객체는 살아있음!)",
           "names": [
             {
               "name": "sys",
@@ -310,15 +310,15 @@
         }
       },
       {
-        "title": "确认减少的引用计数",
-        "explanation": "**`print(f\"del b 후: {sys.getrefcount(a)}\")`**\n\n最终确认`del b`后引用计数是否真的减少了。\n\n**计算**：\n1. 实际引用：`a`、`c`（2个）- `b`已被删除，不再存在！\n2. 临时引用：调用`getrefcount(a)`时+1\n3. 结果：2 + 1 = **3**\n\n**引用计数完整流程总结**：\n```python\na = [1, 2, 3]  # refcount = 1（getrefcount输出：2）\nb = a          # refcount = 2（getrefcount输出：3）\nc = a          # refcount = 3（getrefcount输出：4）\ndel b          # refcount = 2（getrefcount输出：3）<- 减少了！\n```\n\n**Python内存管理的核心原理**：\n- Python（CPython）**实时**追踪每个对象的引用计数。\n- refcount变为0时**立即**释放内存（与其他语言的GC不同！）。\n- 这种方式快速且可预测，但存在循环引用问题（下一课会讲到）。\n\n**与其他语言的比较**：Java和C#的垃圾收集器**稍后批量**处理，\n但CPython在refcount=0时**立即**清理。这就是`__del__`析构函数调用时机可预测的原因。\n\n**执行顺序**：调用sys.getrefcount(a) -> 读取refcount(3) -> 计算f-string -> 执行print -> 程序结束",
+        "title": "줄어든 참조 횟수 확인",
+        "explanation": "**`print(f\"del b 후: {sys.getrefcount(a)}\")`**\n\n`del b` 이후 참조 횟수가 실제로 줄어들었는지 최종 확인합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"del b 후: {sys.getrefcount(a)}\")",
         "pythonMemoryState": {
           "output": [
             "del b 후: 3"
           ],
-          "note": "getrefcount() = 实际(2) + 临时(1) = 3",
+          "note": "getrefcount() = 실제(2) + 임시(1) = 3",
           "names": [
             {
               "name": "sys",
@@ -353,27 +353,27 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "引用计数变为0时会发生什么？",
+    "question": "当引用计数变为0时会发生什么？",
     "options": [
-      "什么都不会发生",
-      "对象立即从内存中删除",
-      "会发生错误",
-      "垃圾收集器稍后删除它"
+      "什么也没发生",
+      "该对象立即从内存中删除",
+      "发生错误",
+      "垃圾收集器稍后会将其删除。"
     ],
     "correctIndex": 1,
-    "explanation": "在CPython中，当引用计数变为0时，对象会立即从内存中释放。\n这就是引用计数的优势——无延迟地即时清理！"
+    "explanation": "在CPython中，当引用计数达到0时，对象会立即从内存中释放。\n这就是引用计数的优点——立即清理，毫不拖延！"
   },
   "misconceptions": [
     {
-      "wrong": "del会删除对象",
-      "correct": "del只删除名称（引用），对象在refcount=0时才被删除",
-      "why": "如果其他变量指向同一个对象，即使del之后对象仍然存活。"
+      "wrong": "del은 객체를 삭제한다",
+      "correct": "del은 이름(참조)만 삭제, 객체는 refcount=0일 때 삭제",
+      "why": "다른 변수가 같은 객체를 가리키면 del 후에도 객체는 살아있습니다."
     },
     {
-      "wrong": "getrefcount()显示的是准确的引用计数",
-      "correct": "函数调用时会临时增加+1引用，所以结果总是比实际大1",
-      "why": "作为参数传递时会产生临时引用。\n实际值 = 输出值 - 1"
+      "wrong": "getrefcount()가 정확한 참조 수를 보여준다",
+      "correct": "함수 호출 시 임시 참조가 +1 되어 항상 1 크게 나온다",
+      "why": "인자로 전달될 때 임시 참조가 생깁니다.\n실제값 = 출력값 - 1"
     }
   ],
-  "keyTakeaway": "Python通过引用计数管理内存！refcount=0时对象立即被删除！"
+  "keyTakeaway": "파이썬은 참조 카운팅으로 메모리 관리! refcount=0이면 즉시 삭제!"
 }

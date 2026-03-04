@@ -1,13 +1,13 @@
 {
   "lessonId": "java-2-2",
-  "title": "空值检查模式",
-  "concept": "有多种安全处理 null 的模式",
+  "title": "空检查模式",
+  "concept": "有多种安全处理空值的模式。",
   "content": {
     "code": "String str = getValueMaybeNull();\n\nif (str != null && str.length() > 0) {\n    System.out.println(str);\n}\n\nObjects.requireNonNull(str, \"str must not be null\");\n\nString result = (str != null) ? str : \"default\";\n\nString value = Objects.requireNonNullElse(str, \"default\");",
     "steps": [
       {
-        "title": "接收可能为 null 的值",
-        "explanation": "**执行顺序：**\n1. 调用 `getValueMaybeNull()`。\n2. 返回值（或 `null`）。\n3. 存储到 `str` 变量中。\n\n**情景：** 从外部来源（数据库、API、用户输入）获取值时，必须始终怀疑它可能为 `null`。\n这个 `str` 就像一颗随时可能引爆的定时炸弹。",
+        "title": "接收一个可能为 null 的值",
+        "explanation": "**执行顺序：**\n1. 调用`getValueMaybeNull()`。\n2. 返回一个值（或“null”）。\n3. 将其保存到“str”变量中。\n\n**情况：** 当您从外部（数据库、API、用户输入）接收到值时，您应该始终怀疑它可能为“null”。\n这个“str”就像一个你永远不知道会爆炸的定时炸弹。",
         "visualizationType": "javaMemory",
         "code": "String str = getValueMaybeNull();",
         "javaMemoryState": {
@@ -18,25 +18,25 @@
               "type": "String"
             }
           ],
-          "note": "外部输入始终要考虑 null 的可能性",
+          "note": "외부 입력은 항상 null 가능성 고려",
           "heap": [],
           "output": []
         }
       },
       {
-        "title": "短路求值（Short-circuit Evaluation）",
-        "explanation": "**执行顺序：**\n1. 检查 `str != null` -> **false**（如果是 null 的话）。\n2. **立即停止**（后面的 `str.length()` 不会执行）。\n\n**逻辑运算的魔法：** `&&`（AND）运算符在左侧条件为 `false` 时，不会检查右侧。\n先检查 `str != null`，如果为 `null`，后面的 `str.length()` 就不会执行，从而安全地避免 `NullPointerException`。",
-        "keyInsight": "&& 短路求值：左边为 false 则右边不执行",
+        "title": "短路评估",
+        "explanation": "**执行顺序：**\n1. 检查 `str != null` -> **false** （如果为 null）。\n2. **立即中断**（不执行后续的`str.length()`）。\n\n**逻辑运算的魔力：** 如果左侧条件为“假”，“&&”（AND）运算符甚至不会检查右侧。\n首先，它检查“str != null”，如果是“null”，则不执行后续的“str.length()”，从而安全地避免“NullPointerException”。",
+        "keyInsight": "&& 快捷方式求值：如果第一个为 false，则不执行第二个",
         "visualizationType": "javaMemory",
         "code": "if (str != null && str.length() > 0) {",
         "javaMemoryState": {
-          "evaluation": "str != null -> false -> && 后面的代码不执行",
-          "note": "顺序很重要！null 检查要放在前面"
+          "evaluation": "str != null → false → && 뒤 실행 안 함",
+          "note": "순서가 중요! null 체크를 먼저"
         }
       },
       {
         "title": "条件执行",
-        "explanation": "**执行顺序：**\n1. 如果前面的 `if` 条件为 `true`...\n2. 执行 `println(str)`。\n\n只有当整个 `if` 条件（`str != null && str.length() > 0`）为 `true` 时，这行才会执行。\n在确保 `str` 是有效字符串的情况下安全地输出。",
+        "explanation": "**执行顺序：**\n1. 如果前面的“if”条件为“true”...\n2. 执行`println(str)`。\n\n仅当前面的 if 语句 (str != null && str.length() > 0) 中的所有条件都为 true 时，才会执行此行。\n安全打印，并保证“str”是有效字符串。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(str);",
         "javaMemoryState": {
@@ -47,14 +47,14 @@
               "type": "String"
             }
           ],
-          "note": "只有 str 安全时才能到达这行",
+          "note": "이 라인은 str이 안전할 때만 도달 가능",
           "evaluation": null
         }
       },
       {
         "title": "Objects.requireNonNull（快速失败）",
-        "explanation": "**执行顺序：**\n1. 调用 `Objects.requireNonNull(str, ...)`。\n2. 检查 `str` 是否为 `null`。\n3. 如果为 `null`，立即抛出异常。\n\n**快速失败（Fail-fast）策略：** "如果有问题，别等到后面出现莫名其妙的错误，现在就明确地崩溃！"如果 `str` 为 `null`，会立即抛出带有明确消息的 `NullPointerException`，使调试更加容易。",
-        "keyInsight": "快速失败（Fail-fast）模式",
+        "explanation": "**执行顺序：**\n1. 调用`Objects.requireNonNull(str, ...)`。\n2. 检查“str”是否为“null”。\n3. 如果为“null”，则立即发生异常。\n\n**快速失败策略：**“如果出现问题，现在就明确解决，而不是以后再担心！”如果“str”为“null”，它会立即抛出“NullPointerException”并带有明确的消息，从而使调试更容易。",
+        "keyInsight": "快速失败模式",
         "visualizationType": "javaMemory",
         "code": "Objects.requireNonNull(str, \"str must not be null\");",
         "javaMemoryState": {
@@ -68,12 +68,12 @@
           "output": [
             "Exception: str must not be null"
           ],
-          "note": "如果为 null，带着明确错误消息立即失败"
+          "note": "null이면 명확한 에러 메시지와 함께 즉시 실패"
         }
       },
       {
         "title": "用三元运算符提供默认值",
-        "explanation": "**执行顺序：**\n1. 检查 `str != null`。\n2. 如果为 true 选择 `str`，如果为 false 选择 `\"default\"`。\n3. 将结果赋值给 `result`。\n\n如果 `str` 不为 `null`，就赋值 `str` 本身；如果为 `null`，则将默认值 `\"default\"` 赋给 `result` 变量。",
+        "explanation": "**执行顺序：**\n1. `str != null` 检查。\n2. 如果为 true，则选择“str”；如果为 false，则选择“默认”。\n3. 将结果分配给“result”。\n\n如果“str”不为“null”，则为“str”本身赋值，如果“str”为“null”，则将默认值“default”赋给“result”变量。",
         "visualizationType": "javaMemory",
         "code": "String result = (str != null) ? str : \"default\";",
         "javaMemoryState": {
@@ -94,8 +94,8 @@
         }
       },
       {
-        "title": "Objects.requireNonNullElse",
-        "explanation": "**执行顺序：**\n1. 调用 `Objects.requireNonNullElse`。\n2. 内部进行 null 检查。\n3. 如果为 `null`，返回 `\"default\"`。\n4. 赋值给 `value`。\n\n这是 Java 9 起提供的更易读的方式。\n功能与三元运算符相同，但"如果不为 null 就用这个，否则用那个"的意图更加明确。",
+        "title": "对象.requireNonNullElse",
+        "explanation": "**执行顺序：**\n1. 调用`Objects.requireNonNullElse`。\n2. 内部检查是否为空。\n3. 如果为 null，则返回“default”。\n4. 赋值给“value”。\n\n自 Java 9 以来提供了一种更具可读性的方法。\n它与三元运算符的功能相同，但意图却暴露得很清楚：“如果不为空，则为这个，否则为那个”。",
         "keyInsight": "Java 9+：使用 requireNonNullElse",
         "visualizationType": "javaMemory",
         "code": "String value = Objects.requireNonNullElse(str, \"default\");",
@@ -107,29 +107,29 @@
               "type": "String"
             }
           ],
-          "note": "更易读的代码（Java 9+）"
+          "note": "더 읽기 쉬운 코드 (Java 9+)"
         }
       }
     ],
     "deltaFormat": true
   },
   "quiz": {
-    "question": "if (str.length() > 0 && str != null) 有什么问题？",
+    "question": "if (str.length() > 0 && str != null) 有什么问题吗？",
     "options": [
       "语法错误",
-      "str 为 null 时发生 NPE",
+      "如果str为null，则发生NPE",
       "总是返回 false",
-      "没有问题"
+      "没问题"
     ],
     "correctIndex": 1,
-    "explanation": "顺序错了。\n因为 str.length() 先执行，如果 str 为 null 就会发生 NPE。\nnull 检查必须放在最前面。"
+    "explanation": "顺序错误。\nstr.length() 首先执行，因此如果 str 为 null 将导致 NPE。\n必须首先进行空检查。"
   },
   "misconceptions": [
     {
-      "wrong": "null 检查的顺序无所谓",
-      "correct": "顺序至关重要。\n`null` 检查必须放在最前面（最左边）。",
-      "why": "如果先检查右边，`null.方法()` 已经执行了，NPE 就已经发生了。\n`&&` 从左到右读取，遇到 `false` 就立即停止（短路求值）。"
+      "wrong": "空检查的顺序并不重要",
+      "correct": "秩序就是生命。\n“null”检查必须首先进行（左）。",
+      "why": "如果从右侧检查，`null.method()` 已经被执行，并且会发生 NPE。\n`&&` 从左侧读取并在遇到 `false` 时立即停止（缩短计算）。"
     }
   ],
-  "keyTakeaway": "null 检查始终放在最前面。使用 Objects 工具类可以让代码更整洁。"
+  "keyTakeaway": "空检查始终是第一位的。使用对象实用程序将使您的代码更加简洁。"
 }

@@ -1,13 +1,13 @@
 {
   "lessonId": "c-3-3",
   "title": "Array Name vs Pointer",
-  "concept": "An array name is used like a pointer, but it's not actually a pointer variable",
+  "concept": "Array names are used like pointers, but are not true pointer variables.",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int arr[5];\n    int *p = arr;\n\n    printf(\"sizeof(arr): %zu\\n\", sizeof(arr));\n    printf(\"sizeof(p):   %zu\\n\", sizeof(p));\n\n    p = arr;\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h Header",
-        "explanation": "Header for `printf` and printing `sizeof` results.\n\nThe goal here is to verify that array names and pointer variables are different entities, even though they look similar.",
+        "title": "Include stdio.h header",
+        "explanation": "Header for outputting `printf` and `sizeof` results.\n\nThe goal this time is to verify that array names and pointer variables are different even if they look similar.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting the main Function",
-        "explanation": "The program entry point. The array `arr` (20 bytes) and pointer `p` (pointer-sized) are prepared on the stack.\n\nThe key point is that although both are \"related to addresses,\" their identities are different: `arr` is the data block itself, while `p` is a variable that holds an address.",
+        "title": "Start main function",
+        "explanation": "Program starting point. An array `arr` (20 bytes) and a pointer `p` (the size of the pointer) are prepared on the stack.\n\nThe important thing is that although both appear to be \"address-related\", they are different: `arr` is the data block itself, and `p` is a variable holding the address.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Array Declaration",
-        "explanation": "`int arr[5];` creates contiguous space for 5 ints.\n\nThe array name `arr` represents the data block itself, not an independent storage location like a pointer variable.",
+        "title": "array declaration",
+        "explanation": "`int arr[5];` creates 5 consecutive int spaces.\n\nThe array name `arr` represents the data block itself and does not imply independent storage like a pointer variable.",
         "visualizationType": "cMemory",
         "code": "int arr[5];",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "Assigning Array Name to Pointer",
-        "explanation": "In `int *p = arr;`, `arr` is converted to `&arr[0]` and stored in `p`.\n\nThe usage looks similar, but the type properties diverge when it comes to `sizeof` and reassignment.",
+        "title": "Assigning an array name to a pointer",
+        "explanation": "In `int *p = arr;`, `arr` is converted to `&arr[0]` and stored in `p`.\n\nThe usage seems similar, but the type properties differ in `sizeof` and whether assignment is possible.",
         "visualizationType": "cMemory",
         "code": "int *p = arr;",
         "stack": [
@@ -64,22 +64,22 @@
         ]
       },
       {
-        "title": "Difference 1: sizeof Result",
-        "explanation": "`sizeof(arr)` returns the total byte count of the entire array, while `sizeof(p)` returns the pointer variable's size.\n\nThis difference is the clearest proof that arrays and pointers are different types.",
+        "title": "Difference 1: sizeof result",
+        "explanation": "`sizeof(arr)` returns the total number of bytes in the array, and `sizeof(p)` returns the size of the pointer variable.\n\nThis difference is the clearest evidence that arrays and pointers are different types.",
         "visualizationType": "cMemory",
         "code": "printf(\"sizeof(arr): %zu\\n\", sizeof(arr));",
         "stdout": "sizeof(arr): 20"
       },
       {
-        "title": "Size of the Pointer Variable",
-        "explanation": "`sizeof(p)` returns the **size of the pointer variable itself**. This value may vary by environment (32/64-bit), and is unrelated to the size of what `p` points to.\n\nSo it's normal that `sizeof(arr)` and `sizeof(p)` produce different results — this difference is key evidence that arrays and pointers are distinct types.",
+        "title": "Size of pointer variable",
+        "explanation": "`sizeof(p)` returns **the size of the pointer variable itself**. This value may vary depending on the environment (32/64 bit) and is independent of the target size pointed to by `p`.\n\nSo it is normal for `sizeof(arr)` and `sizeof(p)` to be different, and this difference is key evidence that arrays and pointers are different types.",
         "visualizationType": "cMemory",
         "code": "printf(\"sizeof(p):   %zu\\n\", sizeof(p));",
         "stdout": "sizeof(arr): 20\nsizeof(p):   8"
       },
       {
-        "title": "Difference 2: Reassignment",
-        "explanation": "Pointer `p` is a variable, so it can be reassigned to a different address.\n\nAn array name, on the other hand, is not an assignable target, so it cannot be changed the same way.",
+        "title": "Difference 2: Reallocation possible?",
+        "explanation": "The pointer `p` is a variable, so it can be reassigned to a different address.\n\nOn the other hand, array names cannot be replaced in the same way because they are not subject to assignment.",
         "visualizationType": "cMemory",
         "code": "p = arr;",
         "stack": [
@@ -101,16 +101,16 @@
         "stdout": ""
       },
       {
-        "title": "Array Name Is a Constant",
-        "explanation": "`arr = p;` is a compile error. An array name is not a modifiable pointer variable.\n\nThe precise statement is: \"an array name decays into a pointer depending on the context.\"",
+        "title": "Array name is a constant",
+        "explanation": "`arr = p;` is a compilation error. Array names are not modifiable pointer variables.\n\nThe correct expression is \"array names decay to pointers depending on the context\".",
         "highlight": [],
         "visualizationType": "cMemory",
         "code": "p = arr;",
         "stack": []
       },
       {
-        "title": "Program Termination",
-        "explanation": "`return 0;` ends the program.\n\nSummary: `sizeof` results and reassignment capability distinguish arrays from pointers.",
+        "title": "Program exit",
+        "explanation": "Exit with `return 0;`.\n\nSummary: The result of `sizeof` and whether it can be reassigned distinguishes arrays/pointers.",
         "visualizationType": "cMemory",
         "code": "return 0;"
       }
@@ -118,22 +118,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What do array name `arr` and pointer `p` have in common?",
+    "question": "What do the array name `arr` and the pointer `p` have in common?",
     "options": [
-      "sizeof gives the same result",
-      "Both can be reassigned (Mutable)",
-      "Both can be used as expressions representing an address",
-      "They have nothing in common"
+      "sizeof is the same size",
+      "Value can be changed (Mutable)",
+      "Both can be used as expressions representing address values.",
+      "have nothing in common"
     ],
     "correctIndex": 2,
     "explanation": "Both can be dereferenced like `*arr`, `*p`, or indexed like `arr[i]`, `p[i]` (due to the Decay property)."
   },
   "misconceptions": [
     {
-      "wrong": "An array is a pointer",
+      "wrong": "Arrays are pointers",
       "correct": "An array is an array, and a pointer is a pointer.",
-      "why": "An array name only 'transforms (Decays)' into a pointer when used in an expression.\nUse `sizeof` and the true identity is revealed."
+      "why": "When an array name is used in an expression, it simply ‘decays’ into a pointer.\nIf you take a picture of `sizeof`, its true color will be revealed."
     }
   ],
-  "keyTakeaway": "An array name is a constant address, a pointer is a variable address. Their `sizeof` results differ!"
+  "keyTakeaway": "Array names are constant addresses, and pointers are variable addresses. `sizeof` results are different!"
 }

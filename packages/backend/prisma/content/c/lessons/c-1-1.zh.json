@@ -1,13 +1,13 @@
 {
   "lessonId": "c-1-1",
-  "title": "声明与内存分配",
-  "concept": "声明变量的那一刻，内存空间就被预留了（但未被初始化）",
+  "title": "声明和内存分配",
+  "concept": "当你声明一个变量时，它就会占用内存空间（但尚未初始化）。",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int a;\n\n    printf(\"Value of a: %d\\n\", a);\n\n    return 0;\n}",
     "steps": [
       {
         "title": "包含头文件",
-        "explanation": "`#include <stdio.h>` 导入了标准I/O函数（如 `printf`）的声明。\n\n只需记住一点：没有这行代码，使用 `printf` 会导致编译错误。",
+        "explanation": "`#include <stdio.h>` 导入使用标准输入/输出函数（例如 `printf`）的声明。\n\n您只需要记住要点：如果没有这一行，您在使用“printf”时将会收到编译错误。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "定义 main 函数",
-        "explanation": "`int main()` 是程序的入口。当执行开始时，会创建一个 main 栈帧，局部变量存储在这个栈帧中。\n\n在这个阶段，还没有声明任何局部变量，所以只有栈帧本身存在。",
+        "title": "主函数定义",
+        "explanation": "`int main()` 是程序入口点。当执行开始时，将创建一个主堆栈帧，并将局部变量存储在该帧中。\n\n在这个阶段，我们还没有声明任何局部变量，所以我们拥有的只是一个框架。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,7 +30,7 @@
       },
       {
         "title": "变量声明",
-        "explanation": "`int a;` 只预留了内存空间，并没有赋值。\n\n因此 `a` 包含一个垃圾值，读取它可能产生不可预测的结果。通常更安全的做法是在声明时初始化，例如 `int a = 0;`。",
+        "explanation": "`int a;` 只保留内存空间，不插入值。\n\n所以“a”是一个垃圾值，读取它可能会产生不可预测的结果。一般来说，一起使用初始化是一种安全的做法，例如“int a = 0;”。",
         "visualizationType": "cMemory",
         "code": "int a;",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "垃圾值",
-        "explanation": "打印未初始化的 `a`，在不同的执行环境中会产生不同的结果。\n\n这是未定义行为（Undefined Behavior），会导致极难调试的 Bug。要点很简单：始终在声明时初始化局部变量。",
+        "title": "垃圾价值",
+        "explanation": "如果在未初始化的情况下打印“a”，则结果可能会因执行环境而异。\n\n这是未定义的行为，可能会导致很难调试的错误。结论很简单：局部变量一声明就初始化。",
         "visualizationType": "terminal",
         "code": "printf(\"Value of a: %d\\n\", a);",
         "stdout": "Value of a: 21845 (example, varies per execution)"
@@ -53,22 +53,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "在 C 语言中，只声明变量而不初始化时，它包含什么值？",
+    "question": "当用C语言声明变量时，以下哪项是变量中包含的值？",
     "options": [
-      "总是 0",
-      "总是 NULL",
-      "未知（垃圾值）",
+      "无条件 0",
+      "无条件为空",
+      "未知（垃圾价值）",
       "1"
     ],
     "correctIndex": 2,
-    "explanation": "自动初始化为零只发生在全局变量和静态变量上。\n函数内部的局部变量如果不显式初始化，就会包含垃圾值。"
+    "explanation": "自动初始化仅适用于全局或静态变量。\n如果函数内的局部变量未初始化，它们将包含垃圾值。"
   },
   "misconceptions": [
     {
-      "wrong": "所有变量初始值都是 0",
-      "correct": "局部变量永远不会自动初始化为 0。",
-      "why": "C 语言认为将每个变量都初始化为 0 是一种性能浪费（C 将性能放在最优先的位置）。"
+      "wrong": "所有变量都以0开头",
+      "correct": "局部变量永远不会自动变为零。",
+      "why": "这是因为我们认为每次都初始化为0是对性能的浪费（在C语言中性能是重中之重）。"
     }
   ],
-  "keyTakeaway": "声明变量会创建内存空间。但值必须由你来设定。"
+  "keyTakeaway": "创建变量会创建内存空间。但是，我必须自己输入该值。"
 }

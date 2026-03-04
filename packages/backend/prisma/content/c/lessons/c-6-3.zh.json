@@ -1,13 +1,13 @@
 {
   "lessonId": "c-6-3",
-  "title": "Struct Basics",
-  "concept": "将多个变量打包成一个整体的容器（用户自定义类型）",
+  "title": "结构基础知识",
+  "concept": "将多个变量组合为一个的包（用户定义类型）",
   "content": {
     "code": "#include <stdio.h>\n\nstruct Point {\n    int x;\n    int y;\n};\n\nint main() {\n    struct Point p1 = {10, 20};\n\n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n\n    struct Point p2 = p1;\n    p2.x = 99;\n\n    printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);\n    printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 `printf` 所需的头文件。\n\n本课讲解结构体的定义、成员访问和复制行为。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用“printf”的标头。\n\n本课程涵盖结构定义、成员访问和复制操作。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "定义结构体"蓝图"",
-        "explanation": "`struct Point { int x; int y; };` 是一个包含两个成员的新类型蓝图。\n\n这一步只是类型定义，尚未创建实际的变量内存。",
+        "title": "结构“框架”的定义",
+        "explanation": "`结构点{ int x;整数y； };` 是一个具有两个成员的新型蓝图。\n\n此步骤是类型定义，尚未创建实际的变量内存。",
         "visualizationType": "cMemory",
         "code": "struct Point {",
         "highlightOffset": [
@@ -27,8 +27,8 @@
         ]
       },
       {
-        "title": "main 函数开始",
-        "explanation": "创建 main 栈帧。\n\n接下来我们将创建结构体变量，观察值和复制行为。",
+        "title": "启动主函数",
+        "explanation": "主框架已创建。\n\n然后，创建一个结构体变量来检查值和复制操作。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -41,8 +41,8 @@
         ]
       },
       {
-        "title": "声明并初始化结构体变量",
-        "explanation": "`struct Point p1 = {10, 20};` 创建实际变量 `p1` 并初始化其成员。\n\n用一个变量名就能管理一组关联数据。",
+        "title": "声明并初始化结构变量",
+        "explanation": "创建实际变量“p1”，并使用“struct Point p1 = {10, 20};”初始化其成员。\n\n您可以使用一个变量名称来管理一堆相关数据。",
         "visualizationType": "cMemory",
         "code": "struct Point p1 = {10, 20};",
         "stack": [
@@ -55,15 +55,15 @@
         ]
       },
       {
-        "title": "访问并输出结构体成员",
-        "explanation": "通过点运算符（`.`）访问 `p1.x` 和 `p1.y` 来读取值。",
+        "title": "访问和输出结构成员",
+        "explanation": "使用点运算符 (`.`) 访问 `p1.x` 和 `p1.y` 来读取值。",
         "visualizationType": "cMemory",
         "code": "printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);",
         "stdout": "p1: (10, 20)"
       },
       {
-        "title": "复制结构体（值复制）",
-        "explanation": "`p2 = p1` 赋值将成员值复制到新变量中。\n\n原始值和副本之后独立存在。",
+        "title": "复制结构（复制值）",
+        "explanation": "“p2 = p1”形式的副本将成员值复制到新变量。\n\n原件和副本从此独立存在。",
         "visualizationType": "cMemory",
         "code": "struct Point p2 = p1;",
         "stack": [
@@ -83,8 +83,8 @@
         ]
       },
       {
-        "title": "修改副本的结构体成员",
-        "explanation": "修改副本 `p2` 的成员只影响副本本身。",
+        "title": "修改复制的结构成员",
+        "explanation": "如果更改副本“p2”的成员，则更改仅适用于该副本。",
         "visualizationType": "cMemory",
         "code": "p2.x = 99;",
         "stack": [
@@ -103,23 +103,23 @@
         ]
       },
       {
-        "title": "验证原始值（p1）",
-        "explanation": "再次检查原始值，确认保持不变。\n\n这是值复制的关键证据。",
+        "title": "检查原始 (p1) 值",
+        "explanation": "如果再次检查原始值，它们将保持之前的状态。\n\n这是证明它是有价值副本的关键证据。",
         "visualizationType": "cMemory",
         "code": "printf(\"p1: (%d, %d)\\n\", p1.x, p1.y);",
         "occurrence": 2,
         "stdout": "p1: (10, 20)\np1: (10, 20)"
       },
       {
-        "title": "验证副本（p2）",
-        "explanation": "副本保留了修改后的值，与原始值分离。",
+        "title": "检查副本（p2）值",
+        "explanation": "副本保留修改后的值，并与原始版本分开。",
         "visualizationType": "cMemory",
         "code": "printf(\"p2: (%d, %d)\\n\", p2.x, p2.y);",
         "stdout": "p1: (10, 20)\np1: (10, 20)\np2: (99, 20)"
       },
       {
-        "title": "程序结束",
-        "explanation": "通过 `return 0;` 结束程序。\n\n要点：结构体赋值是值复制，成员访问使用 `.` 运算符。",
+        "title": "程序退出",
+        "explanation": "使用“return 0;”退出。\n\n关键点：结构体赋值是复制值，成员访问使用“.”运算符。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -128,22 +128,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "访问结构体成员使用什么运算符？",
+    "question": "什么运算符访问结构成员？",
     "options": [
       "->",
-      ".",
+      "。",
       "::",
       "$"
     ],
     "correctIndex": 1,
-    "explanation": "从变量本身访问成员时使用点（`.`）。\n通过指针访问时使用箭头（`->`）。"
+    "explanation": "从变量本身输入成员时，请使用点 (`.`)。\n对于指针，请使用箭头 (`->`)。"
   },
   "misconceptions": [
     {
-      "wrong": "结构体的大小等于各成员大小之和",
-      "correct": "通常如此，但由于填充（Padding）可能会更大。",
-      "why": "CPU 会在成员之间插入空位（填充）以便更快地读取数据（内存对齐）。"
+      "wrong": "结构的大小是其成员大小的总和。",
+      "correct": "这基本上是正确的，但由于填充的原因可能会更大。",
+      "why": "为了让CPU快速读取数据，它通过在行之间插入空白（填充）来对齐行（内存对齐）。"
     }
   ],
-  "keyTakeaway": "将关联数据用 `struct` 打包。使用 `=` 会整体值复制。"
+  "keyTakeaway": "让我们将相关数据分组到“struct”中。如果使用“=”，则会复制整个值。"
 }

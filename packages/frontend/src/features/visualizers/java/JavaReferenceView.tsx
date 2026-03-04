@@ -9,6 +9,7 @@
 
 import { memo, useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import type { FlowStep, FlowVariable } from '@codeinsight/shared';
 
 // ============================================
@@ -265,6 +266,7 @@ export const JavaReferenceView = memo(function JavaReferenceView({
   prevStep,
   className = '',
 }: JavaReferenceViewProps) {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [arrows, setArrows] = useState<ArrowInfo[]>([]);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -421,6 +423,26 @@ export const JavaReferenceView = memo(function JavaReferenceView({
   );
 
   const anyHovered = hoveredId !== null;
+  const hasAnyMemoryData = stackVariables.length > 0 || orderedHeapObjects.length > 0;
+
+  if (!hasAnyMemoryData) {
+    return (
+      <div ref={containerRef} className={`relative ${className}`}>
+        <div className="flex items-center justify-center p-6 min-h-[160px]">
+          <div className="max-w-lg rounded-xl border px-4 py-4 text-center bg-blue-50 border-blue-200">
+            <div className="space-y-3 text-left">
+              <div>
+                <p className="text-sm font-semibold text-blue-900">{t('visualizer.java_compile_time_empty_title')}</p>
+                <p className="mt-1 text-sm text-blue-800">
+                  {t('visualizer.java_compile_time_empty_desc')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>

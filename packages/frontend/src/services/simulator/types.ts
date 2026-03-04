@@ -19,6 +19,11 @@ export interface SimulateResult {
   stepRegisters?: StepRegisters[];
   output?: string;
   error?: string;
+  errorInfo?: {
+    code?: string;
+    message: string;
+    details?: Record<string, unknown>;
+  };
 }
 
 // 스텝별 레지스터 정보

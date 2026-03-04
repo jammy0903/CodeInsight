@@ -1,13 +1,13 @@
 {
   "lessonId": "c-2-3",
-  "title": "解引用：通过地址读取值",
-  "concept": "沿着地址找过去，取回实际的值（像寻宝地图）",
+  "title": "取消引用：转到地址并读取值",
+  "concept": "跟随地址，获取实际价值（寻宝图）",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int money = 1000;\n    int *p = &money;\n\n    printf(\"Money: %d\\n\", money);\n\n    printf(\"Money via *p: %d\\n\", *p);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 ```printf``` 等输入输出函数的头文件。在编译前的预处理阶段处理。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用输入/输出函数（例如“printf”）的标头。在编译前的预处理阶段进行处理。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "程序启动 — 栈上创建 ```main``` 的**栈帧**，```money``` 和 ```p``` 准备放入其中。",
+        "title": "启动主函数",
+        "explanation": "程序启动 - 在堆栈上创建一个“main``”的**堆栈框架**，并准备将“money”和“p”放入其中。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,7 +30,7 @@
       },
       {
         "title": "变量声明",
-        "explanation": "在栈帧中分配 4 字节空间（地址 ```0x2000```），存储整数 ```1000```。\n\n可以把宝物（1000）想象成存放在 ```0x2000``` 号保险箱中。只要知道保险箱编号（地址），就能随时取出宝物。下一步我们将把这个编号告诉指针。",
+        "explanation": "栈帧中保留了4个字节的空间（地址“0x2000”），存储整数“1000”。\n\n宝藏（1,000韩元）存放在号码``0x2000````的保险箱中。如果你知道保险箱号码（地址），你可以随时取出宝物，这个号码将在下一步中提供给指针。",
         "visualizationType": "cMemory",
         "code": "int money = 1000;",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "将地址赋给指针",
-        "explanation": "`int *p = &money;` 使 `p` 存储 `money` 的地址。\n\n之后使用 `*p` 就可以沿着地址访问 `money` 的实际值。",
+        "title": "将地址分配给指针",
+        "explanation": "对于“int *p = &money;”，“p”存储“money”的地址。\n\n然后，您可以使用“*p”通过地址访问“money”的实际值。",
         "visualizationType": "cMemory",
         "code": "int *p = &money;",
         "stack": [
@@ -64,22 +64,22 @@
         ]
       },
       {
-        "title": "直接输出值",
-        "explanation": "写 ```money``` 会直接从地址 ```0x2000``` 读取值 ```1000``` — 因为知道变量名所以可以**直接访问**。\n\n但如果不知道变量名，只知道地址呢？那就需要下一步的**解引用**了。请对比这个输出（```1000```）和下一步的结果。",
+        "title": "直接输出价值",
+        "explanation": "如果你写````money````，值````1000````会直接从地址````0x2000````读取 - 这是一种**直接访问**方法，因为变量名是已知的。\n\n但是如果您不知道变量名而只知道地址怎么办？这时候就需要进行下一步**反向引用**。让我们将此输出（``1000``）与下一步进行比较。",
         "visualizationType": "cMemory",
         "code": "printf(\"Money: %d\\n\", money);",
         "stdout": "Money: 1000"
       },
       {
-        "title": "通过指针间接输出值（解引用）",
-        "explanation": "`*p` 的意思是"到 p 存储的地址去，读取那里的值"。\n\n因此直接输出 `money` 和通过 `*p` 输出得到的结果完全相同。",
+        "title": "通过指针间接输出（取消引用）值",
+        "explanation": "`*p` 的意思是“转到 p 保存的地址并读取它的值。”\n\n因此，直接打印为“money”的值和输出为“*p”的值是相同的。",
         "visualizationType": "cMemory",
         "code": "printf(\"Money via *p: %d\\n\", *p);",
         "stdout": "Money: 1000\nMoney via *p: 1000"
       },
       {
-        "title": "程序结束",
-        "explanation": "```return 0``` — 栈帧被移除，```money``` 和 ```p``` 都消失。\n\n核心总结：```p``` -> 目标的地址，```*p``` -> 目标的实际值。下节课我们不仅会通过 ```*p``` 读取值，还会学习如何**修改**值！",
+        "title": "程序退出",
+        "explanation": "```return 0``` — 堆栈帧被删除，导致 ```money``` 和 ```p``` 消失。\n\n关键定理：```p``` → 目标地址，```*p``` → 目标实际值。在下一课中，您将学习如何使用````*p```不仅读取而且**更改**值！",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
@@ -89,22 +89,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "已知 `int *ptr = &a;`，`*ptr` 与什么值相同？",
+    "question": "当`int *ptr = &a;`时，什么与`*ptr`具有相同的值？",
     "options": [
-      "&a",
-      "ptr",
-      "a",
+      "＆一个",
+      "指针",
+      "一个",
       "&ptr"
     ],
     "correctIndex": 2,
-    "explanation": "`*ptr` 意为"到 ptr 指向的地方（a 的地址）取出内容"，所以它等于 `a` 的值。"
+    "explanation": "`*ptr` 表示转到 `ptr` 指向的位置（`a` 的地址）并检索内容，因此它与 `a` 的值相同。"
   },
   "misconceptions": [
     {
-      "wrong": "*p 指的是指针变量 p 本身",
-      "correct": "它实际上指的是 p 所指向的**目标**。",
-      "why": "`p` 是地址（0x100...），`*p` 是那里存储的值（1000）。\n两者完全不同。"
+      "wrong": "*p表示指针变量p",
+      "correct": "相反，它意味着 p 指向的**目标**。",
+      "why": "`p` 是地址 (0x100...)，而 `*p` 是那里的值 (1000)。\n这是完全不同的。"
     }
   ],
-  "keyTakeaway": "`*p` 是"去那里"的指令。它可以读取值。"
+  "keyTakeaway": "`*p` 是“转到”的命令。可以读取该值。"
 }

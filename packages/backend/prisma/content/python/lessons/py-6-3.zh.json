@@ -1,18 +1,18 @@
 {
   "lessonId": "py-6-3",
-  "title": "实例变量",
-  "concept": "每个实例拥有自己的变量 - 完全独立!",
+  "title": "인스턴스 변수",
+  "concept": "각 인스턴스는 자기만의 변수를 가진다 - 완전히 독립!",
   "content": {
     "code": "class Counter:\n    def __init__(self):\n        self.count = 0\n    \n    def increment(self):\n        self.count += 1\n\nc1 = Counter()\nc2 = Counter()\n\nc1.increment()\nc1.increment()\nc2.increment()\n\nprint(f\"c1: {c1.count}\")  # 2\nprint(f\"c2: {c2.count}\")  # 1",
     "steps": [
       {
-        "title": "Counter 类定义",
-        "explanation": "**`class Counter:`**\n\nPython 从上到下按顺序执行代码。定义 `Counter` 类(计数器蓝图)。\n\n**本课目标**: 直观确认实例变量(`self.count`)对于**每个对象是完全独立的**。我们将创建 c1 和 c2 两个 Counter 对象，分别调用不同次数的 increment()，证明它们互不影响。\n\n**类比**: Counter 类是"计数器工厂"的蓝图。这个工厂可以生产多个计数器，每个计数器都有**独立的显示屏**。按下一个计数器的按钮不会改变其他计数器的数字。\n\n**为什么是这个顺序?** 必须先定义类，之后才能添加方法和创建对象。\n\n**执行顺序**: 执行 class Counter --> 开始创建 Counter 类对象 --> line 2",
+        "title": "Counter 클래스 정의",
+        "explanation": "**`class Counter:`**\n\n`Counter` 클래스를 정의합니다. 이 레슨에서는 인스턴스 변수(`self.count`)가 각 객체마다 완전히 독립적임을 확인합니다. c1과 c2 두 카운터를 만들고, 각각 다른 횟수만큼 증가시켜 서로 영향을 주지 않음을 증명합니다.",
         "visualizationType": "pythonMemory",
         "code": "class Counter:",
         "pythonMemoryState": {
           "output": [],
-          "note": "类定义开始",
+          "note": "클래스 정의 시작",
           "names": [
             {
               "name": "Counter",
@@ -30,8 +30,8 @@
         }
       },
       {
-        "title": "__init__ 方法定义",
-        "explanation": "**`def __init__(self):`**\n\n定义**初始化方法**。调用 Counter() 时，Python 会**自动**执行此方法。\n\n**`self.count = 0` 的含义**: 为**每个对象**创建一个独立的 `count` 属性并初始化为 0。执行 c1 = Counter() 时，c1 的 count 设为 0；执行 c2 = Counter() 时，c2 的 count 设为 0。两个 count 是**完全不同的变量**!\n\n**只有 self 参数的情况**: 这个 __init__ 除了 `self` 没有额外参数。即以 `Counter()` 无参调用。与上一课的 `User(\"Alice\", 20)` 不同，不需要额外数据。\n\n**注意**: 此时只是**定义**方法。`self.count = 0` 并未执行! 只有在稍后调用 `Counter()` 时才会执行。\n\n**为什么是这个顺序?** 在类体内按顺序定义方法。\n\n**执行顺序**: 执行 def __init__ --> 创建 __init__ 函数对象 --> 注册到 Counter 类 --> line 5",
+        "title": "__init__ 메서드 정의",
+        "explanation": "**`def __init__(self):`**\n\n초기화 메서드를 정의합니다. `self.count = 0`으로 각 객체마다 독립적인 `count` 속성을 0으로 초기화합니다. 매개변수가 `self`만 있으므로 `Counter()`처럼 인자 없이 호출합니다.",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self):",
         "highlightOffset": [
@@ -39,7 +39,7 @@
           1
         ],
         "pythonMemoryState": {
-          "note": "__init__ 方法已定义(尚未调用)",
+          "note": "__init__ 메서드 정의됨 (아직 호출 안 됨)",
           "objects": [
             {
               "id": "class1",
@@ -51,8 +51,8 @@
         }
       },
       {
-        "title": "increment 方法定义",
-        "explanation": "**`def increment(self):`**\n\n定义一个将调用对象的 `count` 增加 1 的方法。方法体只有一行: `self.count += 1`。\n\n**`self.count += 1` 意味着什么?** 它是 `self.count = self.count + 1` 的缩写。即:\n1. 读取当前 `self.count` 的值(例如 0)\n2. 加 1(0 + 1 = 1)\n3. 将结果存回 `self.count`(self.count = 1)\n\n**self 的决定性作用**: 同样的 increment 代码**针对哪个对象**执行，完全取决于 `self`。\n- 调用 `c1.increment()` 时: self = c1 --> 只有 c1.count 增加\n- 调用 `c2.increment()` 时: self = c2 --> 只有 c2.count 增加\n- c1 的 increment **不可能**触及 c2 的 count!\n\n**类比**: 有两个独立的计数器。按左边计数器(c1)的按钮只增加左边的数字，按右边计数器(c2)的按钮只增加右边的数字。\n\n**注意**: 此时只是**定义**方法。\n\n**为什么是这个顺序?** 定义完 __init__ 后，按顺序定义下一个方法。\n\n**执行顺序**: 执行 def increment --> 创建 increment 函数对象 --> 注册到 Counter 类 --> Counter 类定义完成 --> line 8",
+        "title": "increment 메서드 정의",
+        "explanation": "**`def increment(self):`**\n\n`self.count += 1`로 호출한 객체의 카운트만 증가시킵니다. `c1.increment()`는 `self = c1`이므로 c1.count만 변경하고, c2.count는 절대 건드리지 않습니다. `self`가 어떤 객체인지 결정하는 것은 호출 방식입니다.",
         "visualizationType": "pythonMemory",
         "code": "def increment(self):",
         "highlightOffset": [
@@ -60,7 +60,7 @@
           1
         ],
         "pythonMemoryState": {
-          "note": "increment 方法已定义",
+          "note": "increment 메서드 정의됨",
           "objects": [
             {
               "id": "class1",
@@ -72,12 +72,12 @@
         }
       },
       {
-        "title": "创建第一个计数器(__init__ 自动调用)",
-        "explanation": "**`c1 = Counter()`**\n\n**创建对象的同时自动调用 __init__!**\n\n**Python 内部操作**:\n1. 分配新对象空间(0x2000)\n2. **自动调用** `__init__(c1)` --> 跳转到 line 3\n3. 初始化完成后将对象引用赋值给 `c1`\n\n**为什么是这个顺序?** 类定义完成后，按顺序执行下一行。\n\n**执行顺序**: 调用 Counter() --> 创建对象 0x2000 --> 自动调用 __init__ --> 跳转到 line 3",
+        "title": "첫 번째 카운터 생성 (__init__ 자동 호출)",
+        "explanation": "**`c1 = Counter()`**\n\nCounter 인스턴스를 생성하면서 `__init__`이 자동 호출됩니다. c1 객체에 `count = 0`이 설정됩니다.",
         "visualizationType": "pythonMemory",
         "code": "c1 = Counter()",
         "pythonMemoryState": {
-          "note": "c1 对象已创建 --> __init__ 即将自动调用",
+          "note": "c1 객체 생성 → __init__ 자동 호출 예정",
           "names": [
             {
               "name": "Counter",
@@ -107,12 +107,12 @@
         }
       },
       {
-        "title": "c1 实例变量初始化",
-        "explanation": "**`self.count = 0`**\n\n**创建实例变量**: 向 `self`(c1 对象, 0x2000)添加 `count` 属性并赋值为 `0`。\n\n**self.count 的含义**:\n- `self` --> c1 对象(0x2000)\n- `.count` --> 该对象的 count 属性(现在创建!)\n- `= 0` --> 初始化为 0\n\n**为什么是这个顺序?** 对象创建(line 8)自动调用了 __init__，跳转到这里。\n\n**执行顺序**: self.count = 0 --> 向 c1 对象添加 count=0 --> __init__ 结束 --> 返回 line 8 --> line 9",
+        "title": "c1 인스턴스 변수 초기화",
+        "explanation": "**`self.count = 0`**\n\n`self`(c1 객체)에 `count` 속성을 추가하고 0으로 초기화합니다. 이 `count`는 c1만의 독립적인 변수입니다.",
         "visualizationType": "pythonMemory",
         "code": "self.count = 0",
         "pythonMemoryState": {
-          "note": "c1 对象初始化完成(count=0)",
+          "note": "c1 객체 초기화 완료 (count=0)",
           "names": [
             {
               "name": "Counter",
@@ -154,12 +154,12 @@
         }
       },
       {
-        "title": "创建第二个计数器(__init__ 自动调用)",
-        "explanation": "**`c2 = Counter()`**\n\n**创建新的独立对象!**\n\n**Python 内部操作**:\n1. 分配**新的**对象空间(0x3000) <-- 与 c1(0x2000)不同!\n2. **自动调用** `__init__(c2)` --> 跳转到 line 3\n3. 初始化完成后将对象引用赋值给 `c2`\n\n**重要**: c1 和 c2 是**完全不同的对象**!\n\n**为什么是这个顺序?** c1 初始化完成后，按顺序执行下一行。\n\n**执行顺序**: 调用 Counter() --> 创建对象 0x3000 --> 自动调用 __init__ --> 跳转到 line 3",
+        "title": "두 번째 카운터 생성 (__init__ 자동 호출)",
+        "explanation": "**`c2 = Counter()`**\n\n새로운 독립 Counter 인스턴스를 생성합니다. c1과 완전히 별개의 객체이며, `__init__`이 자동 호출됩니다.",
         "visualizationType": "pythonMemory",
         "code": "c2 = Counter()",
         "pythonMemoryState": {
-          "note": "c2 对象已创建 --> __init__ 即将自动调用",
+          "note": "c2 객체 생성 → __init__ 자동 호출 예정",
           "names": [
             {
               "name": "Counter",
@@ -199,12 +199,12 @@
         }
       },
       {
-        "title": "c2 实例变量初始化",
-        "explanation": "**`self.count = 0`**\n\n**创建实例变量**: 向 `self`(c2 对象, 0x3000)添加 `count` 属性并赋值为 `0`。\n\n**核心概念**: c1.count 和 c2.count 是**完全不同的变量**!\n- c1.count --> 0x2000 对象的 count\n- c2.count --> 0x3000 对象的 count\n- 名字相同但**内存空间不同**!\n\n**为什么是这个顺序?** 对象创建(line 9)自动调用了 __init__，跳转到这里。\n\n**执行顺序**: self.count = 0 --> 向 c2 对象添加 count=0 --> __init__ 结束 --> 返回 line 9 --> line 11",
+        "title": "c2 인스턴스 변수 초기화",
+        "explanation": "**`self.count = 0`**\n\n이번에는 `self`가 c2이므로 c2에 `count = 0`이 추가됩니다. c1.count와 c2.count는 같은 이름이지만 **서로 다른 메모리 공간**에 있는 완전히 독립된 변수입니다.",
         "visualizationType": "pythonMemory",
         "code": "self.count = 0",
         "pythonMemoryState": {
-          "note": "c2 对象初始化完成(与 c1 独立!)",
+          "note": "c2 객체 초기화 완료 (c1과 독립적!)",
           "names": [
             {
               "name": "Counter",
@@ -256,12 +256,12 @@
         }
       },
       {
-        "title": "调用 c1.increment()(第1次)",
-        "explanation": "**`c1.increment()`**\n\n调用 c1 对象的 increment 方法。\n\n**Python 内部转换**:\n```python\nc1.increment()  # 用户编写的代码\n↓\nCounter.increment(c1)  # Python 内部转换\n```\n\n**self 接收什么?**\n- `self` = `c1`(0x2000 对象)\n\n**为什么是这个顺序?** c2 初始化完成后，按顺序执行下一行。\n\n**执行顺序**: 调用 c1.increment() --> 跳转到 line 6 --> self=c1",
+        "title": "c1.increment() 호출 (1번째)",
+        "explanation": "**`c1.increment()`**\n\nPython이 내부적으로 `Counter.increment(c1)`으로 변환합니다. `self = c1`으로 바인딩되어 c1.count만 변경됩니다.",
         "visualizationType": "pythonMemory",
         "code": "c1.increment()",
         "pythonMemoryState": {
-          "note": "调用 c1.increment() --> 即将跳转到 line 6",
+          "note": "c1.increment() 호출 → line 6으로 점프 예정",
           "names": [
             {
               "name": "Counter",
@@ -301,12 +301,12 @@
         }
       },
       {
-        "title": "c1.count 增加(第1次)",
-        "explanation": "**`self.count += 1`**\n\n将 `self`(c1 对象, 0x2000)的 `count` 增加 1。\n\n**执行流程**:\n1. 读取 `self.count` --> c1.count --> 0\n2. 计算 `0 + 1` --> 1\n3. 赋值 `self.count = 1` --> c1.count = 1\n\n**重要**: c2.count 仍然是 0! 每个对象的实例变量是**完全独立的**。\n\n**为什么是这个顺序?** 从方法调用(line 11)跳转到这里。\n\n**执行顺序**: self.count += 1 --> c1.count 从 0 变为 1 --> increment 结束 --> 返回 line 11 --> line 12",
+        "title": "c1.count 증가 (1번째)",
+        "explanation": "**`self.count += 1`**\n\n`self.count`(c1.count)를 0에서 1로 증가시킵니다. c2.count는 여전히 0으로, 인스턴스 변수의 독립성이 여기서 확인됩니다.",
         "visualizationType": "pythonMemory",
         "code": "self.count += 1",
         "pythonMemoryState": {
-          "note": "c1.count 从 0 增加到 1(c2 不受影响!)",
+          "note": "c1.count가 0→1 증가 (c2는 영향 없음!)",
           "names": [
             {
               "name": "Counter",
@@ -358,13 +358,13 @@
         }
       },
       {
-        "title": "调用 c1.increment()(第2次)",
-        "explanation": "**`c1.increment()`**\n\n**再次调用同一对象的方法**。\n\n**self 接收什么?**\n- `self` = `c1`(0x2000 对象) <-- 与第1次相同的对象!\n\n**为什么是这个顺序?** 上一次方法调用完成后，按顺序执行下一行。\n\n**执行顺序**: 调用 c1.increment() --> 跳转到 line 6 --> self=c1",
+        "title": "c1.increment() 호출 (2번째)",
+        "explanation": "**`c1.increment()`** (2번째)\n\n같은 c1 객체의 메서드를 다시 호출합니다. `self`는 이전과 같은 c1 객체입니다.",
         "visualizationType": "pythonMemory",
         "code": "c1.increment()",
         "occurrence": 2,
         "pythonMemoryState": {
-          "note": "再次调用 c1.increment() --> 即将跳转到 line 6",
+          "note": "c1.increment() 다시 호출 → line 6으로 점프 예정",
           "names": [
             {
               "name": "Counter",
@@ -404,12 +404,12 @@
         }
       },
       {
-        "title": "c1.count 增加(第2次)",
-        "explanation": "**`self.count += 1`**\n\n**再次**将 `self`(c1 对象, 0x2000)的 `count` 增加 1。\n\n**执行流程**:\n1. 读取 `self.count` --> c1.count --> 1(上次调用增加的值!)\n2. 计算 `1 + 1` --> 2\n3. 赋值 `self.count = 2` --> c1.count = 2\n\n**实例变量的持久性**: 由于上次方法调用的结果**存储在对象上**，再次调用时会**累积**!\n\n**为什么是这个顺序?** 从方法调用(line 12)跳转到这里。\n\n**执行顺序**: self.count += 1 --> c1.count 从 1 变为 2 --> increment 结束 --> 返回 line 12 --> line 13",
+        "title": "c1.count 증가 (2번째)",
+        "explanation": "**`self.count += 1`**\n\nc1.count가 1에서 2로 누적됩니다. 인스턴스 변수는 메서드 호출이 끝나도 객체에 영구 저장되므로, 이전 값을 기억하고 누적할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "self.count += 1",
         "pythonMemoryState": {
-          "note": "c1.count 从 1 增加到 2(累积!)",
+          "note": "c1.count가 1→2 증가 (누적!)",
           "names": [
             {
               "name": "Counter",
@@ -461,12 +461,12 @@
         }
       },
       {
-        "title": "调用 c2.increment()",
-        "explanation": "**`c2.increment()`**\n\n**调用另一个对象的方法!**\n\n**Python 内部转换**:\n```python\nc2.increment()  # 用户编写的代码\n↓\nCounter.increment(c2)  # Python 内部转换\n```\n\n**self 接收什么?**\n- `self` = `c2`(0x3000 对象) <-- 不是 c1(0x2000)!\n\n**重要**: 执行相同的方法代码(`line 6`)，但因为 **self 不同**，所以修改的是不同对象的 count!\n\n**为什么是这个顺序?** 上一次方法调用完成后，按顺序执行下一行。\n\n**执行顺序**: 调用 c2.increment() --> 跳转到 line 6 --> self=c2",
+        "title": "c2.increment() 호출",
+        "explanation": "**`c2.increment()`**\n\n이번에는 c2의 메서드를 호출합니다. `self = c2`이므로 c2.count만 변경됩니다. c1.count는 여전히 2입니다.",
         "visualizationType": "pythonMemory",
         "code": "c2.increment()",
         "pythonMemoryState": {
-          "note": "调用 c2.increment() --> 即将跳转到 line 6",
+          "note": "c2.increment() 호출 → line 6으로 점프 예정",
           "names": [
             {
               "name": "Counter",
@@ -506,12 +506,12 @@
         }
       },
       {
-        "title": "c2.count 增加",
-        "explanation": "**`self.count += 1`**\n\n将 `self`(c2 对象, 0x3000)的 `count` 增加 1。\n\n**执行流程**:\n1. 读取 `self.count` --> c2.count --> 0\n2. 计算 `0 + 1` --> 1\n3. 赋值 `self.count = 1` --> c2.count = 1\n\n**核心概念 -- 实例变量的独立性**:\n- c1.count = 2(c1 对象, 0x2000)\n- c2.count = 1(c2 对象, 0x3000)\n- **相同的代码，不同的 self，不同的结果!**\n\n**为什么是这个顺序?** 从方法调用(line 13)跳转到这里。\n\n**执行顺序**: self.count += 1 --> c2.count 从 0 变为 1 --> increment 结束 --> 返回 line 13 --> line 15",
+        "title": "c2.count 증가",
+        "explanation": "**`self.count += 1`**\n\nc2.count가 0에서 1로 증가합니다. 결과 요약: c1.count = 2, c2.count = 1. 같은 클래스, 같은 메서드 코드이지만 데이터는 각 객체가 독립 소유합니다.",
         "visualizationType": "pythonMemory",
         "code": "self.count += 1",
         "pythonMemoryState": {
-          "note": "c2.count 从 0 增加到 1(c1 仍然是 2!)",
+          "note": "c2.count가 0→1 증가 (c1은 여전히 2!)",
           "names": [
             {
               "name": "Counter",
@@ -563,15 +563,15 @@
         }
       },
       {
-        "title": "输出 c1 的最终值",
-        "explanation": "**`print(f\"c1: {c1.count}\")`**\n\n访问 c1 对象的 count 属性并输出。屏幕上打印 \"c1: 2\"。\n\n**执行流程:**\n1. 读取 `c1.count` --> c1.__dict__['count'] --> 2(两次递增的结果)\n2. 计算 f-string --> \"c1: 2\"\n3. 执行 print --> 输出到屏幕\n\n**为什么是 2?** 因为 c1.increment() 被调用了**两次**:\n- line 11: c1.count 0 --> 1(第一次递增)\n- line 12: c1.count 1 --> 2(第二次递增)\n\n**实例变量的持久性**: 即使方法调用结束，`self.count` 的值也**永久存储**在对象上。所以下次调用时能记住上次的值，并在其基础上加 1。这就是实例变量和局部变量的根本区别。\n\n**如果用局部变量代替实例变量会怎样?**\n```python\ndef increment(self):\n    count = 0     # 局部变量! 每次都从 0 开始\n    count += 1    # 变成 1，但是...\n    # 函数结束时 count 就消失了! 无法累积!\n```\n\n**为什么是这个顺序?** 所有方法调用完成后，按顺序执行下一行。\n\n**执行顺序**: 读取 c1.count(2) --> 计算 f-string --> 执行 print --> line 16",
+        "title": "c1의 최종값 출력",
+        "explanation": "**`print(f\"c1: {c1.count}\")`**\n\nc1.count를 읽으면 2가 반환됩니다. c1.increment()를 두 번 호출했기 때문입니다. 인스턴스 변수는 메서드 호출 간에도 값이 유지됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"c1: {c1.count}\")  # 2",
         "pythonMemoryState": {
           "output": [
             "c1: 2"
           ],
-          "note": "c1 递增了两次，所以是 2",
+          "note": "c1은 두 번 증가했으므로 2",
           "names": [
             {
               "name": "Counter",
@@ -611,15 +611,15 @@
         }
       },
       {
-        "title": "输出 c2 的最终值",
-        "explanation": "**`print(f\"c2: {c2.count}\")`**\n\n访问 c2 对象的 count 属性并输出。屏幕上打印 \"c2: 1\"。\n\n**为什么是 1?** 因为 c2.increment() 只被调用了**一次**(只有 line 13)。c1 调用了两次与 c2 **完全无关**。\n\n**本课最终总结 -- 实例变量的完全独立性:**\n\n```\nc1 (0x2000)          c2 (0x3000)\n+-----------+        +-----------+\n+-----------+        +-----------+\n  (递增 2 次)           (递增 1 次)\n```\n\n- 相同的类(Counter) -- 共享蓝图\n- 相同的方法代码(increment) -- 共享代码\n- 但**每个对象拥有独立的 count** -- 数据分离!\n- c1.increment() **绝不会**影响 c2.count\n\n**为什么这种结构好?**\n1. **可预测性**: 一个对象的状态变化不会影响其他对象\n2. **安全性**: 在多线程环境中也可以独立管理每个对象\n3. **代码复用**: 方法代码只写一次，数据按对象分离\n\n**核心原理**: 在面向对象编程中，方法(行为)从类共享，而实例变量(数据)由每个对象独立拥有。这种分离是面向对象编程最基本的设计原则。\n\n**执行顺序**: 读取 c2.count(1) --> 计算 f-string --> 执行 print --> 程序结束",
+        "title": "c2의 최종값 출력",
+        "explanation": "**`print(f\"c2: {c2.count}\")`**\n\nc2.count는 1입니다. c2.increment()는 한 번만 호출되었고, c1의 호출과 무관합니다. 메서드 코드는 클래스에 하나지만, 데이터(인스턴스 변수)는 각 객체가 독립적으로 소유합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"c2: {c2.count}\")  # 1",
         "pythonMemoryState": {
           "output": [
             "c2: 1"
           ],
-          "note": "c2 递增了一次，所以是 1(完全独立!)",
+          "note": "c2는 한 번 증가했으므로 1 (완전히 독립적!)",
           "names": [
             {
               "name": "Counter",
@@ -662,27 +662,27 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "c1.count 和 c2.count 是什么关系?",
+    "question": "c1.count 和 c2.count 怎么样？",
     "options": [
-      "共享同一个变量",
-      "是完全不同的变量",
-      "c1 因为先创建所以优先级更高",
-      "是类变量的副本"
+      "共享相同的变量",
+      "这是一个完全不同的变量。",
+      "c1 是在 c2 之前创建的，因此它具有更高的优先级。",
+      "它是类变量的副本。"
     ],
     "correctIndex": 1,
-    "explanation": "实例变量由每个对象独立拥有。\nc1.count 和 c2.count 只是名字相同，实际上是完全不同的变量。"
+    "explanation": "实例变量由每个对象独立拥有。\nc1.count 和 c2.count 具有相同的名称，但是完全不同的变量。"
   },
   "misconceptions": [
     {
-      "wrong": "同一个类的实例共享变量",
-      "correct": "实例变量(self.x)对每个对象是独立的",
-      "why": "共享的只有类变量。\n实例变量各自拥有。"
+      "wrong": "같은 클래스의 인스턴스는 변수를 공유한다",
+      "correct": "인스턴스 변수(self.x)는 각 객체마다 독립",
+      "why": "공유되는 건 클래스 변수뿐입니다.\n인스턴스 변수는 각자 소유."
     },
     {
-      "wrong": "方法也会为每个实例复制一份",
-      "correct": "方法只在类中存在一份，通过 self 区分实例",
-      "why": "为了内存效率，方法是共享的；只有数据(实例变量)是分离的。"
+      "wrong": "메서드도 인스턴스마다 복사된다",
+      "correct": "메서드는 클래스에 하나만 있고, self로 인스턴스를 구분",
+      "why": "메모리 효율을 위해 메서드는 공유, 데이터(인스턴스 변수)만 분리."
     }
   ],
-  "keyTakeaway": "实例变量(self.x)由每个对象独立拥有! 互不影响!"
+  "keyTakeaway": "인스턴스 변수(self.x)는 각 객체가 독립적으로 소유! 서로 영향 없음!"
 }

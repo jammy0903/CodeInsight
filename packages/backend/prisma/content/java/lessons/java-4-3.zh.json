@@ -1,13 +1,13 @@
 {
   "lessonId": "java-4-3",
-  "title": "String Pool 与 intern()",
-  "concept": "String Pool 是一个缓存常用字符串的内存区域。",
+  "title": "String Pool과 intern()",
+  "concept": "String Pool은 자주 쓰는 문자열을 캐싱(Caching)해두는 메모리 영역이다.",
   "content": {
     "code": "String s1 = \"Hello\";\nString s2 = \"Hello\";\nString s3 = new String(\"Hello\");\nString s4 = s3.intern();\n\nSystem.out.println(s1 == s2);\nSystem.out.println(s1 == s3);\nSystem.out.println(s1 == s4);",
     "steps": [
       {
-        "title": "第一个字面量（\"Hello\"）",
-        "explanation": "**执行流程：**\n1. JVM 遇到 `\"Hello\"` 字面量。\n2. 检查 String Pool 中是否存在 \"Hello\"（不存在）。\n3. 在 Pool 中创建并注册 \"Hello\" 对象。\n4. `s1` 指向该地址（假设为 `Pool[0]`）。\n\n**Pool 的作用：**\n它是存放常用字符串的"公共仓库"。",
+        "title": "첫 번째 리터럴 (\"Hello\")",
+        "explanation": "**실행 순서:**\n1. JVM이 `\"Hello\"` 리터럴을 만남.\n2. String Pool에 \"Hello\"가 있는지 확인 (없음).\n3. Pool에 \"Hello\" 객체 생성 및 등록.\n4. `s1`이 그 주소(`Pool[0]`이라 가정)를 가리킴.\n\n**Pool의 역할:**\n자주 쓰이는 문자열을 모아두는 '공용 창고'입니다.",
         "visualizationType": "javaMemory",
         "code": "String s1 = \"Hello\";",
         "javaMemoryState": {
@@ -30,9 +30,9 @@
         }
       },
       {
-        "title": "字面量复用",
-        "explanation": "**执行流程：**\n1. JVM 再次遇到 `\"Hello\"` 字面量。\n2. 检查 Pool -> "已经有了！"\n3. 不再新建，直接把现有的 `Pool[0]` 地址给 `s2`。\n\n**关键点：**\n使用字面量（`\"...\"`）时，JVM 会先搜索 Pool 并复用已有的条目。\n这是节省内存的首要功臣。",
-        "keyInsight": "相同的字面量 = 相同的地址（复用）",
+        "title": "리터럴 재사용",
+        "explanation": "**실행 순서:**\n1. JVM이 또 `\"Hello\"` 리터럴을 만남.\n2. Pool 확인 -> \"어! 아까 만든 거 있네!\"\n3. 새로 만들지 않고 기존 `Pool[0]` 주소를 `s2`에게 줌.\n\n**핵심:**\n리터럴(`\"...\"`)로 쓰면 무조건 Pool을 먼저 뒤져보고 재사용합니다.\n메모리 절약의 일등공신입니다.",
+        "keyInsight": "같은 리터럴 = 같은 주소 (재사용)",
         "visualizationType": "javaMemory",
         "code": "String s2 = \"Hello\";",
         "javaMemoryState": {
@@ -51,13 +51,13 @@
               "type": "String"
             }
           ],
-          "note": "s1 == s2（地址相同）"
+          "note": "s1 == s2 (주소 같음)"
         }
       },
       {
-        "title": "new String() - 强制创建",
-        "explanation": "**执行流程：**\n1. 执行 `new String(...)`。\n2. 绕过 Pool，**直接在堆内存上创建新对象**（`Heap[0]`）。\n3. `s3` 指向这个新对象。\n\n**类比：**\n如果 Pool 是"公共饮水机"，那 `new String` 就是"花钱买瓶装水"。\n水的味道（内容）一样，但完全是不同的瓶子。",
-        "keyInsight": "new String() = 不复用（堆分配）",
+        "title": "new String() - 강제 생성",
+        "explanation": "**실행 순서:**\n1. `new String(...)` 실행.\n2. Pool을 거치지 않고 **Heap 메모리에 무조건 새 객체**(`Heap[0]`) 생성.\n3. `s3`는 이 새 객체를 가리킴.\n\n**비유:**\nPool이 '공용 정수기'라면, `new String`은 '비싼 생수 사다 마시기'입니다.\n물 맛(내용)은 같아도 완전히 다른 물병입니다.",
+        "keyInsight": "new String() = 재사용 안 함 (Heap 할당)",
         "visualizationType": "javaMemory",
         "code": "String s3 = new String(\"Hello\");",
         "javaMemoryState": {
@@ -83,14 +83,14 @@
               "new": true
             }
           ],
-          "note": "不在 Pool 中！在堆上单独创建",
+          "note": "Pool 아님! Heap에 따로 생김",
           "stringPool": null
         }
       },
       {
-        "title": "intern() - 查找 Pool 条目",
-        "explanation": "**执行流程：**\n1. 拿着 `s3` 的内容（\"Hello\"）去 Pool 查找。\n2. "Pool 里有没有相同内容的条目？"\n3. "有，在 `Pool[0]`。"\n4. 返回该地址（`Pool[0]`）并存储到 `s4` 中。\n\n`intern()` 会检查 Pool 中是否已存在与堆中字符串内容相同的条目——如果有，返回 Pool 地址（如果没有，则注册到 Pool 后返回新地址）。",
-        "keyInsight": "intern() = 转换为 Pool 地址",
+        "title": "intern() - 족보 찾기",
+        "explanation": "**실행 순서:**\n1. `s3`의 내용(\"Hello\")을 들고 Pool에 감.\n2. \"영주님, 저랑 같은 이름 가진 애가 Pool에 있습니까?\"\n3. \"ㅇㅇ, `Pool[0]`에 있음.\"\n4. 그 주소(`Pool[0]`)를 받아와서 `s4`에 저장.\n\n`intern()`은 Heap에 있는 문자열과 똑같은 게 Pool에 있으면 그 주소를 반환합니다 (없으면 Pool에 등록 후 반환).",
+        "keyInsight": "intern() = Pool 주소로 변환",
         "visualizationType": "javaMemory",
         "code": "String s4 = s3.intern();",
         "javaMemoryState": {
@@ -109,12 +109,12 @@
               "address": "Pool[0]"
             }
           ],
-          "note": "s4 现在指向与 s1 相同的位置"
+          "note": "s4는 s1과 같은 곳을 가리키게 됨"
         }
       },
       {
-        "title": "s1 == s2 比较",
-        "explanation": "两者都来自 Pool。\n地址相同。\n-> `true`",
+        "title": "s1 == s2 비교",
+        "explanation": "둘 다 Pool 출신입니다.\n주소가 같습니다.\n-> `true`",
         "visualizationType": "javaMemory",
         "code": "System.out.println(s1 == s2);",
         "javaMemoryState": {
@@ -126,8 +126,8 @@
         }
       },
       {
-        "title": "s1 == s3 比较",
-        "explanation": "`s1`（Pool）和 `s3`（Heap）位于不同的区域。\n地址不匹配。\n-> `false`",
+        "title": "s1 == s3 비교",
+        "explanation": "`s1`(Pool)과 `s3`(Heap)는 사는 동네가 다릅니다.\n주소 불일치.\n-> `false`",
         "visualizationType": "javaMemory",
         "code": "System.out.println(s1 == s3);",
         "javaMemoryState": {
@@ -137,8 +137,8 @@
         }
       },
       {
-        "title": "s1 == s4 比较",
-        "explanation": "得益于 `intern()`，`s4` 也获得了 Pool 地址。\n与 `s1` 的地址相同。\n-> `true`",
+        "title": "s1 == s4 비교",
+        "explanation": "`intern()` 덕분에 `s4`도 Pool 주소를 얻었습니다.\n`s1`과 주소가 같습니다.\n-> `true`",
         "visualizationType": "javaMemory",
         "code": "System.out.println(s1 == s4);",
         "javaMemoryState": {
@@ -151,22 +151,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下哪段代码可能在内存中创建 2 个 String 对象？",
+    "question": "以下哪段代码可能会在内存中产生两个 String 对象？",
     "options": [
-      "String s = \"A\";",
-      "String s = \"A\" + \"B\";",
-      "String s = new String(\"A\");",
-      "String s = s1;"
+      "字符串 s = \"A\";",
+      "字符串 s = \"A\" + \"B\";",
+      "字符串 s = new String(\"A\");",
+      "字符串 s = s1;"
     ],
     "correctIndex": 2,
-    "explanation": "`new String(\"A\")` 首先会在 Pool 中为字面量 \"A\" 创建一个条目（如果不存在），然后复制该值在堆上再创建一个对象。\n因此最多可能创建 2 个对象——这是一种低效的模式。"
+    "explanation": "`new String(\"A\")` 1) 如果池中不存在文字“A”，则在池中创建一个，2) 复制该值并在堆中创建另一个。\n所以这是一个效率低下的代码，最多只能得到 2。"
   },
   "misconceptions": [
     {
-      "wrong": "String Pool 也属于堆内存吗？",
-      "correct": "是的。\n（从 Java 7 开始）",
-      "why": "Java 7 之前，Pool 位于一个叫 PermGen 的特殊区域，经常因空间不足而报错，后来被移到了普通堆区域。\n现在不再使用的字符串可以被 GC（垃圾回收器）回收。"
+      "wrong": "String Pool도 Heap 메모리인가?",
+      "correct": "네, 맞습니다.\n(Java 7 이후)",
+      "why": "예전(Java 6 이하)엔 PermGen이라는 특수 영역에 있었는데, 꽉 차면 에러가 자주 나서 일반 Heap 영역으로 이사 왔습니다.\n그래서 이제는 안 쓰는 문자열은 GC(청소부)가 수거해갑니다."
     }
   ],
-  "keyTakeaway": "使用字面量（\"...\"）才能享受 Pool 的优势。避免使用 new String()。"
+  "keyTakeaway": "리터럴 방식(\"...\")을 써야 Pool 혜택을 받는다. new String()은 쓰지 말자."
 }

@@ -1,13 +1,13 @@
 {
   "lessonId": "c-13-1",
-  "title": "整数类型比较",
-  "concept": "C 提供多种大小的整数类型，每种类型的内存大小和表示范围不同。",
+  "title": "整数数据类型比较",
+  "concept": "C 提供了各种大小的整数数据类型，每种数据类型都有不同的内存大小和表达式范围。",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    char c = 'A';\n    short s = 32000;\n    int i = 2000000000;\n    long long l = 9000000000LL;\n\n    printf(\"char: %c (%d), size: %zu\\n\", c, c, sizeof(c));\n    printf(\"short: %d, size: %zu\\n\", s, sizeof(s));\n    printf(\"int: %d, size: %zu\\n\", i, sizeof(i));\n    printf(\"long long: %lld, size: %zu\\n\", l, sizeof(l));\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "通过 **`#include <stdio.h>`** 包含标准输入输出头文件以使用 `printf` 和输出 `sizeof` 结果。\n\n本课比较 C 的**整数类型（Integer Types）**。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用 **`#include <stdio.h>`** 包含标准输入/输出标头以输出 `printf` 和 `sizeof` 结果。\n\n在本课中，我们比较 C 中的**整数类型**。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "**`int main()`** -- 程序的入口点。\n\n本课中我们声明 `char`、`short`、`int`、`long long` 并比较它们的大小和范围。",
+        "title": "启动主函数",
+        "explanation": "**`int main()`** --- 程序的起点。\n\n在本课中，我们声明“char”、“short”、“int”和“long long”，并比较它们的大小和范围。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "声明 char 变量 - 最小的整数类型",
-        "explanation": "**`char c = 'A';`** -- `char` 是 **1 字节（8 位）**，C 中最小的整数类型。名称来自"character"，但内存中存储的是**数字**。",
+        "title": "声明 char 变量 - 最小整数类型",
+        "explanation": "**`char c = 'A';`** --- `char` 是 **1 个字节（8 位）**，C 中最小的整数类型。名称来源于“字符”，但在内存中存储的是一个**数字**。",
         "visualizationType": "cMemory",
         "code": "char c = 'A';",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "声明 short 变量 - 2 字节整数",
-        "explanation": "**`short s = 32000;`** -- `short` 是 **2 字节（16 位）**，范围为 **-32,768 到 32,767**。`32000` 在此范围内可安全存储，但放入 `32768` 或更大的值会导致**溢出（Overflow）**，可能得到意想不到的负数。",
+        "title": "短变量声明 - 2 字节整数",
+        "explanation": "**`short s = 32000;`** --- `short`为**2字节（16位）**，表示范围**-32,768~32,767**。 `32000` 是安全存储的，因为它在这个范围内，但是如果您输入的内容超过 `32768`，则可能会发生 **溢出** 并导致意外的负数。",
         "visualizationType": "cMemory",
         "code": "short s = 32000;",
         "stack": [
@@ -63,8 +63,8 @@
         ]
       },
       {
-        "title": "声明 int 变量 - 最常用的整数类型",
-        "explanation": "**`int i = 2000000000;`** -- `int` 是 **4 字节（32 位）**，范围约为 **-21 亿到 +21 亿**，是 C 中**使用最多**的整数类型。它是 CPU 一次处理最高效的大小，为大多数计算提供了足够的范围。",
+        "title": "int 变量声明 - 最常用的整数类型",
+        "explanation": "**`int i = 2000000000;`** --- `int` 是 C 中**最常用的**整数类型，**4 字节（32 位）**，范围约为 **-21 亿到 +21 亿**。这是 CPU 一次处理的最有效的大小，并为大多数计算提供了足够的范围。",
         "visualizationType": "cMemory",
         "code": "int i = 2000000000;",
         "stack": [
@@ -89,8 +89,8 @@
         ]
       },
       {
-        "title": "声明 long long 变量 - 大整数",
-        "explanation": "**`long long l = 9000000000LL;`** -- 90 亿超出 `int` 范围，需要更大的整数类型。`LL` 后缀明确标记这是 long long 字面量。",
+        "title": "long long 变量声明 - 大整数",
+        "explanation": "**`long long l = 9000000000LL;`** --- 90亿超出了`int`的范围，所以需要一个大整数类型。 “LL”后缀指定一个 long long 文字。",
         "visualizationType": "cMemory",
         "code": "long long l = 9000000000LL;",
         "stack": [
@@ -121,36 +121,36 @@
         ]
       },
       {
-        "title": "输出 char - 字符与整数的双重性",
-        "explanation": "**`printf(\"char: %c (%d), size: %zu\\n\", c, c, sizeof(c));`** -- 同一个变量 `c` 用 `%c` 输出得到字符 `A`，用 `%d` 输出得到数字 `65`，`sizeof(c)` 为 `1`。内存中存储的始终是数字 65，**解释方式**随格式说明符不同而不同。",
+        "title": "char 输出 - 字符和整数的二元性",
+        "explanation": "**`printf(\"char: %c (%d), size: %zu\\n\", c, c, sizeof(c));`** --- 如果同一个变量`c`输出为`%c`，则为字母`A`，如果输出`%d`则为数字`65`，`sizeof(c)`变为`1`。内存中存储的始终是数字65，**",
         "visualizationType": "cMemory",
         "code": "printf(\"char: %c (%d), size: %zu\\n\", c, c, sizeof(c));",
         "stdout": "char: A (65), size: 1"
       },
       {
-        "title": "输出 short",
-        "explanation": "**`printf(\"short: %d, size: %zu\\n\", s, sizeof(s));`** -- 输出 `short` 变量 `s` 的值 `32000` 和大小 `2`（字节）。使用 char（1 字节，-128~127）两倍的空间，表示范围扩展到 **-32,768~32,767**。",
+        "title": "短输出",
+        "explanation": "**`printf(\"short: %d, size: %zu\\n\", s, sizeof(s));`** --- 打印 `short` 变量 `s` 的值 `32000` 和大小 `2`（字节）。表达式范围是 **-32,768 到 32,767，使用两倍于 char 的空格（1 个字节，-128 到 127）。",
         "visualizationType": "cMemory",
         "code": "printf(\"short: %d, size: %zu\\n\", s, sizeof(s));",
         "stdout": "char: A (65), size: 1\nshort: 32000, size: 2"
       },
       {
-        "title": "输出 int",
-        "explanation": "**`printf(\"int: %d, size: %zu\\n\", i, sizeof(i));`** -- 输出 `int` 变量 `i` 的值 `2000000000` 和大小 `4`。4 字节（32 位）可表示约 42 亿个不同的值，有符号类型的情况下正负各占一半。",
+        "title": "整数输出",
+        "explanation": "**`printf(\"int: %d, size: %zu\\n\", i, sizeof(i));`** --- 打印 `int` 变量 `i` 的值 `2000000000` 和大小 `4`。 4个字节（32位）可以表示大约42亿个不同的值，并且在有符号的情况下，一半被分配给负/正数。",
         "visualizationType": "cMemory",
         "code": "printf(\"int: %d, size: %zu\\n\", i, sizeof(i));",
         "stdout": "char: A (65), size: 1\nshort: 32000, size: 2\nint: 2000000000, size: 4"
       },
       {
-        "title": "输出 long long 及程序终止",
-        "explanation": "**`printf(\"long long: %lld, size: %zu\\n\", l, sizeof(l));`** -- 输出 `l` 的值和大小。`%lld` 是 long long 的格式说明符，`%zu` 是 `sizeof` 返回的 `size_t` 类型专用格式。",
+        "title": "长长输出和程序终止",
+        "explanation": "**`printf(\"long long: %lld, size: %zu\\n\", l, sizeof(l));`** --- 打印 `l` 的值和大小。 `%lld` 是一个 long long，`%zu` 是 `sizeof` 返回的 `size_t` 特有的格式。",
         "visualizationType": "cMemory",
         "code": "printf(\"long long: %lld, size: %zu\\n\", l, sizeof(l));",
         "stdout": "char: A (65), size: 1\nshort: 32000, size: 2\nint: 2000000000, size: 4\nlong long: 9000000000, size: 8"
       },
       {
-        "title": "程序终止",
-        "explanation": "**`return 0;`** -- 程序正常终止，随着 main 栈帧的释放，c、s、i、l 所有变量从内存中消失。\n\n本课核心：C 的整数类型大小不同，越大能存储的范围越广。",
+        "title": "程序退出",
+        "explanation": "**`return 0;`** --- 程序正常终止，所有变量c、s、i、l随着主栈帧被释放而从内存中消失。\n\n本课重点：C 中的整数类型具有不同的大小，较大的整数类型存储较大的范围。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -159,22 +159,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "将 `9000000000` 存入 `int` 变量会发生什么？",
+    "question": "如果将“9000000000”存储在“int”变量中会发生什么？",
     "options": [
-      "精确存储 9000000000",
-      "发生溢出，存入意想不到的值",
-      "产生编译错误",
-      "自动转换为 long 类型"
+      "正好存储了 9000000000 个。",
+      "发生溢出并存储意外值。",
+      "出现编译错误",
+      "自动转换为long类型"
     ],
     "correctIndex": 1,
-    "explanation": "`int` 为 4 字节，最大只能存储约 21 亿。\n90 亿超出此范围会导致溢出，位被截断后存入完全不同的值。"
+    "explanation": "`int` 4 个字节最多只能存储大约 21 亿。\n由于90亿超出了这个范围，就会发生溢出，位被截断，并且存储了错误的值。"
   },
   "misconceptions": [
     {
-      "wrong": "char 是只能存储字符的类型。",
-      "correct": "char 是 1 字节的整数类型，只是通过 ASCII 码表被解释为字符而已。",
-      "why": "内存中存储的始终是数字，只是根据 printf 的格式说明符（%c 或 %d）输出形式不同。"
+      "wrong": "char 是一种只能存储字符的类型。",
+      "correct": "char 是 1 字节整数类型，通过 ASCII 代码表简单解释为字符。",
+      "why": "内存中存储的始终是数字，仅输出格式取决于 printf 的 %c 或 %d 格式说明符。"
     }
   ],
-  "keyTakeaway": "C 的整数类型有 char（1B）、short（2B）、int（4B）、long long（通常 8B），可表示的范围随大小而不同。"
+  "keyTakeaway": "C的整数数据类型有char(1B)、short(2B)、int(4B)和long long（通常为8B），根据大小的不同，可以表示的范围也不同。"
 }

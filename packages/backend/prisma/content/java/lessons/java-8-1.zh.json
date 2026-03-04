@@ -1,13 +1,13 @@
 {
   "lessonId": "java-8-1",
-  "title": "ArrayList：可增长数组的秘密",
-  "concept": "ArrayList 内部使用数组，但当空间不足时会自动扩容，是一种"灵活的数组"。",
+  "title": "ArrayList: 늘어나는 배열의 비밀",
+  "concept": "ArrayList는 내부적으로 배열을 사용하지만, 공간이 부족하면 스스로 크기를 키우는 '유연한 배열'입니다.",
   "content": {
     "code": "import java.util.ArrayList;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<Integer> list = new ArrayList<>(2); // 초기 용량 2\n        \n        list.add(10);\n        list.add(20);\n        list.add(30); // 앗! 공간이 부족해요. 무슨 일이 일어날까요?\n    }\n}",
     "steps": [
       {
-        "title": "包导入",
-        "explanation": "**`import java.util.ArrayList;`**\n\n导入可调整大小的数组 `ArrayList`。",
+        "title": "패키지 임포트",
+        "explanation": "**`import java.util.ArrayList;`**\n\n크기가 조절되는 배열인 `ArrayList`를 사용하기 위해 가져옵니다.",
         "visualizationType": "javaMemory",
         "code": "import java.util.ArrayList;",
         "javaMemoryState": {
@@ -17,8 +17,8 @@
         }
       },
       {
-        "title": "main 方法开始",
-        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。",
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다.",
         "visualizationType": "javaMemory",
         "code": "public static void main(String[] args) {",
         "javaMemoryState": {
@@ -32,8 +32,8 @@
         }
       },
       {
-        "title": "设置初始容量",
-        "explanation": "**执行流程：**\n1. 执行 `new ArrayList<>(2)`。\n2. 内部创建一个大小为 2 的数组（`Object[2]`）。\n\n**准备入住：**\n一开始用一个只有 2 个房间的小房子。",
+        "title": "초기 용량 설정",
+        "explanation": "**실행 순서:**\n1. `new ArrayList<>(2)`를 실행합니다.\n2. 내부적으로 크기가 2인 배열(`Object[2]`)을 만듭니다.\n\n**이사 갈 준비:**\n처음엔 방 2개짜리 작은 집으로 시작합니다.",
         "visualizationType": "javaMemory",
         "code": "ArrayList<Integer> list = new ArrayList<>(2); // 초기 용량 2",
         "javaMemoryState": {
@@ -61,8 +61,8 @@
         }
       },
       {
-        "title": "添加第一个元素",
-        "explanation": "**执行流程：**\n1. 将 `10` 存储到索引 0。\n2. `size` 增加到 1。\n\n**欢迎入住：**\n第一位客人住进了 0 号房间。",
+        "title": "첫 번째 요소 추가",
+        "explanation": "**실행 순서:**\n1. 0번 인덱스에 `10`을 저장합니다.\n2. `size`가 1로 증가합니다.\n\n**입주 환영:**\n첫 번째 손님이 0번 방에 들어왔습니다.",
         "visualizationType": "javaMemory",
         "code": "list.add(10);",
         "javaMemoryState": {
@@ -77,8 +77,8 @@
         }
       },
       {
-        "title": "添加第二个元素",
-        "explanation": "**执行流程：**\n1. 将 `20` 存储到索引 1。\n2. `size` 增加到 2。\n\n**满员：**\n现在房间都满了。",
+        "title": "두 번째 요소 추가",
+        "explanation": "**실행 순서:**\n1. 1번 인덱스에 `20`을 저장합니다.\n2. `size`가 2로 증가합니다.\n\n**만원:**\n이제 방이 꽉 찼습니다.",
         "visualizationType": "javaMemory",
         "code": "list.add(20);",
         "javaMemoryState": {
@@ -93,8 +93,8 @@
         }
       },
       {
-        "title": "容量溢出与扩容（Resizing）",
-        "explanation": "**执行流程：**\n1. 空间已满，创建一个更大的新数组（通常为 1.5 倍）。\n2. 将所有现有数据复制（搬家）到新数组。\n3. 将 `30` 添加到新数组中。\n\n**自动扩展：**\n`ArrayList` 能"自动增长"的秘诀就是这个扩容过程。\n不过搬家是有成本的（性能开销），所以一开始设置合适的大小很重要！",
+        "title": "용량 초과 및 이사(Resizing)",
+        "explanation": "**실행 순서:**\n1. 공간이 꽉 차서 더 큰 배열(보통 1.5배)을 새로 만듭니다.\n2. 기존 데이터를 모두 새 배열로 복사(이사)합니다.\n3. 새 배열에 `30`을 추가합니다.\n\n**자동 확장:**\n`ArrayList`가 '알아서 늘어나는' 비결은 바로 이 '이사 다니기(Resizing)' 덕분입니다.\n다만 이사비용(성능 저하)이 드니까, 처음에 적절한 크기를 잡는 게 중요해요!",
         "visualizationType": "javaMemory",
         "code": "list.add(30); // 앗! 공간이 부족해요. 무슨 일이 일어날까요?",
         "javaMemoryState": {
@@ -112,22 +112,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "向 ArrayList 添加数据时，开销最大的时刻是？",
+    "question": "当向 ArrayList 添加数据时，什么时候开销发生最多？",
     "options": [
-      "列表为空时",
-      "中间有空位时",
-      "内部数组容量满时",
-      "始终相同"
+      "当列表为空时",
+      "当中间有空格时",
+      "当内部数组容量已满时",
+      "始终不变"
     ],
     "correctIndex": 2,
-    "explanation": "当数组满时，需要创建更大的新数组并复制所有数据，临时需要大量运算。\n这被称为扩容（Resizing）。"
+    "explanation": "当数组已满时，必须创建一个新的更大的数组并复制所有数据，这暂时需要大量计算。\n这称为调整大小。"
   },
   "misconceptions": [
     {
-      "wrong": "ArrayList 每接收一个数据就增加一个内存单元。",
-      "correct": "不是的！每次只增加一个太慢了，所以会一次性扩展到 1.5 倍或 2 倍。",
-      "why": "频繁的数组复制是性能下降的主要原因。"
+      "wrong": "ArrayList는 데이터가 들어오는 대로 메모리를 한 칸씩 늘린다.",
+      "correct": "아니요! 매번 늘리면 너무 느리기 때문에, 한 번에 1.5배나 2배 정도로 넉넉하게 늘려둡니다.",
+      "why": "잦은 배열 복사는 성능 저하의 주범이기 때문입니다."
     }
   ],
-  "keyTakeaway": "ArrayList 是结合了数组的查找能力（快速）和灵活性（可增长）的优秀工具！"
+  "keyTakeaway": "ArrayList는 배열의 검색 능력(빠름)과 유연함(늘어남)을 결합한 효자 도구입니다!"
 }

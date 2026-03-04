@@ -1,89 +1,89 @@
 {
   "lessonId": "py-3-5",
   "title": "Dictionary Mutability",
-  "concept": "字典是可变的（Mutable）-- 添加、修改、删除都是在同一个对象上操作！",
+  "concept": "딕셔너리는 수정 가능(Mutable) — 추가, 수정, 삭제 모두 같은 객체를 변경한다!",
   "content": {
     "code": "person = {\"name\": \"Alice\", \"age\": 25}\nprint(f\"id = {id(person)}\")\n\nperson[\"age\"] = 26\nperson[\"city\"] = \"Seoul\"\nprint(f\"After changes: {person}\")\nprint(f\"id = {id(person)}\")\n\nref = person\nref[\"name\"] = \"Bob\"\nprint(f\"person: {person}\")",
     "steps": [
       {
-        "title": "创建字典",
-        "explanation": "**`person = {\"name\": \"Alice\", \"age\": 25}`** -- 创建包含两个键值对的字典对象并赋值给 `person` 变量。\n\nPython 从上到下按顺序执行代码。使用花括号 `{}` 创建字典字面量。\n\n**本课核心主题：** 证明字典是 **Mutable（可变的）**。我们将验证修改后对象的 `id()` 不变，并学习**引用（Aliasing）**的危险性。\n\n**类比：** 新建了一个贴有标签的抽屉柜（0x1000）。\"name\" 抽屉里放着 \"Alice\"，\"age\" 抽屉里放着 25。记住这个柜子的编号（id），修改后再来检查是不是同一个柜子。\n\n**Python 内部机制：** 字典对象在堆内存中分配，键值对以哈希表结构存储。`person` 名称指向此对象的内存地址。\n\n**执行顺序**：line 1 -> 创建字典（id: 0x1000）-> person = 0x1000 -> line 2",
+        "title": "딕셔너리 생성",
+        "explanation": "**`person = {\"name\": \"Alice\", \"age\": 25}`**\n\n두 개의 키-값 쌍을 가진 딕셔너리 객체를 생성합니다. 이 레슨에서는 수정 후에도 `id()`가 변하지 않음을 확인하여 딕셔너리의 **Mutable** 특성을 증명합니다.",
         "visualizationType": "terminal",
         "code": "person = {\"name\": \"Alice\", \"age\": 25}"
       },
       {
-        "title": "检查对象 ID",
-        "explanation": "**`print(f\"id = {id(person)}\")`** -- 使用 `id()` 函数输出 `person` 对象的**唯一 ID（内存地址）**。\n\n`id()` 函数返回 Python 对象的**唯一标识符**。在 CPython 中，此值就是对象的内存地址。记住这个 ID，修改字典后**检查 ID 是否相同**。\n\n**为什么要检查 id？** Mutable 对象修改后保持**同一对象**（id 不变）。而 Immutable 对象（字符串、整数）"修改"时会创建**新对象**（id 改变）。通过输出 id 来实际验证这个差异。\n\n**类比：** 记下抽屉柜的编号。我们计划在更换内容后检查是否还是同一个编号。\n\n**Python 内部机制：** `id(person)` 将 `person` 对象的 C 级指针值作为整数返回。在 CPython 中，只要对象存在于内存中，此值就不会改变。\n\n**执行顺序**：计算 id(person) -> 计算 f-string -> 执行 print -> line 4",
+        "title": "객체 ID 확인",
+        "explanation": "**`print(f\"id = {id(person)}\")`**\n\n`id()`로 딕셔너리 객체의 고유 식별자(메모리 주소)를 출력합니다. 이 값을 수정 후와 비교하여 **같은 객체임을 증명**합니다. Mutable 객체는 수정해도 `id()`가 불변합니다.",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(person)}\")"
       },
       {
-        "title": "修改已有键的值",
-        "explanation": "**`person[\"age\"] = 26`** -- 将已有键 `\"age\"` 的值从 25 **修改**为 26。直接更改同一个对象。\n\n字典是 Mutable 的，所以**不会创建新对象**，而是直接更改现有对象（0x1000）内部的值。\n\n修改前：`{\"name\": \"Alice\", \"age\": 25}`\n修改后：`{\"name\": \"Alice\", \"age\": 26}`\n\n**与字符串（Immutable）的区别：**\n```python\n# 字符串：创建新对象（id 改变）\ns = \"hello\"\ns = s + \"!\"  # 创建新对象 \"hello!\"，s 的 id 改变\n\n# 字典：修改同一对象（id 不变）\nperson[\"age\"] = 26  # 只更改内部内容，id 保持不变\n```\n\n**Python 内部机制：** 在哈希表中找到 `\"age\"` 键的位置，将值引用从 `25` 对象更改为 `26` 对象。字典对象本身的内存地址（id）不变。\n\n**执行顺序**：找到 person[\"age\"] 位置 -> 更改值引用（25->26）-> line 5",
+        "title": "기존 키 값 수정",
+        "explanation": "**`person[\"age\"] = 26`**\n\n기존 키 `\"age\"`의 값을 25에서 26으로 수정합니다. 딕셔너리는 Mutable이므로 새 객체를 만들지 않고 기존 객체 내부만 변경합니다. 객체의 `id()`는 변하지 않습니다.",
         "visualizationType": "terminal",
         "code": "person[\"age\"] = 26"
       },
       {
-        "title": "添加新键值对",
-        "explanation": "**`person[\"city\"] = \"Seoul\"`** -- 对不存在的新键 `\"city\"` 赋值，**添加新条目**。\n\n因为字典中没有 `\"city\"` 键，新键值对 `\"city\": \"Seoul\"` 被自动添加。此操作同样**直接修改现有对象（0x1000）**。\n\n添加后：`{\"name\": \"Alice\", \"age\": 26, \"city\": \"Seoul\"}`\n\n**字典的便利之处：** 相同的 `dict[key] = value` 语法：\n- 键**存在** -> 修改值（上一步）\n- 键**不存在** -> 添加新条目（这一步）\n\n**类比：** 在抽屉柜（0x1000）上添加了标有 \"city\" 的新抽屉，放入 \"Seoul\"。柜子本身不变。\n\n**Python 内部机制：** 计算 `\"city\"` 键的哈希值并在哈希表中添加新条目。使用率过高时自动扩容。对象的 id 不变。\n\n**执行顺序**：person[\"city\"] 哈希搜索 -> 未找到 -> 添加新条目 -> line 6",
+        "title": "새로운 키-값 추가",
+        "explanation": "**`person[\"city\"] = \"Seoul\"`**\n\n없는 키에 할당하면 새 키-값 쌍이 자동으로 추가됩니다. 이 작업 역시 기존 객체(같은 `id()`)를 직접 변경합니다.",
         "visualizationType": "terminal",
         "code": "person[\"city\"] = \"Seoul\""
       },
       {
-        "title": "查看变更后的内容",
-        "explanation": "**`print(f\"After changes: {person}\")`** -- 输出所有修改和添加都已反映的字典当前内容。\n\n输出结果：`After changes: {'name': 'Alice', 'age': 26, 'city': 'Seoul'}`\n\n**变更总结：**\n1. 创建：`{\"name\": \"Alice\", \"age\": 25}`（2个条目）\n2. 修改：`\"age\"` 值 25 -> 26\n3. 添加：`\"city\": \"Seoul\"` 新条目\n\n所有这些更改都在**同一个对象（0x1000）**上完成。下一行将通过再次检查 id 来证明。\n\n**执行顺序**：计算 f-string（插入 person 内容）-> 执行 print -> line 7",
+        "title": "변경 후 내용 확인",
+        "explanation": "**`print(f\"After changes: {person}\")`**\n\n수정·추가가 반영된 현재 딕셔너리 내용을 출력합니다. 결과: `{'name': 'Alice', 'age': 26, 'city': 'Seoul'}`. 다음 줄에서 `id()`를 다시 확인하여 같은 객체임을 증명합니다.",
         "visualizationType": "terminal",
         "code": "print(f\"After changes: {person}\")"
       },
       {
-        "title": "确认 ID 未变",
-        "explanation": "**`print(f\"id = {id(person)}\")`** -- 修改字典后再次检查 id。输出的是**与之前相同的 id**！\n\n这就是 **Mutable 对象的核心证据**。值被修改了，新条目被添加了，但 `person` 仍然是**同一个对象（0x1000）**。id 没有改变。\n\n**Mutable vs Immutable -- 通过 id 比较：**\n- **Mutable**（列表、字典、集合）：修改后 id **不变** -> 修改了同一对象\n- **Immutable**（整数、字符串、元组）："修改"后 id **改变** -> 创建了新对象\n\n**类比：** 更换了柜子内容并添加了抽屉，但再次检查编号发现**与最初记下的完全一致**。确认是同一个柜子！\n\n**Python 内部机制：** 字典对象的 C 结构体指针不会因修改操作而改变。即使内部哈希表扩容，字典对象自身的地址也会保持。\n\n**执行顺序**：计算 id(person)（0x1000）-> 计算 f-string -> 执行 print -> line 9",
+        "title": "ID 불변 확인",
+        "explanation": "**`print(f\"id = {id(person)}\")`**\n\n수정 후 다시 확인한 `id()`가 처음과 **동일합니다**. 이것이 Mutable의 핵심 증거입니다. Immutable 객체(정수, 문자열)는 값 변경 시 새 객체가 생겨 `id()`가 바뀝니다.",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(person)}\")",
         "occurrence": 2
       },
       {
-        "title": "创建引用（别名）",
-        "explanation": "**`ref = person`** -- 将新名称 `ref` 绑定到 `person` 所指向的**同一个对象（0x1000）**。**这不是复制！**\n\n这就是 Python 的 **Aliasing（别名）**。对象没有被复制，只是给同一个字典对象多贴了一个名称标签。\n\n`person` --> {name: Alice, age: 26, city: Seoul}（0x1000）\n`ref` -----> （同一对象）\n\n`id(person) == id(ref)` -> **True**（完全相同的对象）\n\n**为什么这很危险？** 通过 `ref` 修改字典，通过 `person` 访问也能看到修改。因为它们**共享同一个对象**。下一步我们将验证这一点。\n\n**类比：** 同一栋房子（0x1000）有两把钥匙（person、ref）。不管用哪把钥匙进去搬家具，用另一把钥匙进去都能看到搬动后的家具。\n\n**Python 内部机制：** `ref = person` 只是将 `person` 指向的对象的**引用（内存地址）**复制给 `ref`。对象本身的内容不会被复制。字典对象的引用计数从 1 增加到 2。\n\n**执行顺序**：读取 person 的引用（0x1000）-> 将相同引用赋给 ref -> line 10",
+        "title": "참조(별명) 생성",
+        "explanation": "**`ref = person`**\n\n`ref`는 복사본이 아닌 **같은 객체의 별명(Alias)**입니다. `id(ref) == id(person)`이 `True`입니다. 한쪽을 통해 수정하면 다른 쪽에도 즉시 반영됩니다.",
         "visualizationType": "terminal",
         "code": "ref = person"
       },
       {
-        "title": "通过引用修改",
-        "explanation": "**`ref[\"name\"] = \"Bob\"`** -- 通过 `ref` 将 `\"name\"` 键的值从 `\"Alice\"` 修改为 `\"Bob\"`。\n\n因为 `ref` 和 `person` 指向**同一个对象（0x1000）**，通过 `ref` 的修改会**立即反映**在 `person` 上。\n\n修改前：`{\"name\": \"Alice\", \"age\": 26, \"city\": \"Seoul\"}`\n修改后：`{\"name\": \"Bob\", \"age\": 26, \"city\": \"Seoul\"}`\n\n**关键点：** 我们通过 `ref` 修改，但通过 `person` 访问也能看到 `\"name\"` 变成了 `\"Bob\"`！因为两个变量**共享同一个对象**。\n\n**这就是 Aliasing 的危险性。** 修改一边（ref）会影响另一边（person）。这可能导致意外的数据更改。\n\n**类比：** 用 ref 钥匙进屋换了壁纸。用 person 钥匙进去也能看到新壁纸。因为是同一栋房子！\n\n**要创建独立副本：**\n```python\nref = person.copy()     # 浅拷贝（仅1层）\nref = copy.deepcopy(person)  # 深拷贝（包括嵌套对象）\n```\n\n**Python 内部机制：** `ref[\"name\"]` 在 `ref` 指向的对象（0x1000）的哈希表中找到 `\"name\"` 键并更改值引用。因为 `person` 也指向同一对象（0x1000），所以更改直接可见。\n\n**执行顺序**：找到 ref[\"name\"] 位置（0x1000）-> 更改值引用（\"Alice\"->\"Bob\"）-> line 11",
+        "title": "참조를 통해 수정",
+        "explanation": "**`ref[\"name\"] = \"Bob\"`**\n\n`ref`를 통해 `\"name\"`을 수정합니다. `ref`와 `person`이 같은 객체를 공유하므로 `person`으로 접근해도 변경된 값이 보입니다. 독립 복사본이 필요하면 `person.copy()` 또는 `copy.deepcopy(person)`을 사용하세요.",
         "visualizationType": "terminal",
         "code": "ref[\"name\"] = \"Bob\""
       },
       {
-        "title": "检查原始对象是否也变了",
-        "explanation": "**`print(f\"person: {person}\")`** -- 我们修改的是 `ref`，但输出 `person` 也能看到变更后的内容（`'name': 'Bob'`）！\n\n输出结果：`person: {'name': 'Bob', 'age': 26, 'city': 'Seoul'}`\n\n**本课3个核心教训：**\n1. **字典是 Mutable** -- 修改后 `id()` 不变（修改的是同一个对象）\n2. **`=` 赋值是别名，不是复制** -- `ref = person` 给同一个对象多贴了一个名称标签\n3. **通过别名修改会反映到原始对象** -- 因为 `ref` 和 `person` 共享同一个对象\n\n**类比：** 两把钥匙（person、ref）通向同一栋房子（0x1000）。用一把钥匙进去换了家具，用另一把钥匙进去也能看到换过的家具。",
+        "title": "원본도 변경되었는지 확인",
+        "explanation": "**`print(f\"person: {person}\")`**\n\n`ref`를 수정했지만 `person`을 출력해도 `'name': 'Bob'`으로 바뀌어 있습니다. 이것이 Aliasing의 핵심입니다. `=` 할당은 복사가 아니라 같은 객체에 이름표를 하나 더 붙이는 것입니다.",
         "visualizationType": "terminal",
         "code": "print(f\"person: {person}\")"
       }
     ]
   },
   "quiz": {
-    "question": "如何创建字典 d 的独立副本？",
+    "question": "如何创建字典d的独立副本？",
     "options": [
       "e = d",
       "e = d.copy()",
-      "e = dict(d)",
-      "B 和 C 都可以"
+      "e = 字典(d)",
+      "B 和 C 都"
     ],
     "correctIndex": 3,
-    "explanation": "`d.copy()` 和 `dict(d)` 都创建浅拷贝（Shallow Copy）。\n`e = d` 只是创建别名（Alias）。\n对于嵌套字典，请使用 `copy.deepcopy()`。"
+    "explanation": "`d.copy()` 和 `dict(d)` 都创建浅拷贝。\n`e = d` 只是创建一个别名。\n对于嵌套字典，请使用“copy.deepcopy()”。"
   },
   "misconceptions": [
     {
-      "wrong": "`d2 = d1` 会复制字典",
-      "correct": "`d2 = d1` 只是创建别名（Alias）-- 两者都指向同一个对象。",
-      "why": "赋值（=）是给对象贴名称标签，不是复制对象。"
+      "wrong": "`d2 = d1`은 딕셔너리를 복사한다",
+      "correct": "`d2 = d1`은 별명(Alias)을 만들 뿐입니다 — 둘 다 같은 객체를 가리킵니다.",
+      "why": "대입(=)은 이름표를 객체에 붙이는 것이지, 객체를 복사하지 않습니다."
     },
     {
-      "wrong": "列表可以用作字典的键",
-      "correct": "字典的键必须是不可变（Immutable）类型（字符串、数字、元组）。",
-      "why": "可变对象的哈希值不稳定，因此不能用作键。"
+      "wrong": "리스트를 딕셔너리 키로 쓸 수 있다",
+      "correct": "딕셔너리 키는 불변(Immutable) 타입이어야 합니다 (문자열, 숫자, 튜플).",
+      "why": "가변 객체는 해시값이 일정하지 않으므로 키로 사용할 수 없습니다."
     }
   ],
-  "keyTakeaway": "字典和列表一样是 Mutable！`d[key] = value` 就地修改。注意别名（Aliasing）！"
+  "keyTakeaway": "딕셔너리는 리스트처럼 Mutable! `d[key] = value`는 제자리에서 수정합니다. 별명(Aliasing)에 주의하세요!"
 }

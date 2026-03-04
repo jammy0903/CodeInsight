@@ -1,0 +1,68 @@
+{
+  "lessonId": "cpp-5-1",
+  "title": "unique_ptr 基础知识",
+  "concept": "unique_ptr 保证唯一所有权，并在作用域结束时自动删除。",
+  "content": {
+    "code": "#include <iostream>\n#include <memory>\nusing namespace std;\n\nint main() {\n    unique_ptr<int> p = make_unique<int>(42);\n    cout << *p << endl;\n\n    // p가 스코프를 벗어나면 자동 delete\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "创建unique_ptr",
+        "explanation": "`make_unique<int>(42)` 在堆上分配一个 int 并将其包装在 unique_ptr 中。\n\n`unique_ptr` 是应用 RAII 的指针。由于它只有一个所有者，因此无法复制，并且在销毁时会自动“删除”。",
+        "visualizationType": "cMemory",
+        "code": "unique_ptr<int> p = make_unique<int>(42);",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0xA000",
+            "type": "unique_ptr<int>",
+            "address": "0x1000",
+            "points_to": "*p"
+          }
+        ],
+        "heap": [
+          {
+            "name": "*p",
+            "value": "42",
+            "type": "int",
+            "address": "0xA000"
+          }
+        ]
+      },
+      {
+        "title": "用作反向引用",
+        "explanation": "使用“*p”像常规指针一样访问该值。使用方法与原始指针相同。",
+        "visualizationType": "terminal",
+        "code": "cout << *p << endl;",
+        "stdout": "42"
+      },
+      {
+        "title": "自动释放",
+        "explanation": "当`main`以`return 0;`结束时，`p`的析构函数被调用，堆内存被自动释放。\n\n**不需要直接调用delete**——这就是智能指针的核心价值。",
+        "visualizationType": "cMemory",
+        "code": "return 0;",
+        "stack": [],
+        "heap": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "unique_ptr 的描述有什么问题？",
+    "options": [
+      "销毁后自动删除",
+      "可以复制到另一个unique_ptr",
+      "建议使用make_unique创建",
+      "保证独家所有权"
+    ],
+    "correctIndex": 1,
+    "explanation": "unique_ptr 无法复制，因为复制构造函数/赋值运算符已被删除。要转移所有权，必须使用 std::move。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "unique_ptr 可以分配给另一个变量。",
+      "correct": "禁止复制，所有权只能通过 std::move 转移。",
+      "why": "在两个地方删除相同的内存会导致双重释放错误，因此将所有者限制为一个。"
+    }
+  ],
+  "keyTakeaway": "unique_ptr是最基本的智能指针，可以通过RAII从根本上防止内存泄漏。"
+}

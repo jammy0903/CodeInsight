@@ -1,0 +1,153 @@
+{
+  "lessonId": "py-practical-3-1",
+  "title": "PyPDF2로 PDF 조작",
+  "concept": "여러 PDF를 하나로 합치거나, 페이지를 분할하거나, 회전할 수 있습니다",
+  "content": {
+    "code": "from PyPDF2 import PdfReader, PdfWriter\n\nreader = PdfReader('source.pdf')\nwriter = PdfWriter()\nfor page in reader.pages:\n    writer.add_page(page)\nwriter.write('output.pdf')",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Step 1: PyPDF2 불러오기",
+        "explanation": "`PyPDF2`는 **PDF 파일을 읽고 쓰는** 라이브러리입니다.\n\n**주요 기능**:\n- PDF 병합 (여러 파일 → 1개)\n- PDF 분할 (1개 → 여러 페이지)\n- 페이지 회전\n- 메타데이터 수정\n\n**제한사항**: PDF 내용 편집(텍스트 수정)은 안 됩니다.\n읽기 전용입니다.",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 3,
+        "title": "Step 2: PDF 파일 읽기",
+        "explanation": "`PdfReader('source.pdf')`로 **PDF 파일을 읽습니다**.\n\n**동작**:\n1. PDF 파일 열기\n2. 구조 파싱 (페이지 수, 메타데이터 등)\n3. reader 객체 생성\n\n**reader로 뭘 할 수 있나?**\n- `reader.pages`: 전체 페이지 리스트\n- `len(reader.pages)`: 페이지 수\n- `reader.metadata`: 제목, 저자 등",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "reader",
+              "pointsTo": "obj_reader"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_reader",
+              "type": "object",
+              "value": "PdfReader('source.pdf')",
+              "pyId": "5001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "Step 3: 새 PDF Writer 생성",
+        "explanation": "`PdfWriter()`는 **새 PDF를 만들기 위한 객체**입니다.\n\n**Reader vs Writer**:\n- Reader: 기존 PDF 읽기\n- Writer: 새 PDF 만들기\n\n**아직 빈 PDF**: 페이지를 추가해야 내용이 생깁니다.",
+        "highlight": [
+          4
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "reader",
+              "pointsTo": "obj_reader"
+            },
+            {
+              "name": "writer",
+              "pointsTo": "obj_writer"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_reader",
+              "type": "object",
+              "value": "PdfReader('source.pdf')",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_writer",
+              "type": "object",
+              "value": "PdfWriter()",
+              "pyId": "5002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "Step 4: 페이지 반복",
+        "explanation": "`for page in reader.pages:`는 **원본 PDF의 모든 페이지를 순회**합니다.\n\n**reader.pages**:\n- 페이지 객체 리스트\n- `reader.pages[0]`: 첫 페이지\n- `reader.pages[1]`: 두 번째 페이지\n\n**실무 활용**: 특정 페이지만 추출하려면 인덱스 사용 → `reader.pages[2:5]` (3~5페이지)",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "obj_reader",
+              "type": "object",
+              "value": "PdfReader('source.pdf')",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_writer",
+              "type": "object",
+              "value": "PdfWriter()",
+              "pyId": "5002"
+            }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "Step 5: 페이지 추가",
+        "explanation": "`writer.add_page(page)`는 **writer에 페이지를 추가**합니다.\n\n**동작**: 원본 PDF의 페이지를 하나씩 복사하여 새 PDF에 추가합니다.\n\n**실무 예시**:\n- 여러 PDF 병합: `for pdf_file in pdf_files: ...`\n- 페이지 순서 바꾸기: `writer.add_page(reader.pages[2])` 먼저 추가\n- 페이지 회전: `page.rotate(90)` 후 추가",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 7,
+        "title": "Step 6: PDF 파일 저장",
+        "explanation": "`writer.write('output.pdf')`로 **새 PDF 파일을 생성**합니다.\n\n**결과**: output.pdf 파일 생성 (source.pdf와 동일한 내용)\n\n**실무 시나리오**:\n- 100개 PDF를 1개로 병합: 루프 안에서 여러 reader 읽기\n- 1페이지만 추출: `writer.add_page(reader.pages[0])`\n- 홀수 페이지만: `for i in range(0, len(reader.pages), 2)`",
+        "highlight": [
+          7
+        ],
+        "visualizationType": "python"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How to combine three PDFs into one?",
+    "options": [
+      "Read each PDF with PdfReader, add all pages to one PdfWriter",
+      "Save 3 PdfReaders in a list",
+      "Read and save each PDF with PdfWriter",
+      "Using merge() function"
+    ],
+    "correctIndex": 0,
+    "explanation": "Read each PDF with PdfReader, add all pages to one PdfWriter with add_page() and save to merge."
+  },
+  "misconceptions": [
+    {
+      "wrong": "PyPDF2로 PDF 내용(텍스트)을 수정할 수 있다",
+      "correct": "PyPDF2는 페이지 단위 조작만 가능합니다.\n텍스트 편집은 reportlab 같은 라이브러리로 새로 만들어야 합니다.",
+      "why": "PDF는 '완성된 문서' 형식입니다.\n페이지 자체는 조작 가능하지만, 내용은 수정 불가입니다."
+    },
+    {
+      "wrong": "writer.add_page()만 하면 파일이 생성된다",
+      "correct": "writer.write()를 호출해야 실제 파일이 저장됩니다.",
+      "why": "add_page()는 메모리에 페이지를 추가할 뿐, 파일 저장은 별도입니다."
+    }
+  ],
+  "keyTakeaway": "PdfReader (읽기) + PdfWriter (쓰기) = PDF 병합/분할 자동화"
+}

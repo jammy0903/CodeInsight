@@ -1,13 +1,13 @@
 {
   "lessonId": "java-2-1",
   "title": "Understanding NullPointerException",
-  "concept": "Calling a method on a null reference causes a NullPointerException",
+  "concept": "Calling a method on a null reference throws a NullPointerException",
   "content": {
     "code": "String str = null;\n\nint len = str.length();\n\nString text = null;\nboolean result = text.equals(\"hello\");\n\nboolean safe = \"hello\".equals(text);",
     "steps": [
       {
-        "title": "Assigning null",
-        "explanation": "**Execution order:**\n1. Space for `str` variable is created (Stack).\n2. `null` (0x0) value is assigned.\n\n**What happens in memory:**\nA space called `str` is created on the Stack, and the special value `null` is placed in it.\n\n**What is null?**\nIt's a marker meaning \"points to nothing.\"\nIt's like an 'empty envelope' with no address written on it.\nInternally, it's typically represented as an invalid address like 0x0.",
+        "title": "null assignment",
+        "explanation": "**Execution order:**\n1. Create `str` variable space (Stack).\n2. Assigning the value `null`(0x0).\n\n**What happens in memory:**\nCreate a space called `str` on the Stack and insert a special value called `null`.\n\n**What is null?**\nIt is a sign meaning “does not point to anything.”\nIt's like an 'empty envelope' with no address written on it.\nInternally, it is usually expressed as an invalid address such as 0x0.",
         "keyInsight": "null = no reference (address 0x0)",
         "visualizationType": "javaMemory",
         "code": "String str = null;",
@@ -24,8 +24,8 @@
         }
       },
       {
-        "title": "Calling a Method on null (NPE Occurs)",
-        "explanation": "**Execution order:**\n1. Attempts to dereference `str`.\n2. Discovers the value is `null`.\n3. **`NullPointerException`** is thrown.\n\nTo call `str.length()`, the program needs to **follow the address (dereference)** that `str` points to.\nBut since the address is `null` (an empty envelope), it immediately throws an error saying \"there's nowhere to go!\" and halts the program.\n\n**What is Dereferencing?**\nThe act of following an address to access the actual object at that location (the `.` operator).",
+        "title": "Calling method on null (occurs NPE)",
+        "explanation": "**Execution order:**\n1. Attempt to dereference `str`.\n2. Confirm that the value is `null`.\n3. **`NullPointerException`** occurs.\n\nTo call `str.length()`, you need to **move (dereference)** to the address pointed to by `str`.\nHowever, since the address is `null` (empty envelope), an error is immediately thrown and the program stops, saying “I have nowhere to go?”\n\n**What is Dereference?**\nThis refers to the act of following an address and accessing the actual object there (`.` operator).",
         "keyInsight": "null.method() = NullPointerException",
         "visualizationType": "javaMemory",
         "code": "int len = str.length();",
@@ -37,8 +37,8 @@
         }
       },
       {
-        "title": "Another null Variable",
-        "explanation": "**Execution order:**\n1. `text` variable is created.\n2. `null` value is assigned.\n\nThe `text` variable is also initialized in a state where it doesn't point to any object (`null`).\nThis is the starting point of the most common error Java developers encounter.",
+        "title": "another null variable",
+        "explanation": "**Execution order:**\n1. Create a `text` variable.\n2. Assignment of `null` value.\n\nThe `text` variable is likewise initialized to point to no object (`null`).\nThis is the starting point of the most common errors encountered by Java developers.",
         "visualizationType": "javaMemory",
         "code": "String text = null;",
         "javaMemoryState": {
@@ -54,8 +54,8 @@
         }
       },
       {
-        "title": "Calling null.equals() (Dangerous!)",
-        "explanation": "**Execution order:**\n1. Attempts to dereference `text` (text.equals...).\n2. `text` is `null`, so **NPE occurs**.\n\nSince `text` is `null`, any attempt to do something through `text` (`.equals`) will always fail.\n\n**Warning:**\nIf there's even a 0.1% chance that a variable could be `null`, never call a method on it first.",
+        "title": "Calling null.equals() (danger!)",
+        "explanation": "**Execution order:**\n1. Attempt to dereference `text` (text.equals...).\n2. **NPE occurs** because `text` is `null`.\n\nSince `text` is `null`, any attempt to do something with `text` (`.equals`) will inevitably fail.\n\n**Warning:**\nIf there is even a 0.1% chance that the variable is `null`, never call the method first.",
         "keyInsight": "null.equals(x) = NPE!",
         "visualizationType": "javaMemory",
         "code": "boolean result = text.equals(\"hello\");",
@@ -67,8 +67,8 @@
         }
       },
       {
-        "title": "Safe Comparison (Yoda Condition)",
-        "explanation": "**Execution order:**\n1. Reference the `\"hello\"` literal (String Pool).\n2. Call `\"hello\".equals(null)`.\n3. Receives `null` as an argument and safely returns **false**.\n4. Store false in the `safe` variable.\n\n**Just by swapping the order?**\n`\"hello\"` is a literal, so it's a **real object that exists in the String Pool**.\n(It's never null)\nThe `equals` method is designed to gracefully return `false` when `null` is passed as an argument.\nThis pattern is sometimes called 'Yoda Conditions'.",
+        "title": "How to Compare Safely (Yoda Condition)",
+        "explanation": "**Execution order:**\n1. See `\"hello\"` literal (String Pool).\n2. Calling `\"hello\".equals(null)`.\n3. Accepts `null` argument and safely returns **false**.\n4. Store false in `safe` variable.\n\n**They just changed the order?**\nSince `\"hello\"` is a literal, it is **an actual object that exists in the String Pool**.\n(never null)\nThe `equals` method is designed to elegantly return `false` if it takes `null` as an argument.\nThese patterns are also called ‘Yoda Conditions’.",
         "keyInsight": "\"literal\".equals(variable) = null-safe",
         "visualizationType": "javaMemory",
         "code": "boolean safe = \"hello\".equals(text);",
@@ -95,7 +95,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "Which of the following does NOT throw a NullPointerException?",
+    "question": "Which of the following will not cause a NullPointerException?",
     "options": [
       "null.toString()",
       "((String)null).length()",
@@ -103,19 +103,19 @@
       "null.equals(\"test\")"
     ],
     "correctIndex": 2,
-    "explanation": "\"test\".equals(null) calls a method on \"test\", which is a 'living object', so it's safe.\nAll others call methods on null, which causes an error."
+    "explanation": "\"test\".equals(null) is safe because it calls a method on a 'living object' called \"test\".\nAn error occurs because the call is made with everything else being null."
   },
   "misconceptions": [
     {
-      "wrong": "You can call methods without null checks",
-      "correct": "External data and return values **must** be null-checked.",
-      "why": "NPE is a **Runtime Error** that the compiler cannot catch.\nIt's the main culprit behind the 'app has stopped' messages users see while using your app."
+      "wrong": "You can call a method without checking for null.",
+      "correct": "External data or return values ​​**must** be null checked.",
+      "why": "NPE is a **Runtime Error** that the compiler does not catch.\nIn other words, it is the main culprit that causes users to suddenly see the message ‘App has stopped’ while using the app."
     },
     {
-      "wrong": "null is the same as '0' or 'empty string'",
-      "correct": "They are completely different.\n0 is a number and empty string is a string, but null is **'nonexistence' itself**.",
-      "why": "An int initialized to 0 has the value 0 in memory, but a reference variable initialized to null has no target to point to at all."
+      "wrong": "null is equivalent to '0' or 'blank'",
+      "correct": "It's completely different.\n0 is a number and space is a string, but null is just **'non-existent'**.",
+      "why": "An int initialized to 0 has the value 0 in memory, but a reference variable initialized to null has no object to point to."
     }
   ],
-  "keyTakeaway": "null.method() is a bomb. Always use the \"literal\".equals(variable) order."
+  "keyTakeaway": "null.method() is the bomb. Always write in \"literal\".equals(variable) order."
 }

@@ -1,13 +1,13 @@
 {
   "lessonId": "c-7-2",
-  "title": "Pointers to Arrays",
-  "concept": "数组指针和指针数组仅因括号位置不同，含义和运算单位就完全不同",
+  "title": "指向数组的指针",
+  "concept": "数组指针和指针数组具有不同的含义和具有单个括号位置的操作单元。",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int arr[3] = {10, 20, 30};\n\n    int (*p)[3] = &arr;\n\n    int *ptrArr[3];\n    ptrArr[0] = &arr[0];\n\n    printf(\"*(*p + 1) = %d\\n\", *(*p + 1));\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 `printf` 所需的标准输入输出头文件。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用“printf”的标准输入/输出标头。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "创建 main 栈帧，准备进行数组/指针比较。",
+        "title": "启动主函数",
+        "explanation": "主框架已创建并准备好进行数组/指针比较。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "声明整型数组",
-        "explanation": "`arr` 在连续内存中存储 3 个整数。\n\n我们将以此数组为基准比较两种类型。",
+        "title": "整数数组声明",
+        "explanation": "在“arr”的连续内存中存储三个整数。\n\n根据该数组比较两种类型。",
         "visualizationType": "cMemory",
         "code": "int arr[3] = {10, 20, 30};",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "概念 1：指向数组的指针",
-        "explanation": "`int (*p)[3]` 是指向"大小为 3 的整个数组"的指针。\n\n指针运算时，移动单位是整个数组的大小。",
+        "title": "概念1：指向数组的指针",
+        "explanation": "`int (*p)[3]` 是一个指向“整个大小为 3 的数组”的指针。\n\n执行指针操作时，移动单位是数组的整个大小。",
         "visualizationType": "cMemory",
         "code": "int (*p)[3] = &arr;",
         "stack": [
@@ -64,8 +64,8 @@
         ]
       },
       {
-        "title": "概念 2：指针的数组",
-        "explanation": "`int *ptrArr[3]` 是一个存放 3 个指针的数组。\n\n每个元素可以独立指向不同的地址。",
+        "title": "概念2：指针数组",
+        "explanation": "`int *ptrArr[3]` 是一个包含 3 个指针的数组。\n\n每个元素可以独立地指向不同的地址。",
         "visualizationType": "cMemory",
         "code": "int *ptrArr[3];",
         "stack": [
@@ -91,8 +91,8 @@
         ]
       },
       {
-        "title": "给指针数组元素赋值地址",
-        "explanation": "`ptrArr[0] = &arr[0];` 将指针数组元素连接到实际地址。",
+        "title": "将地址值分配给指针数组的元素",
+        "explanation": "将实际地址连接到数组元素指针，如“ptrArr[0] = &arr[0];”。",
         "visualizationType": "cMemory",
         "code": "ptrArr[0] = &arr[0];",
         "stack": [
@@ -118,15 +118,15 @@
         ]
       },
       {
-        "title": "解引用数组指针",
-        "explanation": "`*(*p + 1)` 读取第二个元素，验证数组指针的访问规则。",
+        "title": "数组指针取消引用",
+        "explanation": "通过使用“*(*p + 1)”读取第二个元素的值来检查数组指针访问规则。",
         "visualizationType": "cMemory",
         "code": "printf(\"*(*p + 1) = %d\\n\", *(*p + 1));",
         "stdout": "*(*p + 1) = 20"
       },
       {
-        "title": "程序结束",
-        "explanation": "通过 `return 0;` 结束程序。\n\n要点：`int (*p)[N]` 和 `int *p[N]` 是完全不同的类型。",
+        "title": "程序退出",
+        "explanation": "使用“return 0;”退出。\n\n底线：`int (*p)[N]`和`int *p[N]`是完全不同的类型。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -135,22 +135,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下哪个正确声明了"指向大小为 5 的 int 数组的指针"？",
+    "question": "以下哪项正确声明了“指向大小为 5 的 int 数组的指针”？",
     "options": [
       "int *p[5];",
       "int (*p)[5];",
       "int *p(5);",
-      "int **p;"
+      "int **p；"
     ],
     "correctIndex": 1,
-    "explanation": "没有括号就变成了存放 5 个指针的"指针数组"。\n要指向整个数组，需要用 `(*p)` 这样的括号包裹。"
+    "explanation": "如果没有括号，它就变成一个包含 5 个指针的“指针数组”。\n要引用整个数组，必须将其括在括号中，如“(*p)”。"
   },
   "misconceptions": [
     {
-      "wrong": "int *p[3] 和 int (*p)[3] 是一样的。",
-      "correct": "前者是"指针的数组"，后者是"指向数组的指针"。",
-      "why": "由于运算符优先级，`[]` 比 `*` 先结合，因此括号完全改变了含义。"
+      "wrong": "int *p[3] 和 int (*p)[3] 相同。",
+      "correct": "前者是“指针数组”，后者是“指向数组的指针”。",
+      "why": "由于运算符优先级，“[]”连接在“*”之前，因此括号完全改变了含义。"
     }
   ],
-  "keyTakeaway": "当想把整个数组作为一个整体来指向时，使用数组指针：`TYPE (*NAME)[SIZE]`。"
+  "keyTakeaway": "当您想要将整个数组作为一个块指向时，请使用数组指针“TYPE (*NAME)[SIZE]”。"
 }

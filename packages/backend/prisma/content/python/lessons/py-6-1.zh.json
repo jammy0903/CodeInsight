@@ -1,18 +1,18 @@
 {
   "lessonId": "py-6-1",
-  "title": "类定义",
-  "concept": "类是创建对象的设计图，类本身也是对象！",
+  "title": "클래스 정의",
+  "concept": "클래스는 객체를 만드는 설계도, 클래스 자체도 객체!",
   "content": {
     "code": "class Dog:\n    species = \"Canis familiaris\"\n    \n    def bark(self):\n        print(\"멍멍!\")\n\nprint(type(Dog))\nprint(Dog.species)\n\nmy_dog = Dog()\nprint(type(my_dog))",
     "steps": [
       {
-        "title": "类定义（创建设计图）",
-        "explanation": "**`class Dog:`**\n\nPython 从上到下顺序执行代码。使用 `class` 关键字定义一个名为 `Dog` 的**新类型（类）**。\n\n**本课目标**：深入理解类的本质。类不仅仅是"设计图"——在 Python 中，**它本身就是一个对象**，是元类 `type` 的实例！\n\n**类的三个角色：**\n1. **设计图**：用这个设计图可以创建多个对象（实例）\n2. **类型定义**：诞生了一个名为 `Dog` 的新数据类型（就像 int、str、list 一样！）\n3. **对象**：类本身也是存在于内存中的一个**对象**！\n\n**Python 内部机制**：当 Python 遇到 `class Dog:` 时，它会从上到下执行类体。遇到的变量（`species`）成为类变量，函数（`bark`）成为方法。所有处理完成后，创建一个 Dog 类对象并绑定到 `Dog` 这个名称。\n\n**比喻**：绘制建筑设计图这个行为本身就在创造一个叫"设计图"的"物品"。设计图（类）包含设计信息，可以用这张图纸建造多栋房子（实例）。\n\n**为什么是这个顺序？** 必须先定义类，之后才能用这个设计图创建对象。\n\n**执行顺序**：执行 class Dog → 开始创建 Dog 类对象 → 第2行",
+        "title": "클래스 정의 (설계도 만들기)",
+        "explanation": "**`class Dog:`**\n\n`class` 키워드로 `Dog`라는 새로운 타입(클래스)을 정의합니다. 클래스는 설계도 역할을 하며, 이 설계도로 여러 객체를 만들 수 있습니다. 클래스 자체도 메모리에 존재하는 하나의 객체입니다.",
         "visualizationType": "pythonMemory",
         "code": "class Dog:",
         "pythonMemoryState": {
           "output": [],
-          "note": "类定义开始（类也是对象！）",
+          "note": "클래스 정의 시작 (클래스도 객체!)",
           "names": [
             {
               "name": "Dog",
@@ -30,12 +30,12 @@
         }
       },
       {
-        "title": "类变量定义",
-        "explanation": "**`species = \"Canis familiaris\"`**\n\n这是一个**类变量（Class Variable）**。在类体中不使用 `self` 直接定义的变量，是**所有实例共享**的数据。\n\n**类变量 vs 实例变量——核心区别：**\n- **类变量**（`species`）：属于 Dog 类本身，所有 Dog 实例**共享相同的值**\n- **实例变量**（`self.name` 等）：每个实例**独立**拥有\n\n**Python 内部机制**：执行类体时，`species = \"Canis familiaris\"` 被存储在 Dog 类对象的 `__dict__` 中。即 `Dog.__dict__['species'] = \"Canis familiaris\"`。之后通过实例的 `my_dog.species` 访问时，先在实例的 `__dict__` 中找，找不到就在类的 `__dict__` 中找。\n\n**何时使用类变量？** 当所有实例应该具有相同的值时。例如：所有 Dog 的 species 都是 \"Canis familiaris\"。但要注意——把**可变对象（列表、字典）**作为类变量可能会踩坑（将在 py-6-4 中学习！）。\n\n**比喻**：学校的"校训"在学校（类）中只有一个，所有学生（实例）共享。但每个学生的"姓名"是实例变量，各不相同。\n\n**为什么是这个顺序？** 在类体中按顺序执行。\n\n**执行顺序**：species = \"Canis familiaris\" → 向 Dog.__dict__ 添加 species → 第4行",
+        "title": "클래스 변수 정의",
+        "explanation": "**`species = \"Canis familiaris\"`**\n\n**클래스 변수(Class Variable)**입니다. `self` 없이 클래스 본문에 정의하며, **모든 인스턴스가 같은 값을 공유**합니다. `Dog.species`로 직접 접근하거나 인스턴스를 통해 접근해도 동일한 값이 반환됩니다.",
         "visualizationType": "pythonMemory",
         "code": "species = \"Canis familiaris\"",
         "pythonMemoryState": {
-          "note": "添加类变量（所有实例共享）",
+          "note": "클래스 변수 추가 (모든 인스턴스가 공유)",
           "names": [
             {
               "name": "Dog",
@@ -55,8 +55,8 @@
         }
       },
       {
-        "title": "bark 方法定义",
-        "explanation": "**`def bark(self):`**\n\n定义一个名为 `bark` 的实例方法。在类体中用 `def` 定义的函数会自动成为该类的**方法**。\n\n**方法也是函数对象**：执行 `def bark(self):` 会创建一个名为 bark 的**函数对象**。这个函数对象被存储在 Dog 的 `__dict__` 中。即 `Dog.__dict__['bark'] = <function bark>`。\n\n**self 参数**：每个实例方法的第一个参数都是 `self`。调用 `my_dog.bark()` 时，Python 会自动将 `my_dog` 传递给 `self`。\n\n**此时 Dog 类的状态**：`Dog.__dict__` 中有 `species`（类变量）和 `bark`（方法）两个条目。类体的所有执行完成后，Dog 类定义就完成了。\n\n**注意**：此时只是**定义**方法。`print(\"汪汪!\")` 并没有执行！要等到后面像 `my_dog.bark()` 这样调用时才会执行。\n\n**为什么是这个顺序？** 定义完类变量后，按顺序定义方法。\n\n**执行顺序**：执行 def bark → 创建 bark 函数对象 → 注册到 Dog.__dict__ → Dog 类定义完成 → 第7行",
+        "title": "bark 메서드 정의",
+        "explanation": "**`def bark(self):`**\n\n`bark` 인스턴스 메서드를 정의합니다. 정의 시점에 `print(\"멍멍!\")`은 실행되지 않으며, `my_dog.bark()` 호출 시에야 실행됩니다. 메서드 객체는 `Dog.__dict__['bark']`에 저장됩니다.",
         "visualizationType": "pythonMemory",
         "code": "def bark(self):",
         "highlightOffset": [
@@ -64,7 +64,7 @@
           1
         ],
         "pythonMemoryState": {
-          "note": "bark 方法已定义",
+          "note": "bark 메서드 정의됨",
           "names": [
             {
               "name": "Dog",
@@ -82,15 +82,15 @@
         }
       },
       {
-        "title": "类也是对象！（type 检查）",
-        "explanation": "**`print(type(Dog))`**\n\n这段代码揭示了 Python 的一个惊人特性。我们来查看类 `Dog` 本身是**什么类型**。\n\n**结果：`<class 'type'>`**\n\nDog 是名为 `type` 的**元类（metaclass）**的实例！也就是说，创建"Dog 这个类"的"类的类"就是 `type`。\n\n**Python 的核心哲学——"一切皆对象"：**\n- `42` 是 `int` 的实例（数字也是对象！）\n- `\"hello\"` 是 `str` 的实例（字符串也是对象！）\n- `Dog` 是 `type` 的实例（**类也是对象！！！**）\n\n**为什么这很重要？** 类是对象意味着类也可以赋值给变量、作为函数参数传递、存储在列表中！这个特性使 Python 成为一门非常动态和灵活的语言。\n\n```python\n# 将类存储在变量中\nMyClass = Dog\nmy_dog = MyClass()  # 等同于 Dog()!\n\n# 将类存储在列表中\nclasses = [Dog, Cat, Bird]\nfor cls in classes:\n    obj = cls()  # 创建每个类的实例\n```\n\n**比喻**：通常"设计图"只是纸上的图画，但在 Python 中，设计图（类）本身就是一个**可以触摸的物品（对象）**。可以传递、检查、修改它。\n\n**为什么是这个顺序？** 类定义完成后，按顺序执行下一行。\n\n**执行顺序**：调用 type(Dog) → 返回 <class 'type'> → 执行 print → 第8行",
+        "title": "클래스도 객체다! (type 확인)",
+        "explanation": "**`print(type(Dog))`**\n\n클래스 `Dog` 자체의 타입을 확인합니다. 결과는 `<class 'type'>`입니다. Python에서 클래스 자체도 `type`이라는 메타클래스의 인스턴스이며, 변수에 저장하거나 함수 인자로 전달할 수 있는 일급 객체입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(type(Dog))",
         "pythonMemoryState": {
           "output": [
             "<class 'type'>"
           ],
-          "note": "Dog 是 type 的实例（类也是对象！）",
+          "note": "Dog는 type의 인스턴스 (클래스도 객체!)",
           "names": [
             {
               "name": "Dog",
@@ -110,15 +110,15 @@
         }
       },
       {
-        "title": "访问类变量",
-        "explanation": "**`print(Dog.species)`**\n\n使用 `类名.变量名` 的格式直接访问类变量。不需要创建实例就可以访问！\n\n**为什么不需要实例就能访问？** 因为类变量属于**类对象本身**的属性。Dog 的 `__dict__` 中存储着 `'species': 'Canis familiaris'`，所以可以通过 `Dog.species` 直接读取。\n\n**访问类变量的三种方式：**\n```python\nDog.species        # 从类直接访问 → \"Canis familiaris\"\nmy_dog.species     # 通过实例访问 → \"Canis familiaris\"（相同的值！）\ndog2.species       # 通过其他实例访问 → \"Canis familiaris\"（相同的值！）\n```\n所有方式都返回**相同的值**。因为实例中没有 species 时，Python 会在类中查找。\n\n**Python 的属性查找顺序（Attribute Lookup Order）：**\n1. 在实例的 `__dict__` 中查找 → 如果没有\n2. 在类的 `__dict__` 中查找 → 如果没有\n3. 在父类的 `__dict__` 中查找 → ... → 如果都没有则 AttributeError\n\n这个查找顺序是 Python OOP 最核心的机制！\n\n**为什么是这个顺序？** 上一个 print 完成后，按顺序执行下一行。\n\n**执行顺序**：读取 Dog.__dict__['species'] → \"Canis familiaris\" → 执行 print → 第10行",
+        "title": "클래스 변수 접근",
+        "explanation": "**`print(Dog.species)`**\n\n인스턴스 없이 클래스 이름으로 직접 클래스 변수에 접근합니다. 클래스 변수는 클래스 객체 자체에 속하므로 `Dog.species`로 바로 읽을 수 있습니다. `\"Canis familiaris\"`가 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(Dog.species)",
         "pythonMemoryState": {
           "output": [
             "Canis familiaris"
           ],
-          "note": "类变量不需要实例即可访问",
+          "note": "클래스 변수는 인스턴스 없이 접근 가능",
           "names": [
             {
               "name": "Dog",
@@ -136,12 +136,12 @@
         }
       },
       {
-        "title": "创建实例（对象）",
-        "explanation": "**`my_dog = Dog()`**\n\n调用 `Dog()` 创建 Dog 类的**实例（对象）**。现在从"设计图"制造出了"实际产品"。\n\n**两个对象的关系：**\n- `Dog`（类对象，0x1000）：**设计图**——type 的实例\n- `my_dog`（实例对象，0x2000）：**产品**——Dog 的实例\n\n**Python 内部机制：**\n1. 调用 `Dog.__new__(Dog)` → 在内存 0x2000 分配空的 Dog 对象空间\n2. 调用 `Dog.__init__(新对象)` → 没有 `__init__`，只进行默认初始化\n3. 将已初始化对象的引用（0x2000）绑定到 `my_dog` 变量\n\n**my_dog 的状态**：`my_dog.__dict__` 是空字典 `{}`。还没有任何实例变量。但通过 `my_dog.species` 访问时，Python 的属性查找顺序会找到类变量 \"Canis familiaris\"。\n\n**比喻**：用设计图（Dog）建了一栋房子（my_dog）。房子是空的，但设计图上写的公共信息（species）可以查阅。\n\n**为什么是这个顺序？** 上一个 print 完成后，按顺序执行下一行。\n\n**执行顺序**：调用 Dog() → 通过 __new__ 创建新对象 0x2000 → 将引用 0x2000 赋给 my_dog → 第11行",
+        "title": "인스턴스(객체) 생성",
+        "explanation": "**`my_dog = Dog()`**\n\nDog 인스턴스를 생성합니다. `my_dog` 객체 자체에는 `species` 속성이 없지만, `my_dog.species`로 접근하면 Python이 인스턴스에서 찾지 못할 경우 자동으로 클래스 변수를 반환합니다.",
         "visualizationType": "pythonMemory",
         "code": "my_dog = Dog()",
         "pythonMemoryState": {
-          "note": "Dog 实例已创建（用设计图制造了产品）",
+          "note": "Dog 인스턴스 생성 (설계도로 제품 만듦)",
           "names": [
             {
               "name": "Dog",
@@ -171,15 +171,15 @@
         }
       },
       {
-        "title": "检查实例类型",
-        "explanation": "**`print(type(my_dog))`**\n\n检查 `my_dog` 对象的类型（类）。\n\n**让我们整理一下 Python 的类型层次：**\n```python\ntype(my_dog)       # <class 'Dog'>    - my_dog 是 Dog 的实例\ntype(Dog)          # <class 'type'>   - Dog 是 type 的实例\ntype(type)         # <class 'type'>   - type 也是自身的实例！\n```\n\n**结果：`<class '__main__.Dog'>`**\n- `my_dog` 是 `Dog` 类的实例\n- `__main__` 是当前正在执行的模块（文件）名称\n\n`type` 是 Python 中最根本的对象，具有**自身是自身实例**的独特特性。这个结构就是 Python"一切皆对象"系统的根基。",
+        "title": "인스턴스 타입 확인",
+        "explanation": "**`print(type(my_dog))`**\n\n인스턴스의 타입(소속 클래스)을 확인합니다. `<class '__main__.Dog'>`가 출력됩니다. `my_dog`는 Dog의 인스턴스, Dog는 type의 인스턴스로, Python의 타입 계층 구조를 보여줍니다.",
         "visualizationType": "pythonMemory",
         "code": "print(type(my_dog))",
         "pythonMemoryState": {
           "output": [
             "<class '__main__.Dog'>"
           ],
-          "note": "my_dog 是 Dog 的实例",
+          "note": "my_dog는 Dog의 인스턴스",
           "objects": [
             {
               "id": "class1",
@@ -204,24 +204,24 @@
     "question": "类变量和实例变量有什么区别？",
     "options": [
       "没有区别",
-      "类变量被所有实例共享，实例变量各自独立拥有",
+      "类变量由所有实例共享，而实例变量则单独拥有。",
       "实例变量更快",
-      "类变量只能在方法内部使用"
+      "类变量只能在方法内使用"
     ],
     "correctIndex": 1,
-    "explanation": "类变量属于类，被所有实例共享。\n实例变量（self.xxx）对每个实例是独立的。"
+    "explanation": "类变量属于一个类，并被所有实例共享。\n实例变量 (self.xxx) 对于每个实例都是独立的。"
   },
   "misconceptions": [
     {
-      "wrong": "class 是像函数一样执行的代码",
-      "correct": "class 定义的是新类型（对象模板）",
-      "why": "class 语句创建一个类对象并将其绑定到名称上。"
+      "wrong": "class는 함수처럼 실행되는 코드",
+      "correct": "class는 새로운 타입(객체 틀)을 정의하는 것",
+      "why": "class 문은 클래스 객체를 생성하고 이름에 바인딩합니다."
     },
     {
-      "wrong": "self 是特殊的关键字",
-      "correct": "self 只是约定俗成的参数名",
-      "why": "用 this 也可以，但 Python 社区使用 self。\n请遵循这个约定！"
+      "wrong": "self는 특별한 키워드",
+      "correct": "self는 그냥 관례적인 매개변수 이름",
+      "why": "this도 가능하지만, 파이썬 커뮤니티는 self를 사용합니다.\n따르세요!"
     }
   ],
-  "keyTakeaway": "类是创建对象的设计图，而它本身也是对象！一切皆对象！"
+  "keyTakeaway": "클래스는 객체를 만드는 설계도이면서, 그 자체도 객체! 모든 것이 객체!"
 }

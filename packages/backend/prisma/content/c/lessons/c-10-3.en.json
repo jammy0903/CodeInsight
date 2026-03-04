@@ -1,37 +1,87 @@
 {
   "lessonId": "c-10-3",
   "title": "Buffered I/O",
-  "concept": "Buffered I/O improves performance by reducing system calls, but you must understand flush timing",
+  "concept": "Buffered I/O improves performance by reducing the number of system calls, but requires understanding when to flush.",
   "content": {
     "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main() {\n    printf(\"Example 1... \");\n\n    fflush(stdout);\n    printf(\"Printed immediately!\\n\");\n\n    printf(\"Example 2 with newline\\n\");\n\n    return 0;\n}",
     "steps": [
-      {"title":"Including stdio.h header","explanation":"**`#include <stdio.h>`** -- Header for standard I/O functions like `printf` and `fflush`.\n\nIn this lesson we learn about **Buffering**.","visualizationType":"cMemory","code":"#include <stdio.h>","stack":[],"heap":[],"stdout":""},
-      {"title":"Starting main function","explanation":"**`int main() {`** -- When the program starts, the OS opens the standard streams and sets a **buffering mode** for each.\n\nC has 3 buffering modes.","visualizationType":"cMemory","code":"int main() {","stack":[{"name":"main","type":"frame","func":"main","value":"frame"}]},
-      {"title":"Storing data in the buffer","explanation":"**`printf(\"Example 1... \");`** -- `printf` is called but the string ends without **`\\n`**.\n\nThe data is currently in the `stdout` internal buffer in memory.","visualizationType":"cMemory","code":"printf(\"Example 1... \");","stack":[]},
-      {"title":"Forcing buffer flush (Flush)","explanation":"**`fflush(stdout);`** -- **Forcefully empties** the specified stream's buffer, immediately sending all accumulated data to its destination. At this point, the buffered `\"Example 1... \"` is sent to the terminal.","visualizationType":"cMemory","code":"fflush(stdout);","stdout":"Example 1... "},
-      {"title":"Output with newline character","explanation":"**`printf(\"Printed immediately!\\n\");`** -- This `printf` includes **`\\n`** at the end. In line buffering, encountering `\\n` **automatically flushes** the buffer, so it appears on screen immediately without `fflush`.","visualizationType":"cMemory","code":"printf(\"Printed immediately!\\n\");","stdout":"Example 1... Printed immediately!"},
-      {"title":"Confirming auto-flush","explanation":"**`printf(\"Example 2 with newline\\n\");`** -- Since `\\n` is included, line buffering automatically flushes and the output appears on screen immediately.","visualizationType":"cMemory","code":"printf(\"Example 2 with newline\\n\");","stdout":"Example 1... Printed immediately!\nExample 2 with newline"},
-      {"title":"Program termination","explanation":"**`return 0;`** -- On normal termination, the C runtime automatically flushes all open stream buffers. Even data printed with `printf` without a trailing `\\n` gets output at this point.","visualizationType":"cMemory","code":"return 0;"}
+      {
+        "title": "Include stdio.h header",
+        "explanation": "**`#include <stdio.h>`** — Header for using standard input/output functions such as `printf` and `fflush`.\n\nIn this lesson you will learn **Buffering**.",
+        "visualizationType": "cMemory",
+        "code": "#include <stdio.h>",
+        "stack": [],
+        "heap": [],
+        "stdout": ""
+      },
+      {
+        "title": "Start main function",
+        "explanation": "**`int main() {`** — When a program starts, the operating system opens standard streams and sets the **buffering mode** for each.\n\nThere are three buffering modes in C:",
+        "visualizationType": "cMemory",
+        "code": "int main() {",
+        "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          }
+        ]
+      },
+      {
+        "title": "store data in buffer",
+        "explanation": "**`printf(\"Example 1... \");`** — You called `printf`, but there was no **`\\n` at the end of the string**.\n\nThe current location of the data is the `stdout` internal buffer in memory.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Example 1... \");",
+        "stack": []
+      },
+      {
+        "title": "Force flushing of buffer (Flush)",
+        "explanation": "**`fflush(stdout);`** — Forces the buffer of the specified stream to be flushed and immediately transmits all accumulated data to the destination. At this point, `\"Example 1...",
+        "visualizationType": "cMemory",
+        "code": "fflush(stdout);",
+        "stdout": "Example 1... "
+      },
+      {
+        "title": "Output with newline characters",
+        "explanation": "**`printf(\"Printed immediately!\\n\");`** — This `printf` contains **`\\n`** at the end of the string. In line-by-line buffering, when a `\\n` is encountered, the buffer is **automatically emptied**, so it is immediately displayed on the screen without the need for `fflush`.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Printed immediately!\\n\");",
+        "stdout": "Example 1... Printed immediately!"
+      },
+      {
+        "title": "Automatic flush recheck",
+        "explanation": "**`printf(\"Example 2 with newline\\n\");`** — Since `\\n` is included, per-line buffering is automatically flushed and printed to the screen immediately.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"Example 2 with newline\\n\");",
+        "stdout": "Example 1... Printed immediately!\nExample 2 with newline"
+      },
+      {
+        "title": "Program exit",
+        "explanation": "**`return 0;`** — Upon normal termination, the C runtime automatically flushes the buffers of all open streams. Data that was `printf`ed without `\\n` at the end is also output at this point.",
+        "visualizationType": "cMemory",
+        "code": "return 0;"
+      }
     ],
     "deltaFormat": true
   },
   "quiz": {
-    "question": "Why might printf output not appear on screen when a program crashes?",
+    "question": "When a program crashes and terminates, why may the printf contents not appear on the screen?",
     "options": [
-      "OS bug",
-      "The output buffer was not flushed before the process died",
-      "The printf function is slow",
-      "Out of memory"
+      "operating system bug",
+      "This is because the output buffer could not be emptied and the process died.",
+      "Because the printf function is slow",
+      "low memory"
     ],
     "correctIndex": 1,
-    "explanation": "If data is only in the buffer (no newline or fflush) when a crash occurs, that data never reaches the screen and is lost.\nBe careful when debugging."
+    "explanation": "If there is data in the buffer without a newline (\\n) or fflush and a crash occurs, the data does not appear on the screen and disappears.\nBe careful when debugging."
   },
   "misconceptions": [
     {
-      "wrong": "All I/O is processed immediately.",
+      "wrong": "All input and output are processed immediately.",
       "correct": "Buffering is almost always involved to reduce disk I/O and system call costs (Full, Line, No buffering).",
-      "why": "System calls are expensive operations."
+      "why": "This is because system calls are expensive operations."
     }
   ],
-  "keyTakeaway": "Buffering improves performance, but when real-time output is needed or during debugging, understanding fflush is crucial."
+  "keyTakeaway": "Buffering improves performance, but when you need real-time output or are debugging, you need to understand the importance of fflush."
 }

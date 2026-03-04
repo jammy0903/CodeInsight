@@ -1,13 +1,13 @@
 {
   "lessonId": "java-6-2",
-  "title": "异常的类型：Checked vs Unchecked",
-  "concept": "使用 try-catch 块控制异常流程，理解 Checked 和 Unchecked 异常的处理方式。",
+  "title": "예외의 종류: Checked vs Unchecked",
+  "concept": "try-catch 블록을 사용해 예외 흐름을 제어하고, Checked와 Unchecked 예외의 처리 방식을 이해합니다.",
   "content": {
     "code": "public class Main {\n    public static void main(String[] args) {\n        try {\n            System.out.println(\"1. Start\");\n            String s = null;\n            System.out.println(s.length()); // NPE occurs here\n            System.out.println(\"2. Skipped\");\n            \n        } catch (NullPointerException e) {\n            System.out.println(\"3. Caught NPE!\");\n            \n        } catch (Exception e) {\n            System.out.println(\"4. General Handler\");\n        }\n        System.out.println(\"5. Continues\");\n    }\n}",
     "steps": [
       {
-        "title": "main 方法执行",
-        "explanation": "**`public static void main(String[] args)`**\n\n这是程序的入口点。\n异常处理的实践从这里开始。",
+        "title": "main 메서드 실행",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다.\n여기서부터 예외 처리 실습이 시작됩니다.",
         "visualizationType": "javaMemory",
         "code": "public static void main(String[] args) {",
         "javaMemoryState": {
@@ -17,8 +17,8 @@
         }
       },
       {
-        "title": "进入 try 块",
-        "explanation": "**执行流程：**\n1. `try` 块开始。\n2. 执行第一行，输出 \"1. Start\"。\n\n**说明：**\n**拆弹小组进场！** `try` 块声明了一个安全区域："这里可能会有炸弹（异常）爆炸，请保持监视。"",
+        "title": "try 블록 진입",
+        "explanation": "**실행 순서:**\n1. `try` 블록이 시작됩니다.\n2. 첫 라인을 실행하여 \"1. Start\"를 출력합니다.\n\n**해설:**\n**폭탄 처리반 입장!** `try` 블록은 \"여기서 혹시 폭탄(예외)이 터질지도 모르니 감시해\"라고 선언하는 안전 구역입니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"1. Start\");",
         "javaMemoryState": {
@@ -36,8 +36,8 @@
         }
       },
       {
-        "title": "变量声明（Null）",
-        "explanation": "**执行流程：**\n1. 在栈上创建 String 变量 `s`。\n2. 赋值为 `null`。\n\n**说明：**\n`s` 是一个空壳，什么都没指向。\n就像手里拿着遥控器，但没有连接任何电视。",
+        "title": "변수 선언 (Null)",
+        "explanation": "**실행 순서:**\n1. String 변수 `s`가 스택에 생성됩니다.\n2. 값으로 `null`이 할당됩니다.\n\n**해설:**\n`s`는 아무것도 가리키지 않는 텅 빈 껍데기 상태입니다.\n리모컨을 쥐고 있는데, 연결된 TV가 없는 상황이죠.",
         "visualizationType": "javaMemory",
         "code": "String s = null;",
         "javaMemoryState": {
@@ -59,8 +59,8 @@
         }
       },
       {
-        "title": "异常抛出（Throw）",
-        "explanation": "**执行流程：**\n1. 尝试调用 `s.length()` 时，由于没有引用对象，**抛出** `NullPointerException`。\n2. 异常对象（`0x999`）在堆上创建。\n3. JVM 立即停止当前执行流程，开始搜索 `catch` 块。\n\n**说明：**\n**轰！** 炸弹爆炸了。\n下一行 \"2. Skipped\" 无法执行，控制权被弹出。\n这就是 **Stack Unwinding（栈回退）** 的开始。",
+        "title": "예외 발생 (Throw)",
+        "explanation": "**실행 순서:**\n1. `s.length()` 호출 시도 중, 참조 대상이 없어 `NullPointerException`이 **발생(Throw)**합니다.\n2. 예외 객체(`0x999`)가 Heap에 생성됩니다.\n3. JVM은 즉시 현재 실행 흐름을 멈추고 `catch` 블록을 찾아 떠납니다.\n\n**해설:**\n**펑!** 폭탄이 터졌습니다.\n다음 줄인 \"2. Skipped\"는 실행되지 못하고, 제어권이 튕겨져 나갑니다.\n이걸 **Stack Unwinding(스택 풀기)**의 시작이라고 합니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(s.length()); // NPE occurs here",
         "javaMemoryState": {
@@ -86,12 +86,12 @@
               "new": true
             }
           ],
-          "error": "NullPointerException 已抛出！"
+          "error": "NullPointerException 발생!"
         }
       },
       {
-        "title": "异常捕获（Catch）",
-        "explanation": "**执行流程：**\n1. 找到了与抛出的 `NullPointerException` 精确匹配的 `catch` 块。\n2. 异常对象（`0x999`）传递给参数 `e`。\n\n**说明：**\n**漂亮接住！** 找到了合适的拆弹专家（处理器）。\n在这里安全地处理异常。",
+        "title": "예외 포획 (Catch)",
+        "explanation": "**실행 순서:**\n1. 던져진 `NullPointerException`과 정확히 일치하는 `catch` 블록을 발견했습니다.\n2. 예외 객체(`0x999`)가 매개변수 `e`에 전달됩니다.\n\n**해설:**\n**나이스 캐치!** 적절한 폭탄 처리 전문가(Handler)를 만났습니다.\n여기서 예외를 안전하게 처리합니다.",
         "visualizationType": "javaMemory",
         "code": "} catch (NullPointerException e) {",
         "javaMemoryState": {
@@ -127,8 +127,8 @@
         }
       },
       {
-        "title": "异常处理与流程恢复",
-        "explanation": "**执行流程：**\n1. 执行 `catch` 块内部的代码。\n2. 输出 \"3. Caught NPE!\"。\n3. 退出 `catch` 块，恢复正常流程。\n\n**说明：**\n由于异常已被处理，程序不会终止。\n如果没有 `catch`，程序将会异常终止（崩溃）。",
+        "title": "예외 처리 및 흐름 복구",
+        "explanation": "**실행 순서:**\n1. `catch` 블록 내부 코드가 실행됩니다.\n2. \"3. Caught NPE!\"가 출력됩니다.\n3. `catch` 블록을 빠져나가며 정상 흐름으로 복귀합니다.\n\n**해설:**\n예외가 처리되었으므로 프로그램은 죽지 않습니다.\n만약 `catch`가 없었다면 프로그램은 비정상 종료(Crash)되었을 것입니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"3. Caught NPE!\");",
         "javaMemoryState": {
@@ -152,8 +152,8 @@
         }
       },
       {
-        "title": "程序继续执行",
-        "explanation": "**执行流程：**\n1. 完全退出 `try-catch` 块。\n2. 继续执行剩余代码。\n\n**说明：**\n这正是我们进行异常处理的原因。\n**弹性恢复（Resilience）！** 即使某个部分出了问题，整个系统也能继续运行。",
+        "title": "프로그램 계속 실행",
+        "explanation": "**실행 순서:**\n1. `try-catch` 구문을 완전히 빠져나옵니다.\n2. 남은 코드를 계속 실행합니다.\n\n**해설:**\n이것이 바로 예외 처리를 하는 이유입니다.\n**회복 탄력성(Resilience)!** 한 부분에서 문제가 생겨도, 전체 시스템은 멈추지 않고 계속 돌아가게 만드는 것이죠.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"5. Continues\");",
         "javaMemoryState": {
@@ -168,20 +168,20 @@
   "quiz": {
     "question": "为什么 catch 块的顺序很重要？",
     "options": [
-      "为了代码可读性。",
-      "如果不先捕获子异常（具体的），父异常（通用的）会拦截一切。",
-      "为了 JVM 的性能优化。",
-      "必须按字母顺序排列才能编译。"
+      "因为代码的可读性",
+      "如果您不首先（具体地）捕获子异常，则父异常（通常）将拦截它。",
+      "优化 JVM 性能",
+      "因为要编译，所以必须按字母顺序排序。"
     ],
     "correctIndex": 1,
-    "explanation": "由于多态性，父类型（`Exception`）可以捕获所有子异常。\n因此必须先编写具体异常（`NullPointerException`）的处理，才能避免"不可达代码"错误并按预期处理。"
+    "explanation": "多态性允许父类型（“​​Exception”）捕获所有子异常。\n因此，您必须首先编写特定的异常（`NullPointerException`）处理以防止“无法访问代码”错误并按预期进行处理。"
   },
   "misconceptions": [
     {
-      "wrong": "异常发生时程序一定会终止。",
-      "correct": "不是。\n用 `catch` 块适当处理后，程序不会终止，会继续执行。",
-      "why": "异常处理是防止"异常终止"并实现"优雅恢复"的机制。"
+      "wrong": "예외가 발생하면 무조건 프로그램이 종료된다.",
+      "correct": "아닙니다.\n`catch` 블록으로 적절히 처리하면 프로그램은 종료되지 않고 계속 실행됩니다.",
+      "why": "예외 처리는 프로그램의 '비정상 종료'를 막고 '우아한 회복'을 돕는 메커니즘입니다."
     }
   ],
-  "keyTakeaway": "使用 try-catch 可以在异常发生时防止程序中断。应考虑继承关系，从具体异常开始捕获。"
+  "keyTakeaway": "try-catch를 사용하면 예외 발생 시 프로그램 중단을 막을 수 있으며, 상속 관계를 고려해 구체적인 예외부터 catch 해야 합니다."
 }

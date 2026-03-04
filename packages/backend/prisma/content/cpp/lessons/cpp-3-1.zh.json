@@ -1,0 +1,67 @@
+{
+  "lessonId": "cpp-3-1",
+  "title": "矢量基础知识",
+  "concept": "向量是一个动态数组，其大小会自动调整。",
+  "content": {
+    "code": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> nums = {10, 20, 30};\n    nums.push_back(40);\n\n    for (int i = 0; i < nums.size(); i++) {\n        cout << nums[i] << \" \";\n    }\n    cout << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "创建向量",
+        "explanation": "`vector<int> nums = {10, 20, 30}` 创建一个包含 3 个整数的动态数组。\n\n在内部，在堆上分配连续的内存并复制初始化列表的值。",
+        "visualizationType": "cMemory",
+        "code": "vector<int> nums = {10, 20, 30};",
+        "stack": [
+          {
+            "name": "nums",
+            "value": "[10, 20, 30]",
+            "type": "vector<int>",
+            "address": "0x4000"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "使用push_back添加",
+        "explanation": "`push_back(40)` 将一个新元素添加到数组末尾。\n\n如果容量足够，则立即添加。如果容量不足，则分配更大的内存并复制现有数据。",
+        "visualizationType": "cMemory",
+        "code": "nums.push_back(40);",
+        "stack": [
+          {
+            "name": "nums",
+            "value": "[10, 20, 30, 40]",
+            "type": "vector<int>",
+            "address": "0x4000",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "电路输出",
+        "explanation": "可以像使用“nums[i]”的数组一样进行索引访问。 `.size()` 返回当前元素的数量。",
+        "visualizationType": "terminal",
+        "code": "cout << nums[i] << \" \";",
+        "stdout": "10 20 30 40"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "向量的描述有什么问题？",
+    "options": [
+      "尺寸自动调整",
+      "内部使用连续内存",
+      "Push_back 总是 O(n)",
+      "通过索引可以实现 O(1) 访问。"
+    ],
+    "correctIndex": 2,
+    "explanation": "push_back通常是O(1)，并且仅当超出容量时才会发生重新分配(O(n))。这称为摊销 O(1)。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "向量就像一个链表",
+      "correct": "向量是连续的内存数组，是与链表完全不同的数据结构。",
+      "why": "连续内存可实现高缓存效率和 O(1) 索引访问。"
+    }
+  ],
+  "keyTakeaway": "向量是 C 数组的便捷替代方案，可自动处理大小管理和内存释放。"
+}

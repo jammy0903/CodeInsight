@@ -1,13 +1,13 @@
 {
   "lessonId": "java-7-2",
-  "title": "类型擦除（Type Erasure）的秘密",
+  "title": "타입 소거 (Type Erasure)의 비밀",
   "concept": "Core concept for Type Erasure",
   "content": {
     "code": "import java.util.ArrayList;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<String> list = new ArrayList<>();\n        list.add(\"Hello\");\n        \n        // 1. Compile-time Check\n        // list.add(123); // Error\n        \n        // 2. Runtime Reality (Type Erasure)\n        // Inside JVM, it is just ArrayList (raw type)\n        String s = list.get(0); \n        // Compiler inserts: (String) list.get(0)\n        \n        System.out.println(s);\n        \n        // Proof: getClass() is same for all generic types\n        ArrayList<Integer> intList = new ArrayList<>();\n        boolean sameClass = list.getClass() == intList.getClass();\n        System.out.println(\"Same Class? \" + sameClass);\n    }\n}",
     "steps": [
       {
-        "title": "包导入",
-        "explanation": "**`import java.util.ArrayList;`**\n\n导入可变大小数组 `ArrayList` 类。",
+        "title": "패키지 임포트",
+        "explanation": "**`import java.util.ArrayList;`**\n\n가변 크기 배열인 `ArrayList`를 사용하기 위해 도구를 가져옵니다.",
         "visualizationType": "javaMemory",
         "code": "import java.util.ArrayList;",
         "javaMemoryState": {
@@ -17,14 +17,14 @@
         }
       },
       {
-        "title": "main 方法开始",
-        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。\n在这里我们将见证泛型的"类型擦除"现象。",
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 시작점입니다.\n여기서 제네릭의 '타입 소거' 현상을 목격하게 됩니다.",
         "visualizationType": "javaMemory",
         "code": "public class Main {"
       },
       {
-        "title": "创建泛型列表",
-        "explanation": "**执行流程：**\n1. 在堆中创建 `ArrayList<String>` 对象。\n2. `list` 变量引用该对象。\n\n**编译时 vs 运行时：**\n代码中明确写了 `ArrayList<String>`，但编译完成后，JVM 只把它当作普通的 `ArrayList`（类型擦除）。\n不过编译器会严格监督"这里只能放 String！"",
+        "title": "제네릭 리스트 생성",
+        "explanation": "**실행 순서:**\n1. `ArrayList<String>` 객체를 힙에 생성합니다.\n2. `list` 변수가 이를 참조합니다.\n\n**컴파일 타임 vs 런타임:**\n코드에서는 `ArrayList<String>`이라고 명시했지만, 컴파일이 끝나면 JVM은 이걸 그냥 `ArrayList`로 취급합니다(Type Erasure).\n하지만 컴파일러가 \"여긴 String만 넣어!\"라고 철저히 감시해주죠.",
         "visualizationType": "javaMemory",
         "code": "ArrayList<String> list = new ArrayList<>();",
         "javaMemoryState": {
@@ -52,8 +52,8 @@
         }
       },
       {
-        "title": "添加元素",
-        "explanation": "**执行流程：**\n1. 调用 `list.add(\"Hello\")`。\n2. \"Hello\" 被存储到列表内部。\n\n**隐藏的类型转换：**\n实际上是以 `Object` 类型存储的，但因为我们声明了 `String`，所以可以安全地存入。",
+        "title": "요소 추가",
+        "explanation": "**실행 순서:**\n1. `list.add(\"Hello\")`를 호출합니다.\n2. 리스트 내부에 \"Hello\"가 저장됩니다.\n\n**보이지 않는 형변환:**\n실제로는 `Object` 타입으로 저장되지만, 우리가 `String`이라고 선언했으니 안전하게 들어갑니다.",
         "visualizationType": "javaMemory",
         "code": "list.add(\"Hello\");",
         "javaMemoryState": {
@@ -68,8 +68,8 @@
         }
       },
       {
-        "title": "取出值（类型擦除）",
-        "explanation": "**执行流程：**\n1. 通过 `list.get(0)` 取出值。\n2. 编译器悄悄插入的 `(String)` 类型转换代码被执行。\n3. \"Hello\" 被存储到变量 `s` 中。\n\n**魔法时刻：**\n源代码中没有，但编译器将其转换为 `String s = (String) list.get(0);`。\n这就是泛型背后的秘密！",
+        "title": "값 꺼내기 (Type Erasure)",
+        "explanation": "**실행 순서:**\n1. `list.get(0)`으로 값을 꺼냅니다.\n2. 컴파일러가 몰래 넣어준 `(String)` 캐스팅 코드가 실행됩니다.\n3. `s` 변수에 \"Hello\"가 저장됩니다.\n\n**마법의 순간:**\n소스 코드엔 없지만 컴파일러가 `String s = (String) list.get(0);` 처럼 바꿔줍니다.\n이게 바로 제네릭의 비밀입니다!",
         "visualizationType": "javaMemory",
         "code": "String s = list.get(0);",
         "javaMemoryState": {
@@ -102,8 +102,8 @@
         }
       },
       {
-        "title": "输出",
-        "explanation": "**执行流程：**\n1. 输出 `s` 的值。\n\n**结果：**\n显示 \"Hello\"。",
+        "title": "출력",
+        "explanation": "**실행 순서:**\n1. `s`의 값을 출력합니다.\n\n**결과:**\n\"Hello\"가 출력됩니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(s);",
         "javaMemoryState": {
@@ -113,8 +113,8 @@
         }
       },
       {
-        "title": "创建 Integer 列表",
-        "explanation": "**执行流程：**\n1. 这次在堆中创建 `ArrayList<Integer>`（`0x200`）。\n2. `intList` 变量引用该对象。\n\n**看起来不同，但是：**\n`String` 列表和 `Integer` 列表，在代码中看起来是完全不同的类型，对吧？",
+        "title": "Integer 리스트 생성",
+        "explanation": "**실행 순서:**\n1. 이번엔 `ArrayList<Integer>`를 힙에 생성합니다(`0x200`).\n2. `intList` 변수가 이를 참조합니다.\n\n**겉보기엔 다르지만:**\n`String` 리스트와 `Integer` 리스트, 코드에선 완전 다른 타입 같죠?",
         "visualizationType": "javaMemory",
         "code": "ArrayList<Integer> intList = new ArrayList<>();",
         "javaMemoryState": {
@@ -159,8 +159,8 @@
         }
       },
       {
-        "title": "比较类信息",
-        "explanation": "**执行流程：**\n1. 调用 `list.getClass()` -> 返回 `ArrayList.class`。\n2. 调用 `intList.getClass()` -> 返回 `ArrayList.class`。\n3. 使用 `==` 比较两个类对象。\n\n**令人震惊的真相：**\n泛型类型信息（`String`、`Integer`）在运行时会被**完全擦除**。\n所以两者都只是 `ArrayList` 类，比较结果为 `true`！",
+        "title": "클래스 정보 비교",
+        "explanation": "**실행 순서:**\n1. `list.getClass()`를 호출합니다 -> `ArrayList.class` 반환.\n2. `intList.getClass()`를 호출합니다 -> `ArrayList.class` 반환.\n3. 두 클래스 객체가 같은지 비교합니다 (`==`).\n\n**충격적인 진실:**\n제네릭 타입 정보(`String`, `Integer`)는 런타임에 **완전히 지워집니다(Erased)**.\n그래서 둘 다 그냥 `ArrayList` 클래스일 뿐이며, 결과는 `true`가 됩니다!",
         "visualizationType": "javaMemory",
         "code": "boolean sameClass = list.getClass() == intList.getClass();",
         "javaMemoryState": {
@@ -216,8 +216,8 @@
         }
       },
       {
-        "title": "输出比较结果",
-        "explanation": "**执行流程：**\n1. 输出结果。\n\n**请记住：**\n泛型只是与编译器的约定，不会带到运行时。",
+        "title": "비교 결과 출력",
+        "explanation": "**실행 순서:**\n1. 결과를 출력합니다.\n\n**기억하세요:**\n제네릭은 컴파일러와의 약속일 뿐, 런타임까지 가져가는 짐이 아닙니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"Same Class? \" + sameClass);",
         "javaMemoryState": {
@@ -231,22 +231,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "由于类型擦除，在运行时不可能执行的操作是？",
+    "question": "由于类型擦除，哪些操作在运行时无法进行？",
     "options": [
       "new T()（创建泛型类型实例）",
-      "调用 list.get(0)",
-      "空值检查",
-      "调用对象方法"
+      "调用list.get(0)",
+      "空检查",
+      "对象方法调用"
     ],
     "correctIndex": 0,
-    "explanation": "在运行时，JVM 不知道 T 是什么类型（将其视为 Object），因此无法像 `new T()` 那样调用构造函数，也无法像 `new T[10]` 那样创建数组。"
+    "explanation": "因为运行时不知道 T 是什么类型（它将其视为对象），所以不可能调用像 new T() 这样的构造函数或创建像 new T[10] 这样的数组。"
   },
   "misconceptions": [
     {
-      "wrong": "使用泛型会生成多个类。",
-      "correct": "不会。\n与 C++ 模板不同，Java 泛型只生成一个类文件，内部通过擦除类型信息并添加类型转换来实现。",
-      "why": "这是为了防止代码膨胀（Code Bloat）。"
+      "wrong": "제네릭을 쓰면 클래스가 여러 개 생성된다.",
+      "correct": "아닙니다.\nC++ 템플릿과 달리 Java 제네릭은 단 하나의 클래스 파일만 생성되며, 내부적으로 타입 정보를 지우고 캐스팅을 추가하는 방식입니다.",
+      "why": "코드 팽창(Code Bloat)을 방지하기 위함입니다."
     }
   ],
-  "keyTakeaway": "泛型是"编译时"的安全机制——理解运行时类型信息会被擦除（Erasure）这一点，有助于在使用反射或方法重载时避免混淆。"
+  "keyTakeaway": "제네릭은 '컴파일 타임'의 안전장치이며, 런타임에는 타입 정보가 소거(Erasure)된다는 점을 이해해야 리플렉션이나 오버로딩 시 혼란을 피할 수 있습니다."
 }

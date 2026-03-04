@@ -1,13 +1,13 @@
 {
   "lessonId": "c-3-2",
   "title": "Pointer Arithmetic",
-  "concept": "Adding to a pointer moves to the 'next slot', not just +1 in address!",
+  "concept": "Pointer addition moves to the 'next space' (not incrementing by 1!)",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int arr[3] = {10, 20, 30};\n    int *p = arr;\n\n    printf(\"*p     = %d\\n\", *p);\n    printf(\"*(p+1) = %d\\n\", *(p+1));\n    printf(\"*(p+2) = %d\\n\", *(p+2));\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h Header",
-        "explanation": "Header for using `printf`.\n\nThe key lesson here is that adding 1 to a pointer advances the address by `sizeof(type)`, not just 1.",
+        "title": "Include stdio.h header",
+        "explanation": "Header for using `printf`.\n\nThe key point of this lesson is that when you add 1 to a pointer, the address moves by `sizeof(type)`, not 1.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Defining the main Function",
-        "explanation": "The main frame is created and the array `arr` and pointer `p` are prepared.\n\nThe pointer `p` will point to array elements sequentially to read their values.",
+        "title": "main function definition",
+        "explanation": "The main frame is created and the array `arr` and pointer `p` are prepared.\n\nThe pointer `p` points to the array elements in order and reads their values.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Array Declaration",
-        "explanation": "Array `arr` stores 10, 20, 30 in contiguous memory.\n\nThanks to this contiguity, pointer arithmetic can accurately locate the next element.",
+        "title": "array declaration",
+        "explanation": "Array `arr` stores 10, 20, 30 in contiguous memory.\n\nThis continuity allows pointer addition to find the exact location of the next element.",
         "visualizationType": "cMemory",
         "code": "int arr[3] = {10, 20, 30};",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "Initializing the Pointer to the Array Start",
-        "explanation": "In `int *p = arr;`, `arr` decays to `&arr[0]` and is stored in `p`.\n\nSo `p` becomes a pointer pointing to the first element.",
+        "title": "Initialize the pointer to the start of the array",
+        "explanation": "In `int *p = arr;`, `arr` decays to `&arr[0]` and is stored in `p`.\n\nThat is, `p` becomes the starting pointer pointing to the first element.",
         "visualizationType": "cMemory",
         "code": "int *p = arr;",
         "stack": [
@@ -64,29 +64,29 @@
         ]
       },
       {
-        "title": "Pointer Dereferencing",
-        "explanation": "`*p` reads the value of the element `p` currently points to.\n\nAt the start, it points to the first element, so the result is the value of `arr[0]`.",
+        "title": "Pointer dereference",
+        "explanation": "`*p` reads the value of the element currently pointed to by `p`.\n\nAt startup it points to the first element, so the result is the value `arr[0]`.",
         "visualizationType": "cMemory",
         "code": "printf(\"*p     = %d\\n\", *p);",
         "stdout": "*p     = 10"
       },
       {
-        "title": "Pointer Arithmetic 1: p + 1",
-        "explanation": "`p + 1` moves to the next element's address. The actual offset is `sizeof(int)` bytes.\n\nSo `*(p+1)` equals the value of the second element.",
+        "title": "Pointer arithmetic 1: p + 1",
+        "explanation": "`p + 1` moves to the next element address. The actual amount of movement is `sizeof(int)`.\n\nSo `*(p+1)` is equal to the value of the second element.",
         "visualizationType": "cMemory",
         "code": "printf(\"*(p+1) = %d\\n\", *(p+1));",
         "stdout": "*p     = 10\n*(p+1) = 20"
       },
       {
-        "title": "Pointer Arithmetic 2: p + 2",
-        "explanation": "By the same principle, `*(p+2)` reads the third element.\n\nTo summarize: `*(p+n)` behaves identically to `arr[n]`.",
+        "title": "Pointer arithmetic 2: p + 2",
+        "explanation": "In the same way, `*(p+2)` reads the third element.\n\nTo summarize, `*(p+n)` works the same as `arr[n]`.",
         "visualizationType": "cMemory",
         "code": "printf(\"*(p+2) = %d\\n\", *(p+2));",
         "stdout": "*p     = 10\n*(p+1) = 20\n*(p+2) = 30"
       },
       {
-        "title": "Program Termination",
-        "explanation": "`return 0;` ends the program.\n\nThe key formula: `p+n` translates to `p + n*sizeof(type)` in actual addresses.",
+        "title": "Program exit",
+        "explanation": "Exit with `return 0;`.\n\nThe key formula is `p+n -> p + n*sizeof(type)`.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -95,7 +95,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "If int *p = 1000; what is the value of p + 2? (int is 4 bytes)",
+    "question": "int *p = 1000; When , what is the value of p + 2? (int is 4 bytes)",
     "options": [
       "1002",
       "1004",
@@ -103,14 +103,14 @@
       "2000"
     ],
     "correctIndex": 2,
-    "explanation": "Pointer arithmetic formula: `address + (n * sizeof(type))`.\nSo 1000 + (2 * 4) = 1008."
+    "explanation": "Pointer addition formula: `address + (n * sizeof(type))`.\nSo 1000 + (2 * 4) = 1008."
   },
   "misconceptions": [
     {
-      "wrong": "Writing *p+1 instead of *(p+1) is the same",
-      "correct": "They have completely different meanings!",
-      "why": "`*p + 1` means (*p's value) + 1, i.e., adding 1 to the value, while `*(p+1)` reads the value at the next address.\nParentheses are critical."
+      "wrong": "Instead of *(p+1), you can write *p+1",
+      "correct": "It means something completely different!",
+      "why": "`*p + 1` means (*p value) + 1, that is, adding 1 to the value, and `*(p+1)` reads the value of the next address.\nParentheses are life."
     }
   ],
-  "keyTakeaway": "Adding 1 to a pointer advances the memory address by `sizeof(type)`. (jump to the next slot)"
+  "keyTakeaway": "If you add 1 to the pointer, the memory address increases by `sizeof(type)`. (Jump to the next space)"
 }

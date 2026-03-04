@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>C Memory Viewer Coverage Gap Report</title>
+<style>
+  @page { size: A4; margin: 14mm; }
+  body { font-family: "Noto Sans CJK KR", "Noto Sans KR", "Malgun Gothic", Arial, sans-serif; color:#111; }
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: "D2Coding", "Noto Sans Mono CJK KR", "Consolas", monospace;
+    font-size: 10.5px;
+    line-height: 1.45;
+  }
+</style>
+</head>
+<body>
+<pre># C Memory Viewer Coverage Gap Report
+
+Updated: 2026-03-04
+
+## Scope
+- 대상: `packages/backend/prisma/content/c/curriculum.json` 기준 C 레슨 59개
+- 기준 뷰어: `packages/frontend/src/features/visualizers/c/CReferenceView.tsx`
+- 기준 변환기: `packages/frontend/src/features/visualizers/c/adapters/CTransformer.ts`
+
+## Coverage Verdict
+- 결론: C 레슨 개념을 100% 메모리 뷰로 커버하지 못함.
+- 원인: 현재 뷰어가 `stack/heap/data/pointer/stdout` 중심이며, 컴파일 타임/스트림 채널/버퍼 상태/파일 리소스 상태를 모델링하지 않음.
+
+## Not Covered (or Partially Covered) Concepts
+
+| Gap ID | 개념 | 상태 | 관련 레슨 |
+|---|---|---|---|
+| G1 | 전처리기/매크로/조건부 컴파일(`#include`, `#define`, `#ifdef`, `##`) | 미커버(핵심 모델 부재) | `c-9-1`, `c-9-2`, `c-9-3`, `c-9-4` |
+| G2 | 표준 스트림 채널 분리(`stdin/stdout/stderr`) | 부분 커버(`stdout` 출력 위주) | `c-10-1` |
+| G3 | 버퍼링 내부 상태(라인/풀 버퍼, flush 타이밍) | 부분 커버(개념 설명만, 버퍼 상태 미시각화) | `c-10-3` |
+| G4 | 파일 리소스 상태(`fopen` 모드, 파일 커서, FILE 내부 상태) | 부분 커버(`FILE*` 값만 표면 표시) | `c-10-2`, `c-10-4` |
+
+## How They Are Currently Explained
+
+### G1. 전처리기/매크로/조건부 컴파일
+
+현재 레슨은 개념 설명을 텍스트로 매우 자세히 제공하지만, 메모리 뷰는 빈 stack/heap 또는 일반 실행 단계만 표시한다.
+
+| 레슨 | 현재 설명 방식(요약) | 근거 스텝 |
+|---|---|---|
+| `c-9-1` Preprocessor Phases | 전처리기가 컴파일 전에 텍스트 치환/삽입을 수행한다고 설명 | `전처리기 지시문: #include`, `전처리기 지시문: #define`, `매크로 치환 후 실행 (문자열/숫자)` |
+| `c-9-2` Macro Pitfalls | 괄호 누락/부작용(`n++`) 같은 매크로 함정을 치환 결과 중심으로 설명 | `잘못된 매크로 정의`, `안전한 매크로 정의`, `함정 1`, `함정 2` |
+| `c-9-3` Conditional Compilation | `#ifdef`는 정의 여부, `#if`는 값 비교라고 설명 | `조건부 컴파일 1: #ifdef`, `조건부 컴파일 2: #if` |
+| `c-9-4` Token Pasting | `##`로 식별자/함수 이름을 생성하는 전처리 단계 설명 | `매크로 정의 1`, `매크로 정의 2`, `전처리기 실행: 변수 생성/함수 생성` |
+
+### G2. 표준 스트림 채널 분리(`stdin/stdout/stderr`)
+
+현재 레슨은 스트림 개념을 텍스트로 설명하고 출력 문자열을 누적 표시한다. 하지만 뷰어에는 `stdout`/`stderr` 별도 패널, 리다이렉션 경로, 채널별 버퍼 상태가 없다.
+
+| 레슨 | 현재 설명 방식(요약) | 근거 스텝 |
+|---|---|---|
+| `c-10-1` Standard Streams | `stdin/stdout/stderr`가 OS가 여는 기본 채널이라고 설명, `fprintf(stdout/ stderr, ...)` 비교 | `main 함수 시작`, `표준 출력(stdout)에 쓰기`, `표준 에러(stderr)에 쓰기`, `입력 시뮬레이션` |
+
+### G3. 버퍼링 내부 상태/flush 타이밍
+
+현재 레슨은 `\n` 자동 flush, `fflush(stdout)` 강제 flush를 문장으로 설명한다. 하지만 버퍼 큐(쌓임/배출) 상태의 시각적 모델이 없다.
+
+| 레슨 | 현재 설명 방식(요약) | 근거 스텝 |
+|---|---|---|
+| `c-10-3` Buffered I/O | 출력이 버퍼에 쌓였다가 flush되거나 개행에서 자동 배출된다고 설명 | `데이터를 버퍼에 저장`, `버퍼 강제 비우기 (Flush)`, `개행 문자가 있는 출력` |
+
+### G4. 파일 리소스 상태(`fopen` 모드/커서/FILE 내부 상태)
+
+현재 레슨은 파일 모드(`w/a/r`)와 바이너리 입출력(`fwrite/fread`)을 서술형으로 가르친다. 메모리뷰에는 포인터 값과 일부 스택 변수만 보이고 파일 커서/모드/버퍼/핸들 상태는 보이지 않는다.
+
+| 레슨 | 현재 설명 방식(요약) | 근거 스텝 |
+|---|---|---|
+| `c-10-2` File Modes | `w/a/r` 차이, truncate/append/read 흐름을 설명 | `쓰기 모드로 파일 열기`, `추가 모드로 파일 열기`, `읽기 모드로 파일 열기` |
+| `c-10-4` Binary Input/Output | 구조체 바이트 덤프/복원(`fwrite/fread`)과 이식성 이슈 설명 | `메모리 내용을 파일에 쓰기`, `파일 내용을 메모리에 읽기` |
+
+## Why This Is Outside Current Viewer Model
+
+`CReferenceView`/`CTransformer`는 `stack/heap/data` 변수와 `pointsTo` 화살표를 핵심 모델로 사용한다.
+
+- 스택/힙 중심 렌더링: `CReferenceView.tsx`
+- step 입력 필드 처리: `stack`, `heap`, `data`, `stdout` (`CTransformer.ts`)
+
+따라서 전처리기 단계, 스트림 채널 분리, 버퍼 내부 큐, 파일 핸들 상태 같은 비-메모리 모델 정보는 현재 구조상 직접 표현되지 않는다.
+
+## Source Files Checked
+
+- `packages/backend/prisma/content/c/curriculum.json`
+- `packages/backend/prisma/content/c/lessons/c-9-1.json`
+- `packages/backend/prisma/content/c/lessons/c-9-2.json`
+- `packages/backend/prisma/content/c/lessons/c-9-3.json`
+- `packages/backend/prisma/content/c/lessons/c-9-4.json`
+- `packages/backend/prisma/content/c/lessons/c-10-1.json`
+- `packages/backend/prisma/content/c/lessons/c-10-2.json`
+- `packages/backend/prisma/content/c/lessons/c-10-3.json`
+- `packages/backend/prisma/content/c/lessons/c-10-4.json`
+- `packages/frontend/src/features/visualizers/c/CReferenceView.tsx`
+- `packages/frontend/src/features/visualizers/c/adapters/CTransformer.ts`
+
+</pre>
+</body>
+</html>

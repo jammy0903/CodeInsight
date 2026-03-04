@@ -1,13 +1,13 @@
 {
   "lessonId": "c-13-1",
-  "title": "Comparing Integer Types",
-  "concept": "C provides integer types of various sizes, each with different memory sizes and representable ranges.",
+  "title": "Integer data type comparison",
+  "concept": "C provides integer data types of various sizes, each with different memory size and expression range.",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    char c = 'A';\n    short s = 32000;\n    int i = 2000000000;\n    long long l = 9000000000LL;\n\n    printf(\"char: %c (%d), size: %zu\\n\", c, c, sizeof(c));\n    printf(\"short: %d, size: %zu\\n\", s, sizeof(s));\n    printf(\"int: %d, size: %zu\\n\", i, sizeof(i));\n    printf(\"long long: %lld, size: %zu\\n\", l, sizeof(l));\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
-        "explanation": "We include the standard I/O header with **`#include <stdio.h>`** to use `printf` and print `sizeof` results.\n\nIn this lesson, we compare C's **integer types**.",
+        "title": "Include stdio.h header",
+        "explanation": "Include standard input/output headers with **`#include <stdio.h>`** to output `printf` and `sizeof` results.\n\nIn this lesson, we compare **Integer Types** in C.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting main function",
-        "explanation": "**`int main()`** -- The entry point of the program.\n\nIn this lesson, we declare `char`, `short`, `int`, and `long long` and compare their sizes and ranges.",
+        "title": "Start main function",
+        "explanation": "**`int main()`** --- The starting point of the program.\n\nIn this lesson, we declare `char`, `short`, `int`, and `long long` and compare their sizes and ranges.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Declaring char variable - the smallest integer type",
-        "explanation": "**`char c = 'A';`** -- `char` is **1 byte (8 bits)**, the smallest integer type in C. The name comes from \"character\", but what is stored in memory is a **number**.",
+        "title": "Declare char variable - smallest integer type",
+        "explanation": "**`char c = 'A';`** --- `char` is **1 byte (8 bits)**, the smallest integer type in C. The name comes from \"character\", but what is stored in memory is a **number**.",
         "visualizationType": "cMemory",
         "code": "char c = 'A';",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "Declaring short variable - 2-byte integer",
-        "explanation": "**`short s = 32000;`** -- `short` is **2 bytes (16 bits)** with a range of **-32,768 to 32,767**. `32000` falls within this range so it is safely stored, but putting in `32768` or more would cause **overflow**, potentially resulting in an unexpected negative number.",
+        "title": "Short variable declaration - 2-byte integer",
+        "explanation": "**`short s = 32000;`** --- `short` is **2 bytes (16 bits)**, representation range **-32,768~32,767**. `32000` is safely stored because it is within this range, but if you put more than `32768`, **overflow** may occur and result in an unexpected negative number.",
         "visualizationType": "cMemory",
         "code": "short s = 32000;",
         "stack": [
@@ -63,8 +63,8 @@
         ]
       },
       {
-        "title": "Declaring int variable - the most commonly used integer type",
-        "explanation": "**`int i = 2000000000;`** -- `int` is **4 bytes (32 bits)** with a range of approximately **-2.1 billion to +2.1 billion**, making it the **most commonly used** integer type in C. It is the most efficient size for the CPU to process at once, and provides a sufficient range for most calculations.",
+        "title": "int variable declaration - most frequently used integer type",
+        "explanation": "**`int i = 2000000000;`** --- `int` is the **most used** integer type in C, with **4 bytes (32 bits)**, ranging from approximately **-2.1 billion to +2.1 billion**. This is the most efficient size for the CPU to process at once, and provides sufficient scope for most calculations.",
         "visualizationType": "cMemory",
         "code": "int i = 2000000000;",
         "stack": [
@@ -89,8 +89,8 @@
         ]
       },
       {
-        "title": "Declaring long long variable - large integers",
-        "explanation": "**`long long l = 9000000000LL;`** -- 9 billion exceeds the `int` range, so a larger integer type is needed. The `LL` suffix explicitly marks it as a long long literal.",
+        "title": "long long variable declaration - large integer",
+        "explanation": "**`long long l = 9000000000LL;`** --- 9 billion is beyond the range of `int`, so a large integer type is needed. The `LL` suffix specifies a long long literal.",
         "visualizationType": "cMemory",
         "code": "long long l = 9000000000LL;",
         "stack": [
@@ -121,36 +121,36 @@
         ]
       },
       {
-        "title": "Printing char - the duality of character and integer",
-        "explanation": "**`printf(\"char: %c (%d), size: %zu\\n\", c, c, sizeof(c));`** -- Printing the same variable `c` with `%c` gives the character `A`, with `%d` gives the number `65`, and `sizeof(c)` gives `1`. What is stored in memory is always the number 65; the **interpretation** differs depending on the format specifier.",
+        "title": "char output - duality of characters and integers",
+        "explanation": "**`printf(\"char: %c (%d), size: %zu\\n\", c, c, sizeof(c));`** --- If the same variable `c` is output as `%c`, the letter `A`, if `%d` is output, the number `65`, `sizeof(c)` becomes `1`. What is stored in memory is always the number 65, **",
         "visualizationType": "cMemory",
         "code": "printf(\"char: %c (%d), size: %zu\\n\", c, c, sizeof(c));",
         "stdout": "char: A (65), size: 1"
       },
       {
-        "title": "Printing short",
-        "explanation": "**`printf(\"short: %d, size: %zu\\n\", s, sizeof(s));`** -- Prints the value `32000` and size `2` (bytes) of the `short` variable `s`. Using twice the space of char (1 byte, -128 to 127), its representable range expands to **-32,768 to 32,767**.",
+        "title": "short output",
+        "explanation": "**`printf(\"short: %d, size: %zu\\n\", s, sizeof(s));`** --- Prints the value `32000` and size `2` (bytes) of the `short` variable `s`. The expression range is **-32,768 to 32,767 using a space twice as large as char (1 byte, -128 to 127).",
         "visualizationType": "cMemory",
         "code": "printf(\"short: %d, size: %zu\\n\", s, sizeof(s));",
         "stdout": "char: A (65), size: 1\nshort: 32000, size: 2"
       },
       {
-        "title": "Printing int",
-        "explanation": "**`printf(\"int: %d, size: %zu\\n\", i, sizeof(i));`** -- Prints the value `2000000000` and size `4` of the `int` variable `i`. With 4 bytes (32 bits), it can represent about 4.2 billion distinct values, split evenly between negative and positive for signed types.",
+        "title": "int output",
+        "explanation": "**`printf(\"int: %d, size: %zu\\n\", i, sizeof(i));`** --- Prints the value `2000000000` and size `4` of the `int` variable `i`. Approximately 4.2 billion different values ​​can be expressed with 4 bytes (32 bits), and in the case of signed, half are assigned to negative/positive numbers.",
         "visualizationType": "cMemory",
         "code": "printf(\"int: %d, size: %zu\\n\", i, sizeof(i));",
         "stdout": "char: A (65), size: 1\nshort: 32000, size: 2\nint: 2000000000, size: 4"
       },
       {
-        "title": "Printing long long and program termination",
-        "explanation": "**`printf(\"long long: %lld, size: %zu\\n\", l, sizeof(l));`** -- Prints the value and size of `l`. `%lld` is the format specifier for long long, and `%zu` is the dedicated format for the `size_t` type returned by `sizeof`.",
+        "title": "Long long output and program termination",
+        "explanation": "**`printf(\"long long: %lld, size: %zu\\n\", l, sizeof(l));`** --- Prints the value and size of `l`. `%lld` is a long long, and `%zu` is a format specific to `size_t` returned by `sizeof`.",
         "visualizationType": "cMemory",
         "code": "printf(\"long long: %lld, size: %zu\\n\", l, sizeof(l));",
         "stdout": "char: A (65), size: 1\nshort: 32000, size: 2\nint: 2000000000, size: 4\nlong long: 9000000000, size: 8"
       },
       {
-        "title": "Program termination",
-        "explanation": "**`return 0;`** -- The program terminates normally, and as main's stack frame is deallocated, all variables c, s, i, l disappear from memory.\n\nKey takeaway of this lesson: C's integer types have different sizes, and larger ones can store a wider range of values.",
+        "title": "Program exit",
+        "explanation": "**`return 0;`** --- The program terminates normally, and all variables c, s, i, and l disappear from memory along with the main stack frame being released.\n\nKey point of this lesson: Integer types in C have different sizes, with larger ones storing larger ranges.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -159,22 +159,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What happens when you store `9000000000` in an `int` variable?",
+    "question": "What happens if you store `9000000000` in an `int` variable?",
     "options": [
-      "Exactly 9000000000 is stored",
-      "Overflow occurs and an unexpected value is stored",
+      "Exactly 9000000000 are stored.",
+      "An overflow occurs and an unexpected value is stored.",
       "A compilation error occurs",
-      "It automatically converts to long type"
+      "Automatically converted to long type"
     ],
     "correctIndex": 1,
-    "explanation": "`int` is 4 bytes and can store a maximum of about 2.1 billion.\n9 billion exceeds this range, so overflow occurs and bits are truncated, resulting in a completely different value being stored."
+    "explanation": "`int` can only store up to approximately 2.1 billion in 4 bytes.\nSince 9 billion exceeds this range, an overflow occurs, bits are cut off, and incorrect values ​​are stored."
   },
   "misconceptions": [
     {
-      "wrong": "char is a type that can only store characters.",
-      "correct": "char is a 1-byte integer type, and it is merely interpreted as a character through the ASCII table.",
-      "why": "What is stored in memory is always a number, and only the output format changes depending on the printf format specifier (%c or %d)."
+      "wrong": "char is a type that can store only characters.",
+      "correct": "char is a 1-byte integer type and is simply interpreted as a character through the ASCII code table.",
+      "why": "What is stored in memory is always a number, only the output format depends on printf's %c or %d format specifier."
     }
   ],
-  "keyTakeaway": "C's integer types are char (1B), short (2B), int (4B), long long (typically 8B), and their representable range varies with size."
+  "keyTakeaway": "C's integer data types are char(1B), short(2B), int(4B), and long long (usually 8B), and the range that can be expressed varies depending on the size."
 }

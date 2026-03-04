@@ -12,6 +12,12 @@ interface JSStepResponse {
   line?: number;
   code?: string;
   explanation?: string;
+  visualizationType?: string;
+  eventLoopState?: unknown;
+  scopeState?: unknown;
+  thisState?: unknown;
+  prototypeState?: unknown;
+  promiseState?: unknown;
   stack?: unknown[];
   heap?: unknown[];
   stdout?: string;
@@ -20,54 +26,37 @@ interface JSStepResponse {
 
 interface JSSimulateResponse {
   success: boolean;
+  engine?: 'legacy' | 'inspector';
   steps?: JSStepResponse[];
-  error?: string;
-}
-
-type LessonMemoryBlock = NonNullable<LessonStep['stack']>[number];
-
-function toMemoryBlock(raw: unknown): LessonMemoryBlock {
-  if (!raw || typeof raw !== 'object') {
-    return { value: String(raw ?? '') };
-  }
-
-  const block = raw as Record<string, unknown>;
-  const rawValue = block.value ?? block.content ?? block.data ?? '';
-
-  const result: LessonMemoryBlock = {
-    value: typeof rawValue === 'string' ? rawValue : String(rawValue),
+  normalizedSteps?: unknown[];
+  meta?: {
+    durationMs: number;
+    stepCount: number;
+    truncated?: boolean;
   };
-
-  if (typeof block.name === 'string') result.name = block.name;
-  if (typeof block.address === 'string') result.address = block.address;
-  if (typeof block.type === 'string') result.type = block.type;
-  if (typeof block.size === 'number' || typeof block.size === 'string') result.size = block.size;
-  const pointsTo = block.points_to;
-  if (typeof pointsTo === 'string') result.points_to = pointsTo;
-  if (typeof block.explanation === 'string') result.explanation = block.explanation;
-  if (typeof block.highlight === 'boolean') result.highlight = block.highlight;
-  if (typeof block.isArray === 'boolean') result.isArray = block.isArray;
-  if (typeof block.isExpanded === 'boolean') result.isExpanded = block.isExpanded;
-  if (Array.isArray(block.bytes)) {
-    result.bytes = block.bytes.filter((byte): byte is number => typeof byte === 'number');
-  }
-  if (
-    block.segment === 'stack' ||
-    block.segment === 'heap' ||
-    block.segment === 'data' ||
-    block.segment === 'text'
-  ) {
-    result.segment = block.segment;
-  }
-  if (Array.isArray(block.arrayElements)) {
-    result.arrayElements = block.arrayElements.map(toMemoryBlock);
-  }
-
-  return result;
+  error?: string | {
+    code?: string;
+    message: string;
+    details?: Record<string, unknown>;
+  };
 }
 
-function toMemoryBlocks(raw: unknown): LessonMemoryBlock[] {
-  return Array.isArray(raw) ? raw.map(toMemoryBlock) : [];
+function parseErrorPayload(error: JSSimulateResponse['error']): {
+  message: string;
+  code?: string;
+  details?: Record<string, unknown>;
+} {
+  if (!error) {
+    return { message: 'JavaScript simulation failed' };
+  }
+  if (typeof error === 'string') {
+    return { message: error };
+  }
+  return {
+    message: error.message || 'JavaScript simulation failed',
+    code: error.code,
+    details: error.details,
+  };
 }
 
 export async function simulateJavaScript(request: SimulateRequest): Promise<SimulateResult> {
@@ -84,30 +73,43 @@ export async function simulateJavaScript(request: SimulateRequest): Promise<Simu
       console.log('[simulateJavaScript] API response:', JSON.stringify(data, null, 2));
     }
 
-    if (data.success && data.steps) {
+    if (data.success && Array.isArray(data.steps)) {
       const lessonSteps: LessonStep[] = data.steps.map((step) => ({
         line: step.line ?? 0,
         code: step.code ?? '',
         explanation: step.explanation ?? '',
-        stack: toMemoryBlocks(step.stack),
-        heap: toMemoryBlocks(step.heap),
+        // Keep simulator's original JS snapshot shape.
+        // JSTransformer/useLessonVisualization expect frame objects (methodName + variables),
+        // and flattening to MemoryBlock loses variable information.
+        stack: (Array.isArray(step.stack) ? step.stack : []) as LessonStep['stack'],
+        heap: (Array.isArray(step.heap) ? step.heap : []) as LessonStep['heap'],
         stdout: step.stdout,
-        visualizationType: 'javascript',
+        visualizationType: step.visualizationType ?? 'javascript',
         visualizationState: step.visualizationState,
+        eventLoopState: step.eventLoopState,
+        scopeState: step.scopeState,
+        thisState: step.thisState,
+        prototypeState: step.prototypeState,
+        promiseState: step.promiseState,
       }));
 
       return { success: true, steps: lessonSteps };
     }
 
-    const errorMessage = data.error || 'JavaScript simulation failed';
+    const errorInfo = parseErrorPayload(data.error);
+    const errorMessage = errorInfo.message;
     handleSimulatorError('JavaScript', errorMessage);
-    return { success: false, steps: [], error: errorMessage };
+    return { success: false, steps: [], error: errorMessage, errorInfo };
   } catch (error) {
-    const errorMessage = error instanceof AxiosError
-      ? error.response?.data?.error || error.message
-      : error instanceof Error ? error.message : 'Unknown error';
+    const responseData = error instanceof AxiosError
+      ? (error.response?.data as JSSimulateResponse | undefined)
+      : undefined;
+    const parsed = responseData
+      ? parseErrorPayload(responseData.error)
+      : { message: error instanceof Error ? error.message : 'Unknown error' };
+    const errorMessage = parsed.message;
 
     handleSimulatorError('JavaScript', errorMessage);
-    return { success: false, steps: [], error: errorMessage };
+    return { success: false, steps: [], error: errorMessage, errorInfo: parsed };
   }
 }

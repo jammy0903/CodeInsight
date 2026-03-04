@@ -5,7 +5,10 @@
  */
 
 import { FastifyPluginAsync } from 'fastify';
-import { JavaScriptSimulationService } from './javascript-simulation.service';
+import {
+  JavaScriptSimulationService,
+  SimulationErrorCode,
+} from './javascript-simulation.service';
 
 export const javascriptSimulatorRoutes: FastifyPluginAsync = async (fastify) => {
   /**
@@ -14,17 +17,41 @@ export const javascriptSimulatorRoutes: FastifyPluginAsync = async (fastify) => 
    */
   fastify.post('/simulate', async (request, reply) => {
     const { code } = request.body as { code?: string };
+    const abortController = new AbortController();
 
     if (!code || typeof code !== 'string') {
       return reply.status(400).send({
         success: false,
-        error: 'code is required',
+        engine: 'legacy',
+        steps: [],
+        meta: {
+          durationMs: 0,
+          stepCount: 0,
+        },
+        error: {
+          code: SimulationErrorCode.INVALID_REQUEST,
+          message: 'code is required',
+        },
       });
     }
 
+    const onAbort = () => abortController.abort();
+    const onClose = () => {
+      if (request.raw.aborted) {
+        onAbort();
+      }
+    };
+    request.raw.once('aborted', onAbort);
+    request.raw.once('close', onClose);
+
     const service = new JavaScriptSimulationService();
-    const result = await service.simulate(code);
-    return result;
+    try {
+      const result = await service.simulate(code, { signal: abortController.signal });
+      return result;
+    } finally {
+      request.raw.removeListener('aborted', onAbort);
+      request.raw.removeListener('close', onClose);
+    }
   });
 };
 

@@ -1,0 +1,121 @@
+{
+  "lessonId": "cpp-6-1",
+  "title": "左值和右值",
+  "concept": "左值是寻址表达式，右值是临时的、未寻址的表达式。",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x = 10;\n    int y = x + 5;\n\n    int& lref = x;\n    // int& bad = x + 5;  // 오류! rvalue에 lvalue 참조 불가\n    int&& rref = x + 5;\n\n    cout << lref << \" \" << rref << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "左值：带有名称的值",
+        "explanation": "`x` 是一个**左值**，因为它有一个内存地址。您可以通过“&x”获取地址。\n\n另一方面，“x + 5”是一个**右值**，仅作为运算结果短暂存在。",
+        "visualizationType": "cMemory",
+        "code": "int x = 10;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "y",
+            "value": "15",
+            "type": "int",
+            "address": "0x1004"
+          }
+        ],
+        "heap": []
+      },
+      {
+        "title": "左值参考",
+        "explanation": "`int& lref = x` 是对左值的引用。这是您已经学过的常见参考资料。",
+        "visualizationType": "cMemory",
+        "code": "int& lref = x;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "y",
+            "value": "15",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "lref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "x",
+            "isReference": true
+          }
+        ]
+      },
+      {
+        "title": "右值引用 (&&)",
+        "explanation": "`int&& rref = x + 5` 是右值引用。\n\n临时值 (15) 的生命周期由“rref”延长。这是运动语义的基础。",
+        "visualizationType": "cMemory",
+        "code": "int&& rref = x + 5;",
+        "stack": [
+          {
+            "name": "x",
+            "value": "10",
+            "type": "int",
+            "address": "0x1000"
+          },
+          {
+            "name": "y",
+            "value": "15",
+            "type": "int",
+            "address": "0x1004"
+          },
+          {
+            "name": "lref",
+            "value": "10",
+            "type": "int&",
+            "address": "0x1000",
+            "points_to": "x",
+            "isReference": true
+          },
+          {
+            "name": "rref",
+            "value": "15",
+            "type": "int&&",
+            "address": "0x1008",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "title": "检查结果",
+        "explanation": "`lref` 打印 `x` (10)，`rref` 打印临时值 (15)。",
+        "visualizationType": "terminal",
+        "code": "cout << lref << \" \" << rref << endl;",
+        "stdout": "10 15"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "以下哪一个是右值？",
+    "options": [
+      "变量 x",
+      "数组元素 arr[0]",
+      "表达式 x + 1",
+      "参考参考"
+    ],
+    "correctIndex": 2,
+    "explanation": "x + 1 是操作产生的临时值，并且是右值，因为它没有名称且无法获取其地址。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "右值引用就像常规引用一样",
+      "correct": "右值引用 (&&) 仅绑定临时值，从而启用移动语义。",
+      "why": "普通引用 (&) 仅绑定到命名对象（左值）。"
+    }
+  ],
+  "keyTakeaway": "左值是“可寻址的”，右值是“临时的”。右值引用 (&&) 是移动语义的核心。"
+}

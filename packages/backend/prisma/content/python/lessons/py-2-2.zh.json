@@ -1,13 +1,13 @@
 {
   "lessonId": "py-2-2",
-  "title": "While 循环：满足条件就继续",
-  "concept": "条件为 True 时持续重复（注意无限循环）",
+  "title": "While 반복문: 조건이 맞을 때까지",
+  "concept": "조건이 True인 동안 계속 반복한다 (무한 루프 주의)",
   "content": {
     "code": "count = 3\n\nwhile count > 0:\n    print(f\"Count: {count}\")\n    count = count - 1\n\nprint(\"Liftoff!\")",
     "steps": [
       {
-        "title": "初始化计数器变量",
-        "explanation": "**`count = 3`** -- 将计数器变量初始化为整数 `3`。\n\nPython 从上到下按顺序执行。将标签 `count` 贴到整数对象 `3` 上。\n\n**为什么是这个顺序？** 因为循环（第 3 行）中要使用 `count`，必须先创建变量。如果 `while` 条件引用不存在的变量会引发 `NameError`。\n\n**类比：** 就像在火箭发射倒计时开始前将计数器设为 3。\"3, 2, 1, 发射！\" 我们将重复直到计数器到达 0。\n\n**Python 内部原理：** `3` 在小整数缓存范围内，复用预缓存的对象。while 循环中每次减少 `count` 时，都会有新的整数对象（2、1、0）绑定到 `count`。因为整数是不可变的，`3` 本身不会变成 `2`。\n\n**注意：** while 循环中计数器变量的初始值决定了循环迭代次数。如果 `count = 0` 开始，条件从一开始就为 False，循环一次都不会执行。",
+        "title": "카운터 변수 초기화",
+        "explanation": "**`count = 3`** -- 카운터 변수를 정수 `3`으로 초기화합니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. `count` 이름표를 정수 객체 `3`에 붙입니다.",
         "visualizationType": "pythonMemory",
         "code": "count = 3",
         "pythonMemoryState": {
@@ -29,12 +29,12 @@
         }
       },
       {
-        "title": "检查循环条件（第 1 次）",
-        "explanation": "**`while count > 0:`** -- 检查 while 循环条件：`count` 是否大于 0？\n\n计算条件表达式 `count > 0`。当前 `count` 是 `3`，所以 `3 > 0` 为 **True**。条件为真，执行缩进块（第 4-5 行）。\n\n**while 和 if 的区别：** `if` 在条件为 True 时**只执行一次**。`while` 在条件为 True 的**期间持续重复**。块执行完后会再次检查条件，如果仍为 True 就再次执行。\n\n**类比：** 如果 `if` 是"门开着就通过一次"，`while` 就是"门开着就一直来回走"。\n\n**Python 内部原理：** while 循环在字节码中实现为循环结构：条件计算 -> 条件跳转 -> 块执行 -> 无条件跳转（回到条件）。\n\n**注意：** 如果条件永远为 True，就会进入**无限循环**！`while True: print(\"无限\")` 程序永远不会结束。必须用 `Ctrl+C` 强制终止。",
+        "title": "반복문 조건 확인 (1번째)",
+        "explanation": "**`while count > 0:`** -- while 루프의 조건을 검사합니다: `count`가 0보다 큰가?\n\n조건식 `count > 0`을 평가합니다. 현재 `count`는 `3`이므로, `3 > 0`은 **True**입니다. 조건이 참이므로 들여쓰기된 블록(line 4-5)을 실행합니다.",
         "visualizationType": "pythonMemory",
         "code": "while count > 0:",
         "pythonMemoryState": {
-          "note": "条件 True -> 第 4 行将执行",
+          "note": "조건 True → line 4 실행 예정",
           "names": [
             {
               "name": "count",
@@ -52,8 +52,8 @@
         }
       },
       {
-        "title": "输出当前计数（第 1 次）",
-        "explanation": "**`print(f\"Count: {count}\")`** -- 使用 f-string 输出当前计数值。\n\nwhile 条件为 True，所以缩进块内的代码按顺序执行。f-string 中 `{count}` 被替换为当前值 `3`，输出 `\"Count: 3\"`。\n\n**类比：** 火箭发射倒计时中喊出当前数字的步骤。\"Count: 3!\" 之后将计数器减 1，再次检查。\n\n**Python 内部原理：** f-string 内部调用 `count.__format__('')` 获取字符串 `\"3\"`，与 `\"Count: \"` 字面量组合创建新字符串对象 `\"Count: 3\"`。此字符串传递给 `print()` 输出到 `sys.stdout`。\n\n**注意：** 块内的代码通过**缩进**（通常 4 个空格）来界定。缩进不一致会引发 `IndentationError`。",
+        "title": "현재 카운트 출력 (1번째)",
+        "explanation": "**`print(f\"Count: {count}\")`** -- f-string으로 현재 카운트 값을 출력합니다.\n\nwhile 조건이 True였으므로 들여쓰기된 블록 안의 코드가 순서대로 실행됩니다. f-string에서 `{count}`가 현재 값 `3`으로 치환되어 `\"Count: 3\"`이 출력됩니다.\n\n**비유:** 로켓 발사 카운트다운에서 현재 숫자를 외치는 단계입니다. \"Count: 3!\" 이후 카운터를 1 줄이고, 다시 확인할 것입니다.\n\n**Python 내부 동작:** f-string은 내부적으로 `count.__format__('')`을 호출하여 `\"3\"`이라는 문자열을 얻고, `\"Count: \"` 리터럴과 합쳐 새 문자열 객체 `\"Count: 3\"`을 생성합니다. 이 문자열이 `print()`에 전달되어 `sys.stdout`에 출력됩니다.\n\n**주의:** 블록 안의 코드는 **들여쓰기**(보통 스페이스 4칸)로 구분됩니다. 들여쓰기가 일치하지 않으면 `IndentationError`가 발생합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Count: {count}\")",
         "pythonMemoryState": {
@@ -78,12 +78,12 @@
         }
       },
       {
-        "title": "计数器递减（第 1 次）",
-        "explanation": "**`count = count - 1`** -- 将 `count` 的当前值减 1 后重新赋值给 `count`。\n\n右侧 `count - 1` 先计算。当前 `count` 是 `3`，所以 `3 - 1 = 2`。创建新的整数对象 `2`，`count` 标签从旧的 `3` 移到新的 `2`。\n\n**为什么这行是必须的？** 没有它，`count` 永远是 `3`，`3 > 0` 永远为 `True`，导致**无限循环**。while 循环中**必须**有能让条件最终变为 False 的代码。\n\n**类比：** 倒计时中将数字减 1 的动作。喊完 \"3!\" 后把计数器拨到 2。没有这行就会永远重复 \"3! 3! 3!...\"。\n\n**Python 内部原理：** `count - 1` 内部调用 `count.__sub__(1)`。整数是不可变的，`3` 对象本身不会变成 `2`——而是创建**全新的整数对象 `2`**。只有 `count` 标签移到新对象。（也可以写成 `count -= 1`。）\n\n**注意：** Python **没有** `count--` 或 `--count` 自增自减运算符！必须使用 `count = count - 1` 或 `count -= 1`。",
+        "title": "카운터 값 감소 (1번째)",
+        "explanation": "**`count = count - 1`** -- `count`의 현재 값에서 1을 뺀 결과를 다시 `count`에 할당합니다.\n\n오른쪽의 `count - 1`이 먼저 계산됩니다. 현재 `count`는 `3`이므로 `3 - 1 = 2`입니다. 이 결과인 정수 `2` 객체가 새로 만들어지고, `count` 이름표가 기존의 `3`에서 새로운 `2`로 옮겨 붙습니다.",
         "visualizationType": "pythonMemory",
         "code": "count = count - 1",
         "pythonMemoryState": {
-          "note": "count 已改变 -> 回到第 3 行",
+          "note": "count 변경됨 → line 3으로 돌아감",
           "names": [
             {
               "name": "count",
@@ -103,12 +103,12 @@
         }
       },
       {
-        "title": "检查循环条件（第 2 次）",
-        "explanation": "**`while count > 0:`** -- 从块末尾自动返回条件语句。第 2 次条件检查。\n\n当前 `count` 是 `2`（刚从 3 减了 1）。`2 > 0` 为 **True**，所以再次执行块。\n\n**类比：** 倒计时的第二轮。\"计数器还大于 0 吗？\" -> \"是 2，还是正数！\" -> 再次执行块。",
+        "title": "반복문 조건 확인 (2번째)",
+        "explanation": "**`while count > 0:`** -- 블록 끝에서 자동으로 조건문으로 돌아왔습니다. 2번째 조건 검사입니다.\n\n**왜 다시 line 3으로 돌아왔는가?** while 루프의 핵심 메커니즘입니다. 블록(line 4-5)의 마지막 줄이 실행되면, 파이썬은 **자동으로 조건문(line 3)으로 점프**합니다. 프로그래머가 \"line 3으로 가라\"고 쓸 필요가 없습니다.",
         "visualizationType": "pythonMemory",
         "code": "while count > 0:",
         "pythonMemoryState": {
-          "note": "第 2 次迭代开始",
+          "note": "2번째 반복 시작",
           "names": [
             {
               "name": "count",
@@ -126,8 +126,8 @@
         }
       },
       {
-        "title": "输出当前计数（第 2 次）",
-        "explanation": "**`print(f\"Count: {count}\")`** -- 第 2 次迭代中输出当前计数值。\n\nf-string 中 `{count}` 被替换为当前值 `2`，输出 `\"Count: 2\"`。\n\n**模式识别：** 看目前的输出，值在递减：`Count: 3` -> `Count: 2`。while 循环中计数器递减，直到条件变为 False，这个模式会重复。",
+        "title": "현재 카운트 출력 (2번째)",
+        "explanation": "**`print(f\"Count: {count}\")`** -- 2번째 반복에서 현재 카운트 값을 출력합니다.\n\nwhile 조건이 True였으므로 블록 안의 코드가 다시 실행됩니다. f-string에서 `{count}`가 현재 값 `2`로 치환되어 `\"Count: 2\"`가 출력됩니다.\n\n**반복 패턴 인식:** 지금까지의 출력을 보면 `Count: 3` -> `Count: 2`로 값이 줄어들고 있습니다. while 루프에서 카운터가 감소하면서 조건이 False가 될 때까지 이 패턴이 반복됩니다.\n\n**비유:** 카운트다운의 두 번째 외침입니다. \"Count: 2!\" 이 다음에 카운터를 또 1 줄일 것입니다.\n\n**실행 순서**: f-string 평가({count}→2) → print 실행 → line 5로",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Count: {count}\")",
         "pythonMemoryState": {
@@ -152,12 +152,12 @@
         }
       },
       {
-        "title": "计数器递减（第 2 次）",
-        "explanation": "**`count = count - 1`** -- 将 `count` 再减 1，变为 `1`。\n\n从 `count` 当前值 `2` 减 1，创建新整数对象 `1`，`count` 标签移过去。\n\n**模式识别：** 每次迭代都重复相同操作：输出 -> 递减 -> 检查条件。这是 while 循环的典型模式。计数器 `3 -> 2 -> 1` 在递减，下一次 `1 -> 0` 时条件将变为 False。",
+        "title": "카운터 값 감소 (2번째)",
+        "explanation": "**`count = count - 1`** -- `count`를 다시 1 감소시켜 `1`로 만듭니다.\n\n`count`의 현재 값 `2`에서 1을 빼서 새로운 정수 객체 `1`을 만들고, `count` 이름표를 그쪽으로 옮깁니다.\n\n**패턴 인식:** 매 반복마다 같은 동작이 반복됩니다: 출력 -> 감소 -> 조건 확인. 이것이 while 루프의 전형적인 패턴입니다. 카운터가 `3 → 2 → 1`로 줄어들고 있으며, 다음 반복에서 `1 → 0`이 되면 조건이 False가 됩니다.\n\n**Python 내부 동작:** 다시 `count.__sub__(1)`이 호출되어 새 정수 객체 `1`이 생성됩니다. 이전의 `2` 객체는 더 이상 참조되지 않습니다. `1`도 Small Integer Cache 범위(-5~256) 안이므로 미리 캐시된 객체가 재사용됩니다.\n\n**실행 순서**: count - 1 계산(=1) → count 이름표 이동 → 블록 끝 → line 3으로 점프",
         "visualizationType": "pythonMemory",
         "code": "count = count - 1",
         "pythonMemoryState": {
-          "note": "count 已改变 -> 回到第 3 行",
+          "note": "count 변경됨 → line 3으로 돌아감",
           "names": [
             {
               "name": "count",
@@ -177,12 +177,12 @@
         }
       },
       {
-        "title": "检查循环条件（第 3 次）",
-        "explanation": "**`while count > 0:`** -- 第 3 次条件检查。\n\n当前 `count` 是 `1`。`1 > 0` 为 **True**，再执行一次块。\n\n**类比：** 倒计时的最后一轮。\"还大于 0 吗？\" -> \"是 1，还是正数！\" -> 最后一次执行块。这次迭代结束后 count 将变为 0，下次检查条件时循环终止。",
+        "title": "반복문 조건 확인 (3번째)",
+        "explanation": "**`while count > 0:`** -- 3번째 조건 검사입니다. 블록 끝에서 다시 조건문으로 자동 점프했습니다.\n\n현재 `count`는 `1`입니다. `1 > 0`은 **True**이므로 블록을 한 번 더 실행합니다.\n\n**비유:** 카운트다운의 마지막 라운드입니다. \"아직 0보다 큰가?\" -> \"1이니까 아직 양수!\" -> 마지막으로 블록을 실행합니다. 이번 반복이 끝나면 count가 0이 되어 다음 조건 검사에서 루프가 종료될 것입니다.\n\n**전체 반복 추적:** 1번째(count=3, True) -> 2번째(count=2, True) -> **3번째(count=1, True)** -> 다음에 count=0이 되면 False로 종료\n\n**실행 순서**: line 5 끝 → line 3 점프 → 조건 확인(1 > 0 = True) → line 4 실행",
         "visualizationType": "pythonMemory",
         "code": "while count > 0:",
         "pythonMemoryState": {
-          "note": "第 3 次迭代开始",
+          "note": "3번째 반복 시작",
           "names": [
             {
               "name": "count",
@@ -200,8 +200,8 @@
         }
       },
       {
-        "title": "输出当前计数（第 3 次）",
-        "explanation": "**`print(f\"Count: {count}\")`** -- 第 3 次（最后）迭代中输出当前计数值。\n\nf-string 中 `{count}` 被替换为当前值 `1`，输出 `\"Count: 1\"`。这是循环的最后一次输出。\n\n**完整输出追踪：** `Count: 3` -> `Count: 2` -> **`Count: 1`** -> 接下来将输出 `Liftoff!`。",
+        "title": "현재 카운트 출력 (3번째)",
+        "explanation": "**`print(f\"Count: {count}\")`** -- 3번째(마지막) 반복에서 현재 카운트 값을 출력합니다.\n\nf-string에서 `{count}`가 현재 값 `1`로 치환되어 `\"Count: 1\"`이 출력됩니다. 이것이 마지막 출력입니다.\n\n**전체 출력 추적:** `Count: 3` -> `Count: 2` -> **`Count: 1`** -> 다음에 `Liftoff!`가 출력될 것입니다.\n\n**비유:** 카운트다운의 마지막 외침입니다. \"Count: 1!\" 다음에 카운터가 0이 되면 \"Liftoff!\"(발사!)가 외쳐집니다.\n\n**실행 순서**: f-string 평가({count}→1) → print 실행 → line 5로",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Count: {count}\")",
         "pythonMemoryState": {
@@ -226,12 +226,12 @@
         }
       },
       {
-        "title": "计数器递减（第 3 次）",
-        "explanation": "**`count = count - 1`** -- 将 `count` 减 1，终于变为 `0`。\n\n从 `count` 当前值 `1` 减 1，创建新整数对象 `0`，`count` 标签移过去。\n\n**关键时刻！** `count` 终于变成 `0`。下次条件检查 `0 > 0` 将为 **False**，while 循环终止。这就是**终止条件**。\n\n**计数器变化全程：** 3 -> 2 -> 1 -> **0**（终止点）",
+        "title": "카운터 값 감소 (3번째)",
+        "explanation": "**`count = count - 1`** -- `count`를 1 감소시켜 드디어 `0`으로 만듭니다.\n\n`count`의 현재 값 `1`에서 1을 빼서 새로운 정수 객체 `0`을 만들고, `count` 이름표를 그쪽으로 옮깁니다.",
         "visualizationType": "pythonMemory",
         "code": "count = count - 1",
         "pythonMemoryState": {
-          "note": "count 变为 0 -> 下次条件检查为 False",
+          "note": "count가 0이 됨 → 다음 조건 확인에서 False",
           "names": [
             {
               "name": "count",
@@ -251,12 +251,12 @@
         }
       },
       {
-        "title": "检查循环条件（终止）",
-        "explanation": "**`while count > 0:`** -- 第 4 次条件检查。这次条件为 **False**，循环终止。\n\n当前 `count` 是 `0`。`0 > 0` 为 **False**，Python 跳过 while 块，退出到循环外的第一行代码（第 7 行）。\n\n**为什么终止了？** 因为每次迭代都将 `count` 减 1。从 `3 -> 2 -> 1 -> 0`，条件终于变为 False。这是 while 循环的正常终止机制。\n\n**完整条件检查记录：** 第 1 次（3>0=True） -> 第 2 次（2>0=True） -> 第 3 次（1>0=True） -> **第 4 次（0>0=False，终止）**",
+        "title": "반복문 조건 확인 (종료)",
+        "explanation": "**`while count > 0:`** -- 4번째 조건 검사입니다. 이번에는 조건이 **False**가 되어 루프가 종료됩니다.\n\n블록 끝에서 다시 조건문으로 점프했습니다. 현재 `count`는 `0`입니다. `0 > 0`은 **False**이므로, 파이썬은 while 블록을 건너뛰고 루프 밖의 첫 번째 코드(line 7)로 빠져나갑니다.",
         "visualizationType": "pythonMemory",
         "code": "while count > 0:",
         "pythonMemoryState": {
-          "note": "条件 False -> 循环结束 -> 跳到第 7 行",
+          "note": "조건 False → 루프 종료 → line 7로",
           "names": [
             {
               "name": "count",
@@ -274,8 +274,8 @@
         }
       },
       {
-        "title": "循环结束后执行",
-        "explanation": "**`print(\"Liftoff!\")`** -- while 循环结束后执行的循环外代码。\n\n**为什么现在才执行？** 这个 `print` 语句没有缩进，在 while 循环**外面**。循环迭代期间无法到达这一行，只有条件变为 False 退出循环后才执行。\n\n屏幕输出 `Liftoff!`，没有更多代码要执行，程序结束。\n\n**完整输出结果：** `Count: 3` -> `Count: 2` -> `Count: 1` -> **`Liftoff!`**\n\n**类比：** 倒计时（3, 2, 1）结束后火箭终于发射！倒计时（while 循环）结束了，发射（循环外代码）执行了。\n\n**缩进的重要性：** 如果这个 `print` 有缩进在 while 块**里面**，它会每次迭代都执行：`Count: 3`、`Liftoff!`、`Count: 2`、`Liftoff!`…… 一个缩进就能完全改变程序行为！",
+        "title": "반복문 종료 후 실행",
+        "explanation": "**`print(\"Liftoff!\")`** -- while 루프가 종료된 후 실행되는, 루프 밖의 코드입니다.\n\n**왜 이제야 실행되는가?** 이 `print`문은 들여쓰기가 없어서 while 루프 **밖에** 있습니다. while 루프가 반복되는 동안에는 이 줄에 도달할 수 없었고, 조건이 False가 되어 루프를 탈출한 지금에서야 실행됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(\"Liftoff!\")",
         "pythonMemoryState": {
@@ -303,22 +303,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下哪个 while 语句永远不会停止（无限循环）？",
+    "question": "在以下哪种情况下，while 语句永远不会停止（无限循环）？",
     "options": [
-      "while False: print(1)",
-      "i=5\nwhile i > 0: i -= 1",
-      "while True: print('Run')",
-      "while 1 == 0: pass"
+      "当错误时：打印（1）",
+      "我=5\n当 i > 0 时：i -= 1",
+      "while True: print('运行')",
+      "while 1 == 0: 通过"
     ],
     "correctIndex": 2,
-    "explanation": "`while True:` 如果没有终止条件会永远运行。\n必须用 `Ctrl + C` 强制终止。"
+    "explanation": "如果没有终止条件，`while True:` 将永远运行。\n您必须使用“Ctrl + C”强制退出。"
   },
   "misconceptions": [
     {
-      "wrong": "Python 有 count--",
-      "correct": "Python **没有** `++`、`--` 运算符。",
-      "why": "必须使用 `i += 1` 或 `i -= 1`。"
+      "wrong": "count-- 가 있다",
+      "correct": "파이썬에는 `++`, `--` 연산자가 없습니다.",
+      "why": "`i += 1` 또는 `i -= 1`을 써야 합니다."
     }
   ],
-  "keyTakeaway": "while 在条件为真时循环。必须改变变量值使其最终停止。"
+  "keyTakeaway": "while은 조건이 참일 때 돈다. 변수 값을 바꿔서 언젠가 멈추게 해야 한다."
 }

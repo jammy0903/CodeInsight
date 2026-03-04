@@ -1,0 +1,76 @@
+{
+  "lessonId": "cpp-4-1",
+  "title": "新建和删除",
+  "concept": "new 在堆上分配内存，delete 则释放它。",
+  "content": {
+    "code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int* p = new int(42);\n    cout << *p << endl;\n\n    delete p;\n    p = nullptr;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "在堆上分配内存",
+        "explanation": "new int(42) 在堆上分配 int 大小的空间并将其初始化为 42。\n\n返回的地址存储在指针“p”中。这是一个结构，其中堆栈上的“p”指向堆上的数据。",
+        "visualizationType": "cMemory",
+        "code": "int* p = new int(42);",
+        "stack": [
+          {
+            "name": "p",
+            "value": "0x8000",
+            "type": "int*",
+            "address": "0x1000",
+            "points_to": "*p"
+          }
+        ],
+        "heap": [
+          {
+            "name": "*p",
+            "value": "42",
+            "type": "int",
+            "address": "0x8000"
+          }
+        ]
+      },
+      {
+        "title": "使用值作为解引用",
+        "explanation": "用`*p`读取存储在堆中的值42。",
+        "visualizationType": "terminal",
+        "code": "cout << *p << endl;",
+        "stdout": "42"
+      },
+      {
+        "title": "释放并删除",
+        "explanation": "`delete p` 将堆内存返回给操作系统。\n\n**注意**：删除后，`p`仍然包含旧地址（悬空指针）。为了防止这种情况，请使用“p = nullptr”对其进行初始化。",
+        "visualizationType": "cMemory",
+        "code": "delete p;",
+        "stack": [
+          {
+            "name": "p",
+            "value": "nullptr",
+            "type": "int*",
+            "address": "0x1000",
+            "highlight": true
+          }
+        ],
+        "heap": []
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "为什么删除后指针设置为nullptr？",
+    "options": [
+      "重新分配内存",
+      "防止悬空指针",
+      "优化性能",
+      "因为编译器需要它"
+    ],
+    "correctIndex": 1,
+    "explanation": "删除后，指针变成指向已释放内存的悬空指针。将其设置为 nullptr 会导致意外访问时立即崩溃，从而使调试更容易。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "当调用delete时，指针自动变为nullptr。",
+      "correct": "delete只是释放堆内存，并不会改变指针变量的值。",
+      "why": "在C++中，指针是一个简单的地址值，因此程序员必须手动将其设置为nullptr。"
+    }
+  ],
+  "keyTakeaway": "new/delete是手动内存管理的基础，但是很容易忘记，所以智能指针更安全。"
+}

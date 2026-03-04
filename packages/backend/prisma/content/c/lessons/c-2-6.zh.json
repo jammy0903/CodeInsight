@@ -1,13 +1,13 @@
 {
   "lessonId": "c-2-6",
-  "title": "指针类型与大小",
-  "concept": "指针根据所指向的目标类型来决定数据的解释方式",
+  "title": "指针类型和大小",
+  "concept": "指针根据其指向的对象类型有不同的解释。",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int a = 10;\n    char c = 'A';\n\n    int *pi = &a;\n    char *pc = &c;\n\n    printf(\"Size of int*:  %zu\\n\", sizeof(pi));\n    printf(\"Size of char*: %zu\\n\", sizeof(pc));\n\n    printf(\"Read int*:  %d\\n\", *pi);\n    printf(\"Read char*: %c\\n\", *pc);\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 ```printf``` 的头文件。```sizeof``` 是**编译时运算符**而非函数，不需要额外的头文件 — 但输出其结果需要 ```stdio.h```。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用``printf```` 的标头。 ```sizeof``` 不是一个函数，而是一个**编译时运算符**，因此不需要单独的头文件，但需要 ```stdio.h``` 来输出结果。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "程序启动 — 栈上创建 ```main``` 的**栈帧**。其中将创建 ```a```、```c```、```pi```、```pc``` 共 4 个变量。\n\n核心问题：```int*``` 和 ```char*``` 指向的目标大小不同（4字节 vs 1字节）。那指针本身的大小是否也不同呢？",
+        "title": "启动主函数",
+        "explanation": "程序启动 - 在堆栈上创建“main”的 **堆栈帧**。这里总共创建了四个变量：````a````、````c````、````pi```` 和````pc````。\n\n关键问题：``int*```` 和````char*```` 所指向的大小不同（4 字节与 1 字节）。指针本身的大小是否不同？",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "声明变量",
-        "explanation": "`int a = 10` 和 `char c = 'A'` 准备了不同类型的值。\n\n这两者的大小和解释方式不同，作为解释指针类型差异的参考数据。",
+        "title": "变量声明",
+        "explanation": "准备不同类型的值如`int a = 10`、`char c = 'A'`。\n\n这两者具有不同的大小和解释方法，作为解释指针类型差异的参考数据。",
         "visualizationType": "cMemory",
         "code": "int a = 10;",
         "highlightOffset": [
@@ -53,8 +53,8 @@
         ]
       },
       {
-        "title": "声明指针",
-        "explanation": "`pi` 存储 `a` 的地址，`pc` 存储 `c` 的地址。\n\n两个变量都是存储地址的指针，但解引用时读取的大小和解释方式因类型（`int*`/`char*`）而不同。",
+        "title": "指针声明",
+        "explanation": "`pi` 存储 `a` 的地址，`pc` 存储 `c` 的地址。\n\n这两个变量都是包含地址的指针，但是当取消引用时，读取大小和解释方法根据类型（`int*`/`char*`）而变化。",
         "visualizationType": "cMemory",
         "code": "int *pi = &a;",
         "highlightOffset": [
@@ -92,35 +92,35 @@
       },
       {
         "title": "int 指针的大小",
-        "explanation": "`sizeof(pi)` 是指针变量本身的大小，不是它所指向的目标的大小。\n\n指针大小取决于系统架构，64位系统通常为 8 字节。",
+        "explanation": "`sizeof(pi)` 是指针变量本身的大小，而不是 `pi` 指向的大小。\n\n指针大小取决于系统架构，64 位上通常为 8 字节。",
         "visualizationType": "cMemory",
         "code": "printf(\"Size of int*:  %zu\\n\", sizeof(pi));",
         "stdout": "Size of int*:  8"
       },
       {
-        "title": "char 指针的大小",
-        "explanation": "`sizeof(pc)` 在相同环境下与 `sizeof(pi)` 相同。\n\n也就是说，指针大小由架构的地址长度决定，而非目标类型。",
+        "title": "char指针的大小",
+        "explanation": "在同一环境中，“sizeof(pc)”也相当于“sizeof(pi)”。\n\n也就是说，指针大小由体系结构的地址大小决定，而不是由目标类型决定。",
         "visualizationType": "cMemory",
         "code": "printf(\"Size of char*: %zu\\n\", sizeof(pc));",
         "stdout": "Size of int*:  8\nSize of char*: 8"
       },
       {
-        "title": "通过 int 指针读取值",
-        "explanation": "`*pi` 按照 `int*` 规则将该地址的数据作为整数读取，得到值 10。\n\n指针类型决定了解引用时数据的解释方式。",
+        "title": "使用int指针读取值",
+        "explanation": "*pi 根据 int* 规则读取地址为整数，得到值 10。\n\n指针类型决定了取消引用时数据的解释方式。",
         "visualizationType": "cMemory",
         "code": "printf(\"Read int*:  %d\\n\", *pi);",
         "stdout": "Size of int*:  8\nSize of char*: 8\nRead int*:  10"
       },
       {
-        "title": "通过 char 指针读取值",
-        "explanation": "`*pc` 按照 `char*` 规则读取字符，得到 `A`。\n\n即使是相同的地址操作，不同的指针类型会导致不同的读取单位和解释结果。",
+        "title": "使用 char 指针读取值",
+        "explanation": "`*pc` 根据 `char*` 规则读取一个字符，得到 `A`。\n\n即使对于相同的地址操作，如果指针类型不同，读取的单位和解释结果也会不同。",
         "visualizationType": "cMemory",
         "code": "printf(\"Read char*: %c\\n\", *pc);",
         "stdout": "Size of int*:  8\nSize of char*: 8\nRead int*:  10\nRead char*: A"
       },
       {
-        "title": "程序结束",
-        "explanation": "`return 0;` 终止程序，清理栈变量。\n\n总结：指针大小取决于环境，但类型决定了解引用的解释规则。",
+        "title": "程序退出",
+        "explanation": "它以“return 0;”结束，并且堆栈变量被清理。\n\n总之，指针大小取决于环境，但类型决定解引用解析规则。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
@@ -130,22 +130,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "在64位系统上，`double *p;` 的 sizeof(p) 是多少？",
+    "question": "在 64 位系统上，`double *p;` 的大小 (sizeof(p)) 是多少？",
     "options": [
-      "4 字节",
-      "8 字节",
-      "16 字节",
-      "与 double 类型大小相同（8）"
+      "4字节",
+      "8字节",
+      "16字节",
+      "与双型尺寸相同 (8)"
     ],
     "correctIndex": 1,
-    "explanation": "无论指针指向 double 还是其他类型，指针本身存储的是"地址"，在64位系统上始终为 8 字节。"
+    "explanation": "无论指针指向 double 类型还是其他类型，指针本身都是一个“地址”，因此在 64 位系统上始终为 8 个字节。"
   },
   "misconceptions": [
     {
-      "wrong": "double* 比 int* 更大",
-      "correct": "不是。\n所有指针变量的大小都相同。",
-      "why": "只是指向的目标大小不同，地址本身的长度是相同的。"
+      "wrong": "double* 大于 int*",
+      "correct": "不。\n所有指针变量都具有相同的大小。",
+      "why": "唯一的区别是所指向的房屋的大小，但地址本身的长度是相同的。"
     }
   ],
-  "keyTakeaway": "所有指针大小相同，但类型充当"读取多少字节"的地图。"
+  "keyTakeaway": "所有指针大小都相同，但类型用作确定“读取多少字节”的映射。"
 }

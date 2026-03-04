@@ -1,13 +1,13 @@
 {
   "lessonId": "c-3-2",
   "title": "指针运算",
-  "concept": "指针加法是移动到"下一格"，不是地址简单 +1！",
+  "concept": "指针加法移动到“下一个空格”（不增加 1！）",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int arr[3] = {10, 20, 30};\n    int *p = arr;\n\n    printf(\"*p     = %d\\n\", *p);\n    printf(\"*(p+1) = %d\\n\", *(p+1));\n    printf(\"*(p+2) = %d\\n\", *(p+2));\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 `printf` 的头文件。\n\n本课的核心是：指针加 1 时，地址增加的不是 1，而是 `sizeof(类型)` 个字节。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用“printf”的标头。\n\n本课的重点是，当你给指针加 1 时，地址会移动“sizeof(type)”，而不是 1。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "定义 main 函数",
-        "explanation": "创建 main 栈帧，准备数组 `arr` 和指针 `p`。\n\n指针 `p` 将按顺序指向数组元素并读取值。",
+        "title": "主函数定义",
+        "explanation": "主框架已创建，数组“arr”和指针“p”已准备好。\n\n指针“p”按顺序指向数组元素并读取它们的值。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -30,7 +30,7 @@
       },
       {
         "title": "数组声明",
-        "explanation": "数组 `arr` 在连续内存中存储 10、20、30。\n\n正是因为这种连续性，指针运算才能准确找到下一个元素的位置。",
+        "explanation": "数组“arr”在连续内存中存储 10、20、30。\n\n这种连续性允许指针相加来找到下一个元素的确切位置。",
         "visualizationType": "cMemory",
         "code": "int arr[3] = {10, 20, 30};",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "将指针初始化为数组起始位置",
-        "explanation": "在 `int *p = arr;` 中，`arr` 衰减为 `&arr[0]` 并存储到 `p` 中。\n\n也就是说 `p` 成为指向第一个元素的起始指针。",
+        "title": "初始化指向数组开头的指针",
+        "explanation": "在 `int *p = arr;` 中，`arr` 衰减为 `&arr[0]` 并存储在 `p` 中。\n\n也就是说，“p”成为指向第一个元素的起始指针。",
         "visualizationType": "cMemory",
         "code": "int *p = arr;",
         "stack": [
@@ -65,28 +65,28 @@
       },
       {
         "title": "指针解引用",
-        "explanation": "`*p` 读取 `p` 当前指向的元素的值。\n\n起始时指向第一个元素，所以结果是 `arr[0]` 的值。",
+        "explanation": "`*p` 读取 `p` 当前指向的元素的值。\n\n启动时它指向第一个元素，因此结果是值“arr[0]”。",
         "visualizationType": "cMemory",
         "code": "printf(\"*p     = %d\\n\", *p);",
         "stdout": "*p     = 10"
       },
       {
-        "title": "指针运算 1：p + 1",
-        "explanation": "`p + 1` 移动到下一个元素的地址。实际偏移量为 `sizeof(int)` 字节。\n\n因此 `*(p+1)` 等于第二个元素的值。",
+        "title": "指针运算1：p + 1",
+        "explanation": "`p + 1` 移动到下一个元素地址。实际的移动量是“sizeof(int)”。\n\n所以“*(p+1)”等于第二个元素的值。",
         "visualizationType": "cMemory",
         "code": "printf(\"*(p+1) = %d\\n\", *(p+1));",
         "stdout": "*p     = 10\n*(p+1) = 20"
       },
       {
-        "title": "指针运算 2：p + 2",
-        "explanation": "同理，`*(p+2)` 读取第三个元素。\n\n总结：`*(p+n)` 与 `arr[n]` 的行为完全相同。",
+        "title": "指针运算2：p+2",
+        "explanation": "同理，`*(p+2)`读取第三个元素。\n\n总而言之，“*(p+n)”与“arr[n]”的作用相同。",
         "visualizationType": "cMemory",
         "code": "printf(\"*(p+2) = %d\\n\", *(p+2));",
         "stdout": "*p     = 10\n*(p+1) = 20\n*(p+2) = 30"
       },
       {
-        "title": "程序结束",
-        "explanation": "`return 0;` 结束程序。\n\n核心公式：`p+n` 实际地址为 `p + n*sizeof(类型)`。",
+        "title": "程序退出",
+        "explanation": "使用“return 0;”退出。\n\n关键公式是“p+n -> p + n*sizeof(type)”。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -95,22 +95,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "如果 int *p = 1000; 那么 p + 2 的值是？（int 为 4 字节）",
+    "question": "整数*p = 1000;当 时，p + 2 的值为多少？ （int为4个字节）",
     "options": [
       "1002",
       "1004",
       "1008",
-      "2000"
+      "2000年"
     ],
     "correctIndex": 2,
-    "explanation": "指针运算公式：`地址 + (n * sizeof(类型))`。\n所以 1000 + (2 * 4) = 1008。"
+    "explanation": "指针加法公式：“address + (n * sizeof(type))”。\n所以 1000 + (2 * 4) = 1008。"
   },
   "misconceptions": [
     {
-      "wrong": "写 *p+1 和 *(p+1) 是一样的",
-      "correct": "含义完全不同！",
-      "why": "`*p + 1` 是 (*p的值) + 1，即对值加1；而 `*(p+1)` 是读取下一个地址的值。\n括号至关重要。"
+      "wrong": "您可以写 *p+1 而不是 *(p+1)",
+      "correct": "这意味着完全不同的东西！",
+      "why": "`*p + 1`表示(*p value) + 1，即值加1，`*(p+1)`读取下一个地址的值。\n括号里就是生命。"
     }
   ],
-  "keyTakeaway": "指针加 1，内存地址增加 `sizeof(类型)` 个字节。（跳到下一格）"
+  "keyTakeaway": "如果将指针加 1，则内存地址会增加“sizeof(type)”。 （跳到下一个空格）"
 }

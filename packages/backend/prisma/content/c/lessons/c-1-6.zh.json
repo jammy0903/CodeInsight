@@ -1,13 +1,13 @@
 {
   "lessonId": "c-1-6",
-  "title": "循环 (while)",
-  "concept": "while 循环在条件为真时持续重复。它非常适合迭代次数不确定的场景。",
+  "title": "循环（同时）",
+  "concept": "只要条件为真，while 语句就会重复。这适用于未预先确定重复次数的情况。",
   "content": {
-    "code": "#include <stdio.h>\n\nint main() {\n    int n = 1;\n\n    while (n <= 4) {\n        printf(\"n = %d\\n\", n);\n        n = n * 2;\n    }\n\n    printf(\"Final n = %d\\n\", n);\n\n    return 0;\n}\n",
+    "code": "#include <stdio.h>\n\nint main() {\n    int n = 1;\n\n    while (n <= 4) {\n        printf(\"n = %d\\n\", n);\n        n = n * 2;\n    }\n\n    printf(\"최종 n = %d\\n\", n);\n\n    return 0;\n}\n",
     "steps": [
       {
-        "title": "启动 main 函数",
-        "explanation": "程序开始时创建 main 栈帧。\n\n本课重点在于理解 while 循环如何通过条件检查和值更新来推进和终止。",
+        "title": "启动主函数",
+        "explanation": "主堆栈帧是在程序启动时创建的。\n\n本课的目的是通过检查 while 条件并更新值来检查重复进行和结束的结构。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -21,8 +21,8 @@
         "stdout": ""
       },
       {
-        "title": "设置初始值",
-        "explanation": "`int n = 1;` 在循环体外部为 while 循环准备变量。\n\n由于 while 需要你手动编写初始化和更新代码，明确设置初始值非常重要。",
+        "title": "初始值设定",
+        "explanation": "在循环外使用 `int n = 1;` 准备在 while 中使用的变量。\n\n虽然需要您自己编写初始化/更新，所以有一个明确的起始值很重要。",
         "code": "int n = 1;",
         "stack": [
           {
@@ -41,18 +41,18 @@
       },
       {
         "title": "while 条件检查 (n = 1)",
-        "explanation": "首先检查 `n <= 4` 是否为真，如果为真则执行循环体。\n\n由于 while 是条件驱动的循环，忘记更新条件变量很容易导致无限循环。",
+        "explanation": "首先检查“n <= 4”是否为真，如果为真，则执行主体。\n\nwhile是一个面向条件的循环，所以如果省略条件改变代码，很容易导致无限循环。",
         "code": "while (n <= 4) {"
       },
       {
-        "title": "第 1 次迭代：打印当前值",
-        "explanation": "打印 `n` 的当前值以跟踪循环的进展。\n\n在 while 循环中，这些中间输出对于调试流程非常有用。",
+        "title": "第 1 轮：打印当前值",
+        "explanation": "打印当前的“n”值以检查迭代进度。\n\n同时，这个中间输出对于调试流程很有用。",
         "code": "printf(\"n = %d\\n\", n);",
         "stdout": "n = 1"
       },
       {
-        "title": "第 1 次迭代：n 翻倍",
-        "explanation": "`n = n * 2;` 将 n 从 1 变为 2。在 while 循环中，这种更新代码是必不可少的。\n\n如果没有更新，条件将永远为真，造成无限循环。",
+        "title": "第一轮：双n",
+        "explanation": "`n = n * 2;` 将 n 从 1 更改为 2。 while 中需要此更新代码。\n\n如果没有更新，条件将保持为真，导致无限循环。",
         "code": "n = n * 2;",
         "stack": [
           {
@@ -70,8 +70,8 @@
         ]
       },
       {
-        "title": "第 2 次迭代：条件检查 (n = 2)",
-        "explanation": "更新后，`n=2`，条件仍然为真，继续下一次迭代。\n\n流程不断重复：`检查条件 -> 执行循环体 -> 更新值`。",
+        "title": "第 2 轮：条件测试 (n = 2)",
+        "explanation": "更新后，`n=2`，所以条件仍然为真，我们继续下一次迭代。\n\n流程是一遍又一遍“检查条件 -> 执行主体 -> 更新值”。",
         "code": "n = n * 2;",
         "stack": [
           {
@@ -90,8 +90,8 @@
         "stdout": "n = 1\nn = 2"
       },
       {
-        "title": "第 3 次迭代：条件检查 (n = 4)",
-        "explanation": "当 `n=4` 时，`n <= 4` 仍然为真，所以循环体再执行一次。\n\n这次更新后，n 变为 8，将在下一次检查时终止循环。",
+        "title": "第 3 轮：条件测试 (n = 4)",
+        "explanation": "即使在“n=4”中，“n <= 4”也为真，因此最后一个主体会再次执行。\n\n随后的更新使 n 变为 8，并在下一次检查时终止。",
         "code": "n = n * 2;",
         "stack": [
           {
@@ -110,19 +110,19 @@
         "stdout": "n = 1\nn = 2\nn = 4"
       },
       {
-        "title": "循环终止 (n = 8)",
-        "explanation": "当 `n=8` 时，`8 <= 4` 为假，while 循环退出。\n\n注意，循环退出时变量的值可能不是"最后执行的值"，而是"使条件不成立的值"。",
+        "title": "迭代结束 (n = 8)",
+        "explanation": "当“n=8”时，while 结束，因为“8 <= 4”为 false。\n\n退出循环时，变量值可能不是“最后执行的值”，而是“破坏条件的值”。",
         "code": "while (n <= 4) {"
       },
       {
-        "title": "打印最终的 n",
-        "explanation": "打印循环结束后 `n` 的最终值。\n\n这证实了退出值不是最后打印的值，而是条件被打破后的值。",
-        "code": "printf(\"Final n = %d\\n\", n);",
-        "stdout": "n = 1\nn = 2\nn = 4\nFinal n = 8"
+        "title": "最终n个输出",
+        "explanation": "循环结束后，输出“n”的最终值。\n\n请注意，结束值可能不是最后的输出值，而是打破条件后的值。",
+        "code": "printf(\"최종 n = %d\\n\", n);",
+        "stdout": "n = 1\nn = 2\nn = 4\n최종 n = 8"
       },
       {
         "title": "程序退出",
-        "explanation": "`return 0;` 正常终止程序。\n\n本例的核心要点是：在 while 循环中，你必须自己管理条件和更新。",
+        "explanation": "使用“return 0;”正常终止程序。\n\n这个例子的关键点是你必须管理条件并同时更新自己。",
         "code": "return 0;",
         "stack": []
       }
@@ -130,22 +130,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "while (1) { ... } 会如何执行？",
+    "question": "while (1) { ... } 是如何工作的？",
     "options": [
-      "执行一次",
-      "不执行",
-      "无限循环",
+      "运行一次",
+      "未运行",
+      "无限重复",
       "编译错误"
     ],
     "correctIndex": 2,
-    "explanation": "在 C 语言中，1 表示真，0 表示假。\n\n`while (1)` 意味着条件永远为真，所以会无限循环。\n需要使用 `break` 语句来退出。"
+    "explanation": "在C语言中，1为真，0为假。\n\n`while(1)` 无限重复，因为条件始终为真。\n您必须使用“break”语句进行转义。"
   },
   "misconceptions": [
     {
-      "wrong": "即使条件为假，while 循环也至少执行一次",
-      "correct": "如果条件一开始就为假，while 永远不会执行。",
-      "why": "保证至少执行一次的循环是 do-while。\nwhile 在进入循环体之前就会先检查条件。"
+      "wrong": "即使条件为假，while 语句也至少执行一次。",
+      "correct": "如果条件从一开始就为假，那么 while 永远不会被执行。",
+      "why": "do-while 语句保证至少执行一次。\nwhile 进入前先检查条件。"
     }
   ],
-  "keyTakeaway": "while 循环适用于"不知道何时结束"的场景——只要条件为真就一直重复！"
+  "keyTakeaway": "while 语句是“当你不知道什么时候结束时”——如果条件为真，就继续重复！"
 }

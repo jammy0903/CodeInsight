@@ -1,13 +1,13 @@
 {
   "lessonId": "java-1-7",
-  "title": "方法与参数",
-  "concept": "Java 使用值传递（pass by value）。基本类型被复制，引用类型的引用被复制。",
+  "title": "方法和参数",
+  "concept": "Java是按值传递的。基本类型是复制的，引用类型是通过引用复制的。",
   "content": {
     "code": "int a = 10;\nint b = 20;\nSystem.out.println(\"swap 전: a=\" + a + \", b=\" + b);\n\nint temp = a;\na = b;\nb = temp;\nSystem.out.println(\"swap 후: a=\" + a + \", b=\" + b);\n",
     "steps": [
       {
         "title": "变量声明",
-        "explanation": "**`int a = 10;`** / **`int b = 20;`**\n\n声明两个要交换的变量。\n\n**Java 的内存**：\n- 基本类型的值直接存储在**栈**上\n- `a = 10`、`b = 20` 存储在栈上\n",
+        "explanation": "**`int a = 10;`** / **`int b = 20;`**\n\n声明要交换的两个变量。\n\n**Java 中的内存**：\n- 基本类型直接将值存储在**堆栈**上\n- `a = 10`, `b = 20` 存储在堆栈上",
         "visualizationType": "javaMemory",
         "code": "int a = 10;",
         "javaMemoryState": {
@@ -35,8 +35,8 @@
         }
       },
       {
-        "title": "交换前输出",
-        "explanation": "**`System.out.println(\"swap 전: a=\" + a + \", b=\" + b);`**\n\n**输出**：`swap 전: a=10, b=20`\n",
+        "title": "兑换前打印",
+        "explanation": "**`System.out.println(\"交换前：a=\" + a + \", b=\" + b);`**\n\n**输出结果**：`交换前：a=10，b=20`",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"swap 전: a=\" + a + \", b=\" + b);",
         "javaMemoryState": {
@@ -61,8 +61,8 @@
         }
       },
       {
-        "title": "存储到临时变量",
-        "explanation": "**`int temp = a;`**\n\n将 a 的值（10）存储到临时变量 temp 中。\n\n**为什么需要 temp？**\n如果先执行 `a = b`，a 的原始值（10）就会丢失！\n",
+        "title": "存储在临时变量中",
+        "explanation": "**`int temp = a;`**\n\n将 a (10) 的值存储在临时变量 temp 中。\n\n**为什么需要温度？**\n如果你先运行 `a = b`，a (10) 的原始值就会消失！",
         "visualizationType": "javaMemory",
         "code": "int temp = a;",
         "javaMemoryState": {
@@ -93,7 +93,7 @@
       },
       {
         "title": "将 b 赋值给 a",
-        "explanation": "**`a = b;`**\n\na = 20（b 的值）\n\n**当前状态**：a=20, b=20, temp=10\n",
+        "explanation": "**`a = b;`**\n\na = 20（b 的值）\n\n**当前状态**：a=20，b=20，temp=10",
         "visualizationType": "javaMemory",
         "code": "a = b;",
         "javaMemoryState": {
@@ -123,8 +123,8 @@
         }
       },
       {
-        "title": "将 temp 赋值给 b",
-        "explanation": "**`b = temp;`**\n\nb = 10（存储在 temp 中的 a 的原始值）\n\n**交换完成！** a=20, b=10\n",
+        "title": "将温度分配给 b",
+        "explanation": "**`b = 温度；`**\n\nb = 10（a 的原始值存储在 temp 中）\n\n**交换完成！** a=20，b=10",
         "visualizationType": "javaMemory",
         "code": "b = temp;",
         "javaMemoryState": {
@@ -154,8 +154,8 @@
         }
       },
       {
-        "title": "交换后输出",
-        "explanation": "**`System.out.println(\"swap 후: a=\" + a + \", b=\" + b);`**\n\n**输出**：`swap 후: a=20, b=10`\n\n**注意**：在 C 语言中可以使用指针创建 swap 函数，\n但在 Java 中基本类型无法通过引用传递，因此很难通过方法实现交换。\n",
+        "title": "兑换后打印",
+        "explanation": "**`System.out.println(\"交换后：a=\" + a + \", b=\" + b);`**\n\n**输出结果**：`交换后：a=20，b=10`\n\n**注意**：在 C 中，您可以使用指针创建交换函数，但是\n在 Java 中，基本类型不能通过引用传递，因此使用方法交换它们很困难。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"swap 후: a=\" + a + \", b=\" + b);",
         "javaMemoryState": {
@@ -166,14 +166,14 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "在 Java 中将基本类型（int）传递给方法会怎样？",
+    "question": "如果将基本类型 (int) 传递给 Java 中的方法会怎样？",
     "options": [
-      "传递引用",
-      "值被复制后传递",
-      "传递地址",
-      "无法传递"
+      "参考已通过",
+      "值被复制并传递",
+      "地址已送达",
+      "无法交付"
     ],
     "correctIndex": 1,
-    "explanation": "Java 始终使用值传递（pass by value）。\n\n- 基本类型：值本身被复制（方法中的修改不影响原始值）\n- 引用类型：引用（地址）被复制（指向同一个对象）\n"
+    "explanation": "Java 总是按值传递。\n\n- 基本类型：复制值本身（即使在方法中改变，原始值也保持不变）\n- 引用类型：引用（地址）被复制（指向同一个对象）"
   }
 }

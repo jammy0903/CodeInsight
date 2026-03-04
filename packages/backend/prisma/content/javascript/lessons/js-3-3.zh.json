@@ -1,13 +1,13 @@
 {
   "lessonId": "js-3-3",
-  "title": "箭头函数中的 this",
-  "concept": "箭头函数没有自己的 this——它使用外层作用域的 this",
+  "title": "화살표 함수의 this",
+  "concept": "화살표 함수는 자신만의 this를 갖지 않고, 상위 스코프의 this를 사용한다",
   "content": {
     "code": "const user = {\n  name: 'Alice',\n  greetRegular() {\n    setTimeout(function() {\n      console.log(`Regular: ${this.name}`);\n    }, 100);\n  },\n  greetArrow() {\n    setTimeout(() => {\n      console.log(`Arrow: ${this.name}`);\n    }, 100);\n  }\n};\n\nuser.greetRegular();\nuser.greetArrow();",
     "steps": [
       {
-        "title": "调用 user.greetRegular()",
-        "explanation": "调用 `user` 对象的 `greetRegular` 方法。\n此时 `greetRegular` 内部的 `this` 是 `user`。\n但是，其内部的 `setTimeout` 回调（普通函数）在 Web API 100ms 后运行时会丢失 `this`。",
+        "title": "user.greetRegular() 호출",
+        "explanation": "`greetRegular` 메서드를 `user` 객체의 메서드로 호출합니다.\n이 때 `greetRegular` 내부의 `this`는 `user`가 됩니다.\n하지만 그 안의 `setTimeout` 콜백(일반 함수)은 100ms 후 Web API에 의해 실행될 때 `this`를 잃어버립니다.",
         "visualizationType": "thisBinding",
         "code": "user.greetRegular();",
         "thisState": {
@@ -22,8 +22,8 @@
         }
       },
       {
-        "title": "调用 user.greetArrow()",
-        "explanation": "调用 `greetArrow` 方法。\n此时 `greetArrow` 内部的 `this` 也是 `user`。\n其内部的 `setTimeout` 回调（箭头函数）在 100ms 后运行时会"记住"这个 `this` 值。",
+        "title": "user.greetArrow() 호출",
+        "explanation": "`greetArrow` 메서드를 호출합니다.\n이 때 `greetArrow` 내부의 `this`도 `user`가 됩니다.\n그 안의 `setTimeout` 콜백(화살표 함수)은 100ms 후 실행될 때 이 `this` 값을 '기억'합니다.",
         "visualizationType": "thisBinding",
         "code": "user.greetArrow();",
         "thisState": {
@@ -39,9 +39,9 @@
         }
       },
       {
-        "title": "回调执行（普通函数）",
-        "explanation": "100ms 后，`greetRegular` 的回调执行。\n这个回调是"普通函数"，所以它在被调用时获得自己的 `this`。\n由 `setTimeout` 调用的回调，其 `this` 指向全局对象（`window`），所以 `this.name` 是 `undefined`。",
-        "keyInsight": "普通函数回调的 this 是全局对象。",
+        "title": "콜백 실행 (일반 함수)",
+        "explanation": "100ms 후, `greetRegular`의 콜백이 실행됩니다.\n이 콜백은 '일반 함수'이므로, 호출될 때 자신만의 `this`를 갖습니다.\n`setTimeout`에 의해 호출된 콜백의 `this`는 전역 객체(`window`)를 가리키므로, `this.name`은 `undefined`가 됩니다.",
+        "keyInsight": "일반 함수 콜백의 this는 전역 객체입니다.",
         "visualizationType": "thisBinding",
         "code": "setTimeout(function() {",
         "highlightOffset": [
@@ -58,9 +58,9 @@
         }
       },
       {
-        "title": "回调执行（箭头函数）",
-        "explanation": "接着，`greetArrow` 的回调执行。\n"箭头函数"不会创建自己的 `this`——它使用词法作用域（定义位置）的 `this`。\n这里它引用的是 `greetArrow` 方法的 `this`，即 `user` 对象。",
-        "keyInsight": "箭头函数的 this = 父级的 this（继承）",
+        "title": "콜백 실행 (화살표 함수)",
+        "explanation": "이어서 `greetArrow`의 콜백이 실행됩니다.\n'화살표 함수'는 자신만의 `this`를 만들지 않고, 자신이 정의된 위치(lexical scope)의 `this`를 그대로 사용합니다.\n여기서는 `greetArrow` 메서드의 `this`인 `user` 객체를 가리킵니다.",
+        "keyInsight": "화살표 함수 this = 내 부모의 this (상속)",
         "visualizationType": "thisBinding",
         "code": "setTimeout(() => {",
         "highlightOffset": [
@@ -80,27 +80,27 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下代码中按钮被点击时，this 是什么？\n\nconst obj = {\n  name: 'MyObj',\n  handleClick: () => {\n    console.log(this.name);\n  }\n};\nbutton.addEventListener('click', obj.handleClick);",
+    "question": "当点击下面的代码中的按钮时，这是什么意思？\n\n常量对象 = {\n  名称：'MyObj'，\n  处理点击：() => {\n    console.log(this.name);\n  }\n};\nbutton.addEventListener('点击', obj.handleClick);",
     "options": [
-      "'MyObj'",
+      "“我的对象”",
       "按钮元素",
-      "undefined（来自全局作用域的 this）",
+      "未定义（全局 this）",
       "发生错误"
     ],
     "correctIndex": 2,
-    "explanation": "箭头函数使用定义时外层作用域的 this。\n虽然它被定义为 obj 的方法，但 obj 不是一个作用域，所以使用的是全局的 this。"
+    "explanation": "箭头函数在定义时使用父作用域 this 。\n它被定义为 obj 的方法，但由于 obj 不在作用域内，因此使用全局 this。"
   },
   "misconceptions": [
     {
-      "wrong": "箭头函数的 this 指向父对象",
-      "correct": "不是。\n它指向外层的**函数**作用域。\n对象字面量 `{}` 不是一个作用域。",
-      "why": "对象不充当作用域。\n所以在对象字面量中定义的箭头函数，其 this 最终指向全局（window）。"
+      "wrong": "화살표 함수의 this는 상위 객체를 가리킨다",
+      "correct": "아닙니다.\n**상위 '함수' 스코프**를 가리킵니다.\n객체 리터럴 `{}`은 스코프가 아닙니다.",
+      "why": "객체는 스코프 역할을 하지 못합니다.\n따라서 객체 안에서 쓴 화살표 함수는 전역(Window)을 가리키게 됩니다."
     },
     {
-      "wrong": "可以通过 call/apply/bind 改变箭头函数的 this",
-      "correct": "箭头函数的 this 无法被改变。\ncall/apply/bind 会被忽略。",
-      "why": "箭头函数使用词法 this，所以其绑定是固定的。"
+      "wrong": "화살표 함수도 call/apply/bind로 this를 바꿀 수 있다",
+      "correct": "화살표 함수의 this는 변경할 수 없습니다.\ncall/apply/bind가 무시됩니다.",
+      "why": "화살표 함수는 렉시컬 this를 사용하므로 바인딩이 고정됩니다."
     }
   ],
-  "keyTakeaway": "箭头函数 = 没有自己的 this，使用外层作用域的 this（词法绑定）"
+  "keyTakeaway": "화살표 함수 = 자신의 this 없음, 상위 스코프의 this 사용 (렉시컬)"
 }

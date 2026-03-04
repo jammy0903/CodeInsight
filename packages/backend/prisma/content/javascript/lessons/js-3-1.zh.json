@@ -1,14 +1,14 @@
 {
   "lessonId": "js-3-1",
-  "title": "全局上下文中的 this",
-  "concept": "在全局上下文中，this 指向全局对象（window/global）",
+  "title": "전역에서의 this",
+  "concept": "전역 컨텍스트에서 this는 전역 객체(window/global)를 가리킨다",
   "content": {
     "code": "var globalValue = 100;\n\nfunction getGlobalValue() {\n  return this.globalValue;\n}\n\nfunction strictGetValue() {\n  'use strict';\n  return this;\n}\n\nvar result1 = getGlobalValue();\nvar result2 = strictGetValue();\nvar isUndefined = result2 === undefined;\n\nconsole.log(result1, isUndefined);",
     "steps": [
       {
-        "title": "全局变量声明",
-        "explanation": "`var globalValue = 100` 在全局层级声明。\n用 var 声明的全局变量会成为**全局对象（window）的属性**。",
-        "keyInsight": "var globalValue = 100 等同于 window.globalValue = 100。",
+        "title": "전역 변수 선언",
+        "explanation": "`var globalValue = 100`이 전역에서 선언됩니다.\nvar로 선언된 전역 변수는 **전역 객체(window)의 속성**이 됩니다.",
+        "keyInsight": "var globalValue = 100은 window.globalValue = 100과 같습니다.",
         "visualizationType": "thisBinding",
         "code": "var globalValue = 100;",
         "thisState": {
@@ -20,9 +20,9 @@
         }
       },
       {
-        "title": "调用 getGlobalValue()",
-        "explanation": "调用 `getGlobalValue()` 函数。\n这是一个普通函数调用，所以 this 是全局对象（window）。",
-        "keyInsight": "在普通函数调用中，this = 全局对象（window）",
+        "title": "getGlobalValue() 호출",
+        "explanation": "`getGlobalValue()` 함수를 호출합니다.\n일반 함수 호출이므로 this는 전역 객체(window)입니다.",
+        "keyInsight": "일반 함수 호출에서 this = 전역 객체 (window)",
         "visualizationType": "thisBinding",
         "code": "var result1 = getGlobalValue();",
         "thisState": {
@@ -31,10 +31,10 @@
         }
       },
       {
-        "title": "返回 this.globalValue",
-        "explanation": "在函数内部，返回 `this.globalValue`。\n因为 this 是 window，所以返回 window.globalValue = 100。\n\n**类比**：就像公司（window）的员工（函数）查询"本公司（this）的资产（globalValue）"。",
+        "title": "this.globalValue 반환",
+        "explanation": "함수 내부에서 `this.globalValue`를 반환합니다.\nthis는 window이므로, window.globalValue = 100이 반환됩니다.\n\n**비유**: 회사(window)에서 직원(함수)이 '이 회사(this)의 자산(globalValue)'을 조회하는 것과 같습니다.",
         "keyInsight": "this.globalValue = window.globalValue = 100",
-        "analogy": "就像公司（window）的员工（函数）查询"本公司（this）的资产（globalValue）"。",
+        "analogy": "회사(window)에서 직원(함수)이 '이 회사(this)의 자산(globalValue)'을 조회하는 것과 같습니다.",
         "visualizationType": "thisBinding",
         "code": "return this.globalValue;",
         "thisState": {
@@ -42,9 +42,9 @@
         }
       },
       {
-        "title": "调用 strictGetValue()",
-        "explanation": "调用 `strictGetValue()` 函数。\n这个函数内部声明了 `'use strict';`。",
-        "keyInsight": "在严格模式下，普通函数调用的 this 是 undefined",
+        "title": "strictGetValue() 호출",
+        "explanation": "`strictGetValue()` 함수를 호출합니다.\n이 함수 내부에 `'use strict';`가 선언되어 있습니다.",
+        "keyInsight": "strict mode에서 일반 함수 호출 시 this = undefined",
         "visualizationType": "thisBinding",
         "code": "var result2 = strictGetValue();",
         "thisState": {
@@ -55,17 +55,17 @@
         }
       },
       {
-        "title": "在严格模式下返回 this",
-        "explanation": "在严格模式下返回 `this`。\n在严格模式下，普通函数调用的 this 是 **undefined**。",
-        "keyInsight": "严格模式防止意外修改全局对象。",
-        "tip": "ES6 模块和类默认处于严格模式。",
+        "title": "Strict Mode에서 this 반환",
+        "explanation": "strict mode에서 `this`를 반환합니다.\n일반 함수 호출에서 strict mode의 this는 **undefined**입니다.",
+        "keyInsight": "strict mode는 실수로 전역 객체를 수정하는 것을 방지합니다.",
+        "tip": "ES6 모듈과 클래스는 기본적으로 strict mode입니다.",
         "visualizationType": "thisBinding",
         "code": "return this;"
       },
       {
-        "title": "检查是否为 undefined",
-        "explanation": "检查 `result2 === undefined`。\n由于严格模式函数返回的 this 是 undefined，所以 `isUndefined = true`。",
-        "keyInsight": "严格模式如何防止全局对象被污染",
+        "title": "undefined 여부 확인",
+        "explanation": "`result2 === undefined`를 확인합니다.\nstrict mode 함수에서 반환된 this가 undefined이므로 `isUndefined = true`입니다.",
+        "keyInsight": "strict mode가 전역 객체 오염을 방지하는 방법",
         "visualizationType": "thisBinding",
         "code": "var isUndefined = result2 === undefined;",
         "thisState": {
@@ -76,8 +76,8 @@
         }
       },
       {
-        "title": "打印结果",
-        "explanation": "执行 `console.log(result1, isUndefined)`。\nresult1 是 100，isUndefined 是 true。",
+        "title": "결과 출력",
+        "explanation": "`console.log(result1, isUndefined)`를 실행합니다.\nresult1은 100, isUndefined는 true입니다.",
         "visualizationType": "thisBinding",
         "code": "console.log(result1, isUndefined);",
         "thisState": {
@@ -92,27 +92,27 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下代码中严格模式下的 this 是什么？\n\n'use strict';\nfunction test() {\n  return this;\n}\ntest();",
+    "question": "严格模式下下面的代码中的这是什么？\n\n'使用严格'；\n函数测试() {\n  返回这个；\n}\n测试（）;",
     "options": [
-      "window",
-      "global",
-      "undefined",
-      "null"
+      "窗户",
+      "全球的",
+      "不明确的",
+      "无效的"
     ],
     "correctIndex": 2,
-    "explanation": "在严格模式下，普通函数调用的 this 是 undefined。\n这可以防止意外修改全局对象。"
+    "explanation": "在严格模式下，常规函数调用的 this 是未定义的。\n这可以防止您意外修改全局对象。"
   },
   "misconceptions": [
     {
-      "wrong": "this 指向函数本身",
-      "correct": "完全不是。\nthis 是执行上下文的一个属性，由**函数被调用的方式和位置（调用点）**决定。",
-      "why": "this 在函数执行时确定（而不是定义时）。\n（箭头函数是例外。）"
+      "wrong": "this는 자기 자신(함수)을 가리킨다",
+      "correct": "절대 아닙니다.\nthis는 **함수가 호출되는 방식(Call Site)**에 따라 결정되는 실행 컨텍스트의 속성입니다.",
+      "why": "this는 함수 정의(Lexical)가 아니라 함수 호출(Execution) 시점에 결정됩니다.\n(화살표 함수 제외)"
     },
     {
-      "wrong": "函数内部的 this 总是同一个值",
-      "correct": "不是。\n同一个函数根据是作为 `obj.method()` 还是 `method()` 调用，可以有完全不同的 this。",
-      "why": "谁（哪个对象）调用了函数，决定了 this 是什么。"
+      "wrong": "함수 안의 this는 항상 일정하다",
+      "correct": "아닙니다.\n같은 함수라도 `obj.method()`로 부르냐 `method()`로 부르냐에 따라 천지차이입니다.",
+      "why": "누가(어떤 객체가) 호출했느냐가 this를 결정짓습니다."
     }
   ],
-  "keyTakeaway": "全局 this = window，普通函数 this = window（严格模式：undefined）"
+  "keyTakeaway": "전역 this = window, 일반함수 this = window (strict: undefined)"
 }

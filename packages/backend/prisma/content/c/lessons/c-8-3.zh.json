@@ -1,45 +1,54 @@
 {
   "lessonId": "c-8-3",
-  "title": "qsort and Comparators",
-  "concept": "qsort 使用 void 指针和比较回调来通用地排序任意类型的数组",
+  "title": "qsort 和比较器",
+  "concept": "qsort 通过 void 指针和比较回调提供各种类型数组的通用排序。",
   "content": {
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint compare(const void *a, const void *b) {\n    int int_a = *(int*)a;\n    int int_b = *(int*)b;\n    return int_a - int_b;\n}\n\nint main() {\n    int arr[] = {42, 10, 5, 100};\n    int n = 4;\n\n    qsort(arr, n, sizeof(int), compare);\n\n    printf(\"Sorted: %d %d %d %d\\n\", arr[0], arr[1], arr[2], arr[3]);\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含所需头文件",
-        "explanation": "`stdio.h` 提供输出函数；`stdlib.h` 提供 `qsort` 的声明。",
+        "title": "包含必需的标头",
+        "explanation": "`stdio.h` 提供输出，`stdlib.h` 提供 `qsort` 声明。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
-        "highlightOffset": [0, 1],
+        "highlightOffset": [
+          0,
+          1
+        ],
         "stack": [],
         "heap": [],
         "stdout": ""
       },
       {
-        "title": "定义比较函数（Comparator）",
-        "explanation": "`compare(const void*, const void*)` 是 qsort 要求的比较回调签名。\n\n返回值的正负决定排序顺序。",
+        "title": "比较函数（Comparator）的定义",
+        "explanation": "`compare(const void*, const void*)` 是 qsort 所需的比较回调签名。\n\n返回符号决定排序顺序。",
         "visualizationType": "cMemory",
         "code": "int compare(const void *a, const void *b) {"
       },
       {
-        "title": "提取值（类型转换 & 解引用）",
-        "explanation": "将 `void*` 转换为实际类型（`int*`）后解引用读取值。\n\n类型不匹配会产生错误的结果。",
+        "title": "值提取（转换和取消引用）",
+        "explanation": "将 `void*` 转换为实际类型 (`int*`)，然后取消引用它以读取值。\n\n如果类型不匹配，您将得到不正确的结果。",
         "visualizationType": "cMemory",
         "code": "int int_a = *(int*)a;",
-        "highlightOffset": [0, 1]
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
         "title": "返回比较结果",
-        "explanation": "返回负数/0/正数告诉 qsort 顺序：前/相等/后。",
+        "explanation": "返回负数/0/正数以将前序/等于/后序传递给 qsort。",
         "visualizationType": "cMemory",
         "code": "return int_a - int_b;"
       },
       {
-        "title": "main 函数与数组声明",
-        "explanation": "准备待排序的数组和元素数量。",
+        "title": "main函数和数组声明",
+        "explanation": "准备要排序的数组和元素数量。",
         "visualizationType": "cMemory",
         "code": "int main() {",
-        "highlightOffset": [0, 1],
+        "highlightOffset": [
+          0,
+          1
+        ],
         "stack": [
           {
             "name": "arr",
@@ -56,8 +65,8 @@
         ]
       },
       {
-        "title": "调用 qsort",
-        "explanation": "`qsort(arr, n, sizeof(int), compare)` 对数组进行原地排序。\n\n排序标准逻辑由 compare 函数提供。",
+        "title": "排序调用",
+        "explanation": "使用 qsort(arr, n, sizeof(int), Compare) 就地对数组进行排序。\n\n排序标准逻辑由比较函数提供。",
         "keyInsight": "qsort 通过比较函数从外部接收排序标准。",
         "visualizationType": "cMemory",
         "code": "qsort(arr, n, sizeof(int), compare);",
@@ -78,8 +87,8 @@
         ]
       },
       {
-        "title": "输出排序结果",
-        "explanation": "排序后输出数组值以验证结果。",
+        "title": "排序结果输出",
+        "explanation": "排序后，打印数组值并检查结果。",
         "visualizationType": "cMemory",
         "code": "printf(\"Sorted: %d %d %d %d\\n\", arr[0], arr[1], arr[2], arr[3]);",
         "stack": [
@@ -93,8 +102,8 @@
         "stdout": "Sorted: 5 10 42 100"
       },
       {
-        "title": "程序结束",
-        "explanation": "通过 `return 0;` 结束程序。\n\n要点：qsort 的灵活性来自比较回调。",
+        "title": "程序退出",
+        "explanation": "使用“return 0;”退出。\n\n底线：qsort 的灵活性来自于它的比较回调。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -103,22 +112,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "当比较函数返回正值时，qsort 会怎么做？",
+    "question": "如果 qsort 的比较函数返回正数 (+)，它会如何表现？",
     "options": [
-      "判断第一个元素（a）大于第二个（b），在升序排列中交换它们。",
+      "确定第一个元素（a）大于第二个元素（b），因此按升序改变其位置。",
       "判断两个元素相等。",
-      "什么都不会发生。",
-      "产生错误。"
+      "什么也没发生。",
+      "发生错误。"
     ],
     "correctIndex": 0,
-    "explanation": "在升序排序中，如果 a - b 为正数，则 a > b，所以 a 必须移到 b 后面（交换）。"
+    "explanation": "在升序排序中，如果a - b 是正数，a > b，所以a 必须向后发送（交换）。"
   },
   "misconceptions": [
     {
-      "wrong": "比较函数的参数可以声明为 `int a, int b`。",
-      "correct": "不行。必须是 `const void *a` 的形式，内部需要自己读取值。",
-      "why": "qsort 传递的是"值的地址"，而不是值本身。"
+      "wrong": "比较函数参数可以声明为“int a, int b”。",
+      "correct": "不。\n它必须是`const void *a`类型的指针，并且该值必须在内部读取。",
+      "why": "这是因为 qsort 传递的是“值的地址”而不是值本身。"
     }
   ],
-  "keyTakeaway": "使用 void* 类型转换编写比较函数是 C 语言泛型编程的核心模式。"
+  "keyTakeaway": "使用 void* 转换编写比较函数是 C 语言泛型编程的核心模式。"
 }

@@ -1,13 +1,13 @@
 {
   "lessonId": "c-13-2",
-  "title": "浮点数（float vs double）",
-  "concept": "计算机以近似值存储实数，double 比 float 更精确，但也不是完美的。",
+  "title": "浮点数（浮点与双精度）",
+  "concept": "计算机将实数存储为近似值，尽管双精度数比浮点数更精确，但它们并不完美。",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    float f = 0.1f;\n    double d = 0.1;\n\n    printf(\"float:  %.20f\\n\", f);\n    printf(\"double: %.20f\\n\", d);\n\n    float sum = 0.0f;\n    for (int i = 0; i < 10; i++) {\n        sum += 0.1f;\n    }\n    printf(\"0.1 * 10 = %.20f\\n\", sum);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "通过 **`#include <stdio.h>`** 包含标准输入输出头文件以使用 `printf`。\n\n本课将学习一个令人震惊的事实：**计算机无法精确存储 0.1。**整数（int、long）可以完全精确地存储，但浮点数始终是近似值。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用 **`#include <stdio.h>`** 包含标准输入/输出标头，以便与 `printf` 一起使用。\n\n在本课中，您将了解到一个令人震惊的事实：**计算机无法准确存储 0.1。** 整数（int、long）可以完美准确地存储。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "**`int main()`** -- 程序的入口点，创建 main 栈帧。\n\n本课比较处理实数的两种类型：`float`（4 字节，6~7 位精度）和 `double`（8 字节，15~16 位精度），并探索**浮点误差**。",
+        "title": "启动主函数",
+        "explanation": "**`int main()`** --- 程序的起点，创建主堆栈帧。\n\n在本课中，我们比较处理实数的两种数据类型：“float”（4 字节，6 到 7 位精度）和“double”（8 字节，15 到 16 位精度）。 **",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,68 +29,68 @@
         ]
       },
       {
-        "title": "声明 float 变量 - 4 字节实数",
-        "explanation": "**`float f = 0.1f;`** -- `float` 是 4 字节（32 位）浮点类型，通常提供 6~7 位精度。\n\n关键在于 `0.1` 在二进制中是无限循环小数，因此**无法精确存储**。",
+        "title": "float 变量声明 - 4 字节实数",
+        "explanation": "**`float f = 0.1f;`** --- `float` 是 4 字节（32 位）浮点类型，通常提供 6 到 7 位精度。\n\n关键是“0.1”在二进制中是无限重复的小数，因此**存储不正确**。",
         "visualizationType": "cMemory",
         "code": "float f = 0.1f;",
         "stack": [
           {
             "name": "f",
-            "value": "0.1（近似值）",
+            "value": "0.1 (근사값)",
             "type": "float (4B)",
             "address": "0x1000"
           }
         ]
       },
       {
-        "title": "声明 double 变量 - 8 字节实数",
-        "explanation": "**`double d = 0.1;`** -- `double` 为 8 字节（64 位），比 float 精确得多（约 15~16 位）。\n\n不过它同样无法完美存储 `0.1`，只是存储了更接近的近似值。",
+        "title": "双变量声明 - 8 字节实数",
+        "explanation": "**`double d = 0.1;`** --- `double` 是 8 个字节（64 位），比 float（大约 15-16 位）精确得多。\n\n然而，这并不能完美地存储‘0.1’，而只是存储更接近的近似值。",
         "visualizationType": "cMemory",
         "code": "double d = 0.1;",
         "stack": [
           {
             "name": "f",
-            "value": "0.1（近似值）",
+            "value": "0.1 (근사값)",
             "type": "float (4B)",
             "address": "0x1000"
           },
           {
             "name": "d",
-            "value": "0.1（近似值）",
+            "value": "0.1 (근사값)",
             "type": "double (8B)",
             "address": "0x1004"
           }
         ]
       },
       {
-        "title": "查看 float 的实际存储值",
-        "explanation": "**`printf(\"float:  %.20f\\n\", f);`** -- `%.20f` 表示"输出小数点后 20 位"。结果：`0.10000000149011611938`。",
+        "title": "检查float的实际存储值",
+        "explanation": "**`printf(\"float: %.20f\\n\", f);`** --- `%.20f` 表示打印到小数点后 20 位。结果：`0.10000000149011611938`。",
         "visualizationType": "cMemory",
         "code": "printf(\"float:  %.20f\\n\", f);",
         "stdout": "float:  0.10000000149011611938"
       },
       {
-        "title": "查看 double 的实际存储值",
-        "explanation": "**`printf(\"double: %.20f\\n\", d);`** -- double 存储的 0.1 的实际值：`0.10000000000000000555`。比 float（0.1000000014...）更接近 0.1，但第 16 位之后出现了 `555` 这样的误差。",
+        "title": "检查 double 的实际存储值",
+        "explanation": "**`printf(\"double: %.20f\\n\", d);`** --- 0.1 的实际值存储为 double: `0.10000000000000000555`。它比 float(0.1000000014...) 更接近 0.1，但在 16 位数字后出现“555”的错误。",
         "visualizationType": "cMemory",
         "code": "printf(\"double: %.20f\\n\", d);",
         "stdout": "float:  0.10000000149011611938\ndouble: 0.10000000000000000555"
       },
       {
-        "title": "误差的累积 - 循环开始",
-        "explanation": "**`float sum = 0.0f;`** -- 实验浮点误差在实际中会造成什么问题。将 `0.1` 加 10 次，能精确得到 `1.0` 吗？",
+        "title": "错误累积 - 循环开始",
+        "explanation": "**`float sum = 0.0f;`** --- 实验一下浮点错误在实践中会导致什么问题。如果将“0.1”添加 10 次，您会得到精确的“1.0”吗？",
         "visualizationType": "cMemory",
         "code": "float sum = 0.0f;",
         "stack": [
           {
             "name": "f",
-            "value": "0.1（近似值）",
+            "value": "0.1 (근사값)",
             "type": "float (4B)",
             "address": "0x1000"
           },
           {
             "name": "d",
-            "value": "0.1（近似值）",
+            "value": "0.1 (근사값)",
             "type": "double (8B)",
             "address": "0x1004"
           },
@@ -103,8 +103,8 @@
         ]
       },
       {
-        "title": "将 0.1 加 10 次",
-        "explanation": "**`for (int i = 0; i < 10; i++) { sum += 0.1f; }`** -- 将 `0.1f` 加 10 次。每次相加时，近似值的误差都会一点点累积。",
+        "title": "添加0.1×10次",
+        "explanation": "**`for (int i = 0; i < 10; i++) { sum += 0.1f; }`** --- 添加 `0.1f` 10 次。每次相加，近似误差都会一点点累积。",
         "visualizationType": "cMemory",
         "code": "for (int i = 0; i < 10; i++) {",
         "highlightOffset": [
@@ -115,19 +115,19 @@
         "stack": [
           {
             "name": "f",
-            "value": "0.1（近似值）",
+            "value": "0.1 (근사값)",
             "type": "float (4B)",
             "address": "0x1000"
           },
           {
             "name": "d",
-            "value": "0.1（近似值）",
+            "value": "0.1 (근사값)",
             "type": "double (8B)",
             "address": "0x1004"
           },
           {
             "name": "sum",
-            "value": "1.0000001（近似值）",
+            "value": "1.0000001 (근사값)",
             "type": "float (4B)",
             "address": "0x100C"
           },
@@ -140,15 +140,15 @@
         ]
       },
       {
-        "title": "查看累积结果",
-        "explanation": "**`printf(\"0.1 * 10 = %.20f\\n\", sum);`** -- 结果可能不是精确的 1.0。因为 `0.1f` 的近似误差在 10 次加法中不断累积。",
+        "title": "检查累计结果",
+        "explanation": "**`printf(\"0.1 * 10 = %.20f\\n\", sum);`** --- 结果可能显示为 1.0 以外的值。这是因为“0.1f”的近似误差是在 10 次加法过程中累积的。",
         "visualizationType": "cMemory",
         "code": "printf(\"0.1 * 10 = %.20f\\n\", sum);",
         "stdout": "float:  0.10000000149011611938\ndouble: 0.10000000000000000555\n0.1 * 10 = 1.00000011920928955078"
       },
       {
-        "title": "程序终止",
-        "explanation": "**`return 0;`** -- 程序正常终止，随着 main 栈帧的释放，所有变量从内存中消失。\n\n本课核心：计算机中的实数始终是**近似值**，double（8B，15 位）比 float（4B，7 位）更精确。",
+        "title": "程序退出",
+        "explanation": "**`return 0;`** --- 程序正常终止，所有变量随着主堆栈帧被释放而从内存中消失。\n\n本课重点：在计算机中，实数总是**近似**，并且 double（8B，15 位数字）比 float（4B，7 位数字）更精确。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -157,22 +157,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下代码的结果是什么？`float x = 0.1f; if (x == 0.1f) printf(\"相等\"); else printf(\"不相等\");`",
+    "question": "下面的代码的结果是什么？ `浮点x = 0.1f； if (x == 0.1f) printf(\"相同\"); else printf(\"不同\");`",
     "options": [
-      "始终输出'相等'",
-      "始终输出'不相等'",
-      "输出'相等'，但 0.1f 和数学上的 0.1 并不完全相同",
-      "产生编译错误"
+      "始终输出“相同”",
+      "始终显示“不同”",
+      "打印了“equal”，但 0.1f 和数学上的 0.1 并不完全相等。",
+      "出现编译错误"
     ],
     "correctIndex": 2,
-    "explanation": "由于比较的是相同的近似值，所以输出'相等'。\n但内存中存储的值并非精确的 0.1，而是近似值。\n将 `0.1f` 与 `0.1`（double）进行比较可能得到不同的结果。"
+    "explanation": "由于比较相同的近似值，因此输出“等于”。\n然而，存储在内存中的值并不是精确的 0.1，而是一个近似值。\n比较“0.1f”和“0.1”（双精度）可能会产生不同的结果。"
   },
   "misconceptions": [
     {
-      "wrong": "double 可以精确存储实数。",
-      "correct": "double 也存储近似值，只是比 float 更精确，并非没有误差。",
-      "why": "将十进制小数用二进制表示时经常产生无限循环小数，有限的位数无法容纳精确值。"
+      "wrong": "double 准确地存储实数。",
+      "correct": "双精度数还存储近似值，并且比浮点数更精确，但并非没有错误。",
+      "why": "当十进制小数用二进制表示时，它们往往会变成无限小数，因此有限的位数无法包含精确的值。"
     }
   ],
-  "keyTakeaway": "float（4B）和 double（8B）都存储近似值；比较浮点数时应使用误差范围（epsilon）而非 ==。"
+  "keyTakeaway": "float(4B) 和 double(8B) 都存储近似值，在比较浮点数时，应该使用误差范围 (epsilon) 而不是 ==。"
 }

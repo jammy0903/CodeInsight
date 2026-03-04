@@ -1,13 +1,13 @@
 {
   "lessonId": "c-1-3",
-  "title": "Address Operator (&) and sizeof",
-  "concept": "Every variable lives somewhere in memory and has its own size",
+  "title": "Address operator (&) and sizeof",
+  "concept": "Every variable lives somewhere in memory and has its own size.",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int num = 42;\n    char ch = 'A';\n\n    printf(\"Address of num: %p\\n\", &num);\n    printf(\"Address of ch:  %p\\n\", &ch);\n\n    printf(\"Size of num: %zu bytes\\n\", sizeof(num));\n    printf(\"Size of ch:  %zu bytes\\n\", sizeof(ch));\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h Header",
-        "explanation": "The standard I/O header for using ```printf```. In this lesson, we'll directly examine a variable's **memory address** and **size** — essential foundations for learning **pointers** later.",
+        "title": "Include stdio.h header",
+        "explanation": "Standard input/output header for use with ``printf````. In this lesson, you will directly check the **memory address** and **size** of the variable — an essential foundation for learning **pointers** later.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting the main Function",
-        "explanation": "The program entry point. A main stack frame is created, and the variables declared inside it will each be assigned a unique **address**.",
+        "title": "Start main function",
+        "explanation": "Program starting point. The main stack frame is created, and the variables to be declared within it are each given a unique **address**.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Declaring an Integer Variable",
-        "explanation": "`int num = 42;` creates an integer variable num and stores a value.\n\nThe key point is that every variable has a memory address, and in the next step we'll check it with `&num`.",
+        "title": "Integer variable declaration",
+        "explanation": "`int num = 42;` creates an integer variable num and stores its value.\n\nThe key is that each variable has a memory address, and we check that address with `&num` in the next step.",
         "visualizationType": "cMemory",
         "code": "int num = 42;",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "Declaring a Character Variable",
-        "explanation": "`char ch = 'A';` creates a 1-byte character variable.\n\nCharacters are stored internally as numeric codes. Note that `'A'` (a character) and `\"A\"` (a string) are different types.",
+        "title": "Character variable declaration",
+        "explanation": "`char ch = 'A';` creates a 1-byte character variable.\n\nCharacters are stored internally as numeric codes, and `'A'` (letter) and `\"A\"` (string) are of different types.",
         "visualizationType": "cMemory",
         "code": "char ch = 'A';",
         "stack": [
@@ -63,36 +63,36 @@
         ]
       },
       {
-        "title": "Printing num's Address",
-        "explanation": "`&num` gives the memory address of num, not its value.\n\nThe `%p` format specifier is used for printing addresses. This concept is the starting point for learning pointers.",
+        "title": "Print address of num",
+        "explanation": "`&num` refers to the memory address, not the value of num.\n\n`%p` is used for address output, and this concept is the starting point for pointer learning.",
         "visualizationType": "cMemory",
         "code": "printf(\"Address of num: %p\\n\", &num);",
         "stdout": "Address of num: 0x1004"
       },
       {
-        "title": "Printing ch's Address",
-        "explanation": "`&ch` returns the memory address of the character variable `ch`.\n\nPrinting the address with `%p` shows that it's stored at a different location than `num`.",
+        "title": "Address output of ch",
+        "explanation": "`&ch` returns the memory address of the character variable `ch`.\n\nIf you print the address with `%p`, you can see that it is stored in a different location than `num`.",
         "visualizationType": "cMemory",
         "code": "printf(\"Address of ch:  %p\\n\", &ch);",
         "stdout": "Address of num: 0x1004\nAddress of ch:  0x1000"
       },
       {
-        "title": "Printing num's Size (sizeof)",
-        "explanation": "`sizeof` returns the size in bytes of a type or variable. Since `num` is an `int`, it typically prints 4 bytes.\n\nThe return type of `sizeof` is `size_t`, so the correct format specifier is `%zu`.",
+        "title": "Print size of num (sizeof)",
+        "explanation": "`sizeof` returns the size in bytes of the target type/variable. Since `num` is `int`, 4 bytes are usually output.\n\nSince the return type of `sizeof` is `size_t`, it is correct to use `%zu` as the output format.",
         "visualizationType": "cMemory",
         "code": "printf(\"Size of num: %zu bytes\\n\", sizeof(num));",
         "stdout": "Address of num: 0x1004\nAddress of ch:  0x1000\nSize of num: 4 bytes"
       },
       {
-        "title": "Printing ch's Size (sizeof)",
-        "explanation": "`sizeof(ch)` returns 1. In C, `char` is the baseline type for bytes, so it always has a size of 1.\n\nTo summarize: `&variable` gives the address, `sizeof(variable)` gives the size. Make sure to distinguish these before learning pointers.",
+        "title": "Output the size of ch (sizeof)",
+        "explanation": "`sizeof(ch)` is 1. In C, `char` is the base type for bytes, so it always has size 1.\n\nTo summarize, `&variable` is the address and `sizeof(variable)` is the size. Be sure to distinguish them before learning pointers.",
         "visualizationType": "cMemory",
         "code": "printf(\"Size of ch:  %zu bytes\\n\", sizeof(ch));",
         "stdout": "Address of num: 0x1004\nAddress of ch:  0x1000\nSize of num: 4 bytes\nSize of ch:  1 bytes"
       },
       {
-        "title": "Program Termination",
-        "explanation": "`return 0;` terminates the program normally.\n\nThe key takeaway of this lesson is distinguishing the roles of `&` (address) and `sizeof` (size).",
+        "title": "Program exit",
+        "explanation": "Terminate the program normally with `return 0;`.\n\nThe point of this lesson is to distinguish between the roles of `&` (address) and `sizeof` (size).",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
@@ -102,22 +102,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What is the sizeof a char type variable?",
+    "question": "What is the size (sizeof) of a char type variable?",
     "options": [
-      "It varies by compiler",
-      "Always 1 byte",
-      "Always 4 bytes",
-      "It depends on the operating system"
+      "Different compilers",
+      "always 1 byte",
+      "always 4 bytes",
+      "Depends on operating system"
     ],
     "correctIndex": 1,
-    "explanation": "The C standard defines `char` as always being 1 byte (the minimum storage unit).\n`int` and `long` may vary across systems."
+    "explanation": "In the C standard, `char` is always defined as 1 byte (the smallest unit of storage).\n`int` or `long` may vary from system to system."
   },
   "misconceptions": [
     {
-      "wrong": "&variable changes the variable's value",
-      "correct": "& only 'reads' the address — it doesn't change the value.",
-      "why": "To change a value, you need the assignment operator (=)."
+      "wrong": "&variable changes the value of the variable",
+      "correct": "& only 'checks' the address and does not change the value.",
+      "why": "To change the value, you must use the assignment operator (=)."
     }
   ],
-  "keyTakeaway": "`&` is the address (where does it live?), `sizeof` is the size (how many bytes does it occupy?)."
+  "keyTakeaway": "`&` is the address (where do you live?), and `sizeof` is the size (how many pyeong do you live in?)."
 }

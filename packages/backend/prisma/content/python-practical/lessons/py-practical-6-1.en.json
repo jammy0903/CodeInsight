@@ -1,0 +1,147 @@
+{
+  "lessonId": "py-practical-6-1",
+  "title": "matplotlib 기초 - 선 그래프",
+  "concept": "데이터를 그래프로 시각화하여 한눈에 트렌드를 파악합니다. Excel 차트보다 코드로 더 빠르고 정확하게",
+  "content": {
+    "code": "import matplotlib.pyplot as plt\nimport pandas as pd\n\ndf = pd.read_csv('sales.csv')\nplt.plot(df['월'], df['매출'])\nplt.title('Monthly Sales')\nplt.xlabel('Month')\nplt.ylabel('Sales')\nplt.savefig('sales_chart.png')\nplt.show()",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Step 1: matplotlib 불러오기",
+        "explanation": "`matplotlib.pyplot`은 **그래프를 그리는 라이브러리**입니다.\n\n**pyplot**: MATLAB 스타일의 간단한 그래프 생성\n- `plot()`: 선 그래프\n- `bar()`: 막대 그래프\n- `scatter()`: 산점도\n\n**별칭 plt**: 매번 `matplotlib.pyplot` 쓰기 귀찮으니 `plt`로 줄임",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 2,
+        "title": "Step 2: pandas 불러오기",
+        "explanation": "데이터를 읽기 위해 pandas도 필요합니다.\n\n**그래프 제작 흐름**:\n1. pandas로 데이터 읽기\n2. matplotlib로 그래프 그리기\n3. 이미지 파일로 저장",
+        "highlight": [
+          2
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 4,
+        "title": "Step 3: CSV 데이터 읽기",
+        "explanation": "`pd.read_csv('sales.csv')`로 **매출 데이터**를 불러옵니다.\n\n**예시 데이터**:\n```\n월,매출\n1월,1000\n2월,1200\n3월,1100\n```\n\n**왜 CSV?** Excel보다 가볍고, 코드로 처리하기 쉬움",
+        "highlight": [
+          4
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "Step 4: 선 그래프 그리기",
+        "explanation": "`plt.plot(x, y)`로 **선 그래프**를 그립니다.\n\n**매개변수**:\n- x축: `df['월']` (1월, 2월, 3월...)\n- y축: `df['매출']` (1000, 1200, 1100...)\n\n**동작**: 점들을 선으로 연결하여 트렌드를 보여줌\n\n**실무 활용**: 월별 매출, 일별 방문자 수 등 시간 흐름 분석",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "Step 5: 그래프 제목 설정",
+        "explanation": "`plt.title('Monthly Sales')`로 **그래프 제목**을 설정합니다.\n\n**결과**: 그래프 상단에 'Monthly Sales' 표시\n\n**한글 깨짐 주의**: 한글 제목은 폰트 설정 필요 (나중에 배움)\n\n**실무 팁**: 영문 제목 권장",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 7,
+        "title": "Step 6: X축 레이블 설정",
+        "explanation": "`plt.xlabel('Month')`로 **X축 레이블**을 설정합니다.\n\n**결과**: X축 아래에 'Month' 표시\n\n**왜 필요한가?** 숫자만 있으면 무슨 의미인지 모름.\n레이블로 명확히!",
+        "highlight": [
+          7
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 8,
+        "title": "Step 7: Y축 레이블 설정",
+        "explanation": "`plt.ylabel('Sales')`로 **Y축 레이블**을 설정합니다.\n\n**결과**: Y축 왼쪽에 'Sales' 표시\n\n**실무 활용**: 단위 표시 (예: 'Sales (만원)', 'Visitors (명)')",
+        "highlight": [
+          8
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 9,
+        "title": "Step 8: 이미지 파일로 저장",
+        "explanation": "`plt.savefig('sales_chart.png')`로 **그래프를 이미지 파일로 저장**합니다.\n\n**결과**: sales_chart.png 파일 생성\n\n**지원 형식**:\n- PNG: 웹/문서용 (기본)\n- JPG: 사진 형식\n- PDF: 벡터 형식 (확대해도 깨지지 않음)\n\n**실무**: 보고서에 붙이거나 이메일로 전송",
+        "highlight": [
+          9
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 10,
+        "title": "Step 9: 그래프 화면에 표시",
+        "explanation": "`plt.show()`로 **그래프를 화면에 표시**합니다.\n\n**동작**: 새 창이 열리며 그래프가 보임\n\n**주의**: Jupyter Notebook에서는 자동으로 보이지만, 파이썬 스크립트에서는 `show()` 필수\n\n**실무 흐름**: 그래프 확인 → 수정 → savefig → 보고서 첨부",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "python"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How to save a graph as an image file in matplotlib?",
+    "options": [
+      "plt.savefig('chart.png')",
+      "plt.save('chart.png')",
+      "plt.export('chart.png')",
+      "plt.to_image('chart.png')"
+    ],
+    "correctIndex": 0,
+    "explanation": "Save the graph as an image file with plt.savefig('file name').\nsave() and export() are functions that do not exist."
+  },
+  "misconceptions": [
+    {
+      "wrong": "plt.plot()만 하면 그래프가 화면에 나온다",
+      "correct": "plt.plot()은 그래프를 그릴 준비만 합니다.\nplt.show()를 호출해야 화면에 표시됩니다.",
+      "why": "Jupyter Notebook은 자동으로 show()를 호출하지만, 일반 파이썬 스크립트에서는 명시적으로 필요합니다."
+    },
+    {
+      "wrong": "savefig()는 show() 후에 호출해야 한다",
+      "correct": "savefig()는 show() 전에 호출해야 합니다.\nshow() 후엔 그래프 객체가 초기화됩니다.",
+      "why": "show()는 그래프를 표시하고 메모리를 정리합니다.\nsavefig → show 순서가 정석입니다."
+    }
+  ],
+  "keyTakeaway": "plot(x, y) → title/xlabel/ylabel → savefig → show = 그래프 자동화"
+}

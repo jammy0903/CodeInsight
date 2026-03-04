@@ -1,13 +1,13 @@
 {
   "lessonId": "java-10-4",
-  "title": "线程池：工人人力事务所",
-  "concept": "每次都创建新线程成本很高。我们需要一个"人力事务所"，让工人们预先待命，只把任务分配给他们。",
+  "title": "线程池：工人人事办公室",
+  "concept": "每次创建一个新线程的成本都很高。需要有一个“人力办公室”，让工人提前待命，只给他们工作。",
   "content": {
     "code": "import java.util.concurrent.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // 1. 일꾼 3명이 대기하는 사무소 건설\n        ExecutorService office = Executors.newFixedThreadPool(3);\n\n        // 2. 사무소에 일감을 던짐\n        office.execute(() -> System.out.println(\"A 작업 처리 중...\"));\n        office.execute(() -> System.out.println(\"B 작업 처리 중...\"));\n\n        // 3. 사무소 문을 닫음\n        office.shutdown();\n    }\n}",
     "steps": [
       {
-        "title": "导入所需类",
-        "explanation": "**`import java.util.concurrent.*;`**\n\n导入管理线程池的 `ExecutorService` 及相关类。",
+        "title": "导入需要的类",
+        "explanation": "**`导入 java.util.concurrent.*;`**\n\n预取以供“ExecutorService”和管理线程池的朋友使用。",
         "visualizationType": "memory",
         "code": "import java.util.concurrent.*;",
         "memoryState": {
@@ -17,8 +17,8 @@
         }
       },
       {
-        "title": "开设人力事务所（ThreadPool）",
-        "explanation": "**`Executors.newFixedThreadPool(3)`**\n\n建立一个有 3 名工人待命的事务所。\n当任务进来时，这 3 名工人轮流处理。\n不再需要每次都雇佣临时工（创建线程）的成本。\n\n**类比**：就像一个"外卖配送中心"有 3 位骑手待命。\n当订单（Task）进来时，待命的骑手立即出发。",
+        "title": "人力资源办公室（ThreadPool）开业",
+        "explanation": "**`Executors.newFixedThreadPool(3)`**\n\n我们开设了一个拥有三名全职员工的办公室。\n现在，工作来了，三个人轮流处理。\n每次都不需要寻找新的兼职工人（创建线程）。\n\n**类似**：就像三个司机在“送货代理办公室”等待。\n一旦接到命令（任务），等候的司机就会立即出发。",
         "visualizationType": "memory",
         "code": "ExecutorService office = Executors.newFixedThreadPool(3);",
         "memoryState": {
@@ -32,9 +32,9 @@
         }
       },
       {
-        "title": "提交第一个任务",
-        "explanation": "通过 `execute()` 将第一个任务（lambda 函数）提交到线程池。\n待命线程中的一个会接下并执行该任务。",
-        "keyInsight": "复用性 = 高效的资源管理",
+        "title": "提交您的第一份工作",
+        "explanation": "通过`execute()`将第一个任务（lambda函数）提交到线程池。\n等待线程之一接管该任务并执行它。",
+        "keyInsight": "可重用性=高效的资源管理",
         "visualizationType": "memory",
         "code": "office.execute(() -> System.out.println(\"A 작업 처리 중...\"));",
         "memoryState": {
@@ -44,8 +44,8 @@
         }
       },
       {
-        "title": "提交第二个任务",
-        "explanation": "接着提交第二个任务。\n另一个空闲线程会立即接手执行。\n如果所有线程都在忙，该任务会在队列中等待。",
+        "title": "提交第二份工作",
+        "explanation": "然后提交第二个任务。\n另一个等待线程立即接管该任务并执行它。\n如果所有线程都在工作，则任务将在队列中等待。",
         "visualizationType": "memory",
         "code": "office.execute(() -> System.out.println(\"B 작업 처리 중...\"));",
         "memoryState": {
@@ -53,13 +53,13 @@
         }
       },
       {
-        "title": "关闭线程池",
-        "explanation": "调用 `shutdown()` 关闭线程池。\n不再接受新任务，当前所有任务完成后线程会安全终止。\n如果忘记调用，程序将不会退出。",
+        "title": "线程池退出",
+        "explanation": "通过调用“shutdown()”关闭线程池。\n它不再接受新的工作，并且当当前正在进行的所有工作完成时，线程将安全终止。\n如果你忘记了这个调用，你的程序将永远不会结束。",
         "visualizationType": "memory",
         "code": "office.shutdown();",
         "memoryState": {
           "threadPool": "SHUTTING_DOWN",
-          "note": "所有任务完成后，线程会安全销毁。",
+          "note": "모든 작업이 끝나면 쓰레드들도 안전하게 소멸합니다.",
           "worker1": null,
           "worker2": null,
           "worker3": null
@@ -69,22 +69,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下哪个不是使用线程池的主要原因？",
+    "question": "以下哪项不是使用线程池的主要原因？",
     "options": [
-      "减少线程创建和销毁的成本",
-      "应对突发的任务激增",
-      "提高整个程序的关闭速度",
-      "高效使用资源（内存和 CPU）"
+      "减少创建和删除线程的成本",
+      "应对突然激增的工作量",
+      "加快整个程序的关闭速度",
+      "有效利用资源（内存和CPU）"
     ],
     "correctIndex": 2,
-    "explanation": "实际上，如果不正确关闭线程池，进程可能会一直存活不退出。\n与关闭速度没有直接关系。"
+    "explanation": "相反，如果您没有正确关闭线程池，进程可能会保持活动状态而不会被终止。\n与关机速度没有直接关系。"
   },
   "misconceptions": [
     {
-      "wrong": "线程越多程序就越快。",
-      "correct": "不是的！如果线程数量远超 CPU 核心数，它们会花更多时间在"决定谁先执行"（上下文切换）上，反而变慢。",
-      "why": "线程池用于根据系统规格调整适当的工人数量。"
+      "wrong": "线程越多，速度就越快。",
+      "correct": "不！如果线程数多于 CPU 数，则速度会变慢，因为会争夺谁先执行（上下文切换）而不是执行任何工作。",
+      "why": "线程池用于调整适合系统规格的工作线程数量。"
     }
   ],
-  "keyTakeaway": "ExecutorService 是现代 Java 并发编程的核心。请使用线程池而不是直接创建线程！"
+  "keyTakeaway": "ExecutorService是现代Java并发编程的核心。使用池而不是自己创建线程！"
 }

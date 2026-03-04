@@ -1,0 +1,110 @@
+{
+  "lessonId": "cpp-5-2",
+  "title": "Shared_ptr 和引用计数",
+  "concept": "shared_ptr 在多个所有者之间共享相同的内存，并在最后一个所有者消失时被释放。",
+  "content": {
+    "code": "#include <iostream>\n#include <memory>\nusing namespace std;\n\nint main() {\n    shared_ptr<int> a = make_shared<int>(100);\n    cout << \"count: \" << a.use_count() << endl;\n\n    {\n        shared_ptr<int> b = a;\n        cout << \"count: \" << a.use_count() << endl;\n    }\n\n    cout << \"count: \" << a.use_count() << endl;\n    return 0;\n}",
+    "steps": [
+      {
+        "title": "创建shared_ptr",
+        "explanation": "`make_shared<int>(100)` 在堆上一起分配一个 int 和一个引用计数器。\n\n当前所有者是“a”，因此“use_count() = 1”。",
+        "visualizationType": "cMemory",
+        "code": "shared_ptr<int> a = make_shared<int>(100);",
+        "stack": [
+          {
+            "name": "a",
+            "value": "0xB000",
+            "type": "shared_ptr<int>",
+            "address": "0x1000",
+            "points_to": "*a"
+          }
+        ],
+        "heap": [
+          {
+            "name": "*a",
+            "value": "100",
+            "type": "int",
+            "address": "0xB000"
+          }
+        ],
+        "stdout": "count: 1"
+      },
+      {
+        "title": "分享——增加引用计数",
+        "explanation": "使用“shared_ptr<int> b = a”，“b”也成为同一内存的所有者。\n\n引用计数增加到2。“a”和“b”都指向相同的堆数据。",
+        "visualizationType": "cMemory",
+        "code": "shared_ptr<int> b = a;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "0xB000",
+            "type": "shared_ptr<int>",
+            "address": "0x1000",
+            "points_to": "*a"
+          },
+          {
+            "name": "b",
+            "value": "0xB000",
+            "type": "shared_ptr<int>",
+            "address": "0x1008",
+            "points_to": "*a",
+            "highlight": true
+          }
+        ],
+        "heap": [
+          {
+            "name": "*a",
+            "value": "100",
+            "type": "int",
+            "address": "0xB000"
+          }
+        ],
+        "stdout": "count: 2"
+      },
+      {
+        "title": "b 消失 — 减少计数",
+        "explanation": "在块“{}”末尾，“b”被销毁。引用计数减少到 1。\n\n由于计数不为0，因此堆内存尚未被释放。 `a` 仍然被拥有。",
+        "visualizationType": "cMemory",
+        "code": "cout << \"count: \" << a.use_count() << endl;",
+        "stack": [
+          {
+            "name": "a",
+            "value": "0xB000",
+            "type": "shared_ptr<int>",
+            "address": "0x1000",
+            "points_to": "*a"
+          }
+        ],
+        "heap": [
+          {
+            "name": "*a",
+            "value": "100",
+            "type": "int",
+            "address": "0xB000"
+          }
+        ],
+        "stdout": "count: 1"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "那么shared_ptr的内存什么时候被释放呢？",
+    "options": [
+      "当第一个shared_ptr被销毁时",
+      "当最后一个shared_ptr被销毁并且use_count变成0时",
+      "当程序结束时",
+      "手动调用delete时"
+    ],
+    "correctIndex": 1,
+    "explanation": "当shared_ptr的引用计数变为0时，它会自动释放内存。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "shared_ptr不存在循环引用问题",
+      "correct": "如果shared_ptr以A→B和B→A的方式相互引用，则计数永远不会变为0，从而导致内存泄漏。",
+      "why": "要解决此问题，您需要将一侧更改为weak_ptr。"
+    }
+  ],
+  "keyTakeaway": "shared_ptr 通过引用计数管理共享所有权，并在最后一个所有者消失时自动释放。"
+}

@@ -1,13 +1,13 @@
 {
   "lessonId": "c-13-3",
   "title": "隐式/显式类型转换",
-  "concept": "在 C 中混合使用不同数据类型时，会发生自动转换（隐式）或手动转换（显式），需要注意数据丢失。",
+  "concept": "如果在C中混合不同的数据类型，会发生自动转换（隐式）或手动转换（显式），必须小心数据丢失。",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int a = 7;\n    int b = 2;\n\n    double result1 = a / b;\n    printf(\"int/int: %f\\n\", result1);\n\n    double result2 = (double)a / b;\n    printf(\"(double)int/int: %f\\n\", result2);\n\n    double big = 1e18;\n    int truncated = (int)big;\n    printf(\"Overflow: %d\\n\", truncated);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "通过 **`#include <stdio.h>`** 包含标准输入输出头文件以使用 `printf`。\n\n本课探讨混合使用不同数据类型时发生的**类型转换（Type Casting）**。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用 **`#include <stdio.h>`** 包含标准输入/输出标头，以便与 `printf` 一起使用。\n\n在本课中，我们将学习**类型转换**，它在混合不同数据类型时发生。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "**`int main()`** -- 程序的入口点，创建 main 栈帧。\n\n本课学习类型之间的转换是如何发生的，以及为什么**同样的数学运算会因数据类型不同而产生完全不同的结果**。",
+        "title": "启动主函数",
+        "explanation": "**`int main()`** --- 程序的起点，创建主堆栈帧。\n\n在本课程中，您将了解数据类型之间的转换是如何发生的，以及为什么相同的数学运算会根据数据类型产生完全不同的结果。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "声明整数变量",
-        "explanation": "**`int a = 7;`**，**`int b = 2;`** -- 声明两个整型变量。`int` 只存储整数，永远无法表示小数点后的内容。",
+        "title": "整型变量声明",
+        "explanation": "**`int a = 7;`**, **`int b = 2;`** --- 声明两个整型变量。 `int` 仅存储整数，不能表示小数位。",
         "visualizationType": "cMemory",
         "code": "int a = 7;",
         "highlightOffset": [
@@ -54,7 +54,7 @@
       },
       {
         "title": "整数除法的陷阱",
-        "explanation": "**`double result1 = a / b;`** -- 这是 C 初学者最容易掉入的陷阱。`a / b` 两侧都是 `int`，所以先执行**整数除法**：`7 / 2 = 3`（小数 `.5` 是**截断**而非四舍五入）。",
+        "explanation": "**`double result1 = a / b;`** --- 这是 C 初学者最常见的陷阱。由于`a / b`两边都是`int`，所以先进行**整数除法**，得到`7 / 2 = 3`（注意小数点`.5`被**截断**，而不是四舍五入）。",
         "visualizationType": "cMemory",
         "code": "double result1 = a / b;",
         "stack": [
@@ -79,15 +79,15 @@
         ]
       },
       {
-        "title": "输出整数除法结果",
-        "explanation": "**`printf(\"int/int: %f\\n\", result1);`** -- 输出 `3.000000`。不是期望的 `3.500000`——小数部分完全丢失了。",
+        "title": "打印整数除法结果",
+        "explanation": "**`printf(\"int/int: %f\\n\", result1);`** --- `3.000000` 被打印。结果不是预期的“3.500000”，而是小数点完全消失了。",
         "visualizationType": "cMemory",
         "code": "printf(\"int/int: %f\\n\", result1);",
         "stdout": "int/int: 3.000000"
       },
       {
-        "title": "用显式转换实现正确除法",
-        "explanation": "**`double result2 = (double)a / b;`** -- `(double)a` 是**显式类型转换（Explicit Casting）**，意为"将 a 的值转换为 double"。当 `7` 变为 `7.0` 后，C 自动将另一侧的 `b` 也**提升（Promotion）**为 double，于是 `7.0 / 2.0 = 3.5`。",
+        "title": "通过显式类型转换正确除法",
+        "explanation": "**`double result2 = (double)a / b;`** --- `(double)a` 是 **显式转换**，意思是“将 a 的值转换为 double”。当`7`转换为`7.0`时，C自动将另一边`b`提升为双倍（Prom",
         "visualizationType": "cMemory",
         "code": "double result2 = (double)a / b;",
         "stack": [
@@ -118,15 +118,15 @@
         ]
       },
       {
-        "title": "输出显式转换结果",
-        "explanation": "**`printf(\"(double)int/int: %f\\n\", result2);`** -- 这次正确输出了 `3.500000`！多亏了 `(double)` 转换，小数部分被保留了。",
+        "title": "输出显式类型转换结果",
+        "explanation": "**`printf(\"(double)int/int: %f\\n\", result2);`** --- 这次正确打印了 `3.500000`！由于“(double)”转换，小数点得以保留。",
         "visualizationType": "cMemory",
         "code": "printf(\"(double)int/int: %f\\n\", result2);",
         "stdout": "int/int: 3.000000\n(double)int/int: 3.500000"
       },
       {
-        "title": "声明巨大的 double 值",
-        "explanation": "**`double big = 1e18;`** -- `1e18` 是科学记数法表示 `1 x 10^18`，即 **100 京**这个天文数字。`double`（8 字节）可表示到约 `10^308`，轻松存储，但 `int`（4 字节）的最大值仅约 21 亿。",
+        "title": "声明一个巨大的双值",
+        "explanation": "**`double big = 1e18;`** --- `1e18` 是一个非常大的数字，科学计数法中的 `1 x 10^18`，或 **1 quintillion**。 “double”（8 字节）最多可以表示大约“10^308”，因此可以轻松存储，但“int”（4 字节）的最大值约为 21 亿。",
         "visualizationType": "cMemory",
         "code": "double big = 1e18;",
         "stack": [
@@ -163,8 +163,8 @@
         ]
       },
       {
-        "title": "危险的转换 - 溢出",
-        "explanation": "**`int truncated = (int)big;`** -- 将 100 京的 double 值强制转换为 `(int)`。int 最大值（21 亿）比它小 4.6 亿倍，显然无法容纳，这是**未定义行为（Undefined Behavior）**。",
+        "title": "危险演员 - 溢出",
+        "explanation": "**`int truncated = (int)big;`** --- 强制将 100 个 quintillion double 值转换为 `(int)`。由于它是一个比最大 int 值（21 亿）大 4.6 亿倍的值，因此显然无法包含它，这就是**未定义行为**。",
         "visualizationType": "cMemory",
         "code": "int truncated = (int)big;",
         "stack": [
@@ -200,22 +200,22 @@
           },
           {
             "name": "truncated",
-            "value": "???（overflow）",
+            "value": "??? (overflow)",
             "type": "int",
             "address": "0x1020"
           }
         ]
       },
       {
-        "title": "查看溢出结果及终止",
-        "explanation": "**`printf(\"Overflow: %d\\n\", truncated);`** -- 在此环境中输出 `-2147483648`（int 最小值）。这个数字与原始值 100 京毫无关系，在其他系统上可能输出 `0` 或其他垃圾值。",
+        "title": "检查并终止溢出结果",
+        "explanation": "**`printf(\"Overflow: %d\\n\", truncated);`** --- 在此环境中，输出 `-2147483648` （int 最小值）。它是一个与原始值 100 完全无关的数字，在其他系统中它可能显示“0”或其他垃圾值。",
         "visualizationType": "cMemory",
         "code": "printf(\"Overflow: %d\\n\", truncated);",
         "stdout": "int/int: 3.000000\n(double)int/int: 3.500000\nOverflow: -2147483648"
       },
       {
-        "title": "程序终止",
-        "explanation": "**`return 0;`** -- 程序正常终止，随着 main 栈帧的释放，所有局部变量从内存中回收。\n\n本课核心：**隐式转换**由编译器自动执行（`int + double` -> double，而 `int / int` -> int 是陷阱）。**显式转换**使用 `(type)` 手动指定转换。",
+        "title": "程序退出",
+        "explanation": "**`return 0;`** --- 程序正常终止，所有局部变量随着主堆栈帧被释放而从内存中返回。\n\n本课重点：**隐式类型转换**由编译器自动执行（`int + double` -> double、`int / int` -> int 是陷阱）",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -224,7 +224,7 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "`int x = 5; int y = 3; double z = x / y;` 中 `z` 的值是多少？",
+    "question": "`int x = 5;整数 y = 3； double z = x / y;` 中的 `z` 值是多少？",
     "options": [
       "1.666667",
       "1.000000",
@@ -232,14 +232,14 @@
       "编译错误"
     ],
     "correctIndex": 1,
-    "explanation": "`x / y` 是 int / int，所以结果也是 int。\n5 / 3 = 1（小数截断），然后这个 1 被转换为 double，z = 1.000000。\n要获得正确结果，需要用 `(double)x / y` 进行转换。"
+    "explanation": "由于`x/y`是int/int，所以结果也是int。\n5 / 3 = 1（截去小数点），然后将这个 1 转换为 double，得到 z = 1.000000。\n您需要将其转换为“(double)x / y”才能获得正确的结果。"
   },
   "misconceptions": [
     {
-      "wrong": "写 double result = a / b; 结果会自动带小数。",
-      "correct": "除法先执行后才赋值，所以整数除法的结果（已去掉小数）被存入 double。",
-      "why": "在 C 中，运算根据操作数的类型执行，赋值在之后发生。"
+      "wrong": "双结果 = a / b;如果您写入，结果会自动显示到小数点。",
+      "correct": "因为先除法再赋值，所以int之间的除法结果（去掉小数点）存储在double中。",
+      "why": "这是因为在C中，运算是根据操作数的类型进行的，然后进行赋值操作。"
     }
   ],
-  "keyTakeaway": "整数相除会截断小数部分，需要精确的浮点结果时必须先用 (double) 进行转换。"
+  "keyTakeaway": "在整数之间进行除法时，小数点会被丢弃，因此如果需要精确的实数结果，必须先进行强制转换 (double)。"
 }

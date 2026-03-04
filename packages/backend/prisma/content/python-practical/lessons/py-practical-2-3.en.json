@@ -1,0 +1,181 @@
+{
+  "lessonId": "py-practical-2-3",
+  "title": "openpyxl로 서식과 차트",
+  "concept": "pandas로 데이터 처리 후, openpyxl로 셀 색상, 폰트, 차트를 추가하여 보기 좋은 보고서를 만듭니다",
+  "content": {
+    "code": "from openpyxl import Workbook\nfrom openpyxl.styles import Font, PatternFill\nfrom openpyxl.chart import BarChart, Reference\n\nwb = Workbook()\nws = wb.active\nws['A1'] = '부서'\nws['B1'] = '매출'\nws['A1'].font = Font(bold=True, size=14)\nws['A1'].fill = PatternFill(start_color='4472C4', fill_type='solid')\nwb.save('report.xlsx')",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Step 1: openpyxl 불러오기",
+        "explanation": "`openpyxl`은 **Excel 파일을 직접 조작**하는 라이브러리입니다.\n\n**pandas vs openpyxl**:\n- pandas: 데이터 분석 (필터링, 집계)\n- openpyxl: Excel 서식 (색상, 폰트, 차트)\n\n**실무 흐름**: pandas로 데이터 정리 → openpyxl로 예쁘게 꾸미기",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 2,
+        "title": "Step 2: 스타일 모듈 불러오기",
+        "explanation": "`Font`, `PatternFill`은 **셀 서식을 설정**하는 클래스입니다.\n\n**Font**: 글꼴, 크기, 볼드, 색상\n**PatternFill**: 셀 배경색\n\n**왜 필요한가?** Excel에서 직접 서식을 설정하는 대신, 코드로 자동화하기 위해서입니다.",
+        "highlight": [
+          2
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 3,
+        "title": "Step 3: 차트 모듈 불러오기",
+        "explanation": "`BarChart`는 **막대 차트**를 생성하는 클래스입니다.\n\n**차트 종류**:\n- BarChart: 막대 차트\n- LineChart: 선 차트\n- PieChart: 원 차트\n\n**Reference**: 차트에 사용할 데이터 범위를 지정합니다.",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 5,
+        "title": "Step 4: 새 Workbook 생성",
+        "explanation": "`Workbook()`은 **빈 Excel 파일**을 메모리에 생성합니다.\n\n**Workbook vs Worksheet**:\n- Workbook: Excel 파일 전체 (여러 시트 포함)\n- Worksheet: 하나의 시트\n\n**아직 저장 안 됨**: 메모리에만 있고, 11번 줄에서 저장합니다.",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "wb",
+              "pointsTo": "obj_wb"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_wb",
+              "type": "object",
+              "value": "Workbook()",
+              "pyId": "5001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "Step 5: 활성 시트 가져오기",
+        "explanation": "`wb.active`는 **현재 활성화된 시트**를 가져옵니다.\n\n**기본 동작**: 새 Workbook은 'Sheet'라는 이름의 시트 1개를 자동 생성합니다.\n\n**ws는 뭐야?** Worksheet의 약자로, 관례적으로 사용하는 변수명입니다.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "wb",
+              "pointsTo": "obj_wb"
+            },
+            {
+              "name": "ws",
+              "pointsTo": "obj_ws"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_wb",
+              "type": "object",
+              "value": "Workbook()",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_ws",
+              "type": "object",
+              "value": "wb.active",
+              "pyId": "5002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "Step 6: 셀에 값 입력",
+        "explanation": "`ws['A1'] = '부서'`는 **A1 셀에 '부서' 입력**합니다.\n\n**셀 주소 방식**: Excel과 동일 (A1, B2, C3...)\n\n**다른 방법**: `ws.cell(row=1, col=1, value='부서')` (행, 열 번호 사용)",
+        "highlight": [
+          7,
+          8
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "obj_wb",
+              "type": "object",
+              "value": "Workbook()",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_ws",
+              "type": "object",
+              "value": "wb.active",
+              "pyId": "5002"
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "Step 7: 폰트 설정",
+        "explanation": "`Font(bold=True, size=14)`로 **A1 셀의 글꼴을 설정**합니다.\n\n**매개변수**:\n- `bold=True`: 볼드 처리\n- `size=14`: 글꼴 크기 14pt\n\n**실무 활용**: 헤더 행을 볼드 처리하여 구분합니다.",
+        "highlight": [
+          9
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 10,
+        "title": "Step 8: 배경색 설정",
+        "explanation": "`PatternFill(start_color='4472C4', fill_type='solid')`로 **A1 셀의 배경색**을 설정합니다.\n\n**start_color**: RGB 색상 코드 (16진수)\n- '4472C4': 파란색\n- 'FF0000': 빨간색\n- '00FF00': 초록색\n\n**fill_type='solid'**: 단색 채우기 (필수)",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 11,
+        "title": "Step 9: Excel 파일 저장",
+        "explanation": "`wb.save('report.xlsx')`로 **메모리의 Workbook을 파일로 저장**합니다.\n\n**결과**: report.xlsx 파일 생성\n- A1: '부서' (볼드, 14pt, 파란 배경)\n- B1: '매출'\n\n**실무 팁**: 파일명에 날짜 넣기 → `f'report_{datetime.now():%Y%m%d}.xlsx'`",
+        "highlight": [
+          11
+        ],
+        "visualizationType": "python"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How to make the text in cell A1 red with openpyxl?",
+    "options": [
+      "ws['A1'].font = Font(color='FF0000')",
+      "ws['A1'].fill = PatternFill(color='FF0000')",
+      "ws['A1'].color = 'FF0000'",
+      "ws['A1'].style = 'red'"
+    ],
+    "correctIndex": 0,
+    "explanation": "Set the text color with the Font color parameter.\nPatternFill is the background color, and Font is the text color."
+  },
+  "misconceptions": [
+    {
+      "wrong": "pandas로도 셀 색상을 바꿀 수 있다",
+      "correct": "pandas는 데이터 분석용입니다.\n서식 설정은 openpyxl 또는 xlsxwriter를 사용해야 합니다.",
+      "why": "pandas의 to_excel()은 서식을 지원하지 않습니다."
+    },
+    {
+      "wrong": "Workbook()만 하면 파일이 생성된다",
+      "correct": "Workbook()은 메모리에만 생성합니다.\nwb.save()를 호출해야 실제 파일이 만들어집니다.",
+      "why": "메모리와 파일은 별개입니다.\n저장하지 않으면 프로그램 종료 시 사라집니다."
+    }
+  ],
+  "keyTakeaway": "pandas (데이터) + openpyxl (서식) = 완벽한 Excel 보고서"
+}

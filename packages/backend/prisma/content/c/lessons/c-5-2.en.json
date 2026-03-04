@@ -6,8 +6,8 @@
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = (int*)malloc(sizeof(int));\n\n    if (p == NULL) {\n        printf(\"Memory full!\\n\");\n        return 1;\n    }\n\n    *p = 100;\n    printf(\"Stored in heap: %d\\n\", *p);\n\n    free(p);\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
-        "explanation": "This header is needed to use `printf`.\n\nThis lesson covers the safe malloc pattern: allocate-check-use-free.",
+        "title": "Include stdio.h header",
+        "explanation": "Header for using `printf`.\n\nThis lesson covers the malloc safety pattern (allocate-check-use-free).",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,14 +15,14 @@
         "stdout": ""
       },
       {
-        "title": "Including stdlib.h header",
-        "explanation": "This header is needed to use `malloc` and `free`.\n\nDynamic memory function declarations are found here.",
+        "title": "Include stdlib.h header",
+        "explanation": "Header for using `malloc` and `free`.\n\nDynamic memory-related function declarations go here.",
         "visualizationType": "cMemory",
         "code": "#include <stdlib.h>"
       },
       {
-        "title": "Defining the main function",
-        "explanation": "The main frame is created.\n\nIn the following steps, we will follow the standard usage sequence for heap memory.",
+        "title": "main function definition",
+        "explanation": "The main frame is created.\n\nIn subsequent steps, we follow the standard usage order of heap memory.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -35,8 +35,8 @@
         ]
       },
       {
-        "title": "Requesting heap memory allocation",
-        "explanation": "`malloc(sizeof(int))` requests space for one integer on the heap.\n\nIt returns the address on success, or `NULL` on failure.",
+        "title": "Heap memory allocation request",
+        "explanation": "Request the size of one integer from the heap with `malloc(sizeof(int))`.\n\nReturns address on success, `NULL` on failure.",
         "visualizationType": "cMemory",
         "code": "int *p = (int*)malloc(sizeof(int));",
         "stack": [
@@ -56,14 +56,14 @@
         ]
       },
       {
-        "title": "Checking for allocation failure",
-        "explanation": "We first check whether `p == NULL`.\n\nA NULL check is the basic safety mechanism to prevent crashes.",
+        "title": "Memory allocation failure check",
+        "explanation": "First check whether `p == NULL`.\n\nNULL checking is a basic failsafe to prevent crashes.",
         "visualizationType": "cMemory",
         "code": "if (p == NULL) {"
       },
       {
-        "title": "Printing failure message",
-        "explanation": "We notify the user about the allocation failure.",
+        "title": "Output failure message",
+        "explanation": "Notifies the user of an allocation failure situation.",
         "visualizationType": "cMemory",
         "code": "printf(\"Memory full!\\n\");",
         "stack": [],
@@ -71,15 +71,15 @@
         "stdout": "Memory full!"
       },
       {
-        "title": "Returning error code",
-        "explanation": "`return 1;` indicates abnormal termination.\n\nIt is important not to continue execution after a failure.",
+        "title": "return error code",
+        "explanation": "Abnormal termination is specified with `return 1;`.\n\nIt is important not to move on after failure.",
         "visualizationType": "cMemory",
         "code": "return 1;",
         "stdout": ""
       },
       {
-        "title": "Storing a value in heap memory",
-        "explanation": "`*p = 100;` stores a value in the allocated heap space.",
+        "title": "Store value in heap memory",
+        "explanation": "Store the value in the heap space allocated with `*p = 100;`.",
         "visualizationType": "cMemory",
         "code": "*p = 100;",
         "stack": [
@@ -100,8 +100,8 @@
         ]
       },
       {
-        "title": "Printing the heap value",
-        "explanation": "We read `*p` to print the stored value.",
+        "title": "Heap memory value output",
+        "explanation": "Reads `*p` and outputs the stored value.",
         "visualizationType": "cMemory",
         "code": "printf(\"Stored in heap: %d\\n\", *p);",
         "heap": [
@@ -114,8 +114,8 @@
         "stdout": "Stored in heap: 100"
       },
       {
-        "title": "Freeing heap memory",
-        "explanation": "`free(p)` returns the used heap memory back to the system.\n\nAfter freeing, you should avoid reusing the pointer.",
+        "title": "free heap memory",
+        "explanation": "Frees the heap memory used with `free(p)`.\n\nPointer reuse should be avoided after freeing.",
         "visualizationType": "cMemory",
         "code": "free(p);",
         "stack": [
@@ -130,8 +130,8 @@
         "heap": []
       },
       {
-        "title": "Successful program termination",
-        "explanation": "The program terminates normally with `return 0;`.\n\nSummary: Using malloc always includes a NULL check and free.",
+        "title": "Program successful completion",
+        "explanation": "It ends normally with `return 0;`.\n\nSummary: Using malloc always includes NULL checking and freeing.",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -140,22 +140,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "The return type of malloc is `void*`.\nWhat does that mean?",
+    "question": "The return type of malloc is `void*`.\nWhat does it mean?",
     "options": [
-      "It returns nothing",
-      "It returns an error",
-      "It is an address with no determined type",
-      "It returns 0"
+      "returns nothing",
+      "returns an error",
+      "It is an address without a type (undetermined).",
+      "returns 0"
     ],
     "correctIndex": 2,
-    "explanation": "`void*` means 'an address whose type is unknown'.\nThat is why it is standard practice to cast it like `(int*)`."
+    "explanation": "`void*` is ‘an address of unknown type’.\nSo, it is standard to use it by casting like `(int*)`."
   },
   "misconceptions": [
     {
-      "wrong": "Memory allocated with malloc is initialized to 0",
-      "correct": "It contains garbage values.",
-      "why": "If you need zero-initialized memory, use `calloc`.\n`malloc` skips initialization for speed."
+      "wrong": "Memory acquired by malloc is initialized to 0.",
+      "correct": "It contains garbage price.",
+      "why": "If you need memory initialized to 0, you should use `calloc`.\n`malloc` does not initialize for speed."
     }
   ],
-  "keyTakeaway": "Borrow with `malloc(sizeof(type))`, check for `NULL`, and use through the pointer."
+  "keyTakeaway": "Borrow with `malloc(sizeof(type))`, check for `NULL`, and write as a pointer."
 }

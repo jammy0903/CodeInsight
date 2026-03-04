@@ -1,13 +1,13 @@
 {
   "lessonId": "java-6-3",
-  "title": "Finally 与异常委托（throws）",
-  "concept": "学习无条件执行的 finally 块，以及通过 throws 关键字将异常处理委托给调用者。",
+  "title": "Finally와 예외 떠넘기기(throws)",
+  "concept": "무조건 실행되는 finally 블록과, 예외 처리를 호출자에게 위임하는 throws 키워드를 배웁니다.",
   "content": {
-    "code": "public class Main {\n    public static void main(String[] args) {\n        try {\n            dangerousTask();\n        } catch (InterruptedException e) {\n            System.out.println(\"Caught!\");\n        }\n    }\n\n    // throws：\"我处理不了，你来！\"\n    static void dangerousTask() throws InterruptedException {\n        System.out.println(\"Task Start\");\n        try {\n            Thread.sleep(1000);\n            throw new InterruptedException(); // Force Error\n        } finally {\n            System.out.println(\"Cleanup\");\n        }\n    }\n}",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        try {\n            dangerousTask();\n        } catch (InterruptedException e) {\n            System.out.println(\"Caught!\");\n        }\n    }\n\n    // throws: \"난 이거 처리 못해, 네가 해!\"\n    static void dangerousTask() throws InterruptedException {\n        System.out.println(\"Task Start\");\n        try {\n            Thread.sleep(1000);\n            throw new InterruptedException(); // Force Error\n        } finally {\n            System.out.println(\"Cleanup\");\n        }\n    }\n}",
     "steps": [
       {
-        "title": "main 方法开始",
-        "explanation": "**`public static void main(String[] args)`**\n\n程序的起点。\n\n**类比**：`main` 就像最终必须处理所有事故的"现场负责人"。",
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램의 시작점입니다.\n\n**비유**: `main`은 사건 사고를 최종적으로 수습해야 하는 '현장 책임자'와 같습니다.",
         "visualizationType": "javaMemory",
         "code": "public static void main(String[] args) {",
         "javaMemoryState": {
@@ -17,8 +17,8 @@
         }
       },
       {
-        "title": "调用危险方法",
-        "explanation": "**执行流程：**\n1. `main` 调用 `dangerousTask()`。\n2. 创建新的栈帧。\n\n**说明：**\n该方法声明了 `throws InterruptedException`。\n相当于发出警告："要调用我，就必须准备好处理这个异常！"",
+        "title": "위험한 메서드 호출",
+        "explanation": "**실행 순서:**\n1. `main`에서 `dangerousTask()`를 호출합니다.\n2. 새로운 스택 프레임이 생성됩니다.\n\n**해설:**\n이 메서드는 `throws InterruptedException`이라고 선언되어 있습니다.\n즉, \"나를 부르려면 반드시 그 예외를 처리할 준비를 해!\"라고 경고장을 날린 것입니다.",
         "visualizationType": "javaMemory",
         "code": "dangerousTask();",
         "javaMemoryState": {
@@ -39,8 +39,8 @@
         }
       },
       {
-        "title": "异常抛出（Throw）",
-        "explanation": "**执行流程：**\n1. `dangerousTask` 执行过程中发生了 `InterruptedException`。\n2. 方法内部的 `try` 块停止执行。\n\n**说明：**\n轰！异常发生了。\n但还不能马上离开。\n因为**清理精灵 `finally`** 还在等着。",
+        "title": "예외 발생 (Throw)",
+        "explanation": "**실행 순서:**\n1. `dangerousTask` 실행 중 `InterruptedException`이 발생합니다.\n2. 메서드 내부의 `try` 블록이 실행 중단됩니다.\n\n**해설:**\n펑! 예외가 발생했습니다.\n하지만 바로 탈출하지 못합니다.\n왜냐하면 **마무리 요정 `finally`**가 기다리고 있기 때문입니다.",
         "visualizationType": "javaMemory",
         "code": "try {",
         "occurrence": 2,
@@ -72,8 +72,8 @@
         }
       },
       {
-        "title": "Finally 执行",
-        "explanation": "**执行流程：**\n1. 尽管发生了异常，在退出方法之前会先执行 `finally` 块。\n2. 输出 \"Cleanup\"。\n\n**说明：**\n**绝对规则：** 无论成功还是失败（异常发生），`finally` **必定**执行。\n主要用于关闭资源或清理工作。",
+        "title": "Finally 실행",
+        "explanation": "**실행 순서:**\n1. 예외가 발생했지만, 메서드를 빠져나가기 전 `finally` 블록으로 이동합니다.\n2. \"Cleanup\"을 출력합니다.\n\n**해설:**\n**절대 규칙:** `finally`는 성공하든 실패하든(예외 발생) **무조건** 실행됩니다.\n주로 문을 닫거나(Close), 청소하는 작업에 쓰입니다.",
         "visualizationType": "javaMemory",
         "code": "Thread.sleep(1000);",
         "highlightOffset": [
@@ -100,10 +100,10 @@
         }
       },
       {
-        "title": "异常传播（Propagation）",
-        "explanation": "**执行流程：**\n1. `finally` 执行完毕后，未被捕获的异常（`0x500`）被抛给调用者（`main`）。\n2. `dangerousTask` 栈帧被销毁（弹出）。\n\n**说明：**\n`dangerousTask` 内部没有 catch。\n所以异常"不关我事！"地飞回了调用它的 `main`。\n这就是**异常传播（Propagation）**。",
+        "title": "예외 떠넘기기 (Propagation)",
+        "explanation": "**실행 순서:**\n1. `finally` 실행 후, 잡지 못한 예외(`0x500`)는 호출자(`main`)에게 던져집니다.\n2. `dangerousTask` 스택 프레임이 파기(Pop)됩니다.\n\n**해설:**\n`dangerousTask` 안에는 catch가 없었습니다.\n그래서 예외는 \"난 몰라!\" 하고 자기를 부른 `main`한테 날아갑니다.\n이게 **예외 전파(Propagation)**입니다.",
         "visualizationType": "javaMemory",
-        "code": "// throws：\"我处理不了，你来！\"",
+        "code": "// throws: \"난 이거 처리 못해, 네가 해!\"",
         "javaMemoryState": {
           "stack": [
             {
@@ -124,8 +124,8 @@
         }
       },
       {
-        "title": "在 Main 中捕获",
-        "explanation": "**执行流程：**\n1. `main` 的 `catch` 块捕获了传播过来的异常。\n2. 输出 \"Caught!\" 并处理了情况。\n\n**说明：**\n"击鼓传花"结束，`main` 最终处理了它。\nChecked Exception 必须由某人来处理。",
+        "title": "Main에서 Catch",
+        "explanation": "**실행 순서:**\n1. `main`의 `catch` 블록이 날아온 예외를 잡습니다.\n2. \"Caught!\"를 출력하고 상황을 수습합니다.\n\n**해설:**\n폭탄 돌리기 끝에 `main`이 최종적으로 처리했습니다.\nChecked Exception은 누군가는 반드시 처리해야 합니다.",
         "visualizationType": "javaMemory",
         "code": "} catch (InterruptedException e) {",
         "highlightOffset": [
@@ -166,22 +166,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下哪种情况是 finally 块唯一不会执行的情况？",
+    "question": "下面哪种情况是finally 块不被执行的唯一情况？",
     "options": [
-      "在 try 块中遇到 return 语句时。",
-      "异常未被捕获时。",
-      "调用了 System.exit(0) 时。",
-      "try 块中存在无限循环时。"
+      "当 try 块中遇到 return 语句时",
+      "当异常没有被捕获时",
+      "当 System.exit(0) 被调用时",
+      "当 try 块内发生无限循环时"
     ],
     "correctIndex": 2,
-    "explanation": "`System.exit(0)` 会强制终止 JVM 本身，因此包括 `finally` 在内的任何代码都不会再执行。\n即使遇到 `return`，`finally` 也会在返回值之前执行。"
+    "explanation": "`System.exit(0)` 是一个强制 JVM 本身终止的命令，因此包括 `finally` 在内的任何代码将不再被执行。\n即使遇到`return`，`finally`也会被执行并退出。"
   },
   "misconceptions": [
     {
-      "wrong": "如果在 try 块中 return，finally 会被跳过。",
-      "correct": "不会。\n在返回值交付之前，`finally` 块会先执行。",
-      "why": "`finally` 是 JVM 保证的最后防线。"
+      "wrong": "try 블록에서 return 하면 finally는 건너뛴다.",
+      "correct": "아닙니다.\n`return` 하기 직전에 `finally` 블록을 들른 후 값을 반환합니다.",
+      "why": "`finally`는 JVM이 보장하는 최후의 보루입니다."
     }
   ],
-  "keyTakeaway": "`finally` 对资源清理至关重要，`throws` 可以将异常处理委托给调用者。"
+  "keyTakeaway": "`finally`는 자원 정리에 필수적이며, `throws`를 통해 예외 처리를 호출자에게 위임할 수 있습니다."
 }

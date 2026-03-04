@@ -1,13 +1,13 @@
 {
   "lessonId": "java-9-2",
-  "title": "JVM 结构：堆区域的三代",
-  "concept": "JVM 为了高效清理，将堆（Heap）区域按对象年龄分为三个区域进行管理。",
+  "title": "JVM 구조: 힙 영역의 3세대",
+  "concept": "JVM은 효율적인 청소를 위해 Heap 영역을 나이에 따라 3개의 구역으로 나누어 관리합니다.",
   "content": {
     "code": "public class Main {\n    public static void main(String[] args) {\n        // 방금 태어난 모든 객체는 Eden 영역으로 갑니다.\n        Object baby = new Object();\n        \n        // 오래 살아남은 객체는 점차 생존자 영역을 거쳐\n        // Old 영역으로 '진급'하게 됩니다.\n    }\n}",
     "steps": [
       {
-        "title": "main 方法开始",
-        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。",
+        "title": "main 메서드 시작",
+        "explanation": "**`public static void main(String[] args)`**\n\n프로그램 진입점입니다.",
         "visualizationType": "javaMemory",
         "code": "public static void main(String[] args) {",
         "javaMemoryState": {
@@ -17,8 +17,8 @@
         }
       },
       {
-        "title": "年轻代（Young Generation）",
-        "explanation": "大多数对象在创建后很快就会消亡。\n为了这些"短命"的对象，设置了 **Eden** 区域和 **Survivor（幸存者）** 区域。\n在这里发生的清理称为 Minor GC。",
+        "title": "Young Generation (청년기)",
+        "explanation": "대부분의 객체는 생성되자마자 금방 죽습니다.\n이런 '금사빠' 객체들을 위해 **Eden** 영역과 **Survivor(생존자)** 영역을 둡니다.\n여기서 일어나는 청소를 Minor GC라고 합니다.",
         "visualizationType": "javaMemory",
         "code": "Object baby = new Object();",
         "javaMemoryState": {
@@ -47,8 +47,8 @@
         }
       },
       {
-        "title": "老年代（Old Generation）",
-        "explanation": "在年轻代中长期存活的对象（经历多次 GC 后仍存活）会被移动到 **Old** 区域（晋升/Promotion）。\n这个区域不经常清理，但一旦清理就需要较长时间（Major GC）。",
+        "title": "Old Generation (노년기)",
+        "explanation": "Young 영역에서 오랫동안 살아남은(여러 번의 GC를 견딘) 객체는 **Old** 영역으로 이동합니다(Promotion).\n여기는 청소를 자주 하지 않는 대신, 한 번 하면 시간이 오래 걸립니다(Major GC).",
         "visualizationType": "javaMemory",
         "code": "// Old 영역으로 '진급'하게 됩니다.",
         "highlightOffset": [
@@ -84,22 +84,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "刚创建的对象最先被分配到哪个区域？",
+    "question": "刚刚创建的对象首先分配到的区域的名称是什么？",
     "options": [
-      "Survivor",
-      "Old",
-      "Eden",
-      "Metaspace"
+      "幸存者",
+      "老的",
+      "伊甸园",
+      "元空间"
     ],
     "correctIndex": 2,
-    "explanation": "新对象被分配到 Eden 区域，取名自"伊甸园"——起源之地。"
+    "explanation": "新的物体被分配到伊甸园领域，意思是开始的花园。"
   },
   "misconceptions": [
     {
-      "wrong": "所有堆清理的速度都一样。",
-      "correct": "不是的！年轻代区域小、清理快，但老年代区域大，清理时程序停顿的时间更长。",
-      "why": "因为对象数量多且引用关系复杂。"
+      "wrong": "모든 Heap 청소 속도는 동일하다.",
+      "correct": "아니요! Young 영역은 좁고 빠르지만, Old 영역은 넓고 청소할 때 프로그램이 멈추는 시간이 깁니다.",
+      "why": "객체 수가 많고 참조 관계가 복잡하기 때문입니다."
     }
   ],
-  "keyTakeaway": "JVM 基于弱分代假说（Weak Generational Hypothesis）高效管理内存。"
+  "keyTakeaway": "JVM은 세대별 가설(Weak Generational Hypothesis)에 따라 효율적으로 메모리를 관리합니다."
 }

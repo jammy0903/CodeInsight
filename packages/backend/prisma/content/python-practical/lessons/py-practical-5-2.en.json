@@ -1,0 +1,406 @@
+{
+  "lessonId": "py-practical-5-2",
+  "title": "피봇 테이블과 교차 분석",
+  "concept": "Excel 피봇 테이블을 코드로 만들어 부서별, 월별 집계를 자동화합니다",
+  "content": {
+    "code": "import pandas as pd\n\ndf = pd.read_csv('sales.csv')\npivot = df.pivot_table(\n    values='매출',\n    index='부서',\n    columns='월',\n    aggfunc='sum'\n)\nprint(pivot)",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Step 1: pandas 불러오기",
+        "explanation": "피봇 테이블 기능을 사용하기 위해 pandas를 import합니다.",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 3,
+        "title": "Step 2: CSV 데이터 읽기",
+        "explanation": "`pd.read_csv('sales.csv')`로 **매출 데이터**를 불러옵니다.\n\n**예시 데이터**:\n- 열: 부서, 월, 매출\n- 행: 개발/1월/1000, 개발/2월/1200, 영업/1월/800...\n\n**피봇 테이블이 필요한 이유**: 이런 세로 형식을 부서×월 표로 변환하기 위해서입니다.",
+        "highlight": [
+          3
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 4,
+        "title": "Step 3: 피봇 테이블 생성 시작",
+        "explanation": "`df.pivot_table()`로 **피봇 테이블**을 만듭니다.\n\n**피봇 테이블이란?**\nExcel에서 '삽입 → 피벗 테이블'로 만드는 그것입니다.\n세로 데이터를 행×열 교차 표로 변환합니다.\n\n**왜 코드로 만들까?** 매번 Excel에서 클릭하는 대신, 자동화하기 위해서입니다.",
+        "highlight": [
+          4
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            },
+            {
+              "name": "pivot",
+              "pointsTo": "obj_pivot"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_pivot",
+              "type": "object",
+              "value": "df.pivot_table(",
+              "pyId": "5002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "Step 4: values - 집계할 값",
+        "explanation": "`values='매출'`은 **어떤 값을 집계할지** 지정합니다.\n\n**의미**: '매출' 열의 값들을 합산(또는 평균 등)합니다.\n\n**다른 예시**:\n- `values='수량'`: 수량 집계\n- `values='금액'`: 금액 집계",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            },
+            {
+              "name": "pivot",
+              "pointsTo": "obj_pivot"
+            },
+            {
+              "name": "values",
+              "pointsTo": "obj_values"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_pivot",
+              "type": "object",
+              "value": "df.pivot_table(",
+              "pyId": "5002"
+            },
+            {
+              "id": "obj_values",
+              "type": "object",
+              "value": "'매출',",
+              "pyId": "5003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "Step 5: index - 행 기준",
+        "explanation": "`index='부서'`는 **피봇 테이블의 행**을 지정합니다.\n\n**결과**: 부서명이 행으로 나열됩니다 (개발, 영업...)\n\n**Excel 비유**: 피벗 테이블의 '행' 영역에 '부서' 필드를 드래그한 것과 같습니다.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            },
+            {
+              "name": "pivot",
+              "pointsTo": "obj_pivot"
+            },
+            {
+              "name": "values",
+              "pointsTo": "obj_values"
+            },
+            {
+              "name": "index",
+              "pointsTo": "obj_index"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_pivot",
+              "type": "object",
+              "value": "df.pivot_table(",
+              "pyId": "5002"
+            },
+            {
+              "id": "obj_values",
+              "type": "object",
+              "value": "'매출',",
+              "pyId": "5003"
+            },
+            {
+              "id": "obj_index",
+              "type": "object",
+              "value": "'부서',",
+              "pyId": "5004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "Step 6: columns - 열 기준",
+        "explanation": "`columns='월'`은 **피봇 테이블의 열**을 지정합니다.\n\n**결과**: 월이 열로 나열됩니다 (1월, 2월...)\n\n**Excel 비유**: 피벗 테이블의 '열' 영역에 '월' 필드를 드래그한 것과 같습니다.",
+        "highlight": [
+          7
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            },
+            {
+              "name": "pivot",
+              "pointsTo": "obj_pivot"
+            },
+            {
+              "name": "values",
+              "pointsTo": "obj_values"
+            },
+            {
+              "name": "index",
+              "pointsTo": "obj_index"
+            },
+            {
+              "name": "columns",
+              "pointsTo": "obj_columns"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_pivot",
+              "type": "object",
+              "value": "df.pivot_table(",
+              "pyId": "5002"
+            },
+            {
+              "id": "obj_values",
+              "type": "object",
+              "value": "'매출',",
+              "pyId": "5003"
+            },
+            {
+              "id": "obj_index",
+              "type": "object",
+              "value": "'부서',",
+              "pyId": "5004"
+            },
+            {
+              "id": "obj_columns",
+              "type": "object",
+              "value": "'월',",
+              "pyId": "5005",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "Step 7: aggfunc - 집계 함수",
+        "explanation": "`aggfunc='sum'`은 **어떻게 집계할지** 지정합니다.\n\n**sum**: 합계 (가장 많이 사용)\n\n**다른 옵션**:\n- `'mean'`: 평균\n- `'count'`: 개수\n- `'max'`: 최댓값\n- `'min'`: 최솟값\n\n**실무**: 부서별 평균 급여 → `aggfunc='mean'`",
+        "highlight": [
+          8
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "df",
+              "pointsTo": "obj_df"
+            },
+            {
+              "name": "pivot",
+              "pointsTo": "obj_pivot"
+            },
+            {
+              "name": "values",
+              "pointsTo": "obj_values"
+            },
+            {
+              "name": "index",
+              "pointsTo": "obj_index"
+            },
+            {
+              "name": "columns",
+              "pointsTo": "obj_columns"
+            },
+            {
+              "name": "aggfunc",
+              "pointsTo": "obj_aggfunc"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_pivot",
+              "type": "object",
+              "value": "df.pivot_table(",
+              "pyId": "5002"
+            },
+            {
+              "id": "obj_values",
+              "type": "object",
+              "value": "'매출',",
+              "pyId": "5003"
+            },
+            {
+              "id": "obj_index",
+              "type": "object",
+              "value": "'부서',",
+              "pyId": "5004"
+            },
+            {
+              "id": "obj_columns",
+              "type": "object",
+              "value": "'월',",
+              "pyId": "5005"
+            },
+            {
+              "id": "obj_aggfunc",
+              "type": "str",
+              "value": "'sum'",
+              "pyId": "5006",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "Step 8: 피봇 테이블 출력",
+        "explanation": "생성된 피봇 테이블을 출력합니다.\n\n**결과 형식**:\n```\n월       1월    2월\n부서\n개발   1000  1200\n영업    800   900\n```\n\n**의미**: 부서×월 교차표로 매출 합계가 표시됩니다.\n\n**실무 활용**: 이 표를 Excel로 저장 → `pivot.to_excel('pivot.xlsx')`",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "obj_df",
+              "type": "object",
+              "value": "pd.read_csv('sales.csv')",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_pivot",
+              "type": "object",
+              "value": "df.pivot_table(",
+              "pyId": "5002"
+            },
+            {
+              "id": "obj_values",
+              "type": "object",
+              "value": "'매출',",
+              "pyId": "5003"
+            },
+            {
+              "id": "obj_index",
+              "type": "object",
+              "value": "'부서',",
+              "pyId": "5004"
+            },
+            {
+              "id": "obj_columns",
+              "type": "object",
+              "value": "'월',",
+              "pyId": "5005"
+            },
+            {
+              "id": "obj_aggfunc",
+              "type": "str",
+              "value": "'sum'",
+              "pyId": "5006"
+            }
+          ],
+          "output": [
+            "df.pivot_table("
+          ]
+        }
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "How to create a pivot table of average salary by department using aggfunc?",
+    "options": [
+      "aggfunc='average'",
+      "aggfunc='mean'",
+      "aggfunc='avg'",
+      "aggfunc='sum'"
+    ],
+    "correctIndex": 1,
+    "explanation": "In pandas, average is 'mean'.\n'average' or 'avg' cannot be used.\n'sum' is the sum."
+  },
+  "misconceptions": [
+    {
+      "wrong": "pivot_table()은 원본 데이터를 변경한다",
+      "correct": "pivot_table()은 새 DataFrame을 반환합니다.\n원본은 그대로 유지됩니다.",
+      "why": "pandas는 대부분 원본을 보존하는 방식으로 동작합니다."
+    },
+    {
+      "wrong": "index와 columns는 순서가 중요하지 않다",
+      "correct": "index는 행, columns는 열입니다.\n바꾸면 표가 90도 회전합니다.",
+      "why": "index='부서', columns='월' → 부서가 세로, 월이 가로"
+    }
+  ],
+  "keyTakeaway": "pivot_table(values, index, columns, aggfunc) = Excel 피벗 자동화"
+}

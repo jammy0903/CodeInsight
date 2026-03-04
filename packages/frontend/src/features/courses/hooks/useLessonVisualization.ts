@@ -3,6 +3,7 @@ import type { LessonStep, StepMemoryState, StackFrame, Variable, HeapObject } fr
 import { processMemoryChanges } from '../utils/memoryUtils';
 import type { MemoryBlock } from '@/types/memory';
 import { extractCFrames, normalizeCValue, isStructValue, isCharArrayValue } from '../components/memory/utils/memoryHelpers';
+import { hasMeaningfulValue, hasVisualizationData, VIZ_DATA_FIELDS } from '../utils/visualizationData';
 
 // JavaScript visualization types (inlined from legacy - kept for backwards compatibility)
 type JSVisualizationType = 'memory' | 'callStack' | 'scopeChain' | 'eventLoop' | 'closure' | 'prototype' | 'thisBind' | 'hoisting' | 'promise';
@@ -74,28 +75,13 @@ function adaptMemoryState(memoryState: StepMemoryState): { stack: MemoryBlock[],
   return { stack: newStack, heap: newHeap, frames };
 }
 
-// 시각화 데이터 존재 여부 확인
-export const VIZ_DATA_FIELDS = [
-  'stack', 'memoryState', 'scopeState', 'eventLoopState',
-  'promiseState', 'thisState', 'prototypeState', 'callStackState',
-  'pythonMemoryState', 'pyNames', 'javaMemoryState', 'memoryChanges',
-  'algorithmState',
-] as const;
-
-export function hasVisualizationData(step: LessonStep): boolean {
-  const stepRecord = step as UnknownRecord;
-  if (step.visualizationType === 'terminal') {
-    return true;
-  }
-  return VIZ_DATA_FIELDS.some(field => stepRecord[field] != null);
-}
-
 // 이전 스텝에서 시각화 데이터 상속 (캐리포워드)
 function resolveStepWithInheritance(steps: LessonStep[], currentIndex: number): LessonStep {
   const currentStep = steps[currentIndex];
   if (!currentStep || hasVisualizationData(currentStep)) return currentStep;
 
   const currentVizType = currentStep.visualizationType || 'memory';
+  const currentStepRecord = currentStep as UnknownRecord;
 
   // 같은 vizType을 가진 가장 가까운 이전 스텝에서 상속
   for (let i = currentIndex - 1; i >= 0; i--) {
@@ -105,13 +91,12 @@ function resolveStepWithInheritance(steps: LessonStep[], currentIndex: number): 
       const prevStepRecord = prevStep as UnknownRecord;
       const vizFields: Record<string, unknown> = {};
       for (const field of VIZ_DATA_FIELDS) {
-        if (prevStepRecord[field] != null) {
+        if (Object.prototype.hasOwnProperty.call(currentStepRecord, field)) {
+          continue;
+        }
+        if (hasMeaningfulValue(prevStepRecord[field])) {
           vizFields[field] = prevStepRecord[field];
         }
-      }
-      // heap도 함께 상속 (stack과 쌍)
-      if (prevStepRecord.heap != null) {
-        vizFields.heap = prevStepRecord.heap;
       }
       return { ...currentStep, ...vizFields };
     }

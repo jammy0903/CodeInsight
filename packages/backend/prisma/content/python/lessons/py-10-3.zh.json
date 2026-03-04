@@ -1,13 +1,13 @@
 {
   "lessonId": "py-10-3",
-  "title": "asyncio：单线程实现并发",
-  "concept": "使用 `async`/`await` 语法，实现协作式多任务处理，在等待I/O操作期间执行其他任务。",
+  "title": "asyncio: 하나의 스레드로 동시성 처리하기",
+  "concept": "`async`/`await` 구문을 사용하여, I/O 작업을 기다리는 동안 다른 작업을 수행하는 협력적 멀티태스킹을 구현합니다.",
   "content": {
     "code": "import asyncio\nimport time\n\nasync def say_after(delay, what):\n    print(f\"'{what}' 작업 시작\")\n    await asyncio.sleep(delay)\n    print(what)\n\nasync def main():\n    start = time.time()\n\n    task1 = asyncio.create_task(say_after(1, 'hello'))\n    task2 = asyncio.create_task(say_after(2, 'world'))\n\n    print(\"--- 작업 예약 완료 ---\")\n    await task1\n    await task2\n    print(f\"총 소요 시간: {time.time() - start:.4f}s\")\n\nasyncio.run(main())",
     "steps": [
       {
-        "title": "导入模块",
-        "explanation": "**`import asyncio` / `import time`** -- 导入异步I/O库和时间测量模块。\n\n`asyncio` 是Python 3.4起标准库中包含的**异步I/O框架**。核心思想是"不要浪费等待时间"。例如，向Web服务器发送请求并等待响应时，CPU什么都不做，处于空闲状态。asyncio在这些"空闲时刻"插入其他任务，最大化效率。\n\n可以把asyncio想象成**一个同时做多道菜的熟练厨师**。不是呆站着等意面水烧开，而是利用这段时间切沙拉、做酱汁。厨师只有一个（1个线程），但通过利用等待时间，看起来像是多个人在工作。\n\n`time` 模块用于后续测量并发执行是否真的节省了时间。\n\n**内部原理**：执行 `import asyncio` 时，事件循环实现、协程调度器、Future/Task类等数十个子模块会被一次性加载。这些都是在单线程内实现异步并发的工具。\n\n**与threading的区别**：threading中OS强制切换线程（抢占式），而asyncio中代码主动说"我休息一下"时才切换（协作式）。因此可以在不担心竞态条件的情况下实现并发。",
+        "title": "모듈 임포트",
+        "explanation": "**`import asyncio` / `import time`**\n\n`asyncio`는 Python 3.4부터 표준 라이브러리에 포함된 비동기 I/O 프레임워크입니다. I/O 대기 시간에 다른 작업을 끼워 넣어 효율을 높이는 방식으로 동작합니다. `threading`이 OS가 스레드를 강제 전환하는 선점형이라면, `asyncio`는 코드가 자발적으로 `await`로 양보하는 협력형입니다.",
         "visualizationType": "pythonMemory",
         "code": "import asyncio",
         "highlightOffset": [
@@ -16,7 +16,7 @@
         ],
         "pythonMemoryState": {
           "output": [],
-          "note": "asyncio 模块准备就绪。",
+          "note": "asyncio 모듈 준비 완료.",
           "names": [
             {
               "name": "asyncio",
@@ -36,8 +36,8 @@
         }
       },
       {
-        "title": "定义协程函数",
-        "explanation": "**`async def say_after(delay, what):`** -- 使用 `async def` 定义一个**协程函数**。\n\n普通函数（`def`）和协程函数（`async def`）最大的区别是，协程函数**调用后不会立即执行**。调用 `say_after(1, 'hello')` 不会执行函数，而是创建一个"协程对象"，相当于一份执行计划。实际执行要等到事件循环调度时才开始。\n\n看函数体，有 `await asyncio.sleep(delay)`。`await` 是一个信号，表示"在这个操作完成之前我先休息"。普通的 `time.sleep()` 会阻塞整个线程，但 `asyncio.sleep()` 只暂停当前协程，允许其他协程运行。\n\n可以把协程函数想象成**食谱**。写食谱并不意味着开始烹饪。厨师（事件循环）必须读取并执行食谱，菜才能做出来。\n\n**内部原理**：Python编译器遇到 `async def` 时，会在函数对象的 `co_flags` 中设置 `CO_COROUTINE` 标志（0x100）。有了这个标志，调用函数时会返回协程对象而不是正常执行。\n\n**常见错误**：如果写 `result = say_after(1, 'hello')`，result中包含的是协程对象而不是执行结果，Python会输出 'coroutine was never awaited' 警告。协程必须被 `await` 或用 `create_task()` 调度。",
+        "title": "코루틴 함수 정의",
+        "explanation": "**`async def say_after(delay, what):`**\n\n`async def`로 정의된 코루틴 함수를 만듭니다. 일반 함수와 달리 호출해도 즉시 실행되지 않고 코루틴 객체를 반환합니다. `await asyncio.sleep(delay)`는 현재 코루틴만 일시정지하고 다른 코루틴이 실행될 수 있도록 양보합니다. `time.sleep()`은 스레드 전체를 멈추므로 비동기 코드에서는 사용하면 안 됩니다.",
         "visualizationType": "pythonMemory",
         "code": "async def say_after(delay, what):",
         "highlightOffset": [
@@ -47,7 +47,7 @@
           3
         ],
         "pythonMemoryState": {
-          "note": "协程函数已定义。",
+          "note": "코루틴 함수가 정의되었습니다.",
           "names": [
             {
               "name": "say_after",
@@ -67,12 +67,12 @@
         }
       },
       {
-        "title": "定义主协程",
-        "explanation": "**`async def main():`** -- 定义作为异步程序**入口点**的主协程。\n\n异步程序通常使用一个 `main()` 协程作为顶层入口点。在这个 `main()` 中，创建其他协程、运行它们、收集结果——协调整个流程。\n\n可以把 `main()` 想象成**厨房里的主厨**。就像主厨决定整个菜单的烹饪顺序、管理每道菜的开始和完成一样，`main()` 统筹异步任务的创建、调度和完成等待。\n\n在这个函数中，用 `time.time()` 记录开始时间，用 `create_task()` 创建任务，用 `await` 等待完成，然后打印总耗时。整个过程在一个协程内完成。\n\n**内部原理**：`async def main():` 也是协程函数，所以调用 `main()` 会返回协程对象。这个协程对象传递给 `asyncio.run()` 在事件循环中执行。\n\n**设计模式**：在异步程序中，明确分离同步代码（普通函数）和异步代码（协程）很重要。`asyncio.run(main())` 正是这个边界——从同步世界进入异步世界的唯一大门。",
+        "title": "메인 코루틴 정의",
+        "explanation": "**`async def main():`**\n\n비동기 프로그램의 진입점 역할을 하는 메인 코루틴을 정의합니다. 이 함수 안에서 다른 코루틴들을 생성·실행하고 결과를 모으는 전체 흐름을 조율합니다. `asyncio.run(main())`이 동기 세계에서 비동기 세계로 진입하는 단 하나의 문입니다.",
         "visualizationType": "pythonMemory",
         "code": "async def main():",
         "pythonMemoryState": {
-          "note": "主协程已定义。",
+          "note": "메인 코루틴 정의.",
           "names": [
             {
               "name": "main",
@@ -92,12 +92,12 @@
         }
       },
       {
-        "title": "运行事件循环",
-        "explanation": "**`asyncio.run(main())`** -- 创建事件循环并运行 `main` 协程。这是异步程序的**启动开关**。\n\n`asyncio.run()` 按顺序执行以下三个步骤：\n1. 创建新的事件循环\n2. 在事件循环中运行 `main()` 协程\n3. 所有任务完成后清理并关闭事件循环\n\n**什么是事件循环？** 事件循环是一个持续运行的**无限循环**。"有没有要执行的任务？有就执行。有没有等待中的I/O完成了？完成了就唤醒对应的协程。"如此反复，直到没有事情可做。\n\n把 `asyncio.run()` 想象成**开一家餐厅**。开门（创建事件循环）、开始接待客人（运行协程）、运营到最后一位客人离开（所有任务完成）、然后关门（关闭事件循环）。\n\n**内部原理**：`asyncio.run()` 内部调用 `loop = asyncio.new_event_loop()` -> `loop.run_until_complete(main())` -> `loop.close()`。Python 3.7之前需要手动写这三行。\n\n**注意**：`asyncio.run()` 在程序中应该**只调用一次**。在已经运行的事件循环中再次调用 `asyncio.run()` 会引发 RuntimeError。这是 Jupyter Notebook 中常见的问题。",
+        "title": "이벤트 루프 실행",
+        "explanation": "**`asyncio.run(main())`**\n\n이벤트 루프를 생성하고 `main` 코루틴을 실행합니다. 내부적으로 새 이벤트 루프 생성 → `main()` 실행 → 루프 종료의 3단계를 수행합니다. 이미 실행 중인 이벤트 루프 안에서 다시 호출하면 RuntimeError가 발생하므로, 프로그램당 단 한 번만 호출해야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "asyncio.run(main())",
         "pythonMemoryState": {
-          "note": "事件循环已启动。",
+          "note": "이벤트 루프가 시작되었습니다.",
           "names": [
             {
               "name": "main",
@@ -117,12 +117,12 @@
         }
       },
       {
-        "title": "创建并发执行任务",
-        "explanation": "**`task1 = asyncio.create_task(say_after(1, 'hello'))`** -- 将协程包装成**Task对象**并立即调度到事件循环。\n\n这一行同时发生了两件事：\n1. 调用 `say_after(1, 'hello')` 创建协程对象\n2. `create_task()` 将协程包装成Task并注册到事件循环\n\n关键在于 **create_task() 是非阻塞的**。执行这一行时，只是向事件循环预约"稍后执行这个任务"，代码不会停下来，立即继续执行下一行。\n\n就像在厨房里**贴上一张点菜单**。贴上菜单不意味着食物马上就好。厨房在合适的时候才开始烹饪。在此期间，服务员（我们的代码）可以继续接其他桌的订单。",
+        "title": "동시 실행 작업 생성 (task)",
+        "explanation": "**`task1 = asyncio.create_task(say_after(1, 'hello'))`**\n\n코루틴을 Task 객체로 감싸서 이벤트 루프에 즉시 스케줄링합니다. `create_task()`는 비차단(non-blocking)으로, 코드는 멈추지 않고 바로 다음 줄로 넘어갑니다. 코루틴 객체를 그냥 변수에 저장하면 실행되지 않고 'coroutine was never awaited' 경고가 발생합니다.",
         "visualizationType": "pythonMemory",
         "code": "task1 = asyncio.create_task(say_after(1, 'hello'))",
         "pythonMemoryState": {
-          "note": "task1 已调度（尚未运行）。",
+          "note": "task1이 예약되었습니다 (아직 실행 안 됨).",
           "names": [
             {
               "name": "task1",
@@ -142,12 +142,12 @@
         }
       },
       {
-        "title": "创建第二个任务",
-        "explanation": "**`task2 = asyncio.create_task(say_after(2, 'world'))`** -- 第二个协程也被做成Task并注册到事件循环。\n\n现在事件循环的就绪队列中有**两个任务在等待：task1和task2**。两者都还没有开始执行——因为 `main()` 协程当前占用着CPU。在asyncio中，当前运行的协程必须主动让出（`await`），其他协程才能运行。\n\n就像两张点菜单贴在厨房公告板上。主厨（事件循环）目前正忙着其他事，还没开始做菜。很快，当服务员（main协程）说"我休息一下"时，主厨就会开始处理两个订单。\n\n**重要一点**：task1需要1秒，task2需要2秒。如果顺序执行，需要1+2=3秒，但同时开始只需要2秒——最长任务的耗时。这就是异步编程的核心优势。\n\n**内部原理**：两个Task对象的状态都是 `PENDING`。它们在事件循环的 `_ready` deque中，只有当前协程await时才会按顺序取出执行。\n\n**注意**：`create_task()` 只能在**事件循环运行中**调用。在事件循环外部调用会引发 RuntimeError。",
+        "title": "두 번째 작업 생성",
+        "explanation": "**`task2 = asyncio.create_task(say_after(2, 'world'))`**\n\n두 번째 코루틴도 Task로 만들어 이벤트 루프에 등록합니다. 이제 task1(1초)과 task2(2초) 두 작업이 대기 중입니다. 순차 실행이면 1+2=3초이지만, 동시 시작이면 가장 긴 작업인 2초만 걸립니다. `create_task()`는 반드시 이벤트 루프가 실행 중인 상태에서만 호출할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "task2 = asyncio.create_task(say_after(2, 'world'))",
         "pythonMemoryState": {
-          "note": "task2 已调度。",
+          "note": "task2가 예약되었습니다.",
           "names": [
             {
               "name": "task1",
@@ -177,8 +177,8 @@
         }
       },
       {
-        "title": "等待任务 (await)",
-        "explanation": "**`await task1`** -- 暂停 `main` 协程直到task1完成，将控制权交给事件循环。\n\n这正是**并发魔法开始的时刻**！遇到 `await` 时：\n1. `main()` 协程被暂停\n2. 事件循环获得控制权\n3. 事件循环开始运行就绪队列中的task1和task2——**两个都运行**\n4. task1遇到 `asyncio.sleep(1)` 时让出 -> task2运行\n5. task2也遇到 `asyncio.sleep(2)` 时让出 -> 事件循环管理定时器\n\n看输出，三行几乎同时出现：\n- \"--- 작업 예약 완료 ---\"（await之前的print语句）\n- \"'hello' 작업 시작\"（task1的第一个print）\n- \"'world' 작업 시작\"（task2的第一个print）\n\n就像服务员（main）说"我休息一下"的那一刻，主厨（事件循环）开始同时做两道菜。先烧意面水（task1），紧接着开始煎牛排（task2）。\n\n**内部原理**：`await` 通过协程的 `__await__()` 或 `send(None)` 方法将控制权转移给事件循环。事件循环使用 `select()` 或 `epoll()` 系统调用监控I/O事件和定时器，执行已完成任务的回调。\n\n**关键理解**：`await task1` 的意思是"我需要task1的结果"。但在等待期间，task2也在同时进行。这就是与 `time.sleep()` 的根本区别。",
+        "title": "작업 기다리기 (await)",
+        "explanation": "**`await task1`**\n\n`main` 코루틴을 일시정지하고 제어권을 이벤트 루프에 넘깁니다. 이 순간 task1과 task2가 모두 실행을 시작합니다. task1이 `asyncio.sleep(1)`을 만나면 양보하고, task2도 `asyncio.sleep(2)`을 만나면 양보합니다. `await` 전에 실행된 print문과 각 task의 시작 메시지가 거의 동시에 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "await task1",
         "pythonMemoryState": {
@@ -187,7 +187,7 @@
             "'hello' 작업 시작",
             "'world' 작업 시작"
           ],
-          "note": "await中... task1和task2同时进行。",
+          "note": "await 중... task1, task2가 동시에 진행됩니다.",
           "names": [
             {
               "name": "task1",
@@ -207,15 +207,15 @@
         }
       },
       {
-        "title": "等待第二个任务",
-        "explanation": "**`await task2`** -- task1完成后，等待task2完成。\n\n让我们整理时间线：\n- **0秒**：task1（1秒）、task2（2秒）同时开始\n- **1秒**：task1完成 -> 输出 `print('hello')`。task2还剩1秒\n- **2秒**：task2完成 -> 输出 `print('world')`\n\ntask1完成时，`await task1` 返回，代码进入 `await task2`。此时task2已经运行了1秒，所以**只需再等约1秒**。\n\n这就是并发执行的精髓。因为等待task1期间task2也在同步进行，两个任务的总时间不是1+2=3秒，而是max(1,2)=**2秒**。\n\n就像同时做意面（1分钟）和牛排（2分钟），意面先做好，牛排只需再等1分钟。总共2分钟，不是3分钟。\n\n**如果是顺序执行呢？**：如果不用create_task，直接 `await say_after(1, 'hello')` -> `await say_after(2, 'world')`，那就要等1秒再等2秒，总共3秒。用 `create_task()` 预先调度是关键。\n\n**内部原理**：如果task2已经完成，`await task2` 会立即返回，直接获取Task对象 `_result` 属性中存储的结果。如果还在运行，事件循环会注册完成回调并等待。",
+        "title": "두 번째 작업 기다리기",
+        "explanation": "**`await task2`**\n\ntask1(1초)이 완료되면 `await task1`이 반환되고 코드가 이 줄로 넘어옵니다. task2는 이미 1초 동안 실행 중이었으므로 추가로 약 1초만 더 기다리면 됩니다. task1을 기다리는 동안 task2도 함께 진행되었기 때문에 총 소요 시간은 1+2=3초가 아닌 max(1,2)=2초가 됩니다.",
         "visualizationType": "pythonMemory",
         "code": "await task2",
         "pythonMemoryState": {
           "output": [
             "hello"
           ],
-          "note": "task1完成。等待task2...",
+          "note": "task1 완료. task2 기다리는 중...",
           "names": [
             {
               "name": "task1",
@@ -245,8 +245,8 @@
         }
       },
       {
-        "title": "查看总耗时",
-        "explanation": "**`print(f\"총 소요 시간: {time.time() - start:.4f}s\")`** -- 打印总耗时。结果约为**2秒**。\n\n这个结果证明了asyncio的威力：\n- 顺序执行：1秒 + 2秒 = **3秒**\n- 并发执行：max(1秒, 2秒) = **2秒**\n- 节省时间：1秒（减少33%！）\n\n任务越多，效果越显著。例如，顺序发送100个各耗时1秒的API请求需要100秒，但用asyncio同时发送只需约1秒。\n\n就像把100桌的订单一次性送进厨房——烹饪时间只取决于最耗时的那道菜。一个一个送则要慢100倍。\n\n**重要提醒**：asyncio不是万能的。它能节省的只是**I/O等待时间**。对于CPU密集型任务（如矩阵乘法、图像处理），asyncio完全帮不上忙，因为没有"等待时间"。CPU密集型任务应使用multiprocessing。\n\n**实际应用**：对于网页爬虫、API调用、数据库查询、文件I/O等"等待时间多"的任务，asyncio能提供显著的性能提升。FastAPI、aiohttp等热门Web框架都基于asyncio。",
+        "title": "총 소요 시간 확인",
+        "explanation": "**`print(f\"총 소요 시간: {time.time() - start:.4f}s\")`**\n\n총 소요 시간은 약 2초입니다. 순차 실행(3초) 대비 33% 단축됐습니다. asyncio는 I/O 대기 시간에만 효과적이며, CPU를 100% 사용하는 계산 작업에는 도움이 되지 않습니다. 웹 크롤링, API 호출, DB 쿼리 등 대기가 많은 작업에서 극적인 성능 향상을 제공합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"총 소요 시간: {time.time() - start:.4f}s\")",
         "pythonMemoryState": {
@@ -256,7 +256,7 @@
             "world",
             "총 소요 시간: 2.0012s"
           ],
-          "note": "所有任务完成。耗时2秒。",
+          "note": "모든 작업 완료. 2초 소요.",
           "names": [
             {
               "name": "task2",
@@ -279,22 +279,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "`await` 关键字的作用是什么？",
+    "question": "`await` 关键字有什么作用？",
     "options": [
-      "立即终止函数。",
-      "阻塞整个程序，直到耗时操作完成。",
-      "将控制权交给事件循环直到耗时操作完成，允许执行其他任务。",
+      "立即终止该函数。",
+      "停止整个程序，直到完成长时间运行的任务。",
+      "在长时间运行的任务完成之前，控制权将移交给事件循环以执行其他工作。",
       "创建一个新线程。"
     ],
     "correctIndex": 2,
-    "explanation": "`await` 暂停当前任务，允许 `asyncio` 事件循环在被等待的任务完成之前执行其他任务。"
+    "explanation": "“await”“暂停”当前任务并允许“asyncio”事件循环执行其他任务，直到“await”目标任务完成。"
   },
   "misconceptions": [
     {
-      "wrong": "`async`/`await` 像多线程一样工作。",
-      "correct": "不是的。`asyncio` 基本上在**单个线程**中运行。",
-      "why": "不是使用多个线程，而是在单线程内通过在多个任务之间高效切换来实现并发的"协作式多任务处理"方式。"
+      "wrong": "`async`/`await`는 멀티스레딩처럼 동작한다.",
+      "correct": "아닙니다.\n`asyncio`는 기본적으로 **하나의 스레드**에서 동작합니다.",
+      "why": "여러 스레드를 쓰는 대신, 하나의 스레드 내에서 여러 작업 사이를 효율적으로 전환하며 동시성을 달성하는 '협력적 멀티태스킹' 방식입니다."
     }
   ],
-  "keyTakeaway": "`asyncio` 在单线程中运行，专门优化了在I/O等待时间内高效处理其他任务的能力。"
+  "keyTakeaway": "`asyncio`는 하나의 스레드에서 작동하며, I/O 대기 시간에 다른 작업을 효율적으로 처리하는 데 최적화되어 있습니다."
 }

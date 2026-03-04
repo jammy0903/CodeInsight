@@ -1,13 +1,13 @@
 {
   "lessonId": "c-2-2",
-  "title": "指针声明（*）：存储地址的变量",
-  "concept": "指针是一种存储"地址"的特殊变量",
+  "title": "指针声明 (*)：包含地址的变量",
+  "concept": "指针是存储“地址”的特殊变量。",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    int num = 10;\n\n    int *ptr = &num;\n\n    printf(\"num value:   %d\\n\", num);\n    printf(\"num address: %p\\n\", &num);\n    printf(\"ptr value:   %p\\n\", ptr);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "使用 ```printf``` 等输入输出函数的头文件。它在编译前的预处理阶段处理，因此不会产生内存变化。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用输入/输出函数（例如“printf”）的标头。由于是在编译前的预处理阶段进行处理的，所以不存在内存变化。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "main 函数开始",
-        "explanation": "程序启动 — 栈上创建 ```main``` 的**栈帧**，```num``` 和 ```ptr``` 将被放置其中。",
+        "title": "启动主函数",
+        "explanation": "程序启动——在栈上创建一个“main”的**栈帧**，并在其中放置“num”和“ptr”。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "声明整型变量",
-        "explanation": "在栈帧中分配 **4字节** 空间（```0x1000```），存储整数 ```10```。\n\n如上节课所学，变量 ```num``` 有两个属性：**值（10）**和**地址（0x1000）**。这个地址正是下一步要存储到指针中的值。",
+        "title": "整型变量声明",
+        "explanation": "**4字节**空间（``0x1000````）被保留在堆栈帧中，并存储整数````10````。\n\n正如您在上一课中了解到的，变量 num 有两个属性：**value(10)** 和 **address(0x1000)**。该地址是下一步将存储在指针中的值。",
         "visualizationType": "cMemory",
         "code": "int num = 10;",
         "stack": [
@@ -43,8 +43,8 @@
         ]
       },
       {
-        "title": "声明并初始化指针变量",
-        "explanation": "`int *ptr = &num;` 将 `num` 的地址存储到指针 `ptr` 中。\n\n在声明中，`*` 表示指针类型；而在表达式中，`*ptr` 表示解引用（访问指向的值），含义完全不同。",
+        "title": "声明和初始化指针变量",
+        "explanation": "`int *ptr = #` 将 `num` 的地址存储在指针 `ptr` 中。\n\n在声明中，“*”表示指针类型，而在表达式中，“*ptr”是取消引用（访问指向的值），因此它们的含义不同。",
         "visualizationType": "cMemory",
         "code": "int *ptr = &num;",
         "stack": [
@@ -64,29 +64,29 @@
         ]
       },
       {
-        "title": "输出 num 的值",
-        "explanation": "写 ```num``` 时，编译器从地址 ```0x1000``` 读取**值（10）**。这是通过变量名**直接**访问的方式。\n\n下一步请对比通过指针**间接**访问的方式。",
+        "title": "打印num的值",
+        "explanation": "如果你写“num”，编译器会从地址“0x1000”读取**值(10)**。这是直接访问变量名的**直接方法**。\n\n让我们在下一步中将其与通过指针的**间接方法**进行比较。",
         "visualizationType": "cMemory",
         "code": "printf(\"num value:   %d\\n\", num);",
         "stdout": "num value:   10"
       },
       {
-        "title": "输出 num 的地址",
-        "explanation": "```&num``` — 使用上节课的**取址运算符**，以 ```%p``` 格式输出 ```num``` 的地址 ```0x1000```。\n\n请记住这个结果。下一步输出 ```ptr``` 的值时，你会得到**完全相同的数字** — 这就是"指针指向"的具体含义。",
+        "title": "打印num的地址",
+        "explanation": "```&num``` — 使用上一课中的 **地址运算符** 以 ```%p``` 格式输出 ```num``` 的地址 ```0x1000```。\n\n让我们记住这个结果。在下一步中，打印“ptr”的值会产生**完全相同的数字**——这就是“指向”的具体含义。",
         "visualizationType": "cMemory",
         "code": "printf(\"num address: %p\\n\", &num);",
         "stdout": "num value:   10\nnum address: 0x1000"
       },
       {
-        "title": "输出 ptr 的值",
-        "explanation": "输出 `ptr` 会显示与 `&num` 相同的地址值。\n\n总结：`num` 是值，`&num` 是 num 的地址，`ptr` 是存储该地址的变量。",
+        "title": "打印 ptr 的值",
+        "explanation": "如果打印“ptr”，则会出现与“&num”相同的地址值。\n\n总结一下，“num”是值，“&num”是 num 的地址，“ptr”是存储地址的变量。",
         "visualizationType": "cMemory",
         "code": "printf(\"ptr value:   %p\\n\", ptr);",
         "stdout": "num value:   10\nnum address: 0x1000\nptr value:   0x1000"
       },
       {
-        "title": "程序结束",
-        "explanation": "```return 0``` — 栈帧被移除，```num``` 和 ```ptr``` 都从内存中消失。\n\n本课要点：```int *ptr``` -> 指针声明，```ptr = &num``` -> 指针指向 num，```ptr``` 的值等于 ```&num``` -> "指向"的实际含义。",
+        "title": "程序退出",
+        "explanation": "```return 0``` — 堆栈帧被删除，导致 ```num``` 和 ```ptr``` 从内存中消失。\n\n本课精髓：````int *ptr```→指针声明，````ptr = &num````→将指针指向num，````ptr```和````&num```的值相同→'指向'的实际含义。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
@@ -96,22 +96,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下哪个是正确的指针声明？（目标是 double 型变量）",
+    "question": "以下哪项是有效的指针声明？ （目标是双变量）",
     "options": [
-      "pointer double p;",
-      "double p;",
-      "double &p;",
-      "double *p;"
+      "指针双p；",
+      "双p；",
+      "双 &p;",
+      "双*p；"
     ],
     "correctIndex": 3,
-    "explanation": "在 C 语言中，指针类型用 `类型 *名称` 的格式声明。"
+    "explanation": "在C语言中，指针类型以“type *name”的格式声明。"
   },
   "misconceptions": [
     {
-      "wrong": "* 的含义总是一样的",
-      "correct": "声明时（`int *p`）和使用时（`*p = 10`）的 `*` 含义**完全不同**。",
-      "why": "声明中的 `*` 是类型标识，表达式中的 `*` 是解引用运算符。\n必须注意上下文。"
+      "wrong": "* 的含义始终相同",
+      "correct": "声明时（`int *p`）和使用时（`*p = 10`）的含义**完全不同**。",
+      "why": "声明部分中的“*”是“类型指示符”，使用部分中的“*”是“解引用运算符”。\n你必须仔细查看上下文。"
     }
   ],
-  "keyTakeaway": "`int *p` 是存储整数地址的变量。用 `p = &a` 来建立连接。"
+  "keyTakeaway": "`int *p` 是一个保存整数地址的变量。用 `p = &a` 连接。"
 }

@@ -1,13 +1,13 @@
 {
   "lessonId": "js-4-1",
-  "title": "回调模式",
-  "concept": "回调是作为参数传递给另一个函数的函数，用于稍后执行",
+  "title": "콜백 패턴",
+  "concept": "콜백(Callback)은 다른 함수에 인자로 전달되어 나중에 실행되는 함수이다",
   "content": {
     "code": "function processArray(arr, callback) {\n  const results = [];\n  for (let i = 0; i < arr.length; i++) {\n    const processed = callback(arr[i], i);\n    results.push(processed);\n  }\n  return results;\n}\n\nfunction double(value, index) {\n  return value * 2;\n}\n\nfunction addIndex(value, index) {\n  return value + index;\n}\n\nconst numbers = [1, 2, 3];\nconst doubled = processArray(numbers, double);\nconst indexed = processArray(numbers, addIndex);\n\nconsole.log(doubled);\nconsole.log(indexed);",
     "steps": [
       {
-        "title": "创建 numbers 数组",
-        "explanation": "使用 `const numbers = [1, 2, 3]` 创建一个数组。",
+        "title": "numbers 배열 생성",
+        "explanation": "`const numbers = [1, 2, 3]`으로 배열을 생성합니다.",
         "visualizationType": "scope",
         "code": "const numbers = [1, 2, 3];",
         "scopeState": {
@@ -44,9 +44,9 @@
         }
       },
       {
-        "title": "调用 processArray(numbers, double)",
-        "explanation": "调用 `processArray` 函数，将 `double` 函数作为回调传入。\n函数可以像值一样被传递！",
-        "keyInsight": "在 JavaScript 中，函数是"一等公民"。它们可以被赋值给变量，也可以作为参数传递。",
+        "title": "processArray(numbers, double) 호출",
+        "explanation": "`processArray` 함수를 호출하면서 `double` 함수를 콜백으로 전달합니다.\n함수도 값처럼 전달할 수 있습니다!",
+        "keyInsight": "JavaScript에서 함수는 '일급 객체(First-class Object)'입니다. 변수에 할당하고, 인자로 전달할 수 있습니다.",
         "visualizationType": "scope",
         "code": "const doubled = processArray(numbers, double);",
         "scopeState": {
@@ -100,8 +100,8 @@
         }
       },
       {
-        "title": "初始化结果数组",
-        "explanation": "在 processArray 函数内部，创建一个空的 `results` 数组。\n处理后的值将存储在这里。",
+        "title": "결과 배열 초기화",
+        "explanation": "processArray 함수 내부에서 `results` 빈 배열을 생성합니다.\n처리된 값들을 여기에 저장할 것입니다.",
         "visualizationType": "scope",
         "code": "const results = [];",
         "scopeState": {
@@ -144,9 +144,9 @@
         }
       },
       {
-        "title": "执行回调（第1次）",
-        "explanation": "`callback(arr[0], 0)` = `double(1, 0)` 被执行。\ndouble 函数运行并返回 1 * 2 = 2。",
-        "keyInsight": "`callback` 只是一个变量名——实际运行的是 `double` 函数。",
+        "title": "콜백 함수 실행 (첫 번째)",
+        "explanation": "`callback(arr[0], 0)` = `double(1, 0)`이 실행됩니다.\ndouble 함수가 실행되어 1 * 2 = 2를 반환합니다.",
+        "keyInsight": "callback은 변수명일 뿐, 실제로는 double 함수가 실행됩니다.",
         "visualizationType": "scope",
         "code": "const processed = callback(arr[i], i);",
         "scopeState": {
@@ -211,9 +211,9 @@
         }
       },
       {
-        "title": "执行 double 函数",
-        "explanation": "double(1, 0) 运行并返回 value * 2 = 1 * 2 = 2。",
-        "keyInsight": "回调函数在被调用时接收参数。",
+        "title": "double 함수 실행",
+        "explanation": "double(1, 0)이 실행되어 value * 2 = 1 * 2 = 2를 반환합니다.",
+        "keyInsight": "콜백 함수는 호출되는 시점에 인자를 받습니다.",
         "visualizationType": "scope",
         "code": "return value * 2;",
         "scopeState": {
@@ -272,8 +272,8 @@
         }
       },
       {
-        "title": "存储结果",
-        "explanation": "将返回值 2 压入 results 数组。\nresults = [2]",
+        "title": "결과 저장",
+        "explanation": "반환값 2를 results 배열에 push합니다.\nresults = [2]",
         "visualizationType": "scope",
         "code": "results.push(processed);",
         "scopeState": {
@@ -317,8 +317,8 @@
         }
       },
       {
-        "title": "执行回调（第2次）",
-        "explanation": "`callback(arr[1], 1)` = `double(2, 1)` 被执行。\n返回 2 * 2 = 4。",
+        "title": "콜백 함수 실행 (두 번째)",
+        "explanation": "`callback(arr[1], 1)` = `double(2, 1)`이 실행됩니다.\n2 * 2 = 4를 반환합니다.",
         "visualizationType": "scope",
         "code": "const processed = callback(arr[i], i);",
         "scopeState": {
@@ -361,8 +361,8 @@
         }
       },
       {
-        "title": "执行回调（第3次）",
-        "explanation": "`callback(arr[2], 2)` = `double(3, 2)` 被执行。\n返回 3 * 2 = 6。\nresults = [2, 4, 6]",
+        "title": "콜백 함수 실행 (세 번째)",
+        "explanation": "`callback(arr[2], 2)` = `double(3, 2)`이 실행됩니다.\n3 * 2 = 6을 반환합니다.\nresults = [2, 4, 6]",
         "visualizationType": "scope",
         "code": "const processed = callback(arr[i], i);",
         "scopeState": {
@@ -404,9 +404,9 @@
         }
       },
       {
-        "title": "返回结果",
-        "explanation": "返回完成的 results 数组 [2, 4, 6]。\ndoubled = [2, 4, 6]",
-        "keyInsight": "原始数组 numbers 没有被修改（不可变性）。",
+        "title": "결과 반환",
+        "explanation": "완성된 results 배열 [2, 4, 6]을 반환합니다.\ndoubled = [2, 4, 6]",
+        "keyInsight": "원본 배열 numbers는 변경되지 않았습니다 (불변성).",
         "visualizationType": "scope",
         "code": "return results;",
         "scopeState": {
@@ -434,9 +434,9 @@
         }
       },
       {
-        "title": "使用不同的回调处理",
-        "explanation": "这次将 `addIndex` 函数作为回调传入。\n同一个 processArray 函数被以完全不同的方式使用。",
-        "keyInsight": "改变回调就改变了行为。这就是回调模式的威力。",
+        "title": "다른 콜백으로 처리",
+        "explanation": "이번에는 `addIndex` 함수를 콜백으로 전달합니다.\n같은 processArray 함수를 다른 방식으로 사용합니다.",
+        "keyInsight": "콜백을 바꾸면 동작이 바뀝니다. 이것이 콜백 패턴의 장점입니다.",
         "visualizationType": "scope",
         "code": "const indexed = processArray(numbers, addIndex);",
         "scopeState": {
@@ -480,9 +480,9 @@
         }
       },
       {
-        "title": "执行 addIndex 回调",
-        "explanation": "addIndex(1, 0) = 1，addIndex(2, 1) = 3，addIndex(3, 2) = 5。indexed = [1, 3, 5]",
-        "keyInsight": "value + index：将索引加到值上的不同逻辑",
+        "title": "addIndex 콜백 실행",
+        "explanation": "addIndex(1, 0) = 1, addIndex(2, 1) = 3, addIndex(3, 2) = 5. indexed = [1, 3, 5]",
+        "keyInsight": "value + index: 값에 인덱스를 더하는 다른 로직",
         "visualizationType": "scope",
         "code": "return value + index;",
         "scopeState": {
@@ -518,27 +518,27 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下代码的输出是什么？\n\nfunction apply(x, fn) { return fn(x); }\nfunction square(n) { return n * n; }\nconsole.log(apply(5, square));",
+    "question": "以下代码的输出是什么？\n\n函数应用（x，fn）{返回fn（x）； }\n函数 square(n) { 返回 n * n; }\nconsole.log(应用(5, 方形));",
     "options": [
       "5",
       "10",
       "25",
-      "undefined"
+      "不明确的"
     ],
     "correctIndex": 2,
-    "explanation": "在 apply(5, square) 中，fn 就是 square 函数。\nfn(x) = square(5) = 5 * 5 = 25 被返回。"
+    "explanation": "在 apply(5, square) 中，fn 是平方函数。\n返回 fn(x) = square(5) = 5 * 5 = 25。"
   },
   "misconceptions": [
     {
-      "wrong": "回调总是异步执行的",
-      "correct": "完全不是。\n回调可以同步执行。",
-      "why": "Array.map()、Array.filter() 等使用的是同步回调。\n只有 setTimeout、fetch 等才使用异步回调。"
+      "wrong": "콜백은 항상 비동기로 실행된다",
+      "correct": "아닙니다.\n콜백은 동기적으로도 실행될 수 있습니다.",
+      "why": "Array.map(), Array.filter() 등은 동기 콜백입니다.\nsetTimeout, fetch 등만 비동기 콜백입니다."
     },
     {
-      "wrong": "回调函数需要特殊语法",
-      "correct": "回调就是一个普通函数。\n它只是作为参数传递给另一个函数的函数。",
-      "why": "在 JavaScript 中，函数是一等公民，所以它们可以像值一样被传递和存储。"
+      "wrong": "콜백 함수는 특별한 문법이 필요하다",
+      "correct": "콜백은 그냥 함수입니다.\n다른 함수에 인자로 전달되는 함수일 뿐입니다.",
+      "why": "JavaScript에서 함수는 일급 객체이므로, 값처럼 전달하고 저장할 수 있습니다."
     }
   ],
-  "keyTakeaway": "回调 = 作为参数传递的函数。它是分离逻辑和提高复用性的核心模式。"
+  "keyTakeaway": "콜백 = 인자로 전달되는 함수. 로직을 분리하고 재사용성을 높이는 핵심 패턴입니다."
 }

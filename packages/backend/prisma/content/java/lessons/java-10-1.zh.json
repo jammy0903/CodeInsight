@@ -1,13 +1,13 @@
 {
   "lessonId": "java-10-1",
-  "title": "线程：工厂里的新工人",
-  "concept": "线程（Thread）就像一个程序（工厂）内同时工作的"工人"。",
+  "title": "主题：我们工厂的新主力",
+  "concept": "线程就像一个“工人”，在一个程序（工厂）内同时工作。",
   "content": {
     "code": "class MyWorker extends Thread {\n    public void run() {\n        System.out.println(\"새로운 일꾼이 일을 시작합니다!\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        MyWorker worker = new MyWorker();\n        worker.start(); // 일꾼에게 일을 시작하라고 지시합니다.\n        \n        System.out.println(\"메인 일꾼도 자기 일을 합니다.\");\n    }\n}",
     "steps": [
       {
-        "title": "main 方法开始",
-        "explanation": "**`public static void main(String[] args)`**\n\n程序的入口点。\n在这里我们将雇佣一个新工人（线程）并分配任务。",
+        "title": "启动主方法",
+        "explanation": "**`public static void main(String[] args)`**\n\n这是程序的入口点。\n在这里，新工人（线程）被雇用并被分配工作。",
         "visualizationType": "memory",
         "code": "public static void main(String[] args) {",
         "memoryState": {
@@ -17,14 +17,14 @@
               "value": "running"
             }
           ],
-          "note": "主线程启动",
+          "note": "메인 쓰레드 시작",
           "heap": [],
           "output": []
         }
       },
       {
-        "title": "继承 Thread 类",
-        "explanation": "在 Java 中创建新工人（线程）最简单的方法是继承 `Thread` 类，并在 `run` 方法中定义实际要做的工作。",
+        "title": "线程类继承",
+        "explanation": "在 Java 中创建新工作线程（线程）的最简单方法是继承 Thread 类并在 run 方法中定义要完成的实际工作。",
         "visualizationType": "memory",
         "code": "class MyWorker extends Thread {",
         "highlightOffset": [
@@ -35,13 +35,13 @@
           4
         ],
         "memoryState": {
-          "note": "MyWorker 蓝图已定义"
+          "note": "MyWorker 설계도 정의"
         }
       },
       {
-        "title": "创建工人对象",
-        "explanation": "根据蓝图创建实际的 `MyWorker` 工人对象。\n还没有开始工作，处于"准备"状态（NEW）。",
-        "keyInsight": "new Thread() = 工人准备就绪 (Ready)",
+        "title": "创建工作对象",
+        "explanation": "根据蓝图创建一个实际的“MyWorker”工作对象。\n我还没有开始工作，但它处于“准备就绪”状态（新）。",
+        "keyInsight": "new Thread() = Worker准备好（Ready）",
         "visualizationType": "memory",
         "code": "MyWorker worker = new MyWorker();",
         "memoryState": {
@@ -62,9 +62,9 @@
         }
       },
       {
-        "title": "开始工作（start）",
-        "explanation": "调用 `start()` 会请求 JVM 创建一个新的执行流。\nJVM 会创建新线程，分配独立的栈空间，然后在其上运行 `run()` 方法。",
-        "keyInsight": "start() 会创建新的栈帧",
+        "title": "开始任务（开始）",
+        "explanation": "当您调用“start()”时，您要求 JVM 创建一个新的执行流。\nJVM 创建一个新线程，分配一个独立的堆栈，并在其上执行 run() 方法。",
+        "keyInsight": "start() 创建一个新的堆栈帧",
         "visualizationType": "memory",
         "code": "worker.start(); // 일꾼에게 일을 시작하라고 지시합니다.",
         "memoryState": {
@@ -79,18 +79,18 @@
               "value": "run()"
             }
           ],
-          "note": "两个任务开始同时执行！"
+          "note": "두 개의 일이 동시에 실행되기 시작!"
         }
       },
       {
         "title": "主线程继续执行",
-        "explanation": "`start()` 只是"请求"任务然后立即返回。\n因此 `main` 线程不会停止，继续做自己的工作。\n哪条消息先输出取决于操作系统的调度，每次运行的结果可能不同。",
-        "keyInsight": "两个线程不会互相等待，各自独立运行。",
+        "explanation": "`start()` 仅“请求”任务并立即返回。\n因此，“main”线程会继续工作而不会停止。\n首先显示哪条消息取决于操作系统的调度，并且每次运行的结果可能会有所不同。",
+        "keyInsight": "两个线程独立运行，无需互相等待。",
         "visualizationType": "memory",
         "code": "System.out.println(\"메인 일꾼도 자기 일을 합니다.\");",
         "memoryState": {
           "output": [
-            "（输出顺序每次可能不同）"
+            "(출력 순서는 매번 다를 수 있음)"
           ],
           "note": null
         }
@@ -99,22 +99,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "要执行线程，必须调用哪个方法？",
+    "question": "必须调用哪个方法来运行线程？",
     "options": [
-      "run()",
-      "start()",
-      "execute()",
-      "begin()"
+      "跑步（）",
+      "开始（）",
+      "执行（）",
+      "开始（）"
     ],
     "correctIndex": 1,
-    "explanation": "直接调用 run() 只是在当前线程中执行该方法。\n要创建新的执行流，必须使用 start()。"
+    "explanation": "直接调用 run() 只是在当前线程上执行该方法。\n要创建新的执行流程，必须使用start()。"
   },
   "misconceptions": [
     {
-      "wrong": "调用 run() 就能实现多线程运行。",
-      "correct": "不是的！run() 只是普通的方法调用。\n只有 start() 才能创建新线程。",
-      "why": "start() 方法内部会调用本地代码来创建操作系统级别的线程。"
+      "wrong": "当您调用 run() 时，它作为多线程运行。",
+      "correct": "不！ run() 只是一个常规方法调用。\n只有 start() 创建一个新线程。",
+      "why": "这是因为在 start() 方法内部调用本机代码来创建操作系统级线程。"
     }
   ],
-  "keyTakeaway": "Thread 是拥有独立栈的执行单位。用 start() 来启动引擎吧！"
+  "keyTakeaway": "线程是一个具有独立堆栈的执行单元。使用 start() 打开引擎！"
 }

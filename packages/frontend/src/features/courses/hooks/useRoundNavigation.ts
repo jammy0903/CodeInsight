@@ -11,7 +11,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import type { LessonStep } from '@/types';
-import { hasVisualizationData } from './useLessonVisualization';
+import { hasVisualizationData } from '../utils/visualizationData';
 
 export type LessonRound = 'explanation' | 'visualization';
 

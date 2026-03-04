@@ -1,13 +1,13 @@
 {
   "lessonId": "c-5-1",
-  "title": "Stack vs Heap",
-  "concept": "栈是自动但空间小，堆是手动但空间大",
+  "title": "堆栈与堆",
+  "concept": "堆栈是自动的但很窄，堆是手动的但很宽",
   "content": {
     "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int stackErr[1000];\n\n    int *heapArr = (int*)malloc(sizeof(int) * 10000000);\n\n    if (heapArr != NULL) {\n        printf(\"Heap allocation success!\\n\");\n        free(heapArr);\n    }\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "包含 `#include <stdio.h>` 以使用 `printf`。\n\n本课将比较栈和堆的不同作用。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "包含“#include <stdio.h>”以与“printf”一起使用。\n\n本课比较了栈和堆的作用差异。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -16,13 +16,13 @@
       },
       {
         "title": "包含 stdlib.h 头文件",
-        "explanation": "包含 `#include <stdlib.h>` 以使用 `malloc`/`free`。\n\n堆内存通过该头文件中的函数直接管理。",
+        "explanation": "包含“#include <stdlib.h>”以供“malloc”/“free”使用。\n\n堆内存由该标头中的函数直接管理。",
         "visualizationType": "cMemory",
         "code": "#include <stdlib.h>"
       },
       {
-        "title": "定义 main 函数",
-        "explanation": "创建 main 栈帧。\n\n接下来我们将在同一段代码中比较栈数组和堆分配。",
+        "title": "主函数定义",
+        "explanation": "主框架已创建。\n\n现在比较同一代码中的堆栈数组和堆分配。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -35,8 +35,8 @@
         ]
       },
       {
-        "title": "在栈上声明数组",
-        "explanation": "在栈上创建了一个整型数组。\n\n栈内存速度快且自动释放，但大小有限。",
+        "title": "在堆栈上声明数组",
+        "explanation": "在堆栈上创建一个整数数组。\n\n堆栈内存速度快且自动释放，但大小限制较小。",
         "visualizationType": "cMemory",
         "code": "int stackErr[1000];",
         "stack": [
@@ -50,7 +50,7 @@
       },
       {
         "title": "在堆上分配内存（malloc）",
-        "explanation": "`malloc` 在堆上申请一大块连续内存，并将起始地址存储在指针中。\n\n实际数据在堆上，栈上只保留存放地址的指针。",
+        "explanation": "使用“malloc”，我们从堆中请求一大块连续内存，并将其起始地址存储在指针中。\n\n实际数据位于堆中，只有包含地址的指针保留在堆栈中。",
         "visualizationType": "cMemory",
         "code": "int *heapArr = (int*)malloc(sizeof(int) * 10000000);",
         "stack": [
@@ -77,20 +77,20 @@
       },
       {
         "title": "检查堆分配是否成功",
-        "explanation": "通过 `heapArr != NULL` 检查分配是否成功。\n\n如果分配失败就解引用，会很危险，因此使用前必须检查。",
+        "explanation": "使用“heapArr != NULL”检查分配是否成功。\n\n发生故障时取消引用是危险的，因此使用前的确认至关重要。",
         "visualizationType": "cMemory",
         "code": "if (heapArr != NULL) {"
       },
       {
-        "title": "输出成功消息",
-        "explanation": "输出堆分配成功的状态。",
+        "title": "打印成功信息",
+        "explanation": "输出堆分配成功状态。",
         "visualizationType": "cMemory",
         "code": "printf(\"Heap allocation success!\\n\");",
         "stdout": "Heap allocation success!"
       },
       {
-        "title": "释放堆内存（free）",
-        "explanation": "`free(heapArr)` 将堆内存归还给系统。\n\n动态分配必须始终与相应的释放配对。",
+        "title": "空闲堆内存",
+        "explanation": "使用 free(heapArr) 释放堆内存。\n\n动态分配必须成对管理，直到被释放。",
         "visualizationType": "cMemory",
         "code": "free(heapArr);",
         "stack": [
@@ -111,8 +111,8 @@
         "heap": []
       },
       {
-        "title": "程序结束",
-        "explanation": "通过 `return 0;` 结束程序。\n\n要点：栈是自动管理的，堆需要手动管理。",
+        "title": "程序退出",
+        "explanation": "使用“return 0;”退出。\n\n底线：堆栈是自动管理的，堆是手动管理的。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -121,22 +121,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "以下哪种情况需要使用堆（Heap）？",
+    "question": "在下列哪种情况下应该使用堆区域？",
     "options": [
-      "只存储一个变量（int）时",
-      "函数结束后可以消失的临时变量",
-      "需要创建运行时动态确定大小的大数组时",
-      "需要最快速度时"
+      "仅存储一个变量（int）时",
+      "函数结束时可以消失的临时变量",
+      "当您需要创建与用户输入的大小一样大（动态）的数组时。",
+      "当你需要最快的速度时"
     ],
     "correctIndex": 2,
-    "explanation": "当数组大小在编译时无法确定（动态），或需要处理非常大的数据时，应该使用堆。"
+    "explanation": "当编译时（动态）未确定数组大小或处理非常大的数据时，必须使用堆。"
   },
   "misconceptions": [
     {
-      "wrong": "堆比栈更快",
-      "correct": "栈要快得多。",
-      "why": "栈是由 CPU 直接管理的简单结构，而堆需要复杂的算法来寻找空闲空间。"
+      "wrong": "堆比栈快",
+      "correct": "堆栈速度要快得多。",
+      "why": "这是因为Stack是一个由CPU直接管理的简单结构，而Heap则需要复杂的算法来搜索空闲空间。"
     }
   ],
-  "keyTakeaway": "小而快用栈，大而持久用堆。"
+  "keyTakeaway": "小而快的东西是栈，大而持久的东西是堆。"
 }

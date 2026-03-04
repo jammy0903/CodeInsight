@@ -1,13 +1,13 @@
 {
   "lessonId": "c-9-4",
   "title": "Token Pasting",
-  "concept": "Token pasting macros automate identifier generation to reduce repetitive code",
+  "concept": "Token combining macros automate identifier creation, reducing repetitive code",
   "content": {
     "code": "#include <stdio.h>\n\n#define MAKE_VAR(type, name) type var_##name\n\n#define GETTER(name) int get_##name() { return var_##name; }\n\nMAKE_VAR(int, apple);\nMAKE_VAR(int, banana);\n\nGETTER(apple)\nGETTER(banana)\n\nint main() {\n    var_apple = 100;\n    printf(\"Apple: %d\\n\", get_apple());\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
-        "explanation": "**`#include <stdio.h>`** -- Includes the header for `printf`.\n\nIn this lesson we learn the **`##` operator (Token Pasting)**.",
+        "title": "Include stdio.h header",
+        "explanation": "**`#include <stdio.h>`** — Include headers for `printf` use.\n\nIn this lesson, you will learn the **`##` operator (Token Pasting)**.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,34 +15,40 @@
         "stdout": ""
       },
       {
-        "title": "Macro definition 1: Variable generator",
-        "explanation": "**`#define MAKE_VAR(type, name) type var_##name`** -- `##` joins the left token (`var_`) with the right token (the actual value of `name`) to create a single new token. `MAKE_VAR(int, apple)` becomes `int var_apple`.",
+        "title": "Macro Definition 1: Variable Generator",
+        "explanation": "**`#define MAKE_VAR(type, name) type var_##name`** — `##` combines the left token (`var_`) and the right token (the actual value of `name`) into one new token. `MAKE_VAR(int, apple)` → `int var_apple`, `MAKE_V",
         "visualizationType": "cMemory",
         "code": "#define MAKE_VAR(type, name) type var_##name"
       },
       {
-        "title": "Macro definition 2: Getter function generator",
-        "explanation": "**`#define GETTER(name) int get_##name() { return var_##name; }`** -- Uses `##` **twice** to simultaneously generate the function name and the variable name in the body. `GETTER(apple)` becomes `int get_apple() { return var_apple; }`.",
+        "title": "Macro Definition 2: Getter Function Generator",
+        "explanation": "**`#define GETTER(name) int get_##name() { return var_##name; }`** — Use `##` **twice** to create both a function name and a variable name in the body at the same time. `GETTER(apple)` → `int get_apple() { return var_",
         "visualizationType": "cMemory",
         "code": "#define GETTER(name) int get_##name() { return var_##name; }"
       },
       {
-        "title": "Preprocessor execution: Variable generation",
-        "explanation": "**`MAKE_VAR(int, apple);`** and **`MAKE_VAR(int, banana);`** -- The preprocessor joins tokens with `##` to produce actual C code: `int var_apple;` and `int var_banana;`.",
+        "title": "Run preprocessor: create variable",
+        "explanation": "**`MAKE_VAR(int, apple);`** and **`MAKE_VAR(int, banana);`** — The preprocessor combines tokens with `##` and replaces them with actual C code: `int var_apple;` and `int var_banana;`. `type` = `int`, `name` = `appl",
         "visualizationType": "cMemory",
         "code": "MAKE_VAR(int, apple);",
-        "highlightOffset": [0, 1]
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "title": "Preprocessor execution: Function generation",
-        "explanation": "**`GETTER(apple)`** and **`GETTER(banana)`** -- `##` produces complete function definitions: `int get_apple() { return var_apple; }` and `int get_banana() { return var_banana; }`.",
+        "title": "Execute the preprocessor: create a function",
+        "explanation": "**`GETTER(apple)`** and **`GETTER(banana)`** — `##` returns `int get_apple() { return var_apple; }` and `int get_banana() { return var_banana; Replace with the complete function definition code called }`.",
         "visualizationType": "cMemory",
         "code": "GETTER(apple)",
-        "highlightOffset": [0, 1]
+        "highlightOffset": [
+          0,
+          1
+        ]
       },
       {
-        "title": "Starting main function",
-        "explanation": "**`int main() {`** -- At this point, the overall structure the compiler sees is: global variables `var_apple`, `var_banana` (macro-generated) + functions `get_apple()`, `get_banana()` (macro-generated) + `main()` (hand-written).",
+        "title": "Start main function",
+        "explanation": "**`int main() {`** — The entire structure recognized by the compiler at this point is: global variables `var_apple`, `var_banana` (create a macro) + functions `get_apple()`, `get_banana()` (create a macro) + `main()` (write it yourself).",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -55,22 +61,22 @@
         ]
       },
       {
-        "title": "Assigning a value to the generated variable",
-        "explanation": "**`var_apple = 100;`** -- Although this name was automatically created by `##` joining `var_` and `apple`, you use it exactly the same as if you had written `int var_apple;` directly.",
+        "title": "Assigning values ​​to created variables",
+        "explanation": "**`var_apple = 100;`** — Although the `##` operator automatically creates a name by combining `var_` and `apple`, it can be used exactly the same as if you had declared it directly as `int var_apple;`.",
         "visualizationType": "cMemory",
         "code": "var_apple = 100;",
         "stack": []
       },
       {
-        "title": "Calling the generated function",
-        "explanation": "**`printf(\"Apple: %d\\n\", get_apple());`** -- Calls the `get_apple()` function generated by `GETTER(apple)`. This function returns the current value of `var_apple`, so `100` is printed.",
+        "title": "Generated function call",
+        "explanation": "**`printf(\"Apple: %d\\n\", get_apple());`** — Calls the `get_apple()` function created by `GETTER(apple)`. This function returns the current value of `var_apple`, so it outputs `100`.",
         "visualizationType": "cMemory",
         "code": "printf(\"Apple: %d\\n\", get_apple());",
         "stdout": "Apple: 100"
       },
       {
-        "title": "Program termination",
-        "explanation": "**`return 0;`** -- The program terminates.\n\n`##` (Token Pasting) is a preprocessor operator that joins two tokens to create a new identifier. It can only be used inside `#define`.",
+        "title": "Program exit",
+        "explanation": "**`return 0;`** — The program terminates.\n\n`##` (Token Pasting) is a preprocessor operator that combines two tokens to create a new identifier, and can only be used within `#define`.",
         "visualizationType": "cMemory",
         "code": "return 0;"
       }
@@ -78,22 +84,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What is the role of the macro operator ##?",
+    "question": "What does the macro operator ## do?",
     "options": [
-      "Commenting",
-      "Stringification",
-      "Joining two tokens into one (Token Pasting)",
-      "Terminating a macro function"
+      "Comment processing",
+      "Stringify",
+      "Combining two tokens into one (Token Pasting)",
+      "Terminate macro function"
     ],
     "correctIndex": 2,
-    "explanation": "The ## operator physically concatenates the tokens on its left and right to create new variable names, function names, etc."
+    "explanation": "The ## operator is used to create a new variable name or function name by physically attaching the preceding and following tokens."
   },
   "misconceptions": [
     {
       "wrong": "The # operator and ## operator are the same.",
-      "correct": "# converts an argument into a string (\" \"), while ## joins arguments into a code token.",
+      "correct": "# converts the argument to a string (\" \"), and ## combines the arguments into a code token.",
       "why": "#x -> \"x\", x##y -> xy"
     }
   ],
-  "keyTakeaway": "Using the ## operator, you can automatically generate dozens of similarly patterned variables or functions with just a few lines of macros."
+  "keyTakeaway": "Using the ## operator, you can automatically create dozens of variables or functions with similar patterns in just a few lines of macro."
 }

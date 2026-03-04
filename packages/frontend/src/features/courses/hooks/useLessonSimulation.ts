@@ -13,6 +13,7 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { simulatorService, isLanguageSupported } from '@/services/simulator';
 import type { LessonFull, LessonStep } from '@/types';
+import { hasVisualizationData } from '../utils/visualizationData';
 
 interface UseLessonSimulationOptions {
   lesson: LessonFull | undefined;
@@ -39,8 +40,6 @@ type SimStep = {
   stdout?: string;
   [key: string]: unknown;
 };
-
-type LegacyVisualizationStep = LessonStep & Record<string, unknown>;
 
 interface PythonName {
   name: string;
@@ -234,12 +233,7 @@ export function useLessonSimulation({
     // 2. JSON 스텝에 시각화 데이터가 이미 있으면 시뮬레이션 스킵
     //    (eventLoopState, scopeState 등 — 시뮬레이터보다 정확한 사전 제작 데이터)
     if (lesson.content?.steps && lesson.content.steps.length > 0) {
-      const VIZ_FIELDS = ['stack', 'memoryState', 'pythonMemoryState', 'javaMemoryState',
-        'scopeState', 'eventLoopState', 'promiseState', 'thisState', 'prototypeState', 'callStackState'];
-      const allStepsHaveViz = lesson.content.steps.every((s) => {
-        const step = s as LegacyVisualizationStep;
-        return step.visualizationType === 'terminal' || VIZ_FIELDS.some((f) => step[f] != null);
-      });
+      const allStepsHaveViz = lesson.content.steps.every((step) => hasVisualizationData(step));
       if (allStepsHaveViz) {
         setLiveSteps(lesson.content.steps);
         return;

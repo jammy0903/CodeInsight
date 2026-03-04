@@ -1,13 +1,13 @@
 {
   "lessonId": "c-10-1",
   "title": "Standard Streams",
-  "concept": "The standard streams stdin, stdout, and stderr are the default channels for console I/O",
+  "concept": "The standard streams stdin, stdout, and stderr are the default channels for console input and output.",
   "content": {
     "code": "#include <stdio.h>\n\nint main() {\n    fprintf(stdout, \"This uses stdout\\n\");\n    printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");\n\n    fprintf(stderr, \"Error: Something went wrong!\\n\");\n\n    int n;\n    fprintf(stdout, \"Enter a number: \");\n    n = 5;\n\n    fprintf(stdout, \"You entered: %d\\n\", n);\n    return 0;\n}",
     "steps": [
       {
-        "title": "Including stdio.h header",
-        "explanation": "**`#include <stdio.h>`** -- Header for standard I/O functions.\n\nEvery C program automatically receives **3 data channels (streams)** from the OS when it starts.",
+        "title": "Include stdio.h header",
+        "explanation": "**`#include <stdio.h>`** — Header for using standard input/output functions.\n\nEvery C program automatically receives **three data streams (streams)** from the operating system when it starts.",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "Starting main function",
-        "explanation": "**`int main() {`** -- When the program starts, the OS automatically opens three streams: `stdin`, `stdout`, and `stderr`.\n\nAll three are **`FILE *` type pointers**.",
+        "title": "Start main function",
+        "explanation": "**`int main() {`** — When the program starts, the OS automatically opens three streams: `stdin`, `stdout`, and `stderr`.\n\nThese three are all **`FILE *` type pointers**.",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -29,8 +29,8 @@
         ]
       },
       {
-        "title": "Writing to standard output (stdout)",
-        "explanation": "**`fprintf(stdout, \"This uses stdout\\n\");`** -- `fprintf` writes a formatted string to a **specified stream**. The structure is `fprintf(stream, format_string, values...)`, with the first argument specifying the output destination.",
+        "title": "Write to standard output (stdout)",
+        "explanation": "**`fprintf(stdout, \"This uses stdout\\n\");`** — `fprintf` is a function that writes a formatted string to the **specified stream**. The structure is `fprintf(stream, format string, values...)`, and the output destination is specified as the first argument.",
         "visualizationType": "cMemory",
         "code": "fprintf(stdout, \"This uses stdout\\n\");",
         "stack": [],
@@ -38,24 +38,27 @@
       },
       {
         "title": "printf is a shortcut for stdout",
-        "explanation": "**`printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");`** -- The `printf(...)` we have been using is actually a **shortcut function** that internally calls `fprintf(stdout, ...)`. In other words, `printf(\"Hello\\n\")` is identical to `fprintf(stdout, \"Hello\\n\")`.",
+        "explanation": "**`printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");`** — The `printf(...)` we've been using is actually a **shortcut** that internally calls `fprintf(stdout, ...)`. i.e. `printf(\"Hello\\n\")`",
         "visualizationType": "cMemory",
         "code": "printf(\"printf is a shortcut for fprintf(stdout, ...)\\n\");",
         "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)"
       },
       {
-        "title": "Writing to standard error (stderr)",
-        "explanation": "**`fprintf(stderr, \"Error: Something went wrong!\\n\");`** -- This time we send a message to **`stderr` (standard error stream)** instead of `stdout`. By default `stderr` is also connected to the terminal, so visually it looks the same as `stdout`.",
+        "title": "Write to standard error (stderr)",
+        "explanation": "**`fprintf(stderr, \"Error: Something went wrong!\\n\");`** — This time, send the message to **`stderr` (the standard error stream)** instead of `stdout`. By default, `stderr` is also connected to the terminal, so it is indistinguishable from `stdout` at a glance.",
         "visualizationType": "cMemory",
         "code": "fprintf(stderr, \"Error: Something went wrong!\\n\");",
         "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!"
       },
       {
         "title": "Variable declaration and input prompt",
-        "explanation": "**`int n;`** and **`fprintf(stdout, \"Enter a number: \");`** -- Declares an integer variable `n` for user input and prints a prompt. Since `n` is declared but not initialized, it contains a **garbage value**, shown as `???` in the visualization.",
+        "explanation": "**`int n;`** and **`fprintf(stdout, \"Enter a number: \");`** — Declare an integer variable `n` to receive user input and print an information message. Since it was declared but not initialized, `n` contains a **garbage value**, and `???` in the visualization indicates this.",
         "visualizationType": "cMemory",
         "code": "int n;",
-        "highlightOffset": [0, 1],
+        "highlightOffset": [
+          0,
+          1
+        ],
         "stack": [
           {
             "name": "n",
@@ -67,8 +70,8 @@
         "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!\nEnter a number: "
       },
       {
-        "title": "Simulating input",
-        "explanation": "**`n = 5;`** -- In practice you would use `scanf(\"%d\", &n);` to read from **`stdin`** (standard input connected to the keyboard), but here we assume the user entered `5`.",
+        "title": "input simulation",
+        "explanation": "**`n = 5;`** — We actually read the value from **`stdin`** (standard input attached to the keyboard) with `scanf(\"%d\", &n);`, but this assumes the user typed `5`.",
         "visualizationType": "cMemory",
         "code": "n = 5;",
         "stack": [
@@ -81,15 +84,15 @@
         ]
       },
       {
-        "title": "Printing the input value",
-        "explanation": "**`fprintf(stdout, \"You entered: %d\\n\", n);`** -- Displays the assigned value on screen via `stdout`. `%d` is replaced with the integer value `5` of `n`, printing `\"You entered: 5\"`.",
+        "title": "Input value confirmation output",
+        "explanation": "**`fprintf(stdout, \"You entered: %d\\n\", n);`** — Displays the assigned value on the screen through `stdout`. `%d` is replaced with the integer value `5` of `n`, and `\"You entered: 5\"` is output.",
         "visualizationType": "cMemory",
         "code": "fprintf(stdout, \"You entered: %d\\n\", n);",
         "stdout": "This uses stdout\nprintf is a shortcut for fprintf(stdout, ...)\nError: Something went wrong!\nEnter a number: \nYou entered: 5"
       },
       {
-        "title": "Program termination",
-        "explanation": "**`return 0;`** -- When the program terminates normally, the three standard streams are automatically closed and any data remaining in the `stdout` buffer is flushed.",
+        "title": "Program exit",
+        "explanation": "**`return 0;`** — When the program terminates normally, the three standard streams are automatically closed, and any data remaining in the `stdout` buffer is also output (flushed).",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": [],
@@ -99,22 +102,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "When running ./app > log.txt in the terminal, what is displayed on screen?",
+    "question": "When you run ./app > log.txt in the terminal, what is displayed on the screen?",
     "options": [
-      "All output",
-      "Content printed to stdout",
-      "Content printed to stderr",
-      "Nothing is displayed"
+      "all output",
+      "Contents output to stdout",
+      "What is output to stderr",
+      "Nothing is output"
     ],
     "correctIndex": 2,
-    "explanation": "The `>` operator redirects only stdout to the file.\nstderr still goes to the screen (terminal), so error messages can be seen immediately."
+    "explanation": "The `>` operator sends only stdout to a file.\nstderr is still output to the screen (terminal), so you can immediately check the error message."
   },
   "misconceptions": [
     {
-      "wrong": "There is no reason to use fprintf when printf works fine.",
-      "correct": "When you learn file I/O, `fprintf(file, ...)` becomes necessary, and distinguishing stdout/stderr is foundational for system programming.",
-      "why": "Following the Unix philosophy (pipelines) requires stream separation."
+      "wrong": "You can just use printf, there is no reason to use fprintf.",
+      "correct": "When learning file input/output, you will need the `fprintf(file, ...)` format, and distinguishing between stdout/stderr is the basis of system programming.",
+      "why": "Stream separation is essential to follow Unix philosophy (pipelining)."
     }
   ],
-  "keyTakeaway": "stdin, stdout, and stderr are file pointers automatically opened at program start, serving as the communication channels with the OS."
+  "keyTakeaway": "stdin, stdout, and stderr are file pointers that are automatically opened when a program starts and communicate with the operating system."
 }

@@ -1,0 +1,298 @@
+{
+  "lessonId": "py-practical-4-1",
+  "title": "python-pptx로 PPT 만들기",
+  "concept": "슬라이드 생성, 텍스트/이미지 삽입, 차트 추가를 자동화하여 매주 반복되는 보고서 PPT를 1초 만에 만듭니다",
+  "content": {
+    "code": "from pptx import Presentation\nfrom pptx.util import Inches, Pt\n\nprs = Presentation()\nslide = prs.slides.add_slide(prs.slide_layouts[0])\ntitle = slide.shapes.title\ntitle.text = 'Weekly Report'\nsubtitle = slide.placeholders[1]\nsubtitle.text = 'Sales Summary'\nprs.save('weekly_report.pptx')",
+    "steps": [
+      {
+        "line": 1,
+        "title": "Step 1: python-pptx 불러오기",
+        "explanation": "`python-pptx`는 **PowerPoint 파일을 생성/수정**하는 라이브러리입니다.\n\n**주요 기능**:\n- 슬라이드 추가/삭제\n- 텍스트, 이미지, 표, 차트 삽입\n- 레이아웃 설정\n\n**실무 활용**: 매주 똑같은 형식의 보고서 PPT 자동 생성",
+        "highlight": [
+          1
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [],
+          "objects": []
+        }
+      },
+      {
+        "line": 2,
+        "title": "Step 2: 단위 도구 불러오기",
+        "explanation": "`Inches`, `Pt`는 **크기와 위치를 지정**하는 단위입니다.\n\n**Inches**: 인치 단위 (1 inch = 2.54cm)\n**Pt**: 포인트 단위 (글꼴 크기 등)\n\n**왜 필요한가?** 이미지 크기, 텍스트 위치 등을 지정할 때 사용합니다.\n\n**예시**: `Inches(2)` = 2인치, `Pt(18)` = 18포인트",
+        "highlight": [
+          2
+        ],
+        "visualizationType": "python"
+      },
+      {
+        "line": 4,
+        "title": "Step 3: 새 프레젠테이션 생성",
+        "explanation": "`Presentation()`으로 **빈 PowerPoint 파일**을 메모리에 생성합니다.\n\n**Presentation**: PPT 파일 전체\n**Slide**: 개별 슬라이드\n\n**아직 빈 PPT**: 슬라이드가 하나도 없습니다.\n5번 줄에서 추가합니다.",
+        "highlight": [
+          4
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "prs",
+              "pointsTo": "obj_prs"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_prs",
+              "type": "object",
+              "value": "Presentation()",
+              "pyId": "5001",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 5,
+        "title": "Step 4: 슬라이드 추가",
+        "explanation": "`prs.slides.add_slide(prs.slide_layouts[0])`로 **새 슬라이드를 추가**합니다.\n\n**slide_layouts[0]**: 제목 슬라이드 레이아웃\n- [0]: 제목 + 부제목\n- [1]: 제목 + 내용\n- [5]: 빈 슬라이드\n\n**레이아웃이 뭐야?** PowerPoint 템플릿의 '슬라이드 레이아웃'과 동일합니다.",
+        "highlight": [
+          5
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "prs",
+              "pointsTo": "obj_prs"
+            },
+            {
+              "name": "slide",
+              "pointsTo": "obj_slide"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_prs",
+              "type": "object",
+              "value": "Presentation()",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_slide",
+              "type": "object",
+              "value": "prs.slides.add_slide(prs.slide_layouts[0])",
+              "pyId": "5002",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 6,
+        "title": "Step 5: 제목 영역 가져오기",
+        "explanation": "`slide.shapes.title`로 **제목 텍스트 박스**를 가져옵니다.\n\n**shapes**: 슬라이드의 모든 도형(텍스트 박스, 이미지 등)\n**title**: 제목 전용 도형\n\n**왜 따로 가져올까?** 제목은 고정 위치에 있으므로 쉽게 접근할 수 있습니다.",
+        "highlight": [
+          6
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "prs",
+              "pointsTo": "obj_prs"
+            },
+            {
+              "name": "slide",
+              "pointsTo": "obj_slide"
+            },
+            {
+              "name": "title",
+              "pointsTo": "obj_title"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_prs",
+              "type": "object",
+              "value": "Presentation()",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_slide",
+              "type": "object",
+              "value": "prs.slides.add_slide(prs.slide_layouts[0])",
+              "pyId": "5002"
+            },
+            {
+              "id": "obj_title",
+              "type": "object",
+              "value": "slide.shapes.title",
+              "pyId": "5003",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 7,
+        "title": "Step 6: 제목 텍스트 설정",
+        "explanation": "`title.text = 'Weekly Report'`로 **제목 내용을 설정**합니다.\n\n**결과**: 슬라이드 상단에 'Weekly Report' 표시\n\n**실무 활용**: 날짜 자동 삽입\n```python\nfrom datetime import datetime\ntitle.text = f'Weekly Report - {datetime.now():%Y.%m.%d}'\n```",
+        "highlight": [
+          7
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "obj_prs",
+              "type": "object",
+              "value": "Presentation()",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_slide",
+              "type": "object",
+              "value": "prs.slides.add_slide(prs.slide_layouts[0])",
+              "pyId": "5002"
+            },
+            {
+              "id": "obj_title",
+              "type": "object",
+              "value": "slide.shapes.title",
+              "pyId": "5003"
+            }
+          ]
+        }
+      },
+      {
+        "line": 8,
+        "title": "Step 7: 부제목 영역 가져오기",
+        "explanation": "`slide.placeholders[1]`로 **부제목 텍스트 박스**를 가져옵니다.\n\n**placeholders**: 레이아웃의 고정 위치 도형들\n- [0]: 제목\n- [1]: 부제목 또는 본문\n\n**레이아웃마다 다름**: slide_layouts[1]은 [1]이 본문 영역입니다.",
+        "highlight": [
+          8
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "names": [
+            {
+              "name": "prs",
+              "pointsTo": "obj_prs"
+            },
+            {
+              "name": "slide",
+              "pointsTo": "obj_slide"
+            },
+            {
+              "name": "title",
+              "pointsTo": "obj_title"
+            },
+            {
+              "name": "subtitle",
+              "pointsTo": "obj_subtitle"
+            }
+          ],
+          "objects": [
+            {
+              "id": "obj_prs",
+              "type": "object",
+              "value": "Presentation()",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_slide",
+              "type": "object",
+              "value": "prs.slides.add_slide(prs.slide_layouts[0])",
+              "pyId": "5002"
+            },
+            {
+              "id": "obj_title",
+              "type": "object",
+              "value": "slide.shapes.title",
+              "pyId": "5003"
+            },
+            {
+              "id": "obj_subtitle",
+              "type": "object",
+              "value": "slide.placeholders[1]",
+              "pyId": "5004",
+              "highlight": true
+            }
+          ]
+        }
+      },
+      {
+        "line": 9,
+        "title": "Step 8: 부제목 텍스트 설정",
+        "explanation": "`subtitle.text = 'Sales Summary'`로 **부제목 내용을 설정**합니다.\n\n**결과**: 제목 아래에 'Sales Summary' 표시",
+        "highlight": [
+          9
+        ],
+        "visualizationType": "python",
+        "pythonMemoryState": {
+          "objects": [
+            {
+              "id": "obj_prs",
+              "type": "object",
+              "value": "Presentation()",
+              "pyId": "5001"
+            },
+            {
+              "id": "obj_slide",
+              "type": "object",
+              "value": "prs.slides.add_slide(prs.slide_layouts[0])",
+              "pyId": "5002"
+            },
+            {
+              "id": "obj_title",
+              "type": "object",
+              "value": "slide.shapes.title",
+              "pyId": "5003"
+            },
+            {
+              "id": "obj_subtitle",
+              "type": "object",
+              "value": "slide.placeholders[1]",
+              "pyId": "5004"
+            }
+          ]
+        }
+      },
+      {
+        "line": 10,
+        "title": "Step 9: PPT 저장",
+        "explanation": "`prs.save('weekly_report.pptx')`로 **PowerPoint 파일을 저장**합니다.\n\n**결과**: weekly_report.pptx 파일 생성\n- 슬라이드 1개\n- 제목: 'Weekly Report'\n- 부제목: 'Sales Summary'\n\n**실무 팁**: 파일명에 날짜 넣기 → `f'report_{datetime.now():%Y%m%d}.pptx'`",
+        "highlight": [
+          10
+        ],
+        "visualizationType": "python"
+      }
+    ],
+    "deltaFormat": true
+  },
+  "quiz": {
+    "question": "如何使用 python-pptx 添加空白幻灯片？",
+    "options": [
+      "prs.slides.add_slide(prs.slide_layouts[6])",
+      "prs.slides.add_slide(prs.slide_layouts[0])",
+      "prs.add_blank_slide()",
+      "prs.new_slide()"
+    ],
+    "correctIndex": 0,
+    "explanation": "Slide_layouts[6] 是一个空的幻灯片布局。\n[0]是标题幻灯片，[1]是标题+内容布局。"
+  },
+  "misconceptions": [
+    {
+      "wrong": "Presentation()만 하면 PPT 파일이 생성된다",
+      "correct": "Presentation()은 메모리에만 객체를 만듭니다.\nprs.save()를 호출해야 실제 파일이 저장됩니다.",
+      "why": "모든 슬라이드를 추가한 후 마지막에 한 번만 저장하는 방식입니다."
+    },
+    {
+      "wrong": "slide.shapes.title은 제목 텍스트다",
+      "correct": "slide.shapes.title은 제목 '도형'입니다.\n텍스트는 title.text에 있습니다.",
+      "why": "PowerPoint는 모든 요소가 '도형(Shape)'입니다.\n텍스트는 도형 안에 들어갑니다."
+    }
+  ],
+  "keyTakeaway": "Presentation → add_slide → placeholders → save = PPT 자동화"
+}

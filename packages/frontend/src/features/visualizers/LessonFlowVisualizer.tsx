@@ -132,14 +132,15 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   const els = eventLoopState;
   const hasStandardEventLoop = !!(els && (vizType === 'eventLoop' || els.callStack || els.webApis || els.taskQueue || els.microtaskQueue));
   const hasEventLoopNoteOnly = !!(els && !hasStandardEventLoop && (eventLoopNote || eventLoopWarning));
-  const isNonMemoryType =
+  const isNonMemoryType = (
     hasStandardEventLoop ||
     hasEventLoopNoteOnly ||
     (vizType === 'scope' && scopeState) ||
     (vizType === 'thisBinding' && thisState) ||
     (vizType === 'prototype' && prototypeState) ||
     (vizType === 'promise' && promiseState) ||
-    (vizType === 'algorithm' && algorithmState);
+    (vizType === 'algorithm' && algorithmState)
+  );
 
   // ========================================================
   // All hooks called unconditionally (React rules of hooks)

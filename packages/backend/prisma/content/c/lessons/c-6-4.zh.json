@@ -1,13 +1,13 @@
 {
   "lessonId": "c-6-4",
   "title": "结构体指针 (->)",
-  "concept": "通过指针访问结构体成员的便捷箭头运算符",
+  "concept": "用于指向结构的方便箭头。",
   "content": {
     "code": "#include <stdio.h>\n\nstruct Player {\n    char name[10];\n    int hp;\n};\n\nvoid heal(struct Player *p) {\n    (*p).hp += 10;\n    p->hp += 10;\n}\n\nint main() {\n    struct Player warrior = {\"Conan\", 50};\n\n    printf(\"HP: %d\\n\", warrior.hp);\n    heal(&warrior);\n    printf(\"HP: %d\\n\", warrior.hp);\n\n    return 0;\n}",
     "steps": [
       {
-        "title": "包含 stdio.h 头文件",
-        "explanation": "这个头文件用于使用 `printf`。\n\n本课讲解如何通过指针传递结构体以修改原始值。",
+        "title": "包含 stdio.h 标头",
+        "explanation": "使用“printf”的标头。\n\n本课程介绍如何通过将结构作为指针传递来修改原始结构。",
         "visualizationType": "cMemory",
         "code": "#include <stdio.h>",
         "stack": [],
@@ -15,8 +15,8 @@
         "stdout": ""
       },
       {
-        "title": "定义 Player 结构体",
-        "explanation": "`Player` 是一个结构体类型，将名称和生命值捆绑在一起。\n\n它是将相关数据作为单个对象处理的基本单元。",
+        "title": "玩家结构定义",
+        "explanation": "`Player` 是一个结合了名字和生命值的结构类型。\n\n它是将相关数据作为单个对象进行处理的基本单元。",
         "visualizationType": "cMemory",
         "code": "struct Player {",
         "highlightOffset": [
@@ -27,14 +27,14 @@
         ]
       },
       {
-        "title": "定义 heal 函数（使用指针）",
-        "explanation": "`heal(struct Player *p)` 接收 Player 结构体的地址。\n\n接收地址使得函数可以直接修改原始值的成员。",
+        "title": "定义heal函数（使用指针）",
+        "explanation": "`heal(struct Player *p)` 接收并处理玩家结构体的地址。\n\n收到地址后，您可以直接修改函数内的原始成员。",
         "visualizationType": "cMemory",
         "code": "void heal(struct Player *p) {"
       },
       {
-        "title": "启动 main 函数",
-        "explanation": "创建 main 栈帧，准备一个玩家实例。",
+        "title": "启动主函数",
+        "explanation": "主框架已创建并准备播放器实例。",
         "visualizationType": "cMemory",
         "code": "int main() {",
         "stack": [
@@ -48,7 +48,7 @@
       },
       {
         "title": "创建结构体变量",
-        "explanation": "我们为 `warrior` 变量设置初始名称和生命值。\n\n这个值将作为函数调用前的基准状态。",
+        "explanation": "将初始名称和生命值设置为“warrior”变量。\n\n该值成为调用函数之前的参考状态。",
         "visualizationType": "cMemory",
         "code": "struct Player warrior = {\"Conan\", 50};",
         "stack": [
@@ -58,22 +58,28 @@
             "value": "{name: \"Conan\", hp: 50}",
             "address": "0x1000",
             "structMembers": [
-              { "key": "name", "value": "Conan" },
-              { "key": "hp", "value": "50" }
+              {
+                "key": "name",
+                "value": "Conan"
+              },
+              {
+                "key": "hp",
+                "value": "50"
+              }
             ]
           }
         ]
       },
       {
-        "title": "打印初始生命值",
-        "explanation": "在调用之前打印生命值，记录修改前的状态。",
+        "title": "初始体力输出",
+        "explanation": "打印调用前的体力值，记录变化前的状态。",
         "visualizationType": "cMemory",
         "code": "printf(\"HP: %d\\n\", warrior.hp);",
         "stdout": "HP: 50"
       },
       {
-        "title": "调用 heal 函数（传递地址）",
-        "explanation": "我们通过 `heal(&warrior)` 传递结构体的地址。\n\n不是传递副本，而是传递原始值的位置，这样修改就能反映到原始值上。",
+        "title": "调用heal函数（传递地址）",
+        "explanation": "将结构体地址传递给 `heal(&warrior)`。\n\n通过传递原始位置而不是副本来反映更改。",
         "visualizationType": "cMemory",
         "code": "heal(&warrior);",
         "stack": [
@@ -84,8 +90,14 @@
             "value": "{name: \"Conan\", hp: 50}",
             "highlight": true,
             "structMembers": [
-              { "key": "name", "value": "Conan" },
-              { "key": "hp", "value": "50" }
+              {
+                "key": "name",
+                "value": "Conan"
+              },
+              {
+                "key": "hp",
+                "value": "50"
+              }
             ]
           },
           {
@@ -98,8 +110,8 @@
         ]
       },
       {
-        "title": "方法一：先解引用再用点运算符",
-        "explanation": "我们可以通过 `(*p).hp` 先解引用，再使用点运算符来访问成员。",
+        "title": "方法 1：解引用后跟点运算符",
+        "explanation": "您可以在取消引用成员后使用点运算符访问成员，如“(*p).hp”。",
         "visualizationType": "cMemory",
         "code": "(*p).hp += 10;",
         "stack": [
@@ -110,8 +122,14 @@
             "value": "{name: \"Conan\", hp: 60}",
             "highlight": true,
             "structMembers": [
-              { "key": "name", "value": "Conan" },
-              { "key": "hp", "value": "60" }
+              {
+                "key": "name",
+                "value": "Conan"
+              },
+              {
+                "key": "hp",
+                "value": "60"
+              }
             ]
           },
           {
@@ -124,8 +142,8 @@
         ]
       },
       {
-        "title": "方法二：箭头运算符 (->)",
-        "explanation": "`p->hp` 是 `(*p).hp` 的简写——它们含义相同。\n\n箭头表示法是通过指针访问成员的标准方式。",
+        "title": "方法 2：箭头运算符 (->)",
+        "explanation": "`p->hp` 是缩写，与 `(*p).hp` 含义相同。\n\n该表示法通常用于指针成员访问。",
         "visualizationType": "cMemory",
         "code": "p->hp += 10;",
         "stack": [
@@ -136,8 +154,14 @@
             "value": "{name: \"Conan\", hp: 70}",
             "highlight": true,
             "structMembers": [
-              { "key": "name", "value": "Conan" },
-              { "key": "hp", "value": "70" }
+              {
+                "key": "name",
+                "value": "Conan"
+              },
+              {
+                "key": "hp",
+                "value": "70"
+              }
             ]
           },
           {
@@ -150,8 +174,8 @@
         ]
       },
       {
-        "title": "验证修改后的生命值",
-        "explanation": "函数调用后检查生命值，发现原始值确实被修改了。\n\n这证明了通过指针传递会导致原始值被修改。",
+        "title": "检查你的体力变化",
+        "explanation": "如果调用函数后检查健康状况，原来的值实际上已经改变了。\n\n它表明指针传递导致了对原始指针的修改。",
         "visualizationType": "cMemory",
         "code": "printf(\"HP: %d\\n\", warrior.hp);",
         "occurrence": 2,
@@ -162,16 +186,22 @@
             "value": "{name: \"Conan\", hp: 70}",
             "address": "0x1000",
             "structMembers": [
-              { "key": "name", "value": "Conan" },
-              { "key": "hp", "value": "70" }
+              {
+                "key": "name",
+                "value": "Conan"
+              },
+              {
+                "key": "hp",
+                "value": "70"
+              }
             ]
           }
         ],
         "stdout": "HP: 50\nHP: 70"
       },
       {
-        "title": "程序终止",
-        "explanation": "程序以 `return 0;` 退出。\n\n关键要点：当传递结构体指针时，使用 `->` 访问成员。",
+        "title": "程序退出",
+        "explanation": "使用“return 0;”退出。\n\n要点：传递结构体指针时，成员访问默认为“->”。",
         "visualizationType": "cMemory",
         "code": "return 0;",
         "stack": []
@@ -180,22 +210,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "给定 struct A *ptr; 访问成员 x 的正确方式是什么？",
+    "question": "结构体A*ptr；访问成员 x 的正确方法是什么",
     "options": [
-      "ptr.x",
-      "ptr->x",
+      "指针x",
+      "指针->x",
       "*ptr.x",
       "&ptr.x"
     ],
     "correctIndex": 1,
-    "explanation": "因为它是指针，所以必须使用箭头 (`->`)。\n`ptr.x` 只在 ptr 是结构体变量时使用。\n`*ptr.x` 由于运算符优先级会变成 `*(ptr.x)`，这是错误的语法。"
+    "explanation": "由于它是一个指针，因此必须使用箭头（`->`）。\n仅当 ptr 是结构变量时才使用“ptr.x”。\n由于运算符优先级，`*ptr.x` 变成了 `*(ptr.x)`，这是不正确的语法。"
   },
   "misconceptions": [
     {
-      "wrong": "`->` 是 C++ 的特性",
-      "correct": "这是 C 语言的基本特性。",
-      "why": "由于通过结构体指针访问成员非常常见，所以创建了这个快捷方式。"
+      "wrong": "`->` 是一个 C++ 特性",
+      "correct": "这是C语言的一个基本特征。",
+      "why": "这是由于结构指针访问过于频繁而创建的快捷方式。"
     }
   ],
-  "keyTakeaway": "对于结构体指针，使用 `->` 而不是 `.`。"
+  "keyTakeaway": "对于结构指针，请使用“->”而不是“.”。"
 }

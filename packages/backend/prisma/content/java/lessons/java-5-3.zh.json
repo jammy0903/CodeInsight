@@ -1,13 +1,13 @@
 {
   "lessonId": "java-5-3",
-  "title": "static 字段",
-  "concept": "static 字段是所有实例共享的"公共变量"。",
+  "title": "static 필드",
+  "concept": "static 필드는 모든 인스턴스가 공유하는 '공용 변수'다.",
   "content": {
     "code": "class Counter {\n    static int count = 0;\n    int id;\n    \n    Counter() {\n        count++;\n        id = count;\n    }\n}\n\nCounter c1 = new Counter();\nCounter c2 = new Counter();\n\nSystem.out.println(c1.id);\nSystem.out.println(c2.id);\nSystem.out.println(Counter.count);",
     "steps": [
       {
-        "title": "static 字段的内存分配",
-        "explanation": "**执行流程：**\n1. JVM 将 `Counter` 类信息加载到 Metaspace 中。\n2. 此时也为 `static int count` 创建了空间并初始化为 `0`。\n\n**先于对象而生：**\n即使一个对象都没创建（`new`），`static` 成员在程序启动时就已经存在了。\n就像一块公告板！",
+        "title": "static 필드 메모리 할당",
+        "explanation": "**실행 순서:**\n1. JVM이 `Counter` 클래스 정보를 Metaspace에 로드(Load)합니다.\n2. 이때 `static int count`를 위한 공간도 함께 생성하고 `0`으로 초기화합니다.\n\n**탄생의 비밀:**\n객체(`new`)를 하나도 안 만들어도, `static` 멤버는 프로그램 시작과 동시에 이미 존재합니다.\n공용 게시판처럼요!",
         "visualizationType": "javaMemory",
         "code": "static int count = 0;",
         "highlightOffset": [
@@ -35,8 +35,8 @@
         }
       },
       {
-        "title": "创建第一个实例（c1）",
-        "explanation": "**执行流程：**\n1. 调用 `new Counter()`。\n2. 构造函数执行，将共享的 `Counter.count` 加 1（0 -> 1）。\n3. 将值 `1` 记录到自己的 `id` 字段中。\n\n**各自又共享：**\n`count` 是所有人都能看到的共享计分板，而 `id` 是每个实例口袋里的个人号码牌。",
+        "title": "첫 번째 인스턴스(c1) 생성",
+        "explanation": "**실행 순서:**\n1. `new Counter()`를 호출합니다.\n2. 생성자가 실행되면서 공동 자산인 `Counter.count`를 `1` 올립니다 (0 -> 1).\n3. 이 `1` 값을 내 `id` 수첩에 적습니다.\n\n**따로 또 같이:**\n`count`는 모두가 공유하는 전광판이고, `id`는 내 주머니 속 번호표입니다.",
         "visualizationType": "javaMemory",
         "code": "Counter c1 = new Counter();",
         "highlightOffset": [
@@ -79,8 +79,8 @@
         }
       },
       {
-        "title": "创建第二个实例（c2）",
-        "explanation": "**执行流程：**\n1. 再次调用 `new Counter()`。\n2. `Counter.count` 之前是 1，现在变成 `2`。\n3. 新实例 `c2` 将 `2` 作为自己的 `id`。\n\n**接力赛：**\n`c2` 接续 `c1` 留下的值继续递增。\n这就是 `static` 的特性！",
+        "title": "두 번째 인스턴스(c2) 생성",
+        "explanation": "**실행 순서:**\n1. 또 `new Counter()`를 호출합니다.\n2. `Counter.count`는 아까 1이었으니까, 이제 `2`가 됩니다.\n3. 새 친구 `c2`는 `id`로 `2`를 가져갑니다.\n\n**이어달리기:**\n`c1`이 올려둔 값을 `c2`가 이어서 올립니다.\n그게 `static`이니까요!",
         "visualizationType": "javaMemory",
         "code": "Counter c2 = new Counter();",
         "highlightOffset": [
@@ -134,8 +134,8 @@
         }
       },
       {
-        "title": "输出结果",
-        "explanation": "**执行流程：**\n1. 检查 `c1` 的 ID：`1`。\n2. 检查 `c2` 的 ID：`2`。\n3. 检查共享计数器：`2`。\n\n**推荐写法：**\n写 `c1.count` 虽然能运行，但会产生警告。\n意思是："这是共享的——请用 `Counter.count` 来调用！"",
+        "title": "결과 출력",
+        "explanation": "**실행 순서:**\n1. `c1`의 번호 `1` 확인.\n2. `c2`의 번호 `2` 확인.\n3. 공용 카운터 `2` 확인.\n\n**권장 표기법:**\n`c1.count`라고 써도 작동은 하지만, 노란 줄(Warning)이 뜹니다.\n\"이건 공용이니까 `Counter.count`라고 불러줘!\"라는 뜻입니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Counter.count);",
         "highlightOffset": [
@@ -174,22 +174,22 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "关于 static 字段，以下哪项描述是错误的？",
+    "question": "关于静态字段的特性，下列哪项是不正确的？",
     "options": [
-      "所有实例共享同一个值。",
-      "不需要创建对象就能使用。",
-      "每个实例都会单独分配内存空间。",
-      "在类加载时就被加载到内存中。"
+      "所有实例共享一个值。",
+      "无需创建对象即可使用它。",
+      "内存空间是为每个实例单独分配的。",
+      "在类加载时加载到内存中。"
     ],
     "correctIndex": 2,
-    "explanation": "每个实例单独分配内存空间是实例变量的特征。\nstatic 字段在每个类中只存在一份。"
+    "explanation": "单独分配给每个实例的是实例变量。\n每个类只有一个静态字段。"
   },
   "misconceptions": [
     {
-      "wrong": "static 变量也会被垃圾回收（GC）。",
-      "correct": "通常会一直存活到程序终止。",
-      "why": "只要类本身没有从内存中卸载，static 变量就会一直存在。\n因此将大量数据设为 static 可能成为内存泄漏（Memory Leak）的主要原因。"
+      "wrong": "static 변수도 GC(가비지 컬렉션) 대상이다.",
+      "correct": "보통 프로그램 종료 시까지 살아있습니다.",
+      "why": "클래스 자체가 메모리에서 내려가지 않는 한 static 변수도 계속 남아있습니다.\n그래서 너무 큰 데이터를 static으로 잡으면 메모리 누수(Memory Leak)의 주범이 됩니다."
     }
   ],
-  "keyTakeaway": "static 就是"公共黑板"。所有人都能看、都能写、都能共享。"
+  "keyTakeaway": "static은 '공용 칠판'이다. 모두가 보고 쓰고 공유한다."
 }
