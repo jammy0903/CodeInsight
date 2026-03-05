@@ -93,6 +93,29 @@ packages/
 
 ---
 
+## Java Frame Visualization Flow (Current)
+
+아래 플로우는 현재 Java 레슨/플레이그라운드에서 함수 프레임이 시각화되는 실제 경로를 나타냅니다.
+
+```mermaid
+flowchart TD
+  A[User Java Code<br/>Main + user classes] --> B[Backend API<br/>POST /api/v1/simulators/java/simulate]
+  B --> C[JavaSimulationService]
+  C --> D[DebuggerAgent (JDI STEP_INTO)]
+  D --> E[SnapshotMaker]
+  E --> F[Snapshots JSON<br/>stack[methodName, variables], heap]
+  F --> G[Frontend javaSimulator.ts<br/>steps -> LessonStep]
+  G --> H[LessonFlowVisualizer<br/>language=java]
+  H --> I[JavaTransformer]
+  I --> J[FlowStep<br/>variables + frames]
+  J --> K[JavaReferenceView]
+  K --> L[Rendered Stack Frames<br/>main, &lt;init&gt;, showInfo, deposit, withdraw ...]
+
+  D -. excludes .-> X[java.*, javax.*, jdk.*, sun.*, com.sun.*]
+```
+
+---
+
 ## Getting Started
 
 ### Prerequisites
