@@ -9,9 +9,9 @@
 
 import { useQuery } from '@tanstack/react-query';
 import i18n from 'i18next';
-import { getLanguageWithChapters, getChapterWithLessons, getUserProgress, getLessonFull } from '@/services/courses';
+import { getLanguageWithChapters, getChapterWithLessons, getChapterProgress, getUserProgress, getLessonFull } from '@/services/courses';
 import { useStore } from '@/stores/store';
-import type { ChapterWithLessons, Language, UserProgress, LessonFull } from '@/types';
+import type { ChapterWithLessons, ChapterWithProgress, Language, UserProgress, LessonFull } from '@/types';
 
 /**
  * 언어 코스 데이터 조회 (챕터 + 진행률 포함)
@@ -57,6 +57,20 @@ export function useChapter(chapterId: string | undefined) {
     queryFn: () => getChapterWithLessons(chapterId!),
     enabled: !!chapterId,
     staleTime: 5 * 60 * 1000, // 5분: 챕터 구조는 세션 중 변경 안 됨
+  });
+}
+
+/**
+ * 챕터 진행 상태 조회 (로그인 사용자 전용)
+ */
+export function useChapterProgress(chapterId: string | undefined) {
+  const appUser = useStore((state) => state.appUser);
+
+  return useQuery<ChapterWithProgress>({
+    queryKey: ['chapter-progress', chapterId, appUser?.id],
+    queryFn: () => getChapterProgress(chapterId!),
+    enabled: !!chapterId && !!appUser,
+    staleTime: 60 * 1000,
   });
 }
 
