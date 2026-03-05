@@ -27,10 +27,10 @@ export const VIZ_DATA_FIELDS = [
 ] as const;
 
 export function hasVisualizationData(step: LessonStep): boolean {
-  const stepRecord = step as UnknownRecord;
-  if (step.visualizationType === 'terminal') {
+  if (typeof step.visualizationType === 'string' && step.visualizationType.trim().length > 0) {
     return true;
   }
+  const stepRecord = step as UnknownRecord;
   return VIZ_DATA_FIELDS.some((field) => hasMeaningfulValue(stepRecord[field]));
 }
 
@@ -71,4 +71,3 @@ export function hasJavaMemoryData(steps: LessonStep[]): boolean {
     return hasMeaningfulValue(s.javaMemoryState);
   });
 }
-
