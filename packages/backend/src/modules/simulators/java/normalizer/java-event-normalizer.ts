@@ -155,11 +155,24 @@ function normalizeOneEvent(
 
 /**
  * JavaStep의 전체 이벤트 배열을 SimulatorEvent[]로 정규화
+ *
+ * JDI 경로(Playground): step.events 없음, step.stdout으로 출력 전달
+ * 핸들러 경로(레슨): step.events 배열로 이벤트 전달
  */
 export function normalizeJavaEvents(step: JavaStep): SimulatorEvent[] {
-  if (!step.events || step.events.length === 0) return [];
-
   const result: SimulatorEvent[] = [];
+
+  // JDI 스냅샷 경로: stdout 필드를 output 이벤트로 변환
+  if ((step as any).stdout !== undefined && (step as any).stdout !== '') {
+    result.push({
+      type: 'output' as const,
+      stream: 'stdout' as const,
+      text: (step as any).stdout,
+    });
+  }
+
+  if (!step.events || step.events.length === 0) return result;
+
   for (const event of step.events) {
     result.push(...normalizeOneEvent(event, step));
   }

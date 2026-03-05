@@ -1,0 +1,108 @@
+{
+  "language": "cpp",
+  "quizType": "multiple-choice",
+  "chapterId": "cpp-reference-mc",
+  "chapterTitle": "References / Copy / Move (Multiple Choice)",
+  "quizzes": [
+    {
+      "id": "mc-cpp-ref-q1",
+      "question": "What is the value of x after executing `int x = 3; int& r = x; r = 9;`?",
+      "options": ["3", "9", "Compilation error", "Undefined"],
+      "answer": "1",
+      "explanation": "r is an alias for x, so changing r also changes x.",
+      "concepts": ["reference", "alias"],
+      "difficulty": "easy",
+      "orderNum": 1
+    },
+    {
+      "id": "mc-cpp-ref-q2",
+      "question": "Which of the following is the syntax for an rvalue reference?",
+      "options": ["int& a = x;", "int&& a = 10;", "const int& a = x;", "int* a = &x;"],
+      "answer": "1",
+      "explanation": "`T&&` is the rvalue reference syntax.",
+      "concepts": ["rvalue reference", "T&&"],
+      "difficulty": "easy",
+      "orderNum": 2
+    },
+    {
+      "id": "mc-cpp-ref-q3",
+      "question": "What is the essential behavior of `std::move(obj)`?",
+      "options": ["Immediately moves memory", "Performs a deep copy", "Casts to an rvalue", "Destroys the object"],
+      "answer": "2",
+      "explanation": "std::move is a casting utility that forces treatment as an rvalue.",
+      "concepts": ["std::move", "cast", "rvalue"],
+      "difficulty": "medium",
+      "orderNum": 3
+    },
+    {
+      "id": "mc-cpp-ref-q4",
+      "question": "Which statement correctly describes the state of an object after a move?",
+      "options": ["Always destroyed", "Always retains original value", "Valid but value may be unspecified", "Always null"],
+      "answer": "2",
+      "explanation": "A moved-from object is in a valid but unspecified state.",
+      "concepts": ["moved-from", "valid", "unspecified"],
+      "difficulty": "medium",
+      "orderNum": 4
+    },
+    {
+      "id": "mc-cpp-ref-q5",
+      "question": "What is commonly used together with `T&&` for perfect forwarding in templates?",
+      "options": ["std::copy", "std::forward", "std::bind", "std::swap"],
+      "answer": "1",
+      "explanation": "std::forward preserves the value category of the forwarded argument.",
+      "concepts": ["perfect forwarding", "std::forward"],
+      "difficulty": "hard",
+      "orderNum": 5
+    },
+    {
+      "id": "mc-cpp-ref-q6",
+      "question": "In which situation is a deep copy typically necessary?",
+      "options": ["A class holding a single int", "A class owning a raw pointer member", "A class holding only references", "A class with only static functions"],
+      "answer": "1",
+      "explanation": "When a class directly owns dynamic resources, the copy strategy must be explicitly defined.",
+      "concepts": ["deep copy", "resource ownership"],
+      "difficulty": "medium",
+      "orderNum": 6
+    },
+    {
+      "id": "mc-cpp-ref-q7",
+      "question": "Which statement is correct about `const int& r = 10;`?",
+      "options": ["Compilation error", "10 can be modified", "Extends the lifetime of the temporary", "r is a pointer"],
+      "answer": "2",
+      "explanation": "A const reference binds to the temporary object and extends its lifetime.",
+      "concepts": ["const reference", "temporary", "lifetime"],
+      "difficulty": "medium",
+      "orderNum": 7
+    },
+    {
+      "id": "mc-cpp-ref-q8",
+      "question": "What is a general characteristic of pass by value?",
+      "options": ["Directly modifies the original", "May incur copy/move costs", "Always faster than pass by reference", "Destructor is never called"],
+      "answer": "1",
+      "explanation": "Pass by value involves object copying or moving, so cost should be considered.",
+      "concepts": ["pass by value", "copy", "move"],
+      "difficulty": "easy",
+      "orderNum": 8
+    },
+    {
+      "id": "mc-cpp-ref-q9",
+      "question": "What is the most appropriate advantage of pass by reference?",
+      "options": ["Always safe", "Reduces copy cost", "Automatically protects the original", "Guarantees thread safety"],
+      "answer": "1",
+      "explanation": "For large objects, pass by reference can reduce copying costs.",
+      "concepts": ["pass by reference", "performance"],
+      "difficulty": "easy",
+      "orderNum": 9
+    },
+    {
+      "id": "mc-cpp-ref-q10",
+      "question": "Which type best fits the pattern of non-copyable but movable?",
+      "options": ["std::vector", "std::unique_ptr", "std::shared_ptr", "std::string"],
+      "answer": "1",
+      "explanation": "unique_ptr deletes copy operations and only allows move for sole ownership.",
+      "concepts": ["unique_ptr", "move-only"],
+      "difficulty": "easy",
+      "orderNum": 10
+    }
+  ]
+}

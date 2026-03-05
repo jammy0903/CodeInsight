@@ -1,0 +1,138 @@
+{
+  "language": "javascript",
+  "quizType": "ox",
+  "chapterId": "js-eventloop",
+  "chapterTitle": "Event Loop and Execution Model",
+  "quizzes": [
+    {
+      "id": "ox-js-eventloop-q1",
+      "question": "JavaScript is a single-threaded language.",
+      "answer": "true",
+      "explanation": "JavaScript is a single-threaded language that uses only one call stack.\nAsynchronous operations are handled through the event loop.",
+      "concepts": [
+        "single-threaded",
+        "call stack",
+        "event loop"
+      ],
+      "difficulty": "easy",
+      "orderNum": 1
+    },
+    {
+      "id": "ox-js-eventloop-q2",
+      "question": "setTimeout(fn, 0) executes fn immediately.",
+      "answer": "false",
+      "explanation": "setTimeout(fn, 0) places fn into the Task Queue, and it is executed after the current call stack is emptied.\nThere is a minimum delay.",
+      "concepts": [
+        "setTimeout",
+        "TaskQueue",
+        "asynchronous"
+      ],
+      "difficulty": "easy",
+      "orderNum": 2
+    },
+    {
+      "id": "ox-js-eventloop-q3",
+      "question": "Promise then callbacks are processed in the Microtask Queue.",
+      "answer": "true",
+      "explanation": "Promise then/catch/finally callbacks are placed in the Microtask Queue.\nMicrotasks have higher priority than Tasks.",
+      "concepts": [
+        "Promise",
+        "MicrotaskQueue",
+        "priority"
+      ],
+      "difficulty": "easy",
+      "orderNum": 3
+    },
+    {
+      "id": "ox-js-eventloop-q4",
+      "question": "The Microtask Queue has higher priority than the Task Queue.",
+      "answer": "true",
+      "explanation": "The event loop fully drains the Microtask Queue after each Task before processing the next Task.",
+      "concepts": [
+        "MicrotaskQueue",
+        "TaskQueue",
+        "event loop"
+      ],
+      "difficulty": "medium",
+      "orderNum": 4
+    },
+    {
+      "id": "ox-js-eventloop-q5",
+      "question": "The event loop waits if the call stack is not empty.",
+      "answer": "true",
+      "explanation": "The event loop can only dequeue callbacks from the Queue when the call stack is empty.\nIf there is code running on the call stack, the event loop waits.",
+      "concepts": [
+        "call stack",
+        "event loop",
+        "blocking"
+      ],
+      "difficulty": "easy",
+      "orderNum": 5
+    },
+    {
+      "id": "ox-js-eventloop-q6",
+      "question": "An async function always returns a Promise.",
+      "answer": "true",
+      "explanation": "An async function returns a Promise even without an explicit return statement.\nThe return value is automatically wrapped in Promise.resolve().",
+      "concepts": [
+        "async",
+        "Promise",
+        "return value"
+      ],
+      "difficulty": "medium",
+      "orderNum": 6
+    },
+    {
+      "id": "ox-js-eventloop-q7",
+      "question": "The await keyword can be used outside of an async function.",
+      "answer": "false",
+      "explanation": "await can only be used inside an async function.\n(Top-level await in ES modules is an exception.)",
+      "concepts": [
+        "await",
+        "async",
+        "syntax"
+      ],
+      "difficulty": "easy",
+      "orderNum": 7
+    },
+    {
+      "id": "ox-js-eventloop-q8",
+      "question": "A callback registered with queueMicrotask() executes before setTimeout(fn, 0).",
+      "answer": "true",
+      "explanation": "queueMicrotask() places callbacks in the Microtask Queue, while setTimeout places them in the Task Queue.\nMicrotasks are always processed first.",
+      "concepts": [
+        "queueMicrotask",
+        "setTimeout",
+        "execution order"
+      ],
+      "difficulty": "medium",
+      "orderNum": 8
+    },
+    {
+      "id": "ox-js-eventloop-q9",
+      "question": "Promise.resolve().then(() => while(true){}) will freeze the browser.",
+      "answer": "true",
+      "explanation": "An infinite loop inside a Microtask never empties the call stack, so the event loop cannot proceed to the next step, causing the browser to freeze.",
+      "concepts": [
+        "Microtask",
+        "infinite loop",
+        "blocking"
+      ],
+      "difficulty": "hard",
+      "orderNum": 9
+    },
+    {
+      "id": "ox-js-eventloop-q10",
+      "question": "requestAnimationFrame callbacks are processed in the Microtask Queue.",
+      "answer": "false",
+      "explanation": "requestAnimationFrame is processed in a separate Animation Frame queue.\nIt runs right before browser rendering and has different timing than Tasks/Microtasks.",
+      "concepts": [
+        "requestAnimationFrame",
+        "rendering",
+        "animation"
+      ],
+      "difficulty": "hard",
+      "orderNum": 10
+    }
+  ]
+}

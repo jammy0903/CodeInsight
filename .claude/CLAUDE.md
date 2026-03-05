@@ -15,6 +15,8 @@
 3. **End-to-End**: Track data flow completely before answering
 4. **Goal-Focused**: Ask what user is trying to solve first
 5. **Diagnose**: Analyze before proposing solutions
+6. **Hot Reload First**: 프론트 UI/스타일 수정 중에는 `pnpm build`를 자동 실행하지 말고, 사용자가 명시적으로 요청할 때만 빌드 실행
+7. **Bug Claims Need Proof**: 버그 제보/반박 시 즉시 수정하지 말고 재현, 코드 근거, 영향 범위를 먼저 확인한 뒤 변경할 것
 
 ## 🏗️ Structure
 ```

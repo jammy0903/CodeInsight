@@ -1,0 +1,98 @@
+{
+  "language": "cpp",
+  "quizType": "ox",
+  "chapterId": "cpp-memory",
+  "chapterTitle": "Memory Management and Smart Pointers",
+  "quizzes": [
+    {
+      "id": "ox-cpp-mem-q1",
+      "question": "Memory allocated with `new` requires a corresponding `delete`.",
+      "answer": "true",
+      "explanation": "Manual allocation requires manual deallocation. Omitting it leads to memory leaks.",
+      "concepts": ["new", "delete", "memory leak"],
+      "difficulty": "easy",
+      "orderNum": 1
+    },
+    {
+      "id": "ox-cpp-mem-q2",
+      "question": "`delete[]` can also be used on a single (non-array) object.",
+      "answer": "false",
+      "explanation": "Use `delete` for single objects and `delete[]` for arrays.",
+      "concepts": ["delete", "delete[]", "array"],
+      "difficulty": "easy",
+      "orderNum": 2
+    },
+    {
+      "id": "ox-cpp-mem-q3",
+      "question": "`std::unique_ptr` is copyable.",
+      "answer": "false",
+      "explanation": "unique_ptr cannot be copied, only moved, ensuring sole ownership.",
+      "concepts": ["unique_ptr", "move-only", "ownership"],
+      "difficulty": "easy",
+      "orderNum": 3
+    },
+    {
+      "id": "ox-cpp-mem-q4",
+      "question": "`std::make_unique<T>()` is recommended over using `new` directly for exception safety.",
+      "answer": "true",
+      "explanation": "It handles creation and ownership transfer in one step, making it safer and more concise.",
+      "concepts": ["make_unique", "exception safety", "RAII"],
+      "difficulty": "medium",
+      "orderNum": 4
+    },
+    {
+      "id": "ox-cpp-mem-q5",
+      "question": "`std::shared_ptr` automatically deallocates when the reference count reaches 0.",
+      "answer": "true",
+      "explanation": "When all owners are gone, the managed object is destroyed.",
+      "concepts": ["shared_ptr", "refcount", "automatic deallocation"],
+      "difficulty": "easy",
+      "orderNum": 5
+    },
+    {
+      "id": "ox-cpp-mem-q6",
+      "question": "Circular references with `shared_ptr` can cause memory leaks.",
+      "answer": "true",
+      "explanation": "If objects hold references to each other, the reference count never reaches 0 and they are never deallocated.",
+      "concepts": ["shared_ptr", "cycle", "memory leak"],
+      "difficulty": "medium",
+      "orderNum": 6
+    },
+    {
+      "id": "ox-cpp-mem-q7",
+      "question": "`std::weak_ptr` is used to break circular references.",
+      "answer": "true",
+      "explanation": "weak_ptr does not increment the ownership count, making it suitable for breaking cycles.",
+      "concepts": ["weak_ptr", "cycle break", "observer"],
+      "difficulty": "medium",
+      "orderNum": 7
+    },
+    {
+      "id": "ox-cpp-mem-q8",
+      "question": "RAII is the same memory management approach as garbage collection.",
+      "answer": "false",
+      "explanation": "RAII is a scope-based deterministic destruction model, which is fundamentally different from GC.",
+      "concepts": ["RAII", "GC", "deterministic destruction"],
+      "difficulty": "medium",
+      "orderNum": 8
+    },
+    {
+      "id": "ox-cpp-mem-q9",
+      "question": "Smart pointers allow specifying a custom deallocation function (Deleter).",
+      "answer": "true",
+      "explanation": "You can attach a custom cleanup function for resources like file handles or sockets.",
+      "concepts": ["custom deleter", "resource", "smart pointer"],
+      "difficulty": "hard",
+      "orderNum": 9
+    },
+    {
+      "id": "ox-cpp-mem-q10",
+      "question": "Obtaining the raw pointer from a `unique_ptr` via `get()` transfers ownership.",
+      "answer": "false",
+      "explanation": "`get()` only retrieves the pointer for observation. Ownership transfer is done via `release()` or move.",
+      "concepts": ["unique_ptr", "get", "release", "ownership"],
+      "difficulty": "hard",
+      "orderNum": 10
+    }
+  ]
+}

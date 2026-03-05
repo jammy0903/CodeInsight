@@ -314,7 +314,7 @@ export function PlaygroundPage() {
           <div style={{ padding: '3px', minHeight: '67px' }}>
             {error ? (
               <div style={{ padding: '10px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '6px' }}>
-                <p style={{ fontSize: '12px', color: colors.errorText }}>{error}</p>
+                <p style={{ fontSize: '12px', color: colors.errorText, whiteSpace: 'pre-line' }}>{error}</p>
               </div>
             ) : canRenderVisualizer && hasSteps ? (
               <>
@@ -632,7 +632,7 @@ export function PlaygroundPage() {
           <div style={{ padding: '5px' }}>
             {error ? (
               <div style={{ padding: '5px', backgroundColor: colors.errorBg, border: `1px solid ${colors.errorBorder}`, borderRadius: '8px' }}>
-                <p style={{ fontSize: '14px', color: colors.errorText }}>{error}</p>
+                <p style={{ fontSize: '14px', color: colors.errorText, whiteSpace: 'pre-line' }}>{error}</p>
               </div>
             ) : canRenderVisualizer && hasSteps ? (
               <>

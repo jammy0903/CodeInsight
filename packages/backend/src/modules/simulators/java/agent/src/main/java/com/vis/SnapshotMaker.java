@@ -9,10 +9,11 @@ public class SnapshotMaker {
     private Set<Long> collectedObjectIds;
     private List<Map<String, Object>> heapObjects;
 
-    public Map<String, Object> capture(ThreadReference thread, int lineNumber) throws IncompatibleThreadStateException {
+    public Map<String, Object> capture(ThreadReference thread, int lineNumber, String stdout) throws IncompatibleThreadStateException {
         Map<String, Object> snapshot = new HashMap<>();
         snapshot.put("line", lineNumber);
         snapshot.put("event", "STEP");
+        snapshot.put("stdout", stdout);
 
         // 힙 객체 추적 초기화
         collectedObjectIds = new HashSet<>();

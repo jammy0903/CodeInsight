@@ -87,7 +87,7 @@ const COLORS = {
     border: 'rgba(139, 92, 246, 0.2)',
   },
   variable: {
-    text: '#e5e7eb',
+    text: '#000000',
     muted: '#9ca3af',
   },
   // 타입별 색상
@@ -178,7 +178,7 @@ function VariableRow({
     >
       {/* 변수명 + 타입 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ fontFamily: 'monospace', fontSize: '13px', fontWeight: 600, color: COLORS.variable.text }}>
+        <span style={{ fontFamily: 'monospace', fontSize: '14px', fontWeight: 600, color: COLORS.variable.text }}>
           {variable.name}
         </span>
         <span style={{

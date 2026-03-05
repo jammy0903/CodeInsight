@@ -1,0 +1,679 @@
+{
+  "language": {
+    "id": "c",
+    "name": "C",
+    "description": "A systems programming language for directly managing pointers and memory",
+    "icon": "C",
+    "color": "#00599C"
+  },
+  "researchBasis": {
+    "sources": [
+      "Stanford CS Education: Pointers and Memory (Nick Parlante)",
+      "ACM: Identifying Student Misconceptions of Programming",
+      "TEDViT: Classroom Practice Research",
+      "Graph Transformations: Pedagogy for Pointers"
+    ],
+    "keyInsights": [
+      "Pointers should be taught after fundamentals (variables, memory model)",
+      "Two-Level concept: both the pointer and the pointee must be allocated",
+      "MMR (Memory Model, References, Pointers) is the most common area of misconception",
+      "Providing code + memory visualization simultaneously is effective"
+    ]
+  },
+  "phases": [
+    {
+      "name": "Building Foundations",
+      "description": "Establishing the basics of the memory model",
+      "chapters": [
+        1
+      ]
+    },
+    {
+      "name": "Core Concepts",
+      "description": "Core principles of pointers and arrays",
+      "chapters": [
+        2,
+        3
+      ]
+    },
+    {
+      "name": "Application",
+      "description": "Working with functions and dynamic memory",
+      "chapters": [
+        4,
+        5
+      ]
+    },
+    {
+      "name": "Advanced Topics",
+      "description": "Compound data types and advanced pointers",
+      "chapters": [
+        6
+      ]
+    }
+  ],
+  "chapters": [
+    {
+      "id": "c-0",
+      "order": 0,
+      "title": "Control Flow and Functions",
+      "description": "Fundamentals of loops and functions",
+      "keyQuestion": "How do you repeat and reuse code?",
+      "part": "syntax",
+      "partLabel": "Syntax",
+      "lessons": [
+        {
+          "id": "c-1-5",
+          "order": 1,
+          "title": "Loops (for)",
+          "description": "The for loop expresses initialization, condition, and increment in a single line",
+          "difficulty": "basic",
+          "estimatedTime": 8
+        },
+        {
+          "id": "c-1-6",
+          "order": 2,
+          "title": "Loops (while)",
+          "description": "The while loop repeats as long as the condition is true",
+          "difficulty": "basic",
+          "estimatedTime": 8
+        },
+        {
+          "id": "c-1-7",
+          "order": 3,
+          "title": "Function Definitions",
+          "description": "Functions separate code into reusable blocks",
+          "difficulty": "basic",
+          "estimatedTime": 10
+        }
+      ]
+    },
+    {
+      "id": "c-1",
+      "order": 1,
+      "title": "Variables and Memory",
+      "description": "Understanding how variables occupy memory",
+      "keyQuestion": "Where in memory does my variable live?",
+      "part": "syntax",
+      "partLabel": "Syntax",
+      "misconceptions": [
+        "Variables are initialized to 0 by default",
+        "The variable name itself is stored in memory"
+      ],
+      "lessons": [
+        {
+          "id": "c-1-1",
+          "order": 1,
+          "title": "Declaration and Memory Allocation",
+          "description": "What happens when you declare 'int a;'",
+          "difficulty": "basic",
+          "estimatedTime": 8
+        },
+        {
+          "id": "c-1-2",
+          "order": 2,
+          "title": "Initialization and Garbage Values",
+          "description": "Why uninitialized variables hold random values",
+          "difficulty": "basic",
+          "estimatedTime": 8
+        },
+        {
+          "id": "c-1-3",
+          "order": 3,
+          "title": "Address-of Operator (&) and sizeof",
+          "description": "Finding the actual location and size of a variable",
+          "difficulty": "basic",
+          "estimatedTime": 9
+        },
+        {
+          "id": "c-1-4",
+          "order": 4,
+          "title": "Stack Memory Lifecycle",
+          "description": "Why local variables disappear when a function returns",
+          "difficulty": "basic",
+          "estimatedTime": 10
+        }
+      ]
+    },
+    {
+      "id": "c-2",
+      "order": 2,
+      "title": "Introduction to Pointers",
+      "description": "Understanding variables that store memory addresses",
+      "keyQuestion": "Why are pointers necessary?",
+      "part": "syntax",
+      "partLabel": "Syntax",
+      "misconceptions": [
+        "A pointer is a magical variable (it's really just a number representing an address)",
+        "* always means the same thing (declaration vs dereference)"
+      ],
+      "lessons": [
+        {
+          "id": "c-2-1",
+          "order": 1,
+          "title": "Address-of Operator (&)",
+          "description": "Finding the 'home address' of a variable",
+          "difficulty": "basic",
+          "estimatedTime": 8
+        },
+        {
+          "id": "c-2-2",
+          "order": 2,
+          "title": "Pointer Declaration (*)",
+          "description": "int *p: p is a variable that holds the address of an integer",
+          "difficulty": "basic",
+          "estimatedTime": 9
+        },
+        {
+          "id": "c-2-3",
+          "order": 3,
+          "title": "Dereference: Reading Data",
+          "description": "*p: following the address to read the value",
+          "difficulty": "basic",
+          "estimatedTime": 8
+        },
+        {
+          "id": "c-2-4",
+          "order": 4,
+          "title": "Dereference: Writing Data",
+          "description": "*p = 10: following the address to modify the original",
+          "difficulty": "basic",
+          "estimatedTime": 9
+        },
+        {
+          "id": "c-2-5",
+          "order": 5,
+          "title": "NULL Pointer",
+          "description": "The safest state: pointing to nothing",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-2-6",
+          "order": 6,
+          "title": "Pointer Types and Sizes",
+          "description": "Why all pointers are 8 bytes (on 64-bit systems)",
+          "difficulty": "intermediate",
+          "estimatedTime": 9
+        }
+      ]
+    },
+    {
+      "id": "c-3",
+      "order": 3,
+      "title": "Arrays and Pointers",
+      "description": "The close relationship between contiguous memory and pointers",
+      "keyQuestion": "Is an array ultimately a pointer?",
+      "part": "syntax",
+      "partLabel": "Syntax",
+      "misconceptions": [
+        "An array is a pointer itself (the array decay misconception)",
+        "arr[i] is internally different from *(arr + i)"
+      ],
+      "lessons": [
+        {
+          "id": "c-3-1",
+          "order": 1,
+          "title": "Memory Layout of Arrays",
+          "description": "How int arr[5] lines up in memory",
+          "difficulty": "basic",
+          "estimatedTime": 9
+        },
+        {
+          "id": "c-3-2",
+          "order": 2,
+          "title": "Pointer Arithmetic",
+          "description": "Why p + 1 moves by the size of the data type, not 1 byte",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-3-3",
+          "order": 3,
+          "title": "Array Name vs Pointer Variable",
+          "description": "The difference between sizeof(arr) and sizeof(p)",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-3-4",
+          "order": 4,
+          "title": "Arrays as Function Arguments",
+          "description": "Why arrays 'decay' into pointers when passed to functions",
+          "difficulty": "intermediate",
+          "estimatedTime": 11
+        },
+        {
+          "id": "c-3-5",
+          "order": 5,
+          "title": "Traversing Arrays with Pointers",
+          "description": "Walking through an array using p++",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        }
+      ]
+    },
+    {
+      "id": "c-4",
+      "order": 4,
+      "title": "Functions and the Memory Model",
+      "description": "Call by Value, stack frames, and pointer arguments",
+      "keyQuestion": "How do you safely share data between functions?",
+      "part": "design",
+      "partLabel": "Memory Model",
+      "misconceptions": [
+        "Modifying a parameter always changes the original",
+        "Returning the address of a local variable (&local) is safe"
+      ],
+      "lessons": [
+        {
+          "id": "c-4-1",
+          "order": 1,
+          "title": "Visualizing Stack Frames",
+          "description": "What data gets pushed onto the stack during a function call",
+          "difficulty": "intermediate",
+          "estimatedTime": 11
+        },
+        {
+          "id": "c-4-2",
+          "order": 2,
+          "title": "Call by Value",
+          "description": "Protecting the original by passing a copy",
+          "difficulty": "basic",
+          "estimatedTime": 9
+        },
+        {
+          "id": "c-4-3",
+          "order": 3,
+          "title": "Call by Reference (Using Pointers)",
+          "description": "Passing a pointer to directly modify the original data",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-4-4",
+          "order": 4,
+          "title": "How Array Parameters Work",
+          "description": "Efficiently passing large arrays to functions",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-4-5",
+          "order": 5,
+          "title": "The Danger of Returning Invalid Addresses",
+          "description": "Why you should never return the address of a dead local variable",
+          "difficulty": "advanced",
+          "estimatedTime": 11
+        }
+      ]
+    },
+    {
+      "id": "c-5",
+      "order": 5,
+      "title": "Dynamic Memory Allocation",
+      "description": "Manual memory management using the heap",
+      "keyQuestion": "When should you use malloc?",
+      "part": "design",
+      "partLabel": "Memory Model",
+      "misconceptions": [
+        "Memory is freed automatically",
+        "Stack memory is infinitely large"
+      ],
+      "lessons": [
+        {
+          "id": "c-5-1",
+          "order": 1,
+          "title": "Stack vs Heap",
+          "description": "Differences in size, lifetime, and purpose",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-5-2",
+          "order": 2,
+          "title": "malloc: Borrowing Memory",
+          "description": "Reserving space on the heap as needed",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-5-3",
+          "order": 3,
+          "title": "free: Returning Memory",
+          "description": "What happens when you don't return the memory you used",
+          "difficulty": "intermediate",
+          "estimatedTime": 9
+        },
+        {
+          "id": "c-5-4",
+          "order": 4,
+          "title": "Memory Leak",
+          "description": "How unreturned memory accumulates and causes programs to freeze",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-5-5",
+          "order": 5,
+          "title": "Dangling Pointer",
+          "description": "The danger of accessing memory that has already been freed",
+          "difficulty": "advanced",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-5-6",
+          "order": 6,
+          "title": "Dynamic Array",
+          "description": "Creating arrays whose size is determined at runtime",
+          "difficulty": "intermediate",
+          "estimatedTime": 11
+        }
+      ]
+    },
+    {
+      "id": "c-6",
+      "order": 6,
+      "title": "Structs and Strings",
+      "description": "Understanding the memory layout of compound types",
+      "keyQuestion": "How are objects represented in C?",
+      "part": "design",
+      "partLabel": "Data Structures",
+      "misconceptions": [
+        "Strings are a built-in type in C",
+        "There is no padding between struct members"
+      ],
+      "lessons": [
+        {
+          "id": "c-6-1",
+          "order": 1,
+          "title": "The True Nature of Strings",
+          "description": "The secret of char arrays terminated by a null character",
+          "difficulty": "basic",
+          "estimatedTime": 9
+        },
+        {
+          "id": "c-6-2",
+          "order": 2,
+          "title": "char Array vs Pointer String",
+          "description": "The modifiable one vs the non-modifiable one",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-6-3",
+          "order": 3,
+          "title": "Struct Basics",
+          "description": "Grouping multiple variables into a single unit",
+          "difficulty": "basic",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-6-4",
+          "order": 4,
+          "title": "Struct Pointers (->)",
+          "description": "Accessing struct members with the arrow operator",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        }
+      ]
+    },
+    {
+      "id": "c-7",
+      "order": 7,
+      "title": "Advanced Pointer Concepts",
+      "description": "Double pointers and complex data structures",
+      "lessons": [
+        {
+          "id": "c-7-1",
+          "order": 1,
+          "title": "Double Pointer (int **)",
+          "description": "Understanding the principle of storing the address of an address",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-7-2",
+          "order": 2,
+          "title": "Array Pointer",
+          "description": "The clear difference between int (*p)[3] and int *p[3]",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-7-3",
+          "order": 3,
+          "title": "Dynamic 2D Array",
+          "description": "Allocating matrix structures on the heap",
+          "estimatedTime": 12
+        },
+        {
+          "id": "c-7-4",
+          "order": 4,
+          "title": "Void Pointer",
+          "description": "A versatile pointer that can hold any type",
+          "estimatedTime": 10
+        }
+      ]
+    },
+    {
+      "id": "c-8",
+      "order": 8,
+      "title": "Function Pointers and Callbacks",
+      "description": "Passing code around as if it were data",
+      "lessons": [
+        {
+          "id": "c-8-1",
+          "order": 1,
+          "title": "Function Pointer Syntax",
+          "description": "Understanding the void (*f)() notation",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-8-2",
+          "order": 2,
+          "title": "Implementing Callbacks",
+          "description": "Passing a function as an argument to be called later",
+          "estimatedTime": 11
+        },
+        {
+          "id": "c-8-3",
+          "order": 3,
+          "title": "Sorting (qsort) and Comparison Functions",
+          "description": "Custom sorting with the standard library",
+          "estimatedTime": 12
+        },
+        {
+          "id": "c-8-4",
+          "order": 4,
+          "title": "Jump Table",
+          "description": "Processing logic designed with arrays of function pointers",
+          "estimatedTime": 12
+        }
+      ]
+    },
+    {
+      "id": "c-9",
+      "order": 9,
+      "title": "Preprocessor and Macros",
+      "description": "Code generation and optimization before compilation",
+      "lessons": [
+        {
+          "id": "c-9-1",
+          "order": 1,
+          "title": "The Preprocessing Stage",
+          "description": "How text is actually transformed into source code",
+          "estimatedTime": 8
+        },
+        {
+          "id": "c-9-2",
+          "order": 2,
+          "title": "Macro Pitfalls",
+          "description": "Why #define SQUARE(x) x*x is dangerous",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-9-3",
+          "order": 3,
+          "title": "Conditional Compilation",
+          "description": "Using #ifdef and header guards",
+          "estimatedTime": 9
+        },
+        {
+          "id": "c-9-4",
+          "order": 4,
+          "title": "Token Pasting (##)",
+          "description": "Dynamic code assembly using macros",
+          "estimatedTime": 10
+        }
+      ]
+    },
+    {
+      "id": "c-10",
+      "order": 10,
+      "title": "File I/O and System Resources",
+      "description": "File input/output: communicating with the OS",
+      "lessons": [
+        {
+          "id": "c-10-1",
+          "order": 1,
+          "title": "Standard Streams",
+          "description": "The true nature of stdin, stdout, and stderr",
+          "estimatedTime": 8
+        },
+        {
+          "id": "c-10-2",
+          "order": 2,
+          "title": "File Modes",
+          "description": "The difference between r, w, a, and binary modes",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-10-3",
+          "order": 3,
+          "title": "Buffered I/O",
+          "description": "Understanding fflush and I/O bottlenecks",
+          "estimatedTime": 11
+        },
+        {
+          "id": "c-10-4",
+          "order": 4,
+          "title": "Binary Read and Write",
+          "description": "Saving data wholesale with fread and fwrite",
+          "estimatedTime": 12
+        }
+      ]
+    },
+    {
+      "id": "c-11",
+      "order": 11,
+      "title": "Conditionals and Branching",
+      "description": "Controlling program flow with if-else, switch-case, and the ternary operator",
+      "keyQuestion": "How does a program behave differently depending on the situation?",
+      "part": "syntax",
+      "partLabel": "Syntax",
+      "lessons": [
+        {
+          "id": "c-11-1",
+          "order": 1,
+          "title": "if-else Conditionals",
+          "description": "The basic branching statement that executes different code based on a condition",
+          "difficulty": "basic",
+          "estimatedTime": 8
+        },
+        {
+          "id": "c-11-2",
+          "order": 2,
+          "title": "switch-case Statement",
+          "description": "Branching into multiple paths based on a single value",
+          "difficulty": "basic",
+          "estimatedTime": 9
+        },
+        {
+          "id": "c-11-3",
+          "order": 3,
+          "title": "Ternary Operator and Logical Operations",
+          "description": "Concise conditional expressions and short-circuit evaluation with && and ||",
+          "difficulty": "basic",
+          "estimatedTime": 8
+        }
+      ]
+    },
+    {
+      "id": "c-12",
+      "order": 12,
+      "title": "Recursive Functions",
+      "description": "The principles of self-calling functions and stack frame changes",
+      "keyQuestion": "What happens in memory when a function calls itself?",
+      "part": "design",
+      "partLabel": "Memory Model",
+      "lessons": [
+        {
+          "id": "c-12-1",
+          "order": 1,
+          "title": "How Recursion Works",
+          "description": "Recursive calls and the importance of the base case",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-12-2",
+          "order": 2,
+          "title": "Factorial and Fibonacci",
+          "description": "Tracing stack frames with classic recursive examples",
+          "difficulty": "intermediate",
+          "estimatedTime": 11
+        },
+        {
+          "id": "c-12-3",
+          "order": 3,
+          "title": "Recursion vs Iteration",
+          "description": "Solving the same problem two different ways",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        }
+      ]
+    },
+    {
+      "id": "c-13",
+      "order": 13,
+      "title": "Data Types and Type Casting",
+      "description": "C's various data types and the principles of implicit/explicit type conversion",
+      "keyQuestion": "What happens when you mix int and float?",
+      "part": "syntax",
+      "partLabel": "Syntax",
+      "lessons": [
+        {
+          "id": "c-13-1",
+          "order": 1,
+          "title": "Comparing Integer Types",
+          "description": "The sizes and ranges of char, short, int, and long",
+          "difficulty": "basic",
+          "estimatedTime": 9
+        },
+        {
+          "id": "c-13-2",
+          "order": 2,
+          "title": "Floating Point (float vs double)",
+          "description": "The secret of precision errors when storing real numbers",
+          "difficulty": "basic",
+          "estimatedTime": 9
+        },
+        {
+          "id": "c-13-3",
+          "order": 3,
+          "title": "Implicit and Explicit Type Casting",
+          "description": "The difference between automatic conversion and casting, and data loss",
+          "difficulty": "intermediate",
+          "estimatedTime": 10
+        },
+        {
+          "id": "c-13-4",
+          "order": 4,
+          "title": "Bitwise Operators",
+          "description": "The principles and applications of &, |, ^, ~, <<, and >> operations",
+          "difficulty": "intermediate",
+          "estimatedTime": 11
+        }
+      ]
+    }
+  ]
+}

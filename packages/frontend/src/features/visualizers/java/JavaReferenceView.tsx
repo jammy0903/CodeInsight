@@ -78,6 +78,11 @@ interface JavaReferenceViewProps {
   className?: string;
 }
 
+interface StackFrameGroup {
+  name: string;
+  variables: FlowVariable[];
+}
+
 // ============================================
 // HeapCard (Heap + String Pool)
 // ============================================
@@ -281,10 +286,32 @@ export const JavaReferenceView = memo(function JavaReferenceView({
     return map;
   }, [step.variables]);
 
-  // Stack variables (main frame)
+  const stackFrames = useMemo<StackFrameGroup[]>(() => {
+    const frameDefs = step.frames.filter((f) => {
+      const n = f.name.toLowerCase();
+      return n !== 'heap' && n !== 'string pool';
+    });
+
+    if (frameDefs.length > 0) {
+      return frameDefs.map((frame) => ({
+        name: frame.name,
+        variables: frame.variableIds
+          .map((id) => variableMap.get(id))
+          .filter((v): v is FlowVariable => !!v && v.scope !== 'heap' && v.scope !== 'stringPool'),
+      }));
+    }
+
+    return [
+      {
+        name: 'main',
+        variables: step.variables.filter((v) => v.scope === 'main'),
+      },
+    ];
+  }, [step.frames, step.variables, variableMap]);
+
   const stackVariables = useMemo(
-    () => step.variables.filter((v) => v.scope === 'main'),
-    [step.variables]
+    () => stackFrames.flatMap((f) => f.variables),
+    [stackFrames]
   );
 
   // Heap objects (참조되지 않는 orphan 제거)
@@ -451,36 +478,39 @@ export const JavaReferenceView = memo(function JavaReferenceView({
         <div className="w-2/5 flex-shrink-0 flex flex-col gap-3">
           <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Stack</div>
 
-          <motion.div
-            layout
-            className="rounded-xl border-2 overflow-hidden shadow-sm"
-            style={{ backgroundColor: FRAME_COLORS.main.bg, borderColor: FRAME_COLORS.main.border }}
-          >
-            <div
-              className="flex items-center gap-2 px-3 py-2"
-              style={{ backgroundColor: FRAME_COLORS.main.header }}
+          {[...stackFrames].reverse().map((frame, idx) => (
+            <motion.div
+              key={`${frame.name}-${idx}`}
+              layout
+              className="rounded-xl border-2 overflow-hidden shadow-sm"
+              style={{ backgroundColor: FRAME_COLORS.main.bg, borderColor: FRAME_COLORS.main.border }}
             >
-              <span className="text-sm">☕</span>
-              <span className="font-mono text-sm font-semibold" style={{ color: FRAME_COLORS.main.headerText }}>
-                main
-              </span>
-            </div>
-            <div className="p-3 flex flex-col gap-2 min-h-[40px]">
-              {stackVariables.length === 0 ? (
-                <span className="text-sm text-gray-400 italic">empty</span>
-              ) : (
-                stackVariables.map((v) => (
-                  <StackVariable
-                    key={v.id}
-                    variable={v}
-                    isHighlighted={highlightedIds.has(v.id)}
-                    onHoverStart={handleHoverStart}
-                    onHoverEnd={handleHoverEnd}
-                  />
-                ))
-              )}
-            </div>
-          </motion.div>
+              <div
+                className="flex items-center gap-2 px-3 py-2"
+                style={{ backgroundColor: FRAME_COLORS.main.header }}
+              >
+                <span className="text-sm">☕</span>
+                <span className="font-mono text-sm font-semibold" style={{ color: FRAME_COLORS.main.headerText }}>
+                  {frame.name}
+                </span>
+              </div>
+              <div className="p-3 flex flex-col gap-2 min-h-[40px]">
+                {frame.variables.length === 0 ? (
+                  <span className="text-sm text-gray-400 italic">empty</span>
+                ) : (
+                  frame.variables.map((v) => (
+                    <StackVariable
+                      key={v.id}
+                      variable={v}
+                      isHighlighted={highlightedIds.has(v.id)}
+                      onHoverStart={handleHoverStart}
+                      onHoverEnd={handleHoverEnd}
+                    />
+                  ))
+                )}
+              </div>
+            </motion.div>
+          ))}
         </div>
 
         {/* Heap + String Pool Column */}

@@ -7,7 +7,7 @@
  * Two rounds: R1 (explanation) → R2 (visualization) → quiz
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Layers, Lightbulb } from 'lucide-react';
@@ -25,7 +25,7 @@ import { ConceptPopup } from '@/features/visualizers/shared/components/ConceptPo
 import { useIsMobile } from '@/hooks';
 import type { LessonStep } from '@/types';
 import type { CodeSelection } from '@/features/visualizers/shared/components/CodeMirrorEditor';
-import { hasMeaningfulValue } from '../utils/visualizationData';
+import { hasMeaningfulValue, hasClassicMemoryData, hasJsMemoryData, hasJavaMemoryData } from '../utils/visualizationData';
 
 interface LessonUnifiedViewProps {
   code: string;
@@ -62,7 +62,7 @@ export function LessonUnifiedView({
 }: LessonUnifiedViewProps) {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
-  const [activeVizTab, setActiveVizTab] = useState<'flow' | 'memory'>('flow');
+  const [activeVizTab, setActiveVizTab] = useState<'flow' | 'memory' | 'jsMemory'>('flow');
   const [isConceptOpen, setIsConceptOpen] = useState(false);
 
   // Round navigation (shared for both layouts)
@@ -75,7 +75,18 @@ export function LessonUnifiedView({
   const currentStep = steps[nav.actualStepIndex];
   const currentStepRecord = currentStep as Record<string, unknown> | undefined;
   const isExplanationRound = nav.round === 'explanation';
-  const showMemoryTab = languageId === 'c' || languageId === 'cpp';
+  const { showMemoryTab, showJsMemoryTab } = useMemo(() => {
+    const vizSteps = nav.vizStepIndices.map(i => steps[i]);
+    return {
+      showMemoryTab: (
+        ((languageId === 'c' || languageId === 'cpp') && hasClassicMemoryData(vizSteps)) ||
+        (languageId === 'java' && hasJavaMemoryData(vizSteps))
+      ),
+      showJsMemoryTab: languageId === 'javascript' && hasJsMemoryData(vizSteps),
+    };
+  }, [languageId, nav.vizStepIndices, steps]);
+  const hasVizTabs = showMemoryTab || showJsMemoryTab;
+  const flowLanguage = languageId === 'python-practical' ? 'python' : (languageId || 'c');
   const rawConceptType = asString(currentStepRecord?.conceptVisualizationType) || asString(currentStepRecord?.visualizationType);
   const conceptType = rawConceptType && CONCEPT_TYPES.has(rawConceptType) ? rawConceptType : undefined;
   const conceptState = isRecord(currentStepRecord?.conceptState) ? currentStepRecord.conceptState : undefined;
@@ -83,6 +94,19 @@ export function LessonUnifiedView({
 
   // Visualization data
   const { memoryState, changedBlocks } = useLessonVisualization(steps, nav.actualStepIndex);
+
+  const toJsMemoryStep = useCallback((step: LessonStep | undefined): LessonStep => {
+    const base = (step || {}) as LessonStep;
+    return {
+      ...base,
+      visualizationType: 'javascript',
+      eventLoopState: undefined,
+      scopeState: undefined,
+      thisState: undefined,
+      prototypeState: undefined,
+      promiseState: undefined,
+    };
+  }, []);
 
   // Terminal output
   const terminalLines = useLessonTerminal({
@@ -105,6 +129,20 @@ export function LessonUnifiedView({
   useEffect(() => {
     setIsConceptOpen(false);
   }, [nav.round, nav.actualStepIndex]);
+
+  useEffect(() => {
+    setActiveVizTab('flow');
+  }, [languageId]);
+
+  useEffect(() => {
+    if (activeVizTab === 'memory' && !showMemoryTab) {
+      setActiveVizTab('flow');
+      return;
+    }
+    if (activeVizTab === 'jsMemory' && !showJsMemoryTab) {
+      setActiveVizTab('flow');
+    }
+  }, [activeVizTab, showMemoryTab, showJsMemoryTab]);
 
   // Next button label
   const nextLabel = (() => {
@@ -172,9 +210,9 @@ export function LessonUnifiedView({
             exit="exit"
             className="w-full"
           >
-            {(showMemoryTab || hasConceptPopup) && (
+            {(hasVizTabs || hasConceptPopup) && (
               <div className="flex items-center shrink-0 border-b border-[var(--theme-lesson-panel-border)]">
-                {showMemoryTab && (
+                {hasVizTabs && (
                   <div className="flex flex-1">
                     <button
                       onClick={() => setActiveVizTab('flow')}
@@ -183,20 +221,31 @@ export function LessonUnifiedView({
                       <Play className="w-4 h-4" />
                       {t('lesson.flow')}
                     </button>
-                    <button
-                      onClick={() => setActiveVizTab('memory')}
-                      className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'memory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
-                    >
-                      <Layers className="w-4 h-4" />
-                      {t('lesson.memory')}
-                    </button>
+                    {showMemoryTab && (
+                      <button
+                        onClick={() => setActiveVizTab('memory')}
+                        className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'memory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
+                      >
+                        <Layers className="w-4 h-4" />
+                        {t('lesson.memory')}
+                      </button>
+                    )}
+                    {showJsMemoryTab && (
+                      <button
+                        onClick={() => setActiveVizTab('jsMemory')}
+                        className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'jsMemory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
+                      >
+                        <Layers className="w-4 h-4" />
+                        JS Memory
+                      </button>
+                    )}
                   </div>
                 )}
 
                 {hasConceptPopup && (
                   <button
                     onClick={() => setIsConceptOpen(true)}
-                    className={`flex items-center gap-1.5 px-3 py-2 text-sm md:text-base font-semibold transition-all ${showMemoryTab ? 'border-l border-[var(--theme-lesson-panel-border)]' : ''} viz-tab-inactive hover:viz-tab-active`}
+                    className={`flex items-center gap-1.5 px-3 py-2 text-sm md:text-base font-semibold transition-all ${hasVizTabs ? 'border-l border-[var(--theme-lesson-panel-border)]' : ''} viz-tab-inactive hover:viz-tab-active`}
                   >
                     <Lightbulb className="w-4 h-4" />
                     {t('lesson.concept')}
@@ -207,11 +256,23 @@ export function LessonUnifiedView({
 
             {/* Visualization content */}
             <div className={`w-full min-h-[67px] px-0 py-2 ${isMobile ? 'viz-zoom-container' : ''}`}>
-              {activeVizTab === 'flow' || !showMemoryTab ? (
+              {activeVizTab === 'flow' || !hasVizTabs ? (
                 <LessonFlowVisualizer
                   step={currentStep}
                   prevStep={nav.actualStepIndex > 0 ? steps[nav.actualStepIndex - 1] : null}
-                  language={languageId === 'python-practical' ? 'python' : (languageId || 'c')}
+                  language={flowLanguage}
+                  fullCode={code}
+                  memoryState={memoryState ? {
+                    stack: memoryState.stack.map((s) => ({ ...s, name: s.name || '?' })),
+                    heap: memoryState.heap.map((h) => ({ ...h, name: h.name || '?' })),
+                  } : undefined}
+                  stdout={currentStep?.stdout}
+                />
+              ) : activeVizTab === 'jsMemory' ? (
+                <LessonFlowVisualizer
+                  step={toJsMemoryStep(currentStep)}
+                  prevStep={nav.actualStepIndex > 0 ? toJsMemoryStep(steps[nav.actualStepIndex - 1]) : null}
+                  language={flowLanguage}
                   fullCode={code}
                   memoryState={memoryState ? {
                     stack: memoryState.stack.map((s) => ({ ...s, name: s.name || '?' })),

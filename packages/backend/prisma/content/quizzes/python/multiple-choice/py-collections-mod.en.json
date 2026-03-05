@@ -1,0 +1,108 @@
+{
+  "language": "python",
+  "quizType": "multiple-choice",
+  "chapterId": "py-collections-mod",
+  "chapterTitle": "collections Module",
+  "quizzes": [
+    {
+      "id": "mc-py-collections-q1",
+      "question": "How do you find the most common character in Counter('banana')?",
+      "options": ["Counter('banana').max()", "Counter('banana').most_common(1)", "Counter('banana').top(1)", "max(Counter('banana'))"],
+      "answer": "1",
+      "explanation": "most_common(n) returns the n most common elements as [(element, count)].\nCounter('banana').most_common(1) = [('a', 3)].",
+      "concepts": ["Counter", "most_common", "frequency"],
+      "difficulty": "easy",
+      "orderNum": 1
+    },
+    {
+      "id": "mc-py-collections-q2",
+      "question": "How do you get the count of 3 in Counter([1, 1, 2, 3, 3, 3])?",
+      "options": ["Counter([1,1,2,3,3,3]).count(3)", "Counter([1,1,2,3,3,3])[3]", "Counter([1,1,2,3,3,3]).get_count(3)", "Counter([1,1,2,3,3,3]).freq(3)"],
+      "answer": "1",
+      "explanation": "Counter is a subclass of dict, so you access it with [key].\nNon-existent keys return 0 instead of raising a KeyError.",
+      "concepts": ["Counter", "dictionary", "indexing"],
+      "difficulty": "easy",
+      "orderNum": 2
+    },
+    {
+      "id": "mc-py-collections-q3",
+      "question": "What happens when you access a non-existent key in defaultdict(list)?",
+      "options": ["KeyError is raised", "None is returned", "An empty list [] is returned", "0 is returned"],
+      "answer": "2",
+      "explanation": "defaultdict calls the factory function to create a default value when a missing key is accessed.\ndefaultdict(list) creates an empty list, defaultdict(int) creates 0.",
+      "concepts": ["defaultdict", "factory function", "default value"],
+      "difficulty": "easy",
+      "orderNum": 3
+    },
+    {
+      "id": "mc-py-collections-q4",
+      "question": "What code pattern does defaultdict(int) simplify?",
+      "options": ["List sorting", "if key not in d: d[key] = 0 pattern", "Dictionary merging", "String conversion"],
+      "answer": "1",
+      "explanation": "defaultdict(int) sets the default value for missing keys to 0.\nThis eliminates the need to check for key existence when counting frequencies.",
+      "concepts": ["defaultdict", "int", "counting pattern"],
+      "difficulty": "medium",
+      "orderNum": 4
+    },
+    {
+      "id": "mc-py-collections-q5",
+      "question": "What is the difference between deque's appendleft() and list's insert(0, x)?",
+      "options": ["Same performance", "deque is O(1), list is O(n)", "list is O(1), deque is O(n)", "Both are O(n)"],
+      "answer": "1",
+      "explanation": "deque supports O(1) insertion and deletion at both ends.\nlist.insert(0, x) must shift all elements by one position, making it O(n).",
+      "concepts": ["deque", "appendleft", "time complexity"],
+      "difficulty": "medium",
+      "orderNum": 5
+    },
+    {
+      "id": "mc-py-collections-q6",
+      "question": "What happens when you append 4 to deque([1, 2, 3], maxlen=3)?",
+      "options": ["Error", "[1, 2, 3, 4]", "[2, 3, 4]", "[1, 2, 3]"],
+      "answer": "2",
+      "explanation": "A deque with maxlen automatically removes the element from the opposite end when a new element is added.\nAppending 4 to the right removes 1 from the left, resulting in [2, 3, 4].",
+      "concepts": ["deque", "maxlen", "circular buffer"],
+      "difficulty": "medium",
+      "orderNum": 6
+    },
+    {
+      "id": "mc-py-collections-q7",
+      "question": "What method removes the leftmost element from a deque?",
+      "options": ["pop()", "popleft()", "remove(0)", "shift()"],
+      "answer": "1",
+      "explanation": "popleft() removes and returns the leftmost element in O(1).\npop() removes the rightmost element. Frequently used in BFS implementations.",
+      "concepts": ["deque", "popleft", "BFS"],
+      "difficulty": "easy",
+      "orderNum": 7
+    },
+    {
+      "id": "mc-py-collections-q8",
+      "question": "What is the result of p.x in Point = namedtuple('Point', ['x', 'y']); p = Point(1, 2)?",
+      "options": ["Error", "1", "(1, 2)", "'x'"],
+      "answer": "1",
+      "explanation": "namedtuple is a tuple that allows field access by name.\nBoth p[0] and p.x return the same value, 1.",
+      "concepts": ["namedtuple", "field access", "immutable"],
+      "difficulty": "easy",
+      "orderNum": 8
+    },
+    {
+      "id": "mc-py-collections-q9",
+      "question": "What is the result of Counter('aabbc') - Counter('abc')?",
+      "options": ["Counter({'a': 1, 'b': 1})", "Counter({'a': 1, 'b': 1, 'c': -1})", "Error", "Counter({'a': 2, 'b': 2, 'c': 1})"],
+      "answer": "0",
+      "explanation": "Subtracting Counters subtracts the count of each element, and negative counts are removed.\na: 2-1=1, b: 2-1=1, c: 1-1=0 (removed), so the result is Counter({'a': 1, 'b': 1}).",
+      "concepts": ["Counter", "subtraction", "arithmetic"],
+      "difficulty": "hard",
+      "orderNum": 9
+    },
+    {
+      "id": "mc-py-collections-q10",
+      "question": "Why is OrderedDict still useful in Python 3.7+?",
+      "options": ["It is faster than regular dict", "It supports move_to_end() and order-aware == comparison", "It uses less memory", "It is no longer needed in Python 3.7+"],
+      "answer": "1",
+      "explanation": "In Python 3.7+, dict also preserves insertion order, but OrderedDict provides additional features like move_to_end() and\norder-aware == comparison, making it useful for LRU caches and similar use cases.",
+      "concepts": ["OrderedDict", "move_to_end", "order comparison"],
+      "difficulty": "hard",
+      "orderNum": 10
+    }
+  ]
+}

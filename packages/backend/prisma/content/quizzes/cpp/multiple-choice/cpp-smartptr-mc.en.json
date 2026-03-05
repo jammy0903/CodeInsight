@@ -1,0 +1,108 @@
+{
+  "language": "cpp",
+  "quizType": "multiple-choice",
+  "chapterId": "cpp-smartptr-mc",
+  "chapterTitle": "Smart Pointers / RAII (Multiple Choice)",
+  "quizzes": [
+    {
+      "id": "mc-cpp-sp-q1",
+      "question": "Which smart pointer is best suited for sole ownership?",
+      "options": ["std::weak_ptr", "std::shared_ptr", "std::unique_ptr", "raw pointer"],
+      "answer": "2",
+      "explanation": "unique_ptr implements a sole ownership model.",
+      "concepts": ["unique_ptr", "ownership"],
+      "difficulty": "easy",
+      "orderNum": 1
+    },
+    {
+      "id": "mc-cpp-sp-q2",
+      "question": "What does it mean when a shared_ptr's use_count is 1?",
+      "options": ["The object is 1 byte", "There is 1 owner", "The reference is invalid", "Deletion is scheduled"],
+      "answer": "1",
+      "explanation": "It indicates the number of shared_ptr instances currently owning the object.",
+      "concepts": ["shared_ptr", "use_count"],
+      "difficulty": "easy",
+      "orderNum": 2
+    },
+    {
+      "id": "mc-cpp-sp-q3",
+      "question": "What is the common approach to resolve circular references with shared_ptr?",
+      "options": ["Replace everything with raw pointers", "Call delete directly", "Change one link to a weak_ptr", "Manually decrement use_count"],
+      "answer": "2",
+      "explanation": "weak_ptr only observes without incrementing ownership, making it suitable for breaking cycles.",
+      "concepts": ["weak_ptr", "cycle", "shared_ptr"],
+      "difficulty": "medium",
+      "orderNum": 3
+    },
+    {
+      "id": "mc-cpp-sp-q4",
+      "question": "In RAII, when does resource deallocation occur by default?",
+      "options": ["When the GC runs", "At program termination", "When the object's scope ends", "When memory is low"],
+      "answer": "2",
+      "explanation": "C++ objects are destroyed when their scope ends, cleaning up resources.",
+      "concepts": ["RAII", "scope", "destructor"],
+      "difficulty": "easy",
+      "orderNum": 4
+    },
+    {
+      "id": "mc-cpp-sp-q5",
+      "question": "Which is a correct advantage of `make_shared<T>()`?",
+      "options": ["Always lock-free", "Can optimize control block and object allocation together", "Disables copying", "Eliminates the need for delete"],
+      "answer": "1",
+      "explanation": "It generally offers benefits in terms of allocation count and memory locality.",
+      "concepts": ["make_shared", "allocation", "control block"],
+      "difficulty": "medium",
+      "orderNum": 5
+    },
+    {
+      "id": "mc-cpp-sp-q6",
+      "question": "Which is an inappropriate practice when using smart pointers?",
+      "options": ["Documenting the ownership model", "Arbitrarily calling delete on a raw pointer obtained via get()", "Using make_unique", "Considering weak_ptr for circular structures"],
+      "answer": "1",
+      "explanation": "Calling delete on an object managed by a smart pointer risks double-free.",
+      "concepts": ["ownership", "double free", "get"],
+      "difficulty": "hard",
+      "orderNum": 6
+    },
+    {
+      "id": "mc-cpp-sp-q7",
+      "question": "Given `unique_ptr<T> p;`, what is the correct way to transfer ownership?",
+      "options": ["p2 = p;", "p2 = std::move(p);", "p2 = p.get();", "p2.reset(p);"],
+      "answer": "1",
+      "explanation": "unique_ptr can only transfer ownership via move.",
+      "concepts": ["unique_ptr", "move", "ownership transfer"],
+      "difficulty": "easy",
+      "orderNum": 7
+    },
+    {
+      "id": "mc-cpp-sp-q8",
+      "question": "What is the core C++ design principle that reduces resource leaks even when exceptions occur?",
+      "options": ["manual free only", "RAII", "global variables", "macro cleanup"],
+      "answer": "1",
+      "explanation": "RAII provides consistency through destructor-based cleanup, even along exception paths.",
+      "concepts": ["RAII", "exception safety"],
+      "difficulty": "easy",
+      "orderNum": 8
+    },
+    {
+      "id": "mc-cpp-sp-q9",
+      "question": "What must be checked before accessing the managed object through a weak_ptr?",
+      "options": ["Whether it has been deleted", "Mutex state", "Whether the result of lock() is valid", "Whether use_count is 0"],
+      "answer": "2",
+      "explanation": "You must obtain a shared_ptr via lock() and check for null to ensure safety.",
+      "concepts": ["weak_ptr", "lock", "null check"],
+      "difficulty": "medium",
+      "orderNum": 9
+    },
+    {
+      "id": "mc-cpp-sp-q10",
+      "question": "In which case is a raw pointer still most appropriate?",
+      "options": ["Expressing ownership", "Non-owning observation (non-owning view)", "Automatic lifetime management", "Thread synchronization"],
+      "answer": "1",
+      "explanation": "Raw pointers can be used clearly for non-owning reference/observation purposes.",
+      "concepts": ["raw pointer", "non-owning", "view"],
+      "difficulty": "medium",
+      "orderNum": 10
+    }
+  ]
+}

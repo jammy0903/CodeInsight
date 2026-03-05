@@ -34,3 +34,41 @@ export function hasVisualizationData(step: LessonStep): boolean {
   return VIZ_DATA_FIELDS.some((field) => hasMeaningfulValue(stepRecord[field]));
 }
 
+/**
+ * C/C++ Memory 탭 노출 여부 판단
+ * viz 스텝 중 하나라도 top-level stack/heap/memoryChanges가 있으면 true
+ */
+export function hasClassicMemoryData(steps: LessonStep[]): boolean {
+  return steps.some(step => {
+    const s = step as UnknownRecord;
+    return (
+      (Array.isArray(s.stack) && (s.stack as unknown[]).length > 0) ||
+      (Array.isArray(s.heap)  && (s.heap  as unknown[]).length > 0) ||
+      hasMeaningfulValue(s.memoryChanges)
+    );
+  });
+}
+
+/**
+ * JS Memory 탭 노출 여부 판단
+ * viz 스텝 중 하나라도 step.memoryState (nested {stack,heap})가 있으면 true
+ * eventLoopState/scopeState 등만 있는 레슨은 false
+ */
+export function hasJsMemoryData(steps: LessonStep[]): boolean {
+  return steps.some(step => {
+    const s = step as UnknownRecord;
+    return hasMeaningfulValue(s.memoryState);
+  });
+}
+
+/**
+ * Java Memory 탭 노출 여부 판단
+ * viz 스텝 중 하나라도 step.javaMemoryState가 있으면 true
+ */
+export function hasJavaMemoryData(steps: LessonStep[]): boolean {
+  return steps.some(step => {
+    const s = step as UnknownRecord;
+    return hasMeaningfulValue(s.javaMemoryState);
+  });
+}
+

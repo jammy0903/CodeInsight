@@ -257,8 +257,7 @@ export class PythonSimulationService {
     // 📝 소스 코드를 라인별로 분리
     const lines = sourceCode.split('\n');
     const maxLine = lines.length;
-
-    return snapshots
+    const filtered = snapshots
       // ❌ 유효하지 않은 라인 번호 제거
       .filter((snapshot) => {
         // line < 1: 실행 전 상태 (초기화)
@@ -273,12 +272,24 @@ export class PythonSimulationService {
           return false;
         }
         return true;
-      })
-      // ✅ 각 스냅샷에 소스 코드 라인 추가
-      .map((snapshot) => ({
+      });
+
+    // Python agent stdout은 step chunk(delta)일 수 있어 누적으로 정규화한다.
+    // - Playground(diffMode=false): 현재까지 전체 출력 표시
+    // - Lesson(diffMode=true): 이전 스텝과 diff 계산으로 신규 출력만 표시
+    let stdoutBuffer = '';
+
+    return filtered.map((snapshot) => {
+      if (snapshot.stdout) {
+        stdoutBuffer += snapshot.stdout;
+      }
+
+      return {
         ...snapshot,
         // 💡 프론트엔드가 line 번호만으로 코드 표시 가능
         code: lines[snapshot.line - 1] || '',
-      }));
+        stdout: stdoutBuffer || undefined,
+      };
+    });
   }
 }

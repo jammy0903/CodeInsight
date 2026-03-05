@@ -64,6 +64,8 @@ export function StepControls({
     setError('Simulation cancelled');
   }, [abortController, setAbortController, setIsSimulating, setError]);
 
+  const DOM_API_PATTERN = /\b(document|window|navigator|location|history|localStorage|sessionStorage|XMLHttpRequest|fetch|alert|confirm|prompt)\s*[.(]/;
+
   const handleRun = async () => {
     if (!code.trim()) {
       setError('코드를 입력해주세요');
@@ -72,6 +74,14 @@ export function StepControls({
 
     if (!isSupported) {
       setError(`${language.toUpperCase()} 시뮬레이션은 아직 지원되지 않습니다`);
+      return;
+    }
+
+    if (language === 'javascript' && DOM_API_PATTERN.test(code)) {
+      setError(
+        'Playground는 Node.js 환경에서 실행되므로 document, window 등 브라우저 DOM API를 지원하지 않습니다.\n' +
+        '이벤트 핸들러 없이 실행되는 순수 JavaScript 로직으로 작성해주세요.'
+      );
       return;
     }
 
@@ -100,7 +110,15 @@ export function StepControls({
       }
 
       if (!result.success) {
-        setError(result.error || 'Simulation failed');
+        const errMsg = result.error || 'Simulation failed';
+        if (language === 'javascript' && /document|window|navigator|localStorage/.test(errMsg) && errMsg.includes('is not defined')) {
+          setError(
+            'Playground는 Node.js 환경에서 실행되므로 document, window 등 브라우저 DOM API를 지원하지 않습니다.\n' +
+            '이벤트 핸들러 없이 실행되는 순수 JavaScript 로직으로 작성해주세요.'
+          );
+        } else {
+          setError(errMsg);
+        }
         return;
       }
 
@@ -117,6 +135,11 @@ export function StepControls({
       const msg = err instanceof Error ? err.message : 'Simulation failed';
       if (msg.includes('timeout') || msg.includes('ECONNABORTED')) {
         setError('코드 실행 시간이 초과되었습니다. 무한 루프가 없는지 확인해주세요.');
+      } else if (language === 'javascript' && (msg.includes('is not defined') && /document|window|navigator|localStorage/.test(msg))) {
+        setError(
+          'Playground는 Node.js 환경에서 실행되므로 document, window 등 브라우저 DOM API를 지원하지 않습니다.\n' +
+          '이벤트 핸들러 없이 실행되는 순수 JavaScript 로직으로 작성해주세요.'
+        );
       } else {
         setError(msg);
       }

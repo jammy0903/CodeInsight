@@ -102,10 +102,66 @@ z = y
 w = numbers
 `;
 
-const DEFAULT_JAVA_CODE = `public class Main {
+const DEFAULT_JAVA_CODE = `import java.util.Scanner;
+
+/**
+ * 간단한 은행 계좌 클래스
+ */
+class BankAccount {
+    private String owner;      // 예금주 (캡슐화)
+    private long balance;      // 잔액
+
+    public BankAccount(String owner, long initialBalance) {
+        this.owner = owner;
+        this.balance = initialBalance;
+    }
+
+    // 입금 메소드
+    public void deposit(long amount) {
+        if (amount <= 0) {
+            System.out.println("❌ 0원 이하의 금액은 입금할 수 없습니다.");
+            return;
+        }
+        balance += amount;
+        System.out.println("💰 [" + amount + "원] 입금 완료. 현재 잔액: " + balance + "원");
+    }
+
+    // 출금 메소드
+    public void withdraw(long amount) {
+        if (amount > balance) {
+            System.out.println("⚠️ 잔액이 부족합니다. (현재 잔액: " + balance + "원)");
+            return;
+        }
+        if (amount <= 0) {
+            System.out.println("❌ 출금 금액이 올바르지 않습니다.");
+            return;
+        }
+        balance -= amount;
+        System.out.println("💸 [" + amount + "원] 출금 완료. 현재 잔액: " + balance + "원");
+    }
+
+    // 정보 출력
+    public void showInfo() {
+        System.out.println("---------------------------");
+        System.out.println("👤 예금주: " + owner);
+        System.out.println("🏦 현재 잔액: " + balance + "원");
+        System.out.println("---------------------------");
+    }
+}
+
+public class Main {
     public static void main(String[] args) {
-        int x = 10;
-        System.out.println(x);
+        // 1. 계좌 생성
+        BankAccount myAccount = new BankAccount("홍길동", 50000);
+        myAccount.showInfo();
+
+        // 2. 동작 테스트
+        myAccount.deposit(15000);  // 입금
+        myAccount.withdraw(20000); // 출금
+        myAccount.withdraw(60000); // 잔액 부족 테스트
+
+        // 3. 최종 결과
+        myAccount.showInfo();
     }
 }`;
 
@@ -130,14 +186,59 @@ int main() {
     return 0;
 }`;
 
-const DEFAULT_JAVASCRIPT_CODE = `// Welcome to the JavaScript Visualizer!
-// Click 'Run' to see the visualization.
+const DEFAULT_JAVASCRIPT_CODE = `/**
+ * 간단한 은행 계좌 클래스
+ */
+class BankAccount {
+  constructor(owner, initialBalance) {
+    this.owner = owner;      // 예금주
+    this.balance = initialBalance; // 잔액
+  }
 
-let name = "CodeInsight";
-const version = 1.0;
-let isAwesome = true;
+  // 입금 메소드
+  deposit(amount) {
+    if (amount <= 0) {
+      console.log("❌ 0원 이하의 금액은 입금할 수 없습니다.");
+      return;
+    }
+    this.balance += amount;
+    console.log("💰 [" + amount + "원] 입금 완료. 현재 잔액: " + this.balance + "원");
+  }
 
-name = "CodeInsight Rocks!";
+  // 출금 메소드
+  withdraw(amount) {
+    if (amount > this.balance) {
+      console.log("⚠️ 잔액이 부족합니다. (현재 잔액: " + this.balance + "원)");
+      return;
+    }
+    if (amount <= 0) {
+      console.log("❌ 출금 금액이 올바르지 않습니다.");
+      return;
+    }
+    this.balance -= amount;
+    console.log("💸 [" + amount + "원] 출금 완료. 현재 잔액: " + this.balance + "원");
+  }
+
+  // 정보 출력
+  showInfo() {
+    console.log("---------------------------");
+    console.log("👤 예금주: " + this.owner);
+    console.log("🏦 현재 잔액: " + this.balance + "원");
+    console.log("---------------------------");
+  }
+}
+
+// 1. 계좌 생성
+const myAccount = new BankAccount("홍길동", 50000);
+myAccount.showInfo();
+
+// 2. 동작 테스트
+myAccount.deposit(15000);  // 입금
+myAccount.withdraw(20000); // 출금
+myAccount.withdraw(60000); // 잔액 부족 테스트
+
+// 3. 최종 결과
+myAccount.showInfo();
 `;
 
 // ============================================================

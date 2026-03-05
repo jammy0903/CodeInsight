@@ -156,10 +156,21 @@ export class JavaTransformer implements IFlowTransformer {
    */
   transform(step: LessonStep, prevStep?: LessonStep, fullCode?: string): FlowStep {
     const variables: FlowVariable[] = [];
-    const mainFrameVars: string[] = [];
+    const frameVarMap = new Map<string, string[]>();
+    const frameOrder: string[] = [];
     const heapFrameVars: string[] = [];
     const stringPoolVars: string[] = [];
     const stepRecord = step as UnknownRecord;
+    const getFrameVarIds = (name: string): string[] => {
+      const normalized = name === '__main__' ? 'main' : name;
+      let ids = frameVarMap.get(normalized);
+      if (!ids) {
+        ids = [];
+        frameVarMap.set(normalized, ids);
+        frameOrder.push(normalized);
+      }
+      return ids;
+    };
 
     // 1. Stack 변수 처리 (main 프레임)
     const stackData =
@@ -171,6 +182,7 @@ export class JavaTransformer implements IFlowTransformer {
     for (const item of stackData) {
       // 형태 1: 단순 형태 {name, value, type?} - 레슨 JSON
       if (isStackVariableItem(item)) {
+        const frameVars = getFrameVarIds('main');
         const pointsTo = extractPointsTo(item.value);
         const isReference = !!pointsTo;
 
@@ -191,11 +203,12 @@ export class JavaTransformer implements IFlowTransformer {
         };
 
         variables.push(variable);
-        mainFrameVars.push(variable.id);
+        frameVars.push(variable.id);
       }
       // 형태 2: 복잡한 형태 {methodName, variables: {...}} - 시뮬레이터
       else if (isSimulatorFrameItem(item)) {
         const frameName = item.methodName || 'main';
+        const frameVars = getFrameVarIds(frameName);
         const frameVariables = item.variables;
 
         if (frameVariables) {
@@ -246,7 +259,7 @@ export class JavaTransformer implements IFlowTransformer {
             };
 
             variables.push(variable);
-            mainFrameVars.push(variable.id);
+            frameVars.push(variable.id);
           });
         }
       }
@@ -310,9 +323,11 @@ export class JavaTransformer implements IFlowTransformer {
     }
 
     // 3. 프레임 생성
-    const frames: FlowFrame[] = [
-      { name: 'main', variableIds: mainFrameVars },
-    ];
+    const stackFrameNames = frameOrder.length > 0 ? frameOrder : ['main'];
+    const frames: FlowFrame[] = stackFrameNames.map((name) => ({
+      name,
+      variableIds: frameVarMap.get(name) ?? [],
+    }));
 
     if (stringPoolVars.length > 0) {
       frames.push({ name: 'String Pool', variableIds: stringPoolVars });
