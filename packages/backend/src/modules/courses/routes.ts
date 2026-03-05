@@ -50,7 +50,7 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string };
       const { locale } = request.query as { locale?: string };
-      const lesson = await courseService.getLessonFull(id);
+      const lesson = await courseService.getLessonFull(id, locale);
 
       if (!lesson) {
         return reply.status(404).send({ error: 'Lesson not found' });
@@ -64,6 +64,7 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
       // 하이브리드 응답: DB 메타데이터 + JSON 콘텐츠
       // JSON 구조가 Flat한 경우(code, steps가 최상위)와 Nested된 경우(content 내부) 모두 지원
       let mergedContent = lesson.content;
+      let mergedQuizzes = lesson.quizzes;
 
       if (jsonContent) {
         // 1. Nested Structure check
@@ -82,12 +83,36 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
             steps: (jsonContent as any).steps,
           } as any;
         }
+
+        // locale JSON에 quiz가 있으면 DB quiz 대신 우선 사용
+        const localizedQuiz = (jsonContent as any).quiz;
+        if (
+          localizedQuiz &&
+          typeof localizedQuiz.question === 'string' &&
+          Array.isArray(localizedQuiz.options) &&
+          typeof localizedQuiz.correctIndex === 'number'
+        ) {
+          const baseQuiz = lesson.quizzes?.[0];
+          mergedQuizzes = [{
+            id: baseQuiz?.id ?? `localized-${id}-quiz-1`,
+            lessonId: baseQuiz?.lessonId ?? id,
+            type: baseQuiz?.type ?? 'multiple_choice',
+            order: baseQuiz?.order ?? 1,
+            createdAt: baseQuiz?.createdAt ?? new Date(),
+            question: localizedQuiz.question,
+            options: localizedQuiz.options,
+            answer: String(localizedQuiz.correctIndex),
+            explanation: typeof localizedQuiz.explanation === 'string'
+              ? localizedQuiz.explanation
+              : (baseQuiz?.explanation ?? ''),
+          }];
+        }
       }
 
       return {
         ...lesson,
         content: mergedContent,
-        quizzes: lesson.quizzes, // 항상 DB 데이터 사용
+        quizzes: mergedQuizzes,
       };
     } catch (error) {
       logger.error('Get lesson error:', error);
@@ -128,7 +153,8 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/chapters/:id', async (request, reply) => {
     try {
       const { id } = request.params as { id: string };
-      const chapter = await courseService.getChapterWithLessons(id);
+      const { locale } = request.query as { locale?: string };
+      const chapter = await courseService.getChapterWithLessons(id, locale);
 
       if (!chapter) {
         return reply.status(404).send({ error: 'Chapter not found' });
@@ -249,6 +275,7 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/:id', { preHandler: [fastify.optionalDbUser] }, async (request, reply) => {
     try {
       const { id } = request.params as { id: string };
+      const { locale } = request.query as { locale?: string };
       // 'chapter'나 'lesson' 등의 키워드가 id로 오면 404 (안전장치)
       if (id === 'chapters' || id === 'lessons' || id === 'progress' || id === 'languages') {
         return reply.status(404).send({ error: 'Not found' });
@@ -260,7 +287,7 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
 
       const userId = request.user?.dbUser?.id;
       const isAdmin = request.user?.uid === env.ADMIN_FIREBASE_UID;
-      const language = await courseService.getLanguageWithChapters(id, userId, !!isAdmin);
+      const language = await courseService.getLanguageWithChapters(id, userId, !!isAdmin, locale);
 
       if (!language) {
         return reply.status(404).send({ error: 'Language not found' });
@@ -282,7 +309,8 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/:lang/chapters', async (request, reply) => {
     try {
       const { lang } = request.params as { lang: string };
-      const chapters = await courseService.getChapters(lang);
+      const { locale } = request.query as { locale?: string };
+      const chapters = await courseService.getChapters(lang, locale);
       return chapters;
     } catch (error) {
       logger.error('Get chapters error:', error);

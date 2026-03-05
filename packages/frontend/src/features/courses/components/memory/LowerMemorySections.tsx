@@ -8,6 +8,7 @@
  */
 
 import type { DataItem, TextItem } from './types';
+import { useTranslation } from 'react-i18next';
 
 interface LowerMemorySectionsProps {
   dataSection?: DataItem[];
@@ -24,6 +25,8 @@ export function LowerMemorySections({
   dataSection = [],
   textSection = [],
 }: LowerMemorySectionsProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-1">
       {/* BSS - 항상 한 줄 (이 커리큘럼에서는 사용 안 함) */}
@@ -38,7 +41,7 @@ export function LowerMemorySections({
           📭 BSS
         </span>
         <span className="text-[9px] italic" style={{ color: SECTION_COLORS.bss.color }}>
-          (비어있음)
+          {t('visualizer.empty')}
         </span>
       </div>
 
@@ -55,7 +58,7 @@ export function LowerMemorySections({
             📝 Data
           </span>
           <span className="text-[9px] italic" style={{ color: 'var(--theme-memory-card-muted)' }}>
-            (비어있음)
+            {t('visualizer.empty')}
           </span>
         </div>
       ) : (
@@ -71,7 +74,7 @@ export function LowerMemorySections({
               📝 Data
             </span>
             <span className="text-[9px]" style={{ color: SECTION_COLORS.data.color }}>
-              문자열 리터럴
+              {t('visualizer.string_literals')}
             </span>
           </div>
           <div className="space-y-1">
@@ -105,7 +108,7 @@ export function LowerMemorySections({
             ⚙️ Text
           </span>
           <span className="text-[9px] italic" style={{ color: 'var(--theme-memory-card-muted)' }}>
-            (비어있음)
+            {t('visualizer.empty')}
           </span>
         </div>
       ) : (
@@ -121,7 +124,7 @@ export function LowerMemorySections({
               ⚙️ Text
             </span>
             <span className="text-[9px]" style={{ color: SECTION_COLORS.text.color }}>
-              실행 코드
+              {t('visualizer.executable_code')}
             </span>
           </div>
           <div className="space-y-1">
@@ -143,7 +146,7 @@ export function LowerMemorySections({
       )}
 
       <div className="text-center text-[9px] pt-0.5" style={{ color: 'var(--theme-memory-card-muted)' }}>
-        ↓ 0x0000 (낮은 주소)
+        {`↓ 0x0000 (${t('visualizer.low_address')})`}
       </div>
     </div>
   );

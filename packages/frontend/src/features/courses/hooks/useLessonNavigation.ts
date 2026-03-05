@@ -79,10 +79,18 @@ export function useLessonNavigation(
   }, [totalSteps, lessonId, lessonKey, onStart]);
 
   const isLastStep = currentStepIndex === totalSteps - 1;
-  const canGoPrev = currentStepIndex > 0;
+  const canGoPrev = phase === 'quiz' || currentStepIndex > 0;
   const canGoNext = currentStepIndex < totalSteps - 1;
 
   const goToPrevStep = useCallback(() => {
+    if (phase === 'quiz') {
+      updateNavigation((prev) => ({
+        ...prev,
+        phase: 'learning',
+      }));
+      return;
+    }
+
     if (currentStepIndex <= 0) return;
     const newIndex = currentStepIndex - 1;
     updateNavigation(() => ({
@@ -90,7 +98,7 @@ export function useLessonNavigation(
       currentStepIndex: newIndex,
     }));
     onStepChange?.(newIndex);
-  }, [currentStepIndex, onStepChange, updateNavigation]);
+  }, [phase, currentStepIndex, onStepChange, updateNavigation]);
 
   const goToNextStep = useCallback(() => {
     if (currentStepIndex >= totalSteps - 1) return;

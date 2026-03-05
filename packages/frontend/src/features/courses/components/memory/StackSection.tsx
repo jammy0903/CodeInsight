@@ -6,6 +6,7 @@
 
 import { useState, useMemo } from 'react';
 import type { MemoryBlock } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 import { COLORS } from './utils/frameColors';
 import type { FrameColor } from './utils/frameColors';
@@ -25,6 +26,7 @@ export function StackSection({
   changedBlocks,
   frames,
 }: StackSectionProps) {
+  const { t } = useTranslation();
   const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
   const [expandedArrays, setExpandedArrays] = useState<Set<string>>(new Set());
 
@@ -124,11 +126,11 @@ export function StackSection({
             📦 Stack
           </span>
           <span className="text-[9px]" style={{ color: 'var(--theme-memory-stack-label)' }}>
-            ↓ 낮은 주소
+            {`↓ ${t('visualizer.low_address')}`}
           </span>
         </div>
         <div className="text-center py-3 text-[10px] italic" style={{ color: 'var(--theme-memory-card-muted)' }}>
-          (비어있음)
+          {t('visualizer.empty')}
         </div>
       </div>
     );
@@ -148,7 +150,7 @@ export function StackSection({
           📦 Stack
         </span>
         <span className="text-[9px]" style={{ color: 'var(--theme-memory-stack-label)' }}>
-          ↓ 낮은 주소
+          {`↓ ${t('visualizer.low_address')}`}
         </span>
       </div>
 

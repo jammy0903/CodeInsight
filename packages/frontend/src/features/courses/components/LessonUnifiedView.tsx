@@ -79,7 +79,7 @@ export function LessonUnifiedView({
     const vizSteps = nav.vizStepIndices.map(i => steps[i]);
     return {
       showMemoryTab: (
-        ((languageId === 'c' || languageId === 'cpp') && hasClassicMemoryData(vizSteps)) ||
+        (languageId === 'c' && hasClassicMemoryData(vizSteps)) ||
         (languageId === 'java' && hasJavaMemoryData(vizSteps))
       ),
       showJsMemoryTab: languageId === 'javascript' && hasJsMemoryData(vizSteps),

@@ -337,8 +337,12 @@ export function useLessonVisualization(
       };
     }
 
-    if (resolvedStep.stack && resolvedStep.heap) {
-      const resolvedStepRecord = resolvedStep as UnknownRecord;
+    const resolvedStepRecord = resolvedStep as UnknownRecord;
+    const hasClassicMemoryShape =
+      Object.prototype.hasOwnProperty.call(resolvedStepRecord, 'stack') ||
+      Object.prototype.hasOwnProperty.call(resolvedStepRecord, 'heap');
+
+    if (hasClassicMemoryShape) {
       const rawStack = asArray(resolvedStepRecord.stack);
       const rawHeap = asArray(resolvedStepRecord.heap);
 
@@ -416,7 +420,6 @@ export function useLessonVisualization(
     }
 
     // JS 레슨의 비-메모리 타입 (scope, eventLoop, promise 등) 패스스루
-    const resolvedStepRecord = resolvedStep as UnknownRecord;
     const resolvedVizState = resolvedStepRecord.scopeState
       || resolvedStepRecord.eventLoopState
       || resolvedStepRecord.promiseState

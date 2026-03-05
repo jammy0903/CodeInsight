@@ -42,6 +42,13 @@ const ENDPOINTS = {
   progress: '/courses/progress',
 };
 
+function getRequestLocale(): string | undefined {
+  const locale = i18n.resolvedLanguage || i18n.language;
+  if (!locale) return undefined;
+  const normalized = locale.toLowerCase().split('-')[0];
+  return normalized === 'ko' ? undefined : normalized;
+}
+
 // =============================================
 // Language API
 // =============================================
@@ -74,7 +81,9 @@ export async function getLanguages(): Promise<Language[]> {
  */
 export async function getLanguageWithChapters(languageId: string): Promise<Language & { chapters: ChapterWithLessons[] }> {
   try {
-    const response = await api.get<Language & { chapters: ChapterWithLessons[] }>(`/courses/${languageId}`);
+    const locale = getRequestLocale();
+    const params = locale ? { locale } : undefined;
+    const response = await api.get<Language & { chapters: ChapterWithLessons[] }>(`/courses/${languageId}`, { params });
     // Note: Zod schema verification omitted for creating composite type dynamically or assuming server correctness for perf
     return response.data;
   } catch (err) {
@@ -93,7 +102,9 @@ export async function getLanguageWithChapters(languageId: string): Promise<Langu
  */
 export async function getChapters(languageId: string): Promise<Chapter[]> {
   try {
-    const response = await api.get<Chapter[]>(ENDPOINTS.chapters(languageId));
+    const locale = getRequestLocale();
+    const params = locale ? { locale } : undefined;
+    const response = await api.get<Chapter[]>(ENDPOINTS.chapters(languageId), { params });
 
     // 런타임 검증
     const parsed = ChaptersSchema.safeParse(response.data);
@@ -115,7 +126,9 @@ export async function getChapters(languageId: string): Promise<Chapter[]> {
  */
 export async function getChapterWithLessons(chapterId: string): Promise<ChapterWithLessons> {
   try {
-    const response = await api.get<ChapterWithLessons>(ENDPOINTS.chapter(chapterId));
+    const locale = getRequestLocale();
+    const params = locale ? { locale } : undefined;
+    const response = await api.get<ChapterWithLessons>(ENDPOINTS.chapter(chapterId), { params });
 
     // 런타임 검증
     const parsed = ChapterWithLessonsSchema.safeParse(response.data);
@@ -163,8 +176,8 @@ export async function getChapterProgress(chapterId: string): Promise<ChapterWith
  */
 export async function getLessonFull(lessonId: string): Promise<LessonFull> {
   try {
-    const locale = i18n.language;
-    const params = locale && locale !== 'ko' ? { locale } : undefined;
+    const locale = getRequestLocale();
+    const params = locale ? { locale } : undefined;
     const response = await api.get<LessonFull>(ENDPOINTS.lesson(lessonId), { params });
 
     // step.code → step.line 런타임 계산 (Zod 검증 전에 수행)
@@ -235,4 +248,3 @@ export async function updateProgress(data: ProgressUpdateRequest): Promise<UserP
     throw error;
   }
 }
-

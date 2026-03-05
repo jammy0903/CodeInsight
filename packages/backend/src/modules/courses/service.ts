@@ -9,6 +9,7 @@
 import { prisma } from '../../config/database';
 import { randomUUID } from 'crypto';
 import * as streakService from '../gamification/streak.service';
+import { getCourseLocalizationCatalog } from './localization';
 
 // =============================================
 // Language
@@ -40,7 +41,7 @@ export async function getLanguages() {
  * - chapter 범위로 completed lessons 필터링 (language 범위 X)
  */
 // ... (previous code)
-export async function getLanguageWithChapters(languageId: string, userId?: string, isAdmin: boolean = false) {
+export async function getLanguageWithChapters(languageId: string, userId?: string, isAdmin: boolean = false, locale?: string) {
   // 1. Structure (Lightweight - Lessons ID only)
   const language = await prisma.language.findUnique({
     where: { id: languageId },
@@ -66,22 +67,37 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
 
   if (!language) return null;
 
+  const localization = await getCourseLocalizationCatalog(languageId, locale);
+  const localizeChapter = (chapter: any) => ({
+    ...chapter,
+    title: localization?.chapterTextById[chapter.id]?.title || chapter.title,
+    description: localization?.chapterTextById[chapter.id]?.description || chapter.description,
+    lessons: chapter.lessons.map((lesson: any) => ({
+      ...lesson,
+      title: localization?.lessonTextById[lesson.id]?.title || lesson.title,
+      description: localization?.lessonTextById[lesson.id]?.description || lesson.description,
+    })),
+  });
+
   // 2. userId 미제공 시: 코스 구조만 반환
   if (!userId) {
     return {
       ...language,
-      chapters: language.chapters.map((chapter: any) => ({
-        ...chapter,
-        lessons: chapter.lessons.map((lesson: any) => ({
-          ...lesson,
-          progress: null,
-        })),
-        progress: {
-          total: chapter.lessons.length,
-          completed: 0,
-          percentage: 0,
-        },
-      })),
+      chapters: language.chapters.map((chapter: any) => {
+        const localizedChapter = localizeChapter(chapter);
+        return {
+          ...localizedChapter,
+          lessons: localizedChapter.lessons.map((lesson: any) => ({
+            ...lesson,
+            progress: null,
+          })),
+          progress: {
+            total: chapter.lessons.length,
+            completed: 0,
+            percentage: 0,
+          },
+        };
+      }),
     };
   }
 
@@ -119,7 +135,8 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
   return {
     ...language,
     chapters: language.chapters.map((chapter: any) => {
-      const lessons = chapter.lessons.map((lesson: any) => {
+      const localizedChapter = localizeChapter(chapter);
+      const lessons = localizedChapter.lessons.map((lesson: any) => {
         if (isAdmin) {
           return {
             ...lesson,
@@ -139,7 +156,7 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
       const completed = lessons.filter((lesson: any) => lesson.progress?.status === 'completed').length;
 
       return {
-        ...chapter,
+        ...localizedChapter,
         lessons,
         progress: {
           total,
@@ -158,8 +175,8 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
 /**
  * 언어별 챕터 목록
  */
-export async function getChapters(languageId: string) {
-  return prisma.chapter.findMany({
+export async function getChapters(languageId: string, locale?: string) {
+  const chapters = await prisma.chapter.findMany({
     where: {
       languageId,
       isActive: true,
@@ -180,13 +197,27 @@ export async function getChapters(languageId: string) {
       }
     }
   });
+
+  const localization = await getCourseLocalizationCatalog(languageId, locale);
+  if (!localization) return chapters;
+
+  return chapters.map((chapter: any) => ({
+    ...chapter,
+    title: localization.chapterTextById[chapter.id]?.title || chapter.title,
+    description: localization.chapterTextById[chapter.id]?.description || chapter.description,
+    lessons: chapter.lessons.map((lesson: any) => ({
+      ...lesson,
+      title: localization.lessonTextById[lesson.id]?.title || lesson.title,
+      description: localization.lessonTextById[lesson.id]?.description || lesson.description,
+    })),
+  }));
 }
 
 /**
  * 챕터 상세 (레슨 포함)
  */
-export async function getChapterWithLessons(chapterId: string) {
-  return prisma.chapter.findUnique({
+export async function getChapterWithLessons(chapterId: string, locale?: string) {
+  const chapter = await prisma.chapter.findUnique({
     where: { id: chapterId },
     include: {
       lessons: {
@@ -195,6 +226,22 @@ export async function getChapterWithLessons(chapterId: string) {
       },
     },
   });
+
+  if (!chapter) return null;
+
+  const localization = await getCourseLocalizationCatalog(chapter.languageId, locale);
+  if (!localization) return chapter;
+
+  return {
+    ...chapter,
+    title: localization.chapterTextById[chapter.id]?.title || chapter.title,
+    description: localization.chapterTextById[chapter.id]?.description || chapter.description,
+    lessons: chapter.lessons.map((lesson: any) => ({
+      ...lesson,
+      title: localization.lessonTextById[lesson.id]?.title || lesson.title,
+      description: localization.lessonTextById[lesson.id]?.description || lesson.description,
+    })),
+  };
 }
 
 // =============================================
@@ -204,7 +251,7 @@ export async function getChapterWithLessons(chapterId: string) {
 /**
  * 레슨 상세 (콘텐츠 + 퀴즈 포함)
  */
-export async function getLessonFull(lessonId: string) {
+export async function getLessonFull(lessonId: string, locale?: string) {
   const lesson = await prisma.lesson.findFirst({
     where: { id: lessonId, isActive: true },
     include: {
@@ -212,29 +259,45 @@ export async function getLessonFull(lessonId: string) {
       quizzes: {
         orderBy: { order: 'asc' },
       },
+      chapter: {
+        select: {
+          languageId: true,
+        },
+      },
     },
   });
 
   if (!lesson) return null;
 
+  const localization = await getCourseLocalizationCatalog(lesson.chapter.languageId, locale);
+  const localizedTitle = localization?.lessonTextById[lesson.id]?.title || lesson.title;
+  const localizedDescription = localization?.lessonTextById[lesson.id]?.description || lesson.description;
+
+  const { chapter, ...lessonData } = lesson;
+  const localizedLesson = {
+    ...lessonData,
+    title: localizedTitle,
+    description: localizedDescription,
+  };
+
   // steps JSON 파싱
-  if (lesson.content?.steps && typeof lesson.content.steps === 'string') {
+  if (localizedLesson.content?.steps && typeof localizedLesson.content.steps === 'string') {
     try {
-      const parsedSteps = JSON.parse(lesson.content.steps);
+      const parsedSteps = JSON.parse(localizedLesson.content.steps);
       return {
-        ...lesson,
+        ...localizedLesson,
         content: {
-          ...lesson.content,
+          ...localizedLesson.content,
           steps: parsedSteps,
         },
       };
     } catch {
       // JSON 파싱 실패 시 원본 반환
-      return lesson;
+      return localizedLesson;
     }
   }
 
-  return lesson;
+  return localizedLesson;
 }
 
 // =============================================

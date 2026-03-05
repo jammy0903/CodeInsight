@@ -8,6 +8,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import i18n from 'i18next';
 import { getLanguageWithChapters, getChapterWithLessons, getUserProgress, getLessonFull } from '@/services/courses';
 import { useStore } from '@/stores/store';
 import type { ChapterWithLessons, Language, UserProgress, LessonFull } from '@/types';
@@ -27,10 +28,11 @@ import type { ChapterWithLessons, Language, UserProgress, LessonFull } from '@/t
 export function useLanguageCourse(languageId: string | undefined) {
   const appUser = useStore((state) => state.appUser);
   const authLoading = useStore((state) => state.authLoading);
+  const locale = i18n.language;
 
   return useQuery<Language & { chapters: ChapterWithLessons[] }>({
     // queryKey에 appUser.id 포함 → 로그인/로그아웃 시 자동 재요청
-    queryKey: ['language', languageId, appUser?.id],
+    queryKey: ['language', languageId, appUser?.id, locale],
 
     queryFn: () => getLanguageWithChapters(languageId!),
 
@@ -49,8 +51,9 @@ export function useLanguageCourse(languageId: string | undefined) {
  * const { data: chapter, isLoading, isError } = useChapter('c-1');
  */
 export function useChapter(chapterId: string | undefined) {
+  const locale = i18n.language;
   return useQuery<ChapterWithLessons>({
-    queryKey: ['chapter', chapterId],
+    queryKey: ['chapter', chapterId, locale],
     queryFn: () => getChapterWithLessons(chapterId!),
     enabled: !!chapterId,
     staleTime: 5 * 60 * 1000, // 5분: 챕터 구조는 세션 중 변경 안 됨
@@ -87,8 +90,9 @@ export function useUserProgress() {
  * const { data: lesson, isLoading, isError } = useLesson('c-1-1');
  */
 export function useLesson(lessonId: string | undefined) {
+  const locale = i18n.language;
   return useQuery<LessonFull>({
-    queryKey: ['lesson', lessonId],
+    queryKey: ['lesson', lessonId, locale],
     queryFn: () => getLessonFull(lessonId!),
     enabled: !!lessonId,
     staleTime: 5 * 60 * 1000, // 5분: 레슨 콘텐츠는 세션 중 변경 안 됨

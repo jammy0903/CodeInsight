@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
+import i18n from 'i18next';
 import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
 import { LessonCard } from './components/LessonCard';
@@ -56,6 +57,7 @@ export function ChapterLessonsPage() {
   const appUser = useStore((s) => s.appUser);
   const langColor = getLanguageColor(lang);
   const isMobile = useIsMobile();
+  const locale = i18n.resolvedLanguage || i18n.language;
 
   // TanStack Query: 언어 코스 데이터 + 진행 상태
   const { data: languageData, isLoading, isError, error } = useLanguageCourse(lang);
@@ -114,7 +116,7 @@ export function ChapterLessonsPage() {
         if (!lessonId) continue;
 
         await queryClient.prefetchQuery({
-          queryKey: ['lesson', lessonId],
+          queryKey: ['lesson', lessonId, locale],
           queryFn: () => getLessonFull(lessonId),
           staleTime: 5 * 60 * 1000,
         });
@@ -127,7 +129,7 @@ export function ChapterLessonsPage() {
       // 현재 챕터 예열이 끝난 뒤, 다음 챕터 첫 레슨 1개만 예열
       if (!cancelled && nextChapterFirstLessonId && !uniqueOrderedIds.includes(nextChapterFirstLessonId)) {
         await queryClient.prefetchQuery({
-          queryKey: ['lesson', nextChapterFirstLessonId],
+          queryKey: ['lesson', nextChapterFirstLessonId, locale],
           queryFn: () => getLessonFull(nextChapterFirstLessonId),
           staleTime: 5 * 60 * 1000,
         });
@@ -139,16 +141,16 @@ export function ChapterLessonsPage() {
     return () => {
       cancelled = true;
     };
-  }, [chapter, queryClient, accessDenied, languageData, getLessonProgress]);
+  }, [chapter, queryClient, accessDenied, languageData, getLessonProgress, locale]);
 
   // hover 시 해당 레슨 프리페치
   const handlePrefetch = useCallback((lessonId: string) => {
     queryClient.prefetchQuery({
-      queryKey: ['lesson', lessonId],
+      queryKey: ['lesson', lessonId, locale],
       queryFn: () => getLessonFull(lessonId),
       staleTime: 5 * 60 * 1000,
     });
-  }, [queryClient]);
+  }, [queryClient, locale]);
 
   // 페이지 제목 설정
   useEffect(() => {

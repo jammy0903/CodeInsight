@@ -7,6 +7,7 @@
 
 import { useMemo } from 'react';
 import type { MemoryBlock } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 import { COLORS } from './utils/frameColors';
 import type { ChangedBlocksType } from './types';
@@ -21,6 +22,7 @@ export function HeapSection({
   blocks,
   changedBlocks,
 }: HeapSectionProps) {
+  const { t } = useTranslation();
   // 주소순 정렬 (낮은 주소 → 높은 주소), NaN 방어
   const sortedBlocks = useMemo(() => {
     return [...blocks].sort((a, b) => {
@@ -46,7 +48,7 @@ export function HeapSection({
           🎒 Heap
         </span>
         <span className="text-[9px] italic" style={{ color: 'var(--theme-memory-card-muted)' }}>
-          (비어있음)
+          {t('visualizer.empty')}
         </span>
       </div>
     );
@@ -65,7 +67,7 @@ export function HeapSection({
           🎒 Heap
         </span>
         <span className="text-[9px]" style={{ color: 'var(--theme-memory-heap-label)' }}>
-          ↑ 높은 주소
+          {`↑ ${t('visualizer.high_address')}`}
         </span>
       </div>
 
