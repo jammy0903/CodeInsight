@@ -6,7 +6,7 @@ import type { ChapterWithLessons } from '@/types';
 import { CourseGrid } from './components/CourseGrid';
 import { ChapterCard } from './components/ChapterCard';
 import { useStore } from '@/stores/store';
-import { ChevronLeft, Lock } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useIsMobile, useLanguageCourse } from '@/hooks';
 import { CBrandIcon } from '@/components/ui/CBrandIcon';
 
@@ -42,7 +42,7 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
   const lang = langOverride ?? routeLang;
   const navigate = useNavigate();
   const setPageTitle = useStore((s) => s.setPageTitle);
-  const appUser = useStore((s) => s.appUser);
+  const authLoading = useStore((s) => s.authLoading);
 
   // TanStack Query: loading, error, data 자동 관리
   const { data, isLoading, isError, error } = useLanguageCourse(lang);
@@ -106,8 +106,8 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
   const isMobile = useIsMobile();
 
   // 데이터에서 language와 chapters 추출
-  const language = data;
   const chapters = data?.chapters || [];
+  const pageLoading = authLoading || isLoading;
 
   // 페이지 제목 설정
   useEffect(() => {
@@ -189,7 +189,7 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
                   {langInfo.name}
                 </h1>
                 <p className="text-[var(--theme-dashboard-text-muted)] text-sm">
-                  {isLoading ? t('common.loading') : `${chapters.length} ${t('courses.chapters')} · ${totalLessons} ${t('courses.lessons')}`}
+                  {pageLoading ? t('common.loading') : `${chapters.length} ${t('courses.chapters')} · ${totalLessons} ${t('courses.lessons')}`}
                 </p>
                 <p className="text-[var(--theme-dashboard-text-muted)] text-xs mt-1">
                   {langInfo.description}
@@ -202,7 +202,7 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
 
       {/* 챕터 리스트 */}
       <div style={{ marginTop: '80px' }}>
-        {isLoading ? (
+        {pageLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--theme-dashboard-accent)] mx-auto mb-4"></div>
@@ -236,30 +236,14 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
                   // 백엔드에서 계산된 진행률 사용 (DRY 원칙)
                   const { total, completed, percentage: progress } = getChapterProgress(chapter);
 
-                  // 이전 챕터들이 모두 완료되었는지 확인
-                  const previousChaptersComplete = chapters.slice(0, index).every(ch => {
-                    const { total: prevTotal, completed: prevCompleted } = getChapterProgress(ch);
-                    return prevTotal > 0 && prevCompleted === prevTotal;
-                  });
-
-                  const isSequentialLocked = language?.isSequential
-                    ? index > 0 && !previousChaptersComplete && completed === 0
-                    : false;
-
-                  // 비로그인: 챕터 2 이상 로그인 필요
-                  const needsLogin = !appUser && chapter.order >= 2;
-
                   return (
                     <div key={chapter.id}>
                       <button
-                        onClick={() => !isSequentialLocked && navigate(`/courses/${lang}/${chapter.id}`)}
-                        disabled={isSequentialLocked}
-                        className="w-full p-4 text-left transition-colors hover:bg-[var(--theme-layout-top-bar-button-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => navigate(`/courses/${lang}/${chapter.id}`)}
+                        className="w-full p-4 text-left transition-colors hover:bg-[var(--theme-layout-top-bar-button-hover)]"
                       >
                         <div className="flex items-center justify-between gap-3">
                           <h3 className="text-base font-semibold text-[#333] flex items-center gap-2 flex-shrink-0">
-                            {isSequentialLocked && <Lock className="w-4 h-4 text-[var(--theme-dashboard-text-muted)]" />}
-                            {needsLogin && !isSequentialLocked && <Lock className="w-4 h-4 text-gray-400" />}
                             {chapter.title}
                           </h3>
                           <div className="flex items-center gap-2 flex-shrink-0">
@@ -295,22 +279,8 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
                 {chapters.map((chapter, index) => {
                   // 백엔드에서 계산된 진행률 사용 (DRY 원칙)
                   const { total, completed } = getChapterProgress(chapter);
-
-                  // 이전 챕터들이 모두 완료되었는지 확인
-                  const previousChaptersComplete = chapters.slice(0, index).every(ch => {
-                    const { total: prevTotal, completed: prevCompleted } = getChapterProgress(ch);
-                    return prevTotal > 0 && prevCompleted === prevTotal;
-                  });
-
                   const isComplete = total > 0 && completed === total;
-                  // isSequential이 false면 모든 챕터 즉시 열림
-                  const isLocked = language?.isSequential
-                    ? index > 0 && !previousChaptersComplete && completed === 0
-                    : false;
-                  const isActive = !isComplete && !isLocked && (index === 0 || previousChaptersComplete);
-
-                  // 비로그인: 챕터 2 이상 로그인 필요
-                  const needsLogin = !appUser && chapter.order >= 2;
+                  const isActive = !isComplete && index === 0;
 
                   return (
                     <ChapterCard
@@ -319,9 +289,7 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
                       languageId={lang}
                       lessonCount={total}
                       completedCount={completed}
-                      isLocked={isLocked}
                       isActive={isActive}
-                      needsLogin={needsLogin}
                     />
                   );
                 })}
