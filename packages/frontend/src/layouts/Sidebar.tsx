@@ -51,7 +51,7 @@ export function Sidebar() {
   const appUser = useStore((s) => s.appUser);
   const needsRegistration = useStore((s) => s.needsRegistration);
   const isAdmin = appUser?.role === 'admin';
-  const lessonRouteMatch = location.pathname.match(/^\/courses\/[^/]+\/[^/]+\/([^/]+)$/);
+  const lessonRouteMatch = location.pathname.match(/^\/courses\/([^/]+-\d+-\d+.*)$/);
   const lessonId = lessonRouteMatch?.[1];
 
   const handleSignOut = async () => {

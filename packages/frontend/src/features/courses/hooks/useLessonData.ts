@@ -17,17 +17,27 @@ import type { SupportedLanguage } from '@/types';
 
 interface UseLessonDataOptions {
   lessonId: string | undefined;
-  chapterId: string | undefined;
-  lang: string | undefined;
 }
 
-export function useLessonData({ lessonId, chapterId, lang }: UseLessonDataOptions) {
+function resolveLanguageId(lessonId: string | undefined, contentLanguage: string | undefined): SupportedLanguage | undefined {
+  if (contentLanguage) return contentLanguage as SupportedLanguage;
+  if (!lessonId) return undefined;
+  if (lessonId.startsWith('py-practical-')) return 'python-practical';
+  if (lessonId.startsWith('py-')) return 'python';
+  if (lessonId.startsWith('js-')) return 'javascript';
+  if (lessonId.startsWith('java-')) return 'java';
+  if (lessonId.startsWith('cpp-')) return 'cpp';
+  if (lessonId.startsWith('c-')) return 'c';
+  return undefined;
+}
+
+export function useLessonData({ lessonId }: UseLessonDataOptions) {
   // 선택적 구독: setPageTitle만 구독하여 불필요한 리렌더링 방지
   const setPageTitle = useStore((state) => state.setPageTitle);
   const queryClient = useQueryClient();
   const locale = i18n.resolvedLanguage || i18n.language;
   const { data: lesson, isLoading, isError, error } = useLesson(lessonId);
-  const { data: chapterData } = useChapter(chapterId);
+  const { data: chapterData } = useChapter(lesson?.chapterId);
 
   // 다음 레슨 ID 계산
   const nextLessonId = useMemo(() => {
@@ -53,12 +63,13 @@ export function useLessonData({ lessonId, chapterId, lang }: UseLessonDataOption
   // 페이지 타이틀 관리
   useEffect(() => {
     if (lesson) {
-      setPageTitle(lesson.title, lesson.description, lang as SupportedLanguage);
+      const languageId = resolveLanguageId(lessonId, lesson.content?.language);
+      setPageTitle(lesson.title, lesson.description, languageId);
     }
     return () => {
       setPageTitle('', '');
     };
-  }, [lesson, setPageTitle, lang]);
+  }, [lesson, setPageTitle, lessonId]);
 
   return {
     lesson,

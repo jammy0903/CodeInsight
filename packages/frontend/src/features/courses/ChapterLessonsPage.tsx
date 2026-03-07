@@ -311,7 +311,7 @@ export function ChapterLessonsPage() {
             return (
               <div key={lesson.id}>
                 <button
-                  onClick={() => navigate(`/courses/${lang}/${chapterId}/${lesson.id}`)}
+                  onClick={() => navigate(`/courses/${lesson.id}`)}
                   onTouchStart={() => handlePrefetch(lesson.id)}
                   className="w-full p-4 text-left transition-colors hover:bg-[var(--theme-layout-top-bar-button-hover)]"
                 >
@@ -344,7 +344,6 @@ export function ChapterLessonsPage() {
               lesson={lesson}
               progress={getLessonProgress(lesson as LessonWithProgress)}
               languageId={lang || 'c'}
-              chapterId={chapter.id}
               onPrefetch={handlePrefetch}
             />
           ))}

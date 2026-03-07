@@ -32,9 +32,14 @@ function getChapterProgress(chapter: ChapterWithLessons): ChapterProgressSnapsho
   return { total, completed, percentage };
 }
 
-export function LanguageCoursePage() {
+interface LanguageCoursePageProps {
+  langOverride?: string;
+}
+
+export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {}) {
   const { t } = useTranslation();
-  const { lang } = useParams<{ lang: string }>();
+  const { lang: routeLang } = useParams<{ lang: string }>();
+  const lang = langOverride ?? routeLang;
   const navigate = useNavigate();
   const setPageTitle = useStore((s) => s.setPageTitle);
   const appUser = useStore((s) => s.appUser);
