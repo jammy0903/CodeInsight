@@ -174,7 +174,7 @@
       },
       {
         "title": "긴 문자열 동일성 검사",
-        "explanation": "**`print(f\"x is y: {x is y}\")`** -- `x`와 `y`가 같은 객체인지 확인합니다. 이 예제에서는 **False**입니다.\n\n`x`(0x2000)와 `y`(0x2001)는 **내용은 같지만 다른 객체**이므로, `is` 연산의 결과는 `False`입니다.",
+        "explanation": "**`print(f\"x is y: {x is y}\")`** -- `x`와 `y`가 같은 객체인지 확인합니다. 이 실행 예시에서는 **False**가 관찰되었습니다.\n\n`x`와 `y`는 내용이 같아도 객체 동일성(`is`) 결과는 인터프리터/최적화에 따라 달라질 수 있습니다. 이 스크립트에서는 `False`로 표현됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"x is y: {x is y}\")",
         "pythonMemoryState": {
@@ -344,7 +344,7 @@
       },
       {
         "title": "생성 방식이 다른 문자열 비교",
-        "explanation": "**`print(f\"s1 is s2: {s1 is s2}\")`** -- `+`로 만든 `s1`과 리터럴 `s2`가 같은 객체인지 확인합니다. **False**입니다.\n\n생성 방식이 다른 `s1`(0x3000, 런타임 동적 생성)과 `s2`(0x2001, 컴파일 타임 리터럴)는 내용은 같지만 **다른 객체**이므로 `False`입니다.\n\n**전체 비교 결과 요약:**\n- `a is b` → **True** (짧은 리터럴, interning됨)\n- `x is y` → **False** (공백 있는 문자열, interning 미보장)\n- `s1 is s2` → **False** (동적 생성 vs 리터럴, 다른 객체)\n- `a == b`, `x == y`, `s1 == s2` → **모두 True** (내용이 같으므로)\n\n**비유:** 내용이 같은 편지를 비교할 때, 같은 종이인지(`is`) 물어보지 말고, 내용이 같은지(`==`) 물어보세요!",
+        "explanation": "**`print(f\"s1 is s2: {s1 is s2}\")`** -- `+`로 만든 `s1`과 리터럴 `s2`가 같은 객체인지 확인합니다. **이 실행에서는 False로 표시됩니다.**\n\n생성 방식이 다르면 `is` 결과가 달라질 수 있습니다. 이 예시 스냅샷에서는 `s1 is s2`가 `False`로 표현됩니다.\n\n**전체 비교 결과 요약:**\n- `a is b` → **True** (짧은 리터럴, interning됨)\n- `x is y` → **환경에 따라 True/False** (공백 있는 문자열, interning 미보장)\n- `s1 is s2` → **환경/최적화에 따라 달라질 수 있음**\n- `a == b`, `x == y`, `s1 == s2` → **모두 True** (내용이 같으므로)\n\n**비유:** 내용이 같은 편지를 비교할 때, 같은 종이인지(`is`) 물어보지 말고, 내용이 같은지(`==`) 물어보세요!",
         "visualizationType": "pythonMemory",
         "code": "print(f\"s1 is s2: {s1 is s2}\")",
         "pythonMemoryState": {

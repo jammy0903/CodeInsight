@@ -26,12 +26,20 @@ export const VIZ_DATA_FIELDS = [
   'algorithmState', 'stdout', 'output', 'conceptVisualizationType', 'conceptState',
 ] as const;
 
+/**
+ * 실제 렌더링 가능한 시각화 payload가 있는지 판단
+ * NOTE: navigation round 분기와 달리, visualizationType 문자열만으로는 true 처리하지 않음
+ */
+export function hasVisualizationPayload(step: LessonStep): boolean {
+  const stepRecord = step as UnknownRecord;
+  return VIZ_DATA_FIELDS.some((field) => hasMeaningfulValue(stepRecord[field]));
+}
+
 export function hasVisualizationData(step: LessonStep): boolean {
   if (typeof step.visualizationType === 'string' && step.visualizationType.trim().length > 0) {
     return true;
   }
-  const stepRecord = step as UnknownRecord;
-  return VIZ_DATA_FIELDS.some((field) => hasMeaningfulValue(stepRecord[field]));
+  return hasVisualizationPayload(step);
 }
 
 /**

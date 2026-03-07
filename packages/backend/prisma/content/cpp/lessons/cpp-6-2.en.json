@@ -6,8 +6,8 @@
     "code": "#include <iostream>\n#include <string>\n#include <utility>\nusing namespace std;\n\nint main() {\n    string src = \"Hello, World!\";\n    cout << \"before: \" << src << endl;\n\n    string dst = std::move(src);\n    cout << \"dst: \" << dst << endl;\n    cout << \"src: [\" << src << \"]\" << endl;\n    return 0;\n}",
     "steps": [
       {
-        "title": "Create original string",
-        "explanation": "`src` adds \"Hello, World!\" to the heap. Allocates character data.",
+        "title": "Create source string",
+        "explanation": "`src` is initialized with \"Hello, World!\" and manages the underlying character storage.",
         "visualizationType": "cMemory",
         "code": "string src = \"Hello, World!\";",
         "stack": [
@@ -22,7 +22,7 @@
         "stdout": "before: Hello, World!"
       },
       {
-        "title": "Transfer ownership with std::move",
+        "title": "Move ownership with std::move",
         "explanation": "`std::move(src)` casts `src` to an rvalue.\n\nThe move constructor of `dst` is called to get the internal pointer of `src` **without copying**.\n\nAfterwards, `src` will be in a valid but empty state (moved-from state).",
         "visualizationType": "cMemory",
         "code": "string dst = std::move(src);",
@@ -45,7 +45,7 @@
       },
       {
         "title": "Check results",
-        "explanation": "`dst` originally contains data from `src`, and `src` is an empty string.\n\n**Key**: Removed heap allocation/copy costs by moving instead of copying.",
+        "explanation": "`dst` now owns the data that was originally in `src`, and `src` is an empty string.\n\n**Key**: Moving avoids heap allocation/copy overhead compared to copying.",
         "visualizationType": "terminal",
         "code": "cout << \"dst: \" << dst << endl;",
         "stdout": "dst: Hello, World!\nsrc: []"

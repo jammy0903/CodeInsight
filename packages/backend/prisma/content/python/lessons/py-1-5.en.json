@@ -30,6 +30,29 @@
         }
       },
       {
+        "title": "Calling the Function",
+        "explanation": "**`result = greet(\"Python\")`** -- **Calls** the defined function `greet`.\n\nAdding parentheses `()` after the function name executes the function. `\"Python\"` inside the parentheses is the **argument**, which is passed to the function's parameter `name`.\n\n**Following the execution flow in detail:**\n1. `greet(\"Python\")` is called -> `\"Python\"` is assigned to parameter `name`\n2. Function body line 2 executes: `message = f\"Hello, Python!\"`\n3. `return message` executes: returns `\"Hello, Python!\"` and function ends\n4. The return value `\"Hello, Python!\"` is assigned to `result`\n\n**Terminology distinction:**\n- **Parameter:** The variable name used in the function definition (`name`)\n- **Argument:** The actual value passed when calling the function (`\"Python\"`)\n\n**Analogy:** It's like inserting a coin (argument) into a vending machine (function) and getting a drink (return value). When designing the machine, you create a 'coin slot' (parameter), and when using it, you insert an actual coin (argument).\n\n**How Python works internally:** When a function is called, Python pushes a new **frame** onto the call stack. Local variables are stored in this frame. When `return` executes, the frame is popped and local variables are cleaned up.",
+        "visualizationType": "pythonMemory",
+        "code": "result = greet(\"Python\")",
+        "pythonMemoryState": {
+          "note": "Line 5 executed",
+          "names": [
+            {
+              "name": "name",
+              "pointsTo": "str1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "1001"
+            }
+          ]
+        }
+      },
+      {
         "title": "Function Body",
         "explanation": "**`message = f\"Hello, {name}!\"`** -- Function body: creates a greeting string using an f-string.\n\nThis code is executed **when** `greet()` is called. At this point where only `def` has been executed, it has not run yet.\n\n**f-string syntax:** In `f\"Hello, {name}!\"`, the variable inside curly braces `{name}` is replaced with its actual value. When `greet(\"Python\")` is called later, `name` becomes `\"Python\"`, producing `\"Hello, Python!\"`.\n\n**Local variable:** `message` is a local variable that only exists inside the function. Trying to use `message` outside the function raises a `NameError`.\n\n**Analogy:** It's like writing the first step in the recipe's 'cooking instructions.' This step is performed when you actually cook (call the function). It's an instruction that says 'take the ingredient (name) and make the dough (message).'\n\n**How Python works internally:** When the function is called, a new **local namespace** is created. `name` and `message` are registered in this local namespace. When the function ends, this namespace is destroyed along with all local variables.",
         "visualizationType": "pythonMemory",
@@ -91,29 +114,6 @@
               "type": "str",
               "value": "\"Hello, Python!\"",
               "pyId": "1002"
-            }
-          ]
-        }
-      },
-      {
-        "title": "Calling the Function",
-        "explanation": "**`result = greet(\"Python\")`** -- **Calls** the defined function `greet`.\n\nAdding parentheses `()` after the function name executes the function. `\"Python\"` inside the parentheses is the **argument**, which is passed to the function's parameter `name`.\n\n**Following the execution flow in detail:**\n1. `greet(\"Python\")` is called -> `\"Python\"` is assigned to parameter `name`\n2. Function body line 2 executes: `message = f\"Hello, Python!\"`\n3. `return message` executes: returns `\"Hello, Python!\"` and function ends\n4. The return value `\"Hello, Python!\"` is assigned to `result`\n\n**Terminology distinction:**\n- **Parameter:** The variable name used in the function definition (`name`)\n- **Argument:** The actual value passed when calling the function (`\"Python\"`)\n\n**Analogy:** It's like inserting a coin (argument) into a vending machine (function) and getting a drink (return value). When designing the machine, you create a 'coin slot' (parameter), and when using it, you insert an actual coin (argument).\n\n**How Python works internally:** When a function is called, Python pushes a new **frame** onto the call stack. Local variables are stored in this frame. When `return` executes, the frame is popped and local variables are cleaned up.",
-        "visualizationType": "pythonMemory",
-        "code": "result = greet(\"Python\")",
-        "pythonMemoryState": {
-          "note": "Line 5 executed",
-          "names": [
-            {
-              "name": "name",
-              "pointsTo": "str1"
-            }
-          ],
-          "objects": [
-            {
-              "id": "str1",
-              "type": "str",
-              "value": "\"Python\"",
-              "pyId": "1001"
             }
           ]
         }

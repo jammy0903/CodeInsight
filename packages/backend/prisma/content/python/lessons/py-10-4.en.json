@@ -93,6 +93,30 @@
         }
       },
       {
+        "title": "Running the Event Loop",
+        "explanation": "**`asyncio.run(main())`** -- Creates an event loop and runs the `main` coroutine.\n\nThis line is the **start point** and **end point** of the entire program. When `asyncio.run()` is called:\n1. A new event loop is created\n2. The `main()` coroutine runs in the event loop\n3. Inside main(), gather() runs 3 tasks concurrently\n4. When all tasks complete, main() returns\n5. The event loop is cleaned up and closed\n\nTracing the code execution order: the Python interpreter proceeds top to bottom, encountering import -> function definition -> function definition -> `asyncio.run()`. Function definitions only create function objects without executing them. All logic actually runs when `asyncio.run(main())` is reached.\n\nThink of it as preparing all the recipes (function definitions) and then finally pressing the \"open for business!\" (asyncio.run) button. From that moment, the kitchen starts running and all orders are processed.\n\n**Full lesson summary**: asyncio.gather() is the **most common and powerful pattern** for running multiple async tasks concurrently and collecting results in order. For I/O-heavy programs, it provides dramatic performance improvements compared to sequential execution.\n\n**Next steps**: In real projects, gather is used with asyncio-compatible libraries like `aiohttp` (HTTP client), `asyncpg` (PostgreSQL), and `aiofiles` (file I/O).",
+        "visualizationType": "pythonMemory",
+        "code": "asyncio.run(main())",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "Program entry.",
+          "names": [
+            {
+              "name": "time",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 3.0012,
+              "pyId": "1008"
+            }
+          ]
+        }
+      },
+      {
         "title": "Concurrent Execution and Result Collection (gather)",
         "explanation": "**`results = await asyncio.gather(fetch_data(1, 2), fetch_data(2, 1), fetch_data(3, 3))`** -- **Runs 3 coroutines concurrently** and **collects all results into a list**.\n\nLet's trace gather()'s operation step by step:\n1. `fetch_data(1, 2)` is called -> coroutine object created (not yet running)\n2. `fetch_data(2, 1)` is called -> coroutine object created\n3. `fetch_data(3, 3)` is called -> coroutine object created\n4. `gather()` wraps the three coroutines into Tasks and registers them with the event loop\n5. `await` is hit, main() is paused -> all three Tasks start running concurrently\n\n**Two key features of gather()**:\n- **Concurrent execution**: Schedules all passed coroutines at once\n- **Result order guaranteed**: Returns the result list in the order coroutines were passed. Even if task_2 finishes first, results[0] is the result of fetch_data(1,2)\n\nThink of a restaurant cooking orders for 3 tables simultaneously, but placing the finished dishes **in table number order** on the tray. Even if table 2's dish finishes first, table 1's dish goes in position 1.\n\n**Note**: If you pass a non-coroutine regular value to gather, that value is included as-is in the results.",
         "visualizationType": "pythonMemory",
@@ -241,30 +265,6 @@
             "Total time: 3.0012s"
           ],
           "note": "Total: 3 seconds.",
-          "names": [
-            {
-              "name": "time",
-              "pointsTo": "float1"
-            }
-          ],
-          "objects": [
-            {
-              "id": "float1",
-              "type": "float",
-              "value": 3.0012,
-              "pyId": "1008"
-            }
-          ]
-        }
-      },
-      {
-        "title": "Running the Event Loop",
-        "explanation": "**`asyncio.run(main())`** -- Creates an event loop and runs the `main` coroutine.\n\nThis line is the **start point** and **end point** of the entire program. When `asyncio.run()` is called:\n1. A new event loop is created\n2. The `main()` coroutine runs in the event loop\n3. Inside main(), gather() runs 3 tasks concurrently\n4. When all tasks complete, main() returns\n5. The event loop is cleaned up and closed\n\nTracing the code execution order: the Python interpreter proceeds top to bottom, encountering import -> function definition -> function definition -> `asyncio.run()`. Function definitions only create function objects without executing them. All logic actually runs when `asyncio.run(main())` is reached.\n\nThink of it as preparing all the recipes (function definitions) and then finally pressing the \"open for business!\" (asyncio.run) button. From that moment, the kitchen starts running and all orders are processed.\n\n**Full lesson summary**: asyncio.gather() is the **most common and powerful pattern** for running multiple async tasks concurrently and collecting results in order. For I/O-heavy programs, it provides dramatic performance improvements compared to sequential execution.\n\n**Next steps**: In real projects, gather is used with asyncio-compatible libraries like `aiohttp` (HTTP client), `asyncpg` (PostgreSQL), and `aiofiles` (file I/O).",
-        "visualizationType": "pythonMemory",
-        "code": "asyncio.run(main())",
-        "pythonMemoryState": {
-          "output": [],
-          "note": "Program entry.",
           "names": [
             {
               "name": "time",

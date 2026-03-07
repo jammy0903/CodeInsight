@@ -6,8 +6,8 @@
     "code": "#include <iostream>\n#include <string>\n#include <utility>\nusing namespace std;\n\nint main() {\n    string src = \"Hello, World!\";\n    cout << \"before: \" << src << endl;\n\n    string dst = std::move(src);\n    cout << \"dst: \" << dst << endl;\n    cout << \"src: [\" << src << \"]\" << endl;\n    return 0;\n}",
     "steps": [
       {
-        "title": "创建原始字符串",
-        "explanation": "`src` 添加了“你好，世界！”到堆。分配字符数据。",
+        "title": "创建源字符串",
+        "explanation": "`src` 持有字符串 \"Hello, World!\"，并管理对应的字符存储。",
         "visualizationType": "cMemory",
         "code": "string src = \"Hello, World!\";",
         "stack": [
@@ -23,7 +23,7 @@
       },
       {
         "title": "使用 std::move 转移所有权",
-        "explanation": "`std::move(src)` 将 `src` 转换为右值。\n\n调用“dst”的移动构造函数来获取“src”的内部指针**而不进行复制**。\n\n之后，`src` 将处于有效但空的状态（移出状态）。",
+        "explanation": "`std::move(src)` 将 `src` 转换为右值。\n\n`dst` 的移动构造函数会接管 `src` 的内部资源，**无需复制**。\n\n之后，`src` 处于有效但通常为空的状态（moved-from state）。",
         "visualizationType": "cMemory",
         "code": "string dst = std::move(src);",
         "stack": [
@@ -45,7 +45,7 @@
       },
       {
         "title": "检查结果",
-        "explanation": "`dst` 最初包含来自 `src` 的数据，而 `src` 是一个空字符串。\n\n**关键**：通过移动而不是复制来消除堆分配/复制成本。",
+        "explanation": "`dst` 现在拥有原本在 `src` 中的数据，而 `src` 为空字符串。\n\n**关键**：使用移动而非复制，可减少堆分配与复制开销。",
         "visualizationType": "terminal",
         "code": "cout << \"dst: \" << dst << endl;",
         "stdout": "dst: Hello, World!\nsrc: []"

@@ -26,9 +26,10 @@
         "code": "int main() {",
         "stack": [
           {
-            "frame": "main",
             "name": "main",
-            "value": "main"
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
           }
         ]
       },
@@ -38,9 +39,10 @@
         "code": "int x = 3;",
         "stack": [
           {
-            "frame": "main",
             "name": "main",
-            "value": "main"
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
           },
           {
             "name": "x",
@@ -57,9 +59,10 @@
         "code": "int y = 7;",
         "stack": [
           {
-            "frame": "main",
             "name": "main",
-            "value": "main"
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
           },
           {
             "name": "x",
@@ -82,26 +85,30 @@
         "code": "int sum = add(x, y);",
         "stack": [
           {
-            "frame": "main",
             "name": "main",
-            "value": "main"
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
           },
           {
             "name": "x",
             "type": "int",
             "value": "3",
-            "address": "0x1008"
+            "address": "0x1008",
+            "frame": "main"
           },
           {
             "name": "y",
             "type": "int",
             "value": "7",
-            "address": "0x1004"
+            "address": "0x1004",
+            "frame": "main"
           },
           {
-            "frame": "add",
             "name": "add",
-            "value": "add",
+            "type": "frame",
+            "func": "add",
+            "value": "frame",
             "highlight": true
           },
           {
@@ -109,14 +116,16 @@
             "type": "int",
             "value": "3",
             "highlight": true,
-            "address": "0x0ff8"
+            "address": "0x0ff8",
+            "frame": "add"
           },
           {
             "name": "b",
             "type": "int",
             "value": "7",
             "highlight": true,
-            "address": "0x0ff4"
+            "address": "0x0ff4",
+            "frame": "add"
           }
         ]
       },
@@ -126,45 +135,52 @@
         "code": "int result = a + b;",
         "stack": [
           {
-            "frame": "main",
             "name": "main",
-            "value": "main"
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
           },
           {
             "name": "x",
             "type": "int",
             "value": "3",
-            "address": "0x1008"
+            "address": "0x1008",
+            "frame": "main"
           },
           {
             "name": "y",
             "type": "int",
             "value": "7",
-            "address": "0x1004"
+            "address": "0x1004",
+            "frame": "main"
           },
           {
-            "frame": "add",
             "name": "add",
-            "value": "add"
+            "type": "frame",
+            "func": "add",
+            "value": "frame"
           },
           {
             "name": "a",
             "type": "int",
             "value": "3",
-            "address": "0x0ff8"
+            "address": "0x0ff8",
+            "frame": "add"
           },
           {
             "name": "b",
             "type": "int",
             "value": "7",
-            "address": "0x0ff4"
+            "address": "0x0ff4",
+            "frame": "add"
           },
           {
             "name": "result",
             "type": "int",
             "value": "10",
             "highlight": true,
-            "address": "0x0ff0"
+            "address": "0x0ff0",
+            "frame": "add"
           }
         ]
       },
@@ -174,9 +190,10 @@
         "code": "return result;",
         "stack": [
           {
-            "frame": "main",
             "name": "main",
-            "value": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame",
             "highlight": true
           },
           {
@@ -199,9 +216,10 @@
         "code": "int sum = add(x, y);",
         "stack": [
           {
-            "frame": "main",
             "name": "main",
-            "value": "main"
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
           },
           {
             "name": "x",
@@ -234,7 +252,8 @@
         "title": "程序退出",
         "explanation": "Main 以“return 0;”结束，局部变量被清理。\n\n函数调用的核心流程是传递值的副本 -> 计算 -> 返回结果。",
         "code": "return 0;",
-        "stack": []
+        "stack": [],
+        "visualizationType": "cMemory"
       }
     ],
     "deltaFormat": true

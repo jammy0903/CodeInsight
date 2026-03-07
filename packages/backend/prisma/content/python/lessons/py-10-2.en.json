@@ -200,7 +200,7 @@
         "title": "Waiting for Process Completion (join)",
         "explanation": "**`p1.join()` / `p2.join()`**\n\n**The main process waits for both child processes to complete.** Same concept as `join()` in `threading`.\n\n**Difference from thread `join()`:**\n- Thread `join()`: Waits for another thread within the same process\n- Process `join()`: Waits for another process (different PID) to terminate\n\n**Analogy**: The headquarters (main process) is waiting for the two branch offices (child processes) to report task completion.\n\n**Under the hood**: The main process uses the `waitpid()` system call to detect child process termination. When a child process terminates, its resources are reclaimed along with the exit code.\n\n**Why this order?** Both processes must complete `countdown()` before we can measure the final elapsed time.\n\n**Note**: If you don't call `join()`, child processes can become 'zombie processes.' Always clean up with `join()`.",
         "visualizationType": "pythonMemory",
-        "code": "p2.start()",
+        "code": "p1.join()",
         "highlightOffset": [
           0,
           1
