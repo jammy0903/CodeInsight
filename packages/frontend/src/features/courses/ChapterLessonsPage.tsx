@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import i18n from 'i18next';
@@ -13,7 +13,7 @@ import type { SupportedLanguage } from '@/types/simulator';
 import { CourseGrid } from './components/CourseGrid';
 import { LessonCard } from './components/LessonCard';
 import { useStore } from '@/stores/store';
-import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle, Lock } from 'lucide-react';
+import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle } from 'lucide-react';
 import { useIsMobile, useChapter, useChapterProgress } from '@/hooks';
 import { getLessonFull } from '@/services/courses';
 
@@ -46,7 +46,6 @@ export function ChapterLessonsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const setPageTitle = useStore((s) => s.setPageTitle);
-  const appUser = useStore((s) => s.appUser);
   const langColor = getLanguageColor(lang);
   const isMobile = useIsMobile();
   const locale = i18n.resolvedLanguage || i18n.language;
@@ -54,10 +53,6 @@ export function ChapterLessonsPage() {
   // TanStack Query: 챕터 단건 + 진행 상태 단건(로그인 시)
   const { data: chapter, isLoading, isError, error } = useChapter(chapterId);
   const { data: chapterProgressData } = useChapterProgress(chapterId);
-
-  // 구독 시스템 제거됨 - 챕터 2 이상은 로그인만 필요
-  const accessDenied = !!chapter && !appUser && chapter.order >= 2;
-  const accessReason = accessDenied ? t('chapter.login_required_for_chapter') : '';
 
   const progressByLessonId = useMemo(() => {
     const map = new Map<string, LessonProgressSnapshot | null>();
@@ -75,7 +70,7 @@ export function ChapterLessonsPage() {
   // - 첫 미완료 레슨 1개만 예열
   // WHY: 이전에는 레슨 전체를 순차 프리페치해서 이동 시 체감 지연을 유발함
   useEffect(() => {
-    if (!chapter?.lessons || chapter.lessons.length === 0 || accessDenied) return;
+    if (!chapter?.lessons || chapter.lessons.length === 0) return;
 
     const lessons = [...chapter.lessons].sort((a, b) => a.order - b.order);
     const firstIncomplete = lessons.find((l) => getLessonProgress(l as LessonWithProgress)?.status !== 'completed');
@@ -87,7 +82,7 @@ export function ChapterLessonsPage() {
       queryFn: () => getLessonFull(targetLessonId),
       staleTime: 5 * 60 * 1000,
     });
-  }, [chapter, queryClient, accessDenied, getLessonProgress, locale]);
+  }, [chapter, queryClient, getLessonProgress, locale]);
 
   // hover 시 해당 레슨 프리페치
   const handlePrefetch = useCallback((lessonId: string) => {
@@ -134,53 +129,6 @@ export function ChapterLessonsPage() {
           >
             {t('chapter.back_to_chapters')}
           </button>
-        </div>
-      </div>
-    );
-  }
-
-  // 구독 필요 (접근 거부)
-  if (accessDenied && chapter) {
-    return (
-      <div className="min-h-screen py-4 px-3 md:px-12 lg:px-16">
-        {/* 뒤로가기 버튼 */}
-        <button
-          onClick={() => navigate(`/courses/${lang}`)}
-          className="group flex items-center gap-2 text-[var(--theme-dashboard-text-muted)] hover:text-[#FFD700] transition-colors mb-6"
-        >
-          <ChevronLeft className="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-2xl font-semibold tracking-wider uppercase">{t('chapter.back_to_chapters')}</span>
-        </button>
-
-        {/* 잠금 안내 */}
-        <div className="flex flex-col items-center justify-center py-20">
-          <div
-            className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
-            style={{ backgroundColor: `${langColor}30` }}
-          >
-            <Lock className="w-12 h-12" style={{ color: langColor }} />
-          </div>
-          <h2 className="text-2xl font-bold text-[var(--theme-dashboard-title)] mb-3">
-            {chapter.title}
-          </h2>
-          <p className="text-[var(--theme-dashboard-text-muted)] mb-6 text-center max-w-md">
-            {accessReason}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link
-              to="/"
-              className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow flex items-center gap-2"
-            >
-              {t('auth.login')}
-            </Link>
-            <button
-              onClick={() => navigate(`/courses/${lang}`)}
-              className="px-6 py-3 border border-[var(--theme-dashboard-card-border)] rounded-xl font-semibold hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors"
-              style={{ color: 'var(--theme-dashboard-text)' }}
-            >
-              {t('chapter.view_other_chapters')}
-            </button>
-          </div>
         </div>
       </div>
     );
