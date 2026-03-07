@@ -126,14 +126,10 @@ export interface ChapterQuery {
 
 /**
  * URL-safe 레슨 경로 생성
- * @example getLessonPath('c', 'ch-uuid', 'lesson-uuid') => '/courses/c/ch-uuid/lesson-uuid'
+ * @example getLessonPath('c-1-1') => '/courses/c-1-1'
  */
-export function getLessonPath(
-  languageId: string,
-  chapterId: string,
-  lessonId: string
-): string {
-  return `/courses/${languageId}/${chapterId}/${lessonId}`;
+export function getLessonPath(lessonId: string): string {
+  return `/courses/${lessonId}`;
 }
 
 /**

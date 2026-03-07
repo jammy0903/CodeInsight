@@ -4,11 +4,11 @@
  * 역할: 데이터 패칭 + 시뮬레이션 + 위상 관리 (학습/퀴즈/완료)
  * 레이아웃은 LessonUnifiedView에 위임 (데스크톱/모바일 자동 전환)
  *
- * Route: /courses/:lang/:chapterId/:lessonId
+ * Route: /courses/:lessonId
  */
 
 import React, { useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Navigate, useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
@@ -54,13 +54,27 @@ function NotFoundView({ message, backPath }: { message: string; backPath: string
 
 // --- 메인 컴포넌트 ---
 
+const LANGUAGE_IDS = new Set(['c', 'cpp', 'java', 'python', 'javascript', 'python-practical']);
+
+function resolveLanguageId(lessonId: string | undefined, contentLanguage: string | undefined): string | undefined {
+  if (contentLanguage) return contentLanguage;
+  if (!lessonId) return undefined;
+  if (lessonId.startsWith('py-practical-')) return 'python-practical';
+  if (lessonId.startsWith('py-')) return 'python';
+  if (lessonId.startsWith('js-')) return 'javascript';
+  if (lessonId.startsWith('java-')) return 'java';
+  if (lessonId.startsWith('cpp-')) return 'cpp';
+  if (lessonId.startsWith('c-')) return 'c';
+  return undefined;
+}
+
 export function LessonPage() {
   const { t } = useTranslation();
-  const { lang, chapterId, lessonId } = useParams<{
-    lang: string;
-    chapterId: string;
-    lessonId: string;
-  }>();
+  const { lessonId } = useParams<{ lessonId: string }>();
+
+  if (lessonId && LANGUAGE_IDS.has(lessonId)) {
+    return <Navigate to={`/courses/${lessonId}`} replace />;
+  }
 
   const queryClient = useQueryClient();
   const appUser = useStore((s) => s.appUser);
@@ -68,11 +82,9 @@ export function LessonPage() {
   const [resetCount, setResetCount] = React.useState(0);
 
   // 1. 데이터 패칭
-  const { lesson, isLoading, isError, error, nextLessonId, quiz } = useLessonData({
-    lessonId,
-    chapterId,
-    lang,
-  });
+  const { lesson, isLoading, isError, error, nextLessonId, quiz } = useLessonData({ lessonId });
+
+  const lang = resolveLanguageId(lessonId, lesson?.content?.language);
 
   // 2. 시뮬레이션
   const { steps, code, simulating } = useLessonSimulation({ lesson, lang, lessonId });
@@ -114,9 +126,8 @@ export function LessonPage() {
   const { setSelection } = useCodeSelection();
 
   // --- 파생 데이터 ---
-  const languageCoursePath = `/courses/${lang}`;
-  const nextLessonPath =
-    nextLessonId && lesson ? `/courses/${lang}/${lesson.chapterId}/${nextLessonId}` : null;
+  const languageCoursePath = lang ? `/courses/${lang}` : '/courses';
+  const nextLessonPath = nextLessonId ? `/courses/${nextLessonId}` : null;
 
   const handleQuizComplete = (isCorrect: boolean) => {
     if (isCorrect) {

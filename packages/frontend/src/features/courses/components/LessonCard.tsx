@@ -81,16 +81,15 @@ interface LessonCardProps {
   lesson: Lesson;
   progress?: Pick<UserProgress, 'status'> | null;
   languageId: string;
-  chapterId: string;
   onPrefetch?: (lessonId: string) => void;
 }
 
-export function LessonCard({ lesson, progress, languageId, chapterId, onPrefetch }: LessonCardProps) {
+export function LessonCard({ lesson, progress, languageId, onPrefetch }: LessonCardProps) {
   const navigate = useNavigate();
   const theme = LANGUAGE_THEMES[languageId] || DEFAULT_THEME;
 
   const handleClick = () => {
-    navigate(`/courses/${languageId}/${chapterId}/${lesson.id}`);
+    navigate(`/courses/${lesson.id}`);
   };
 
   // 난이도 정보
