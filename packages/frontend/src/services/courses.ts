@@ -190,7 +190,11 @@ export async function getLessonFull(lessonId: string): Promise<LessonFull> {
     const parsed = LessonFullSchema.safeParse(data);
     if (!parsed.success) {
       logger.error('Invalid API response:', parsed.error);
-      throw new Error('Invalid lesson data from server');
+      const firstIssue = parsed.error.issues[0];
+      const detail = firstIssue
+        ? `${firstIssue.path.join('.')} (${firstIssue.message})`
+        : 'unknown schema mismatch';
+      throw new Error(`Invalid lesson data from server: ${detail}`);
     }
 
     return parsed.data;

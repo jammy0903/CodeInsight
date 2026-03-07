@@ -3,7 +3,7 @@ import type { LessonStep, StepMemoryState, StackFrame, Variable, HeapObject } fr
 import { processMemoryChanges } from '../utils/memoryUtils';
 import type { MemoryBlock } from '@/types/memory';
 import { extractCFrames, normalizeCValue, isStructValue, isCharArrayValue } from '../components/memory/utils/memoryHelpers';
-import { hasMeaningfulValue, hasVisualizationData, VIZ_DATA_FIELDS } from '../utils/visualizationData';
+import { hasMeaningfulValue, hasVisualizationPayload, VIZ_DATA_FIELDS } from '../utils/visualizationData';
 
 // JavaScript visualization types (inlined from legacy - kept for backwards compatibility)
 type JSVisualizationType = 'memory' | 'callStack' | 'scopeChain' | 'eventLoop' | 'closure' | 'prototype' | 'thisBind' | 'hoisting' | 'promise';
@@ -78,7 +78,7 @@ function adaptMemoryState(memoryState: StepMemoryState): { stack: MemoryBlock[],
 // 이전 스텝에서 시각화 데이터 상속 (캐리포워드)
 function resolveStepWithInheritance(steps: LessonStep[], currentIndex: number): LessonStep {
   const currentStep = steps[currentIndex];
-  if (!currentStep || hasVisualizationData(currentStep)) return currentStep;
+  if (!currentStep || hasVisualizationPayload(currentStep)) return currentStep;
 
   const currentVizType = currentStep.visualizationType || 'memory';
   const currentStepRecord = currentStep as UnknownRecord;
@@ -87,7 +87,7 @@ function resolveStepWithInheritance(steps: LessonStep[], currentIndex: number): 
   for (let i = currentIndex - 1; i >= 0; i--) {
     const prevStep = steps[i];
     const prevVizType = prevStep.visualizationType || 'memory';
-    if (prevVizType === currentVizType && hasVisualizationData(prevStep)) {
+    if (prevVizType === currentVizType && hasVisualizationPayload(prevStep)) {
       const prevStepRecord = prevStep as UnknownRecord;
       const vizFields: Record<string, unknown> = {};
       for (const field of VIZ_DATA_FIELDS) {

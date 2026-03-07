@@ -35,10 +35,17 @@
         "code": "int a = 10;",
         "stack": [
           {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
             "name": "a",
             "value": "10",
             "type": "int",
-            "address": "0x1000"
+            "address": "0x1000",
+            "frame": "main"
           }
         ]
       },
@@ -54,17 +61,26 @@
         "explanation": "`reallyChange(&a);`에서 `&a` 주소가 전달되어 `p`가 `a`를 가리키게 됩니다.\n\nC는 여전히 값 복사이지만, 복사 대상이 주소값이어서 원본 수정이 가능해집니다.",
         "visualizationType": "cMemory",
         "code": "reallyChange(&a);",
-        "highlightOffset": [
-          0,
-          -9
-        ],
+        "highlightOffset": [0, -9],
         "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
           {
             "name": "a",
             "value": "10",
             "type": "int",
             "frame": "main",
             "address": "0x1000"
+          },
+          {
+            "name": "reallyChange",
+            "type": "frame",
+            "func": "reallyChange",
+            "value": "frame"
           },
           {
             "name": "p",
@@ -83,12 +99,24 @@
         "code": "*p = 999;",
         "stack": [
           {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
             "name": "a",
             "value": "999",
             "type": "int",
             "frame": "main",
             "address": "0x1000",
             "highlight": true
+          },
+          {
+            "name": "reallyChange",
+            "type": "frame",
+            "func": "reallyChange",
+            "value": "frame"
           },
           {
             "name": "p",
@@ -106,11 +134,23 @@
         "code": "printf(\"Inside func: Changed!\\n\");",
         "stack": [
           {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
+          {
             "name": "a",
             "value": "999",
             "type": "int",
             "frame": "main",
             "address": "0x1000"
+          },
+          {
+            "name": "reallyChange",
+            "type": "frame",
+            "func": "reallyChange",
+            "value": "frame"
           },
           {
             "name": "p",
@@ -128,6 +168,12 @@
         "visualizationType": "cMemory",
         "code": "printf(\"After:  %d\\n\", a);",
         "stack": [
+          {
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
+          },
           {
             "name": "a",
             "value": "999",

@@ -203,7 +203,7 @@
       },
       {
         "title": "Checking the Final Result",
-        "explanation": "**`print(f\"\\nFinal counter: {shared_counter}\")`**\n\n**We check the final counter value.** The result is **10** (each thread incremented 5 times).\n\n**What the GIL guarantees:**\n- Since only one thread executes at a time, the `shared_counter += 1` operation behaves nearly 'atomically'\n- Therefore, no race condition occurs in this example, and the result is exactly 10\n\n**The two faces of the GIL:**\n- **Advantage**: It guarantees memory safety. Python's reference-counting garbage collection works safely\n- **Disadvantage**: CPU-intensive tasks cannot leverage multiple cores. No matter how many threads you create, only one CPU is used\n\n**Analogy**: Since there's only one computer, the two employees took turns using it. The total work is accurate, but the time taken isn't much different from one person doing it alone.\n\n**Why this order?** This is the final step where we verify the result after all threads have terminated.\n\n**Note**: The GIL doesn't always guarantee safety! With more complex operations (e.g., `counter = counter + 1` split into multiple bytecodes), race conditions can still occur. For safe concurrency, use `Lock`.",
+        "explanation": "**`print(f\"\\nFinal counter: {shared_counter}\")`**\n\nWe check the final counter value. In this scripted run it is shown as 10, but this is not a correctness guarantee.\n\n**What GIL does and does not guarantee:**\n- It allows only one thread to execute Python bytecode at a moment\n- But `shared_counter += 1` is still a read-modify-write sequence, so race conditions are still possible without synchronization\n\nUse `Lock` to protect shared-state updates.\n\nFor CPU-bound parallelism, prefer multiprocessing over threading.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"\\nFinal counter: {shared_counter}\")",
         "pythonMemoryState": {
@@ -242,7 +242,7 @@
       "Thread A finishes completely before Thread B starts"
     ],
     "correctIndex": 1,
-    "explanation": "Because of the GIL (Global Interpreter Lock), only one thread can execute Python code at any given moment, even with multiple threads.\nSo the two threads execute alternately, and since the GIL ensures memory consistency, the final value is always 10."
+    "explanation": "With GIL, execution often alternates between threads. But shared-state correctness is not guaranteed by GIL alone; use `Lock` for reliable synchronization."
   },
   "misconceptions": [
     {

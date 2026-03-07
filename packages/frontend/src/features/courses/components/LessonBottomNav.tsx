@@ -1,8 +1,7 @@
 /**
- * LessonBottomNav - 하단 고정 스텝 네비게이션 바 (compact, 반투명)
+ * LessonBottomNav - 플로팅 스텝 네비게이션 버튼
  *
- * 화면 하단에 항상 고정. 반투명 배경 + blur.
- * 색상은 테마 CSS 변수 사용 (theme.css --theme-lesson-nav-*)
+ * 하단 바 없이 버튼만 화면 하단에 고정(fixed) 표시.
  */
 
 import { ChevronLeft, ChevronRight, Zap } from 'lucide-react';
@@ -31,42 +30,39 @@ export function LessonBottomNav({
     <div
       style={{
         position: 'fixed',
-        bottom: 0,
         left: 0,
         right: 0,
+        bottom: 'max(12px, env(safe-area-inset-bottom))',
         zIndex: 40,
-        padding: '6px 12px',
-        paddingBottom: 'max(10px, env(safe-area-inset-bottom))',
-        backgroundColor: 'color-mix(in srgb, var(--theme-lesson-nav-bg) 68%, transparent)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        borderTop: '1px solid var(--theme-lesson-nav-border)',
+        display: 'flex',
+        justifyContent: 'center',
+        pointerEvents: 'none',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', maxWidth: '720px', margin: '0 auto' }}>
-        {/* 이전 버튼 - 왼쪽 정렬, 터치 영역은 넓게 */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', pointerEvents: 'auto' }}>
         <button
           onClick={onPrev}
           disabled={!canGoPrev}
           style={{
-            flex: 1,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
             gap: '6px',
-            minHeight: '48px',
-            padding: '0 10px',
+            minHeight: '42px',
+            padding: '0 14px',
             borderRadius: '12px',
-            fontSize: '12px',
+            fontSize: '13px',
             fontWeight: 600,
-            border: 'none',
-            backgroundColor: 'transparent',
-            color: `var(${canGoPrev
-              ? '--theme-lesson-nav-prev-text'
-              : '--theme-lesson-nav-prev-disabled-text'})`,
+            border: canGoPrev
+              ? '1px solid var(--theme-lesson-nav-prev-border)'
+              : '1px solid var(--theme-lesson-nav-prev-disabled-border)',
+            backgroundColor: canGoPrev
+              ? 'var(--theme-lesson-nav-prev-bg)'
+              : 'var(--theme-lesson-nav-prev-disabled-bg)',
+            color: `var(${canGoPrev ? '--theme-lesson-nav-prev-text' : '--theme-lesson-nav-prev-disabled-text'})`,
             cursor: canGoPrev ? 'pointer' : 'not-allowed',
-            transition: 'color 0.15s ease, opacity 0.15s ease',
-            opacity: canGoPrev ? 0.95 : 0.45,
+            transition: 'all 0.15s ease',
+            opacity: canGoPrev ? 1 : 0.65,
             WebkitTapHighlightColor: 'transparent',
           }}
           aria-label={prevText}
@@ -75,7 +71,6 @@ export function LessonBottomNav({
           <span>{prevText}</span>
         </button>
 
-        {/* 퀴즈 버튼 - 중앙 미니멀 pill */}
         {onQuiz && (
           <button
             onClick={onQuiz}
@@ -87,7 +82,7 @@ export function LessonBottomNav({
               minHeight: '40px',
               padding: '0 12px',
               borderRadius: '999px',
-              fontSize: '11px',
+              fontSize: '12px',
               fontWeight: 700,
               border: '1px solid color-mix(in srgb, var(--theme-lesson-nav-next-bg) 36%, transparent)',
               backgroundColor: 'color-mix(in srgb, var(--theme-lesson-nav-next-bg) 8%, transparent)',
@@ -95,7 +90,6 @@ export function LessonBottomNav({
               cursor: 'pointer',
               transition: 'all 0.15s ease',
               whiteSpace: 'nowrap',
-              opacity: 0.88,
               WebkitTapHighlightColor: 'transparent',
             }}
             aria-label={quizText}
@@ -105,26 +99,24 @@ export function LessonBottomNav({
           </button>
         )}
 
-        {/* 다음 버튼 - 오른쪽 정렬, 터치 영역은 넓게 */}
         <button
           onClick={onNext}
           style={{
-            flex: 1,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'flex-end',
+            justifyContent: 'center',
             gap: '6px',
-            minHeight: '48px',
-            padding: '0 10px',
+            minHeight: '42px',
+            padding: '0 14px',
             borderRadius: '12px',
-            fontSize: '12px',
+            fontSize: '13px',
             fontWeight: 700,
-            border: 'none',
-            backgroundColor: 'transparent',
-            color: 'var(--theme-lesson-nav-prev-text)',
+            border: '1px solid var(--theme-lesson-nav-next-bg)',
+            backgroundColor: 'var(--theme-lesson-nav-next-bg)',
+            color: 'var(--theme-lesson-nav-next-text)',
             cursor: 'pointer',
-            transition: 'color 0.15s ease, opacity 0.15s ease',
-            opacity: 0.96,
+            transition: 'all 0.15s ease',
+            boxShadow: 'var(--theme-lesson-nav-next-shadow)',
             WebkitTapHighlightColor: 'transparent',
           }}
           aria-label={nextLabel}

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "函数定义",
-        "explanation": "**`def greet(name):`** -- 使用 `def` 关键字定义一个名为 `greet` 的函数。\n\n这一行执行时，Python 将函数的**代码块注册到内存中**。函数内部的代码还没有执行！只是创建了一个"以后调用时执行这段代码"的蓝图。\n\n**结构分析：**\n- `def`："定义（define）"的缩写。声明要创建一个函数\n- `greet`：函数名。之后用这个名字来调用\n- `name`：**参数（parameter）**。用于接收外部传入值的变量\n- `:`：冒号——从下一行开始缩进的代码是函数体\n\n**类比：** 就像在纸上写菜谱。写菜谱（def）和实际做菜（调用）是不同的。菜谱的"食材"栏对应的就是参数（name）。\n\n**Python 内部原理：** `def` 语句执行时，Python 创建一个 `function` 类型的对象，并以 `greet` 为名注册到全局命名空间。函数对象中存储了字节码、参数信息、默认值等。\n\n**注意：** 函数名也和变量一样是**标签**。可以赋值给其他变量如 `f = greet`，也可以用 `f(\"World\")` 来调用。",
+        "explanation": "**`def greet(name):`** -- 使用 `def` 关键字定义一个名为 `greet` 的函数。\n\n这一行执行时，Python 将函数的**代码块注册到内存中**。函数内部的代码还没有执行！只是创建了一个\"以后调用时执行这段代码\"的蓝图。\n\n**结构分析：**\n- `def`：\"定义（define）\"的缩写。声明要创建一个函数\n- `greet`：函数名。之后用这个名字来调用\n- `name`：**参数（parameter）**。用于接收外部传入值的变量\n- `:`：冒号——从下一行开始缩进的代码是函数体\n\n**类比：** 就像在纸上写菜谱。写菜谱（def）和实际做菜（调用）是不同的。菜谱的\"食材\"栏对应的就是参数（name）。\n\n**Python 内部原理：** `def` 语句执行时，Python 创建一个 `function` 类型的对象，并以 `greet` 为名注册到全局命名空间。函数对象中存储了字节码、参数信息、默认值等。\n\n**注意：** 函数名也和变量一样是**标签**。可以赋值给其他变量如 `f = greet`，也可以用 `f(\"World\")` 来调用。",
         "visualizationType": "pythonMemory",
         "code": "def greet(name):",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "函数体",
-        "explanation": "**`message = f\"Hello, {name}!\"`** -- 函数体：使用 f-string 创建问候字符串。\n\n这段代码在 `greet()` 函数**被调用时**才执行。在目前只执行了 `def` 的时候还没有运行。\n\n**f-string 语法：** 在 `f\"Hello, {name}!\"` 中，花括号 `{name}` 内的变量会被替换为实际值。之后调用 `greet(\"Python\")` 时，`name` 变为 `\"Python\"`，生成 `\"Hello, Python!\"`。\n\n**局部变量（Local Variable）：** `message` 是只存在于函数内部的局部变量。在函数外使用 `message` 会引发 `NameError`。\n\n**类比：** 就像在菜谱的"烹饪步骤"中写下第一步。实际做菜时（调用时）才执行这一步。指令是"放入食材（name），做出面团（message）"。\n\n**Python 内部原理：** 函数被调用时会创建新的**局部命名空间（local namespace）**。`name` 和 `message` 注册在这个局部命名空间中。函数结束时，这个命名空间随局部变量一起销毁。",
+        "explanation": "**`message = f\"Hello, {name}!\"`** -- 函数体：使用 f-string 创建问候字符串。\n\n这段代码在 `greet()` 函数**被调用时**才执行。在目前只执行了 `def` 的时候还没有运行。\n\n**f-string 语法：** 在 `f\"Hello, {name}!\"` 中，花括号 `{name}` 内的变量会被替换为实际值。之后调用 `greet(\"Python\")` 时，`name` 变为 `\"Python\"`，生成 `\"Hello, Python!\"`。\n\n**局部变量（Local Variable）：** `message` 是只存在于函数内部的局部变量。在函数外使用 `message` 会引发 `NameError`。\n\n**类比：** 就像在菜谱的\"烹饪步骤\"中写下第一步。实际做菜时（调用时）才执行这一步。指令是\"放入食材（name），做出面团（message）\"。\n\n**Python 内部原理：** 函数被调用时会创建新的**局部命名空间（local namespace）**。`name` 和 `message` 注册在这个局部命名空间中。函数结束时，这个命名空间随局部变量一起销毁。",
         "visualizationType": "pythonMemory",
         "code": "message = f\"Hello, {name}!\"",
         "pythonMemoryState": {
@@ -64,7 +64,7 @@
       },
       {
         "title": "return 语句",
-        "explanation": "**`return message`** -- 将函数的结果值**返回（return）**给调用者。\n\n`return` 执行时发生两件事：\n1. 将 `message` 指向的值（`\"Hello, Python!\"`）**传递回调用处**\n2. 函数**立即终止**执行（return 下面的代码不会执行）\n\n**类比：** 菜谱的最后一步——"将做好的菜装盘端出"。将菜（计算结果）端给客人（调用代码），清理厨房（函数）。\n\n**如果没有 return？** 如果没有 `return` 语句或只写了单独的 `return`，函数返回 `None`。`None` 是 Python 中表示"没有值"的特殊对象。\n\n**Python 内部原理：** `return` 执行时，函数的局部命名空间被销毁。`name`、`message` 等局部变量全部消失。但返回的对象（`\"Hello, Python!\"`）因为被调用者引用，所以存活下来。\n\n**注意：** 要从函数中返回多个值，可以使用元组：`return x, y` 实际上是 `return (x, y)`。",
+        "explanation": "**`return message`** -- 将函数的结果值**返回（return）**给调用者。\n\n`return` 执行时发生两件事：\n1. 将 `message` 指向的值（`\"Hello, Python!\"`）**传递回调用处**\n2. 函数**立即终止**执行（return 下面的代码不会执行）\n\n**类比：** 菜谱的最后一步——\"将做好的菜装盘端出\"。将菜（计算结果）端给客人（调用代码），清理厨房（函数）。\n\n**如果没有 return？** 如果没有 `return` 语句或只写了单独的 `return`，函数返回 `None`。`None` 是 Python 中表示\"没有值\"的特殊对象。\n\n**Python 内部原理：** `return` 执行时，函数的局部命名空间被销毁。`name`、`message` 等局部变量全部消失。但返回的对象（`\"Hello, Python!\"`）因为被调用者引用，所以存活下来。\n\n**注意：** 要从函数中返回多个值，可以使用元组：`return x, y` 实际上是 `return (x, y)`。",
         "visualizationType": "pythonMemory",
         "code": "return message",
         "pythonMemoryState": {
@@ -97,7 +97,7 @@
       },
       {
         "title": "调用函数",
-        "explanation": "**`result = greet(\"Python\")`** -- **调用（call）**已定义的函数 `greet`。\n\n在函数名后加括号 `()` 即可执行函数。括号内的 `\"Python\"` 是**实参（argument）**，传递给函数的形参 `name`。\n\n**详细跟踪执行流程：**\n1. 调用 `greet(\"Python\")` -> 将 `\"Python\"` 赋值给形参 `name`\n2. 执行函数体第 2 行：`message = f\"Hello, Python!\"`\n3. 执行 `return message`：返回 `\"Hello, Python!\"` 并结束函数\n4. 返回值 `\"Hello, Python!\"` 赋值给 `result`\n\n**术语区分：**\n- **形参（Parameter）：** 函数定义时使用的变量名（`name`）\n- **实参（Argument）：** 函数调用时传递的实际值（`\"Python\"`）\n\n**类比：** 就像往自动贩卖机（函数）里投硬币（实参），出饮料（返回值）。设计贩卖机时做了"投币口"（形参），使用时投入实际硬币（实参）。\n\n**Python 内部原理：** 函数调用时，Python 将新的**帧（frame）**压入调用栈（call stack）。局部变量存储在这个帧中。`return` 时帧被弹出，局部变量被清理。",
+        "explanation": "**`result = greet(\"Python\")`** -- **调用（call）**已定义的函数 `greet`。\n\n在函数名后加括号 `()` 即可执行函数。括号内的 `\"Python\"` 是**实参（argument）**，传递给函数的形参 `name`。\n\n**详细跟踪执行流程：**\n1. 调用 `greet(\"Python\")` -> 将 `\"Python\"` 赋值给形参 `name`\n2. 执行函数体第 2 行：`message = f\"Hello, Python!\"`\n3. 执行 `return message`：返回 `\"Hello, Python!\"` 并结束函数\n4. 返回值 `\"Hello, Python!\"` 赋值给 `result`\n\n**术语区分：**\n- **形参（Parameter）：** 函数定义时使用的变量名（`name`）\n- **实参（Argument）：** 函数调用时传递的实际值（`\"Python\"`）\n\n**类比：** 就像往自动贩卖机（函数）里投硬币（实参），出饮料（返回值）。设计贩卖机时做了\"投币口\"（形参），使用时投入实际硬币（实参）。\n\n**Python 内部原理：** 函数调用时，Python 将新的**帧（frame）**压入调用栈（call stack）。局部变量存储在这个帧中。`return` 时帧被弹出，局部变量被清理。",
         "visualizationType": "pythonMemory",
         "code": "result = greet(\"Python\")",
         "pythonMemoryState": {

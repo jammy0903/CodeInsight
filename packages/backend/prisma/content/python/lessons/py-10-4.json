@@ -93,6 +93,30 @@
         }
       },
       {
+        "title": "이벤트 루프 실행",
+        "explanation": "**`asyncio.run(main())`** — 이벤트 루프를 생성하고 `main` 코루틴을 실행합니다.\n\n이 줄은 프로그램 전체의 **시작점**이자 **종료점**입니다. `asyncio.run()`이 호출되면:\n1. 새로운 이벤트 루프가 생성됩니다\n2. `main()` 코루틴이 이벤트 루프에서 실행됩니다\n3. main() 안에서 gather()가 3개의 작업을 동시에 실행합니다\n4. 모든 작업이 완료되면 main()이 반환됩니다\n5. 이벤트 루프가 정리되고 닫힙니다",
+        "visualizationType": "pythonMemory",
+        "code": "asyncio.run(main())",
+        "pythonMemoryState": {
+          "output": [],
+          "note": "프로그램 진입.",
+          "names": [
+            {
+              "name": "time",
+              "pointsTo": "float1"
+            }
+          ],
+          "objects": [
+            {
+              "id": "float1",
+              "type": "float",
+              "value": 3.0012,
+              "pyId": "1008"
+            }
+          ]
+        }
+      },
+      {
         "title": "동시 실행 및 결과 수집 (gather)",
         "explanation": "**`results = await asyncio.gather(fetch_data(1, 2), fetch_data(2, 1), fetch_data(3, 3))`** — 3개의 코루틴을 **동시에 실행**하고, 모든 결과를 **리스트로 수집**합니다.\n\n`gather()`의 동작 과정을 단계별로 살펴봅시다:\n1. `fetch_data(1, 2)` 호출 → 코루틴 객체 생성 (아직 실행 안 됨)\n2. `fetch_data(2, 1)` 호출 → 코루틴 객체 생성\n3. `fetch_data(3, 3)` 호출 → 코루틴 객체 생성\n4. `gather()`가 세 코루틴을 각각 Task로 감싸서 이벤트 루프에 등록\n5. `await`를 만나 main()이 일시정지 → 세 Task가 동시에 실행 시작",
         "visualizationType": "pythonMemory",
@@ -241,30 +265,6 @@
             "Total time: 3.0012s"
           ],
           "note": "총 3초 소요.",
-          "names": [
-            {
-              "name": "time",
-              "pointsTo": "float1"
-            }
-          ],
-          "objects": [
-            {
-              "id": "float1",
-              "type": "float",
-              "value": 3.0012,
-              "pyId": "1008"
-            }
-          ]
-        }
-      },
-      {
-        "title": "이벤트 루프 실행",
-        "explanation": "**`asyncio.run(main())`** — 이벤트 루프를 생성하고 `main` 코루틴을 실행합니다.\n\n이 줄은 프로그램 전체의 **시작점**이자 **종료점**입니다. `asyncio.run()`이 호출되면:\n1. 새로운 이벤트 루프가 생성됩니다\n2. `main()` 코루틴이 이벤트 루프에서 실행됩니다\n3. main() 안에서 gather()가 3개의 작업을 동시에 실행합니다\n4. 모든 작업이 완료되면 main()이 반환됩니다\n5. 이벤트 루프가 정리되고 닫힙니다",
-        "visualizationType": "pythonMemory",
-        "code": "asyncio.run(main())",
-        "pythonMemoryState": {
-          "output": [],
-          "note": "프로그램 진입.",
           "names": [
             {
               "name": "time",

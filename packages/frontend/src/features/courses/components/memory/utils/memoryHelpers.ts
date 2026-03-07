@@ -89,6 +89,10 @@ export function normalizeCValue(rawValue: unknown): string {
 export interface CStackItem {
   type?: string;
   func?: string;
+  frame?: string;
+  name?: string;
+  value?: unknown;
+  address?: string;
   [key: string]: unknown;
 }
 
@@ -98,13 +102,45 @@ export function extractCFrames(rawStack: CStackItem[]): {
 } {
   const frames: { name: string }[] = [];
   const variables: CStackItem[] = [];
+  let currentFrame = 'main';
+
+  const ensureFrame = (name: string) => {
+    if (!frames.some((f) => f.name === name)) {
+      frames.push({ name });
+    }
+  };
+
+  const getFrameFromName = (name?: string): string | null => {
+    if (!name) return null;
+    const dotIndex = name.indexOf('.');
+    if (dotIndex <= 0) return null;
+    return name.slice(0, dotIndex);
+  };
 
   for (const item of rawStack) {
-    if (item.type === 'frame' && item.func) {
-      frames.push({ name: item.func });
-    } else {
-      variables.push(item);
+    // 신규 마커: { type: "frame", func: "main" }
+    // 구버전 마커: { name: "main", value: "main", address?: "???" }
+    const noRealAddress = !item.address || item.address === '???';
+    const isLegacyFrameMarker =
+      !item.type &&
+      noRealAddress &&
+      item.name != null &&
+      String(item.value) === item.name;
+    const isFrameMarker = item.type === 'frame' || isLegacyFrameMarker;
+
+    if (isFrameMarker) {
+      const frameName = item.func || item.frame || item.name;
+      if (frameName) {
+        currentFrame = frameName;
+        ensureFrame(frameName);
+      }
+      continue;
     }
+
+    const dotFrame = getFrameFromName(item.name);
+    const frame = item.frame || dotFrame || currentFrame;
+    ensureFrame(frame);
+    variables.push({ ...item, frame });
   }
 
   // frame이 하나도 없으면 기본 main 추가

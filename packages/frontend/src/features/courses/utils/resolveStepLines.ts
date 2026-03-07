@@ -7,6 +7,10 @@
  */
 import type { LessonStep } from '@/types';
 
+function normalizeLine(line: string): string {
+  return line.trim().replace(/\s+/g, ' ');
+}
+
 /**
  * step.code가 있고 step.line이 없는 스텝들의 line과 highlight를 계산합니다.
  * 이미 line이 있는 스텝(시뮬레이터 결과 등)은 그대로 유지합니다.
@@ -15,7 +19,9 @@ export function resolveStepLines(steps: LessonStep[], fullCode: string): LessonS
   if (!steps.length || !fullCode) return steps;
 
   const codeLines = fullCode.split('\n');
-  const trimmedLines = codeLines.map(l => l.trim());
+  const normalizedLines = codeLines.map(normalizeLine);
+  const seenOccurrenceByCode = new Map<string, number>();
+  let lastResolvedLine = 1;
 
   return steps.map(step => {
     // 이미 line이 있으면 (시뮬레이터 결과 등) 그대로 유지
@@ -25,15 +31,24 @@ export function resolveStepLines(steps: LessonStep[], fullCode: string): LessonS
 
     // step.code가 없으면 resolve 불가
     const stepCode = step.code?.trim();
-    if (!stepCode) return step;
+    if (!stepCode) {
+      return {
+        ...step,
+        line: lastResolvedLine,
+        highlight: step.highlight ?? [lastResolvedLine],
+      };
+    }
+
+    const normalizedStepCode = normalizeLine(stepCode);
 
     // N번째 출현 찾기
-    const occurrence = step.occurrence ?? 1;
+    const explicitOccurrence = step.occurrence;
+    const occurrence = explicitOccurrence ?? ((seenOccurrenceByCode.get(normalizedStepCode) ?? 0) + 1);
     let count = 0;
     let resolvedLine = -1;
 
-    for (let i = 0; i < trimmedLines.length; i++) {
-      if (trimmedLines[i] === stepCode) {
+    for (let i = 0; i < normalizedLines.length; i++) {
+      if (normalizedLines[i] === normalizedStepCode) {
         count++;
         if (count === occurrence) {
           resolvedLine = i + 1; // 1-indexed
@@ -42,7 +57,18 @@ export function resolveStepLines(steps: LessonStep[], fullCode: string): LessonS
       }
     }
 
-    if (resolvedLine === -1) return step;
+    if (resolvedLine === -1) {
+      return {
+        ...step,
+        line: lastResolvedLine,
+        highlight: step.highlight ?? [lastResolvedLine],
+      };
+    }
+
+    if (explicitOccurrence === undefined) {
+      seenOccurrenceByCode.set(normalizedStepCode, occurrence);
+    }
+    lastResolvedLine = resolvedLine;
 
     // highlight 계산
     let highlight: number[] | undefined;

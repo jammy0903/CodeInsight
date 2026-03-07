@@ -111,13 +111,13 @@ const StackVariable = memo(function StackVariable({
           {variable.type}
         </span>
 
-        {/* 포인터: 타깃 변수명 표시 */}
-        {isPtr && !isDangling && pointsToName && (
+        {/* 포인터: 주소 값 + 타깃 변수명 표시 */}
+        {isPtr && !isDangling && (
           <span
             className="px-1.5 py-0.5 rounded text-[11px] font-mono font-semibold"
             style={{ backgroundColor: '#e0e7ff', color: '#3730a3', border: '1px solid #c7d2fe' }}
           >
-            &amp;{pointsToName}
+            {String(variable.value)}{pointsToName ? ` (\u2192${pointsToName})` : ''}
           </span>
         )}
 

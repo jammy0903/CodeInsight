@@ -3,10 +3,10 @@
   "title": "内存泄漏",
   "concept": "如果省略delete，则直到程序结束才释放堆内存。",
   "content": {
-    "code": "#include <iostream>\nusing namespace std;\n\nvoid leaky() {\n    int* p = new int(999);\n    cout << *p << endl;\n    // delete p; 를 빠뜨림!\n}\n\nint main() {\n    leaky();\n    cout << \"leaky 종료\" << endl;\n    return 0;\n}",
+    "code": "#include <iostream>\nusing namespace std;\n\nvoid leaky() {\n    int* p = new int(999);\n    cout << *p << endl;\n    // 忘记调用 delete p!\n}\n\nint main() {\n    leaky();\n    cout << \"leaky 结束\" << endl;\n    return 0;\n}",
     "steps": [
       {
-        "title": "输入泄漏函数",
+        "title": "进入 leaky 函数",
         "explanation": "调用 `leaky()` 函数，创建一个新的堆栈帧。",
         "visualizationType": "cMemory",
         "code": "void leaky() {",
@@ -62,7 +62,7 @@
         "title": "函数退出——泄漏！",
         "explanation": "当“leaky()”完成时，指针“p”与堆栈帧一起消失。\n\n但由于我们没有调用“delete”，所以 **999 的堆仍然存在**。无法访问该内存——这是**内存泄漏**。",
         "visualizationType": "cMemory",
-        "code": "cout << \"leaky 종료\" << endl;",
+        "code": "cout << \"leaky 结束\" << endl;",
         "stack": [
           {
             "type": "frame",
@@ -79,7 +79,7 @@
             "highlight": true
           }
         ],
-        "stdout": "leaky 종료"
+        "stdout": "999\nleaky 结束"
       }
     ],
     "deltaFormat": true

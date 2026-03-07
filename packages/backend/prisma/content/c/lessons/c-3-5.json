@@ -44,7 +44,7 @@
       },
       {
         "title": "포인터 초기화",
-        "explanation": "`p = arr`로 `p`가 첫 요소를 가리키게 합니다.\n\n이제 루프에서 `*p`를 읽고 `p++`로 다음 요소로 이동할 수 있습니다.",
+        "explanation": "`p = arr`로 `p`가 첫 요소(`arr[0]`)를 가리키게 합니다.\n\n`p`의 값은 `0x1000`으로, `arr`의 시작 주소와 같습니다.",
         "visualizationType": "cMemory",
         "code": "int *p = arr;",
         "stack": [
@@ -64,46 +64,80 @@
         ]
       },
       {
-        "title": "while (*p != -1)",
-        "explanation": "조건은 현재 값이 센티널(`-1`)인지 검사합니다.\n\n센티널을 만날 때까지 반복하고, 만나면 즉시 순회를 종료합니다.",
+        "title": "첫 번째 while 검사",
+        "explanation": "`*p`는 `arr[0]` = `10`이므로 `-1`이 아닙니다. 루프에 진입합니다.\n\n`p`는 아직 `0x1000`으로, 배열의 첫 요소를 가리킵니다.",
         "visualizationType": "cMemory",
         "code": "while (*p != -1) {",
-        "highlightOffset": [
-          -2,
-          -1,
-          0,
-          1
-        ],
         "stack": [
           {
             "name": "arr",
             "value": "{10, 20, 30, -1}",
-            "type": "int[]",
+            "type": "int[4]",
             "address": "0x1000"
           },
           {
             "name": "p",
-            "value": "Address(20)",
+            "value": "0x1000",
             "type": "int*",
             "highlight": true,
-            "address": "0x0ffc"
+            "address": "0x1010",
+            "points_to": "arr"
           }
         ],
-        "stdout": "10 20 "
+        "stdout": ""
       },
       {
-        "title": "p++ (Pointer Increment)",
-        "explanation": "`p++`는 다음 요소로 이동하며 이동량은 `sizeof(int)`입니다.\n\n포인터는 증가 가능하지만 배열 이름은 증가 연산 대상이 될 수 없습니다.",
-        "visualizationType": "terminal",
+        "title": "printf로 *p 출력",
+        "explanation": "`*p`는 `10`입니다. `printf`가 이 값을 출력합니다.\n\n이어서 `p++`로 다음 요소로 이동할 차례입니다.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%d \", *p);",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1000",
+            "type": "int*",
+            "address": "0x1010",
+            "points_to": "arr"
+          }
+        ],
+        "stdout": "10 "
+      },
+      {
+        "title": "p++ (0x1000 -> 0x1004)",
+        "explanation": "`p++`는 `sizeof(int)` = 4바이트만큼 주소를 증가시킵니다.\n\n`p`가 `0x1000`에서 `0x1004`로 이동하여 `arr[1]`(값 20)을 가리킵니다.",
+        "visualizationType": "cMemory",
         "code": "p++;",
-        "stdout": "10 20 30 "
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1004",
+            "type": "int*",
+            "highlight": true,
+            "address": "0x1010",
+            "points_to": "arr"
+          }
+        ],
+        "stdout": "10 "
       },
       {
-        "title": "역참조로 값 출력",
-        "explanation": "각 반복에서 `*p`를 출력하면 10, 20, 30이 순서대로 출력됩니다.\n\n핵심은 \"읽기(`*p`) + 이동(`p++`) + 종료조건\"의 3요소를 안정적으로 유지하는 것입니다.",
+        "title": "두 번째 while 검사 + printf",
+        "explanation": "`*p` = `arr[1]` = `20`. 센티널이 아니므로 계속 진행합니다.\n\n`printf`가 `20`을 출력하고, 다시 `p++`로 다음 요소로 이동합니다.",
         "visualizationType": "cMemory",
         "code": "printf(\"%d \", *p);",
         "highlightOffset": [
+          -2,
           -1,
           0,
           1
@@ -117,12 +151,109 @@
           },
           {
             "name": "p",
-            "value": "현재 요소 주소",
+            "value": "0x1004",
             "type": "int*",
-            "address": "0x0ffc"
+            "address": "0x1010",
+            "points_to": "arr"
           }
         ],
-        "heap": [],
+        "stdout": "10 20 "
+      },
+      {
+        "title": "p++ (0x1004 -> 0x1008)",
+        "explanation": "다시 `p++`로 4바이트 이동합니다.\n\n`p`가 `0x1004`에서 `0x1008`로 이동하여 `arr[2]`(값 30)을 가리킵니다.",
+        "visualizationType": "cMemory",
+        "code": "p++;",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1008",
+            "type": "int*",
+            "highlight": true,
+            "address": "0x1010",
+            "points_to": "arr"
+          }
+        ],
+        "stdout": "10 20 "
+      },
+      {
+        "title": "세 번째 while 검사 + printf",
+        "explanation": "`*p` = `arr[2]` = `30`. 마지막 유효 데이터를 출력합니다.\n\n이후 `p++`가 `p`를 센티널 위치로 이동시킵니다.",
+        "visualizationType": "cMemory",
+        "code": "printf(\"%d \", *p);",
+        "highlightOffset": [
+          -2,
+          -1,
+          0,
+          1
+        ],
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x1008",
+            "type": "int*",
+            "address": "0x1010",
+            "points_to": "arr"
+          }
+        ],
+        "stdout": "10 20 30 "
+      },
+      {
+        "title": "p++ (0x1008 -> 0x100C)",
+        "explanation": "`p++`로 `0x100C`에 도달합니다.\n\n이 주소에는 센티널 값 `-1`이 있습니다.",
+        "visualizationType": "cMemory",
+        "code": "p++;",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x100C",
+            "type": "int*",
+            "highlight": true,
+            "address": "0x1010",
+            "points_to": "arr"
+          }
+        ],
+        "stdout": "10 20 30 "
+      },
+      {
+        "title": "while 종료 (*p == -1)",
+        "explanation": "`*p` = `-1`이므로 조건이 거짓이 되어 루프를 빠져나갑니다.\n\n핵심: 읽기(`*p`) + 이동(`p++`) + 종료조건(`-1`) 세 가지가 포인터 순회의 기본입니다.",
+        "visualizationType": "cMemory",
+        "code": "while (*p != -1) {",
+        "stack": [
+          {
+            "name": "arr",
+            "value": "{10, 20, 30, -1}",
+            "type": "int[4]",
+            "address": "0x1000"
+          },
+          {
+            "name": "p",
+            "value": "0x100C",
+            "type": "int*",
+            "highlight": true,
+            "address": "0x1010",
+            "points_to": "arr"
+          }
+        ],
         "stdout": "10 20 30 "
       }
     ],

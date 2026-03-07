@@ -3,7 +3,7 @@
   "title": "unique_ptr basics",
   "concept": "unique_ptr guarantees sole ownership and is automatically deleted when the scope ends.",
   "content": {
-    "code": "#include <iostream>\n#include <memory>\nusing namespace std;\n\nint main() {\n    unique_ptr<int> p = make_unique<int>(42);\n    cout << *p << endl;\n\n    // p가 스코프를 벗어나면 자동 delete\n    return 0;\n}",
+    "code": "#include <iostream>\n#include <memory>\nusing namespace std;\n\nint main() {\n    unique_ptr<int> p = make_unique<int>(42);\n    cout << *p << endl;\n\n    // automatic delete when p leaves scope\n    return 0;\n}",
     "steps": [
       {
         "title": "create unique_ptr",
@@ -29,14 +29,14 @@
         ]
       },
       {
-        "title": "Used as a backreference",
+        "title": "Dereference for access",
         "explanation": "Access the value like a regular pointer with `*p`. The method of use is the same as the raw pointer.",
         "visualizationType": "terminal",
         "code": "cout << *p << endl;",
         "stdout": "42"
       },
       {
-        "title": "auto release",
+        "title": "Automatic cleanup",
         "explanation": "When `main` ends with `return 0;`, `p`'s destructor is called and the heap memory is automatically freed.\n\n**No need to call delete directly** — this is the core value of smart pointers.",
         "visualizationType": "cMemory",
         "code": "return 0;",

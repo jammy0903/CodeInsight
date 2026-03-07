@@ -203,7 +203,7 @@
       },
       {
         "title": "최종 결과 확인",
-        "explanation": "**`print(f\"\\nFinal counter: {shared_counter}\")`**\n\n최종 카운터 값을 확인합니다. GIL이 한 순간에 하나의 스레드만 실행되도록 보장하므로 `shared_counter += 1` 연산이 안전하게 동작하여 결과는 정확히 10이 됩니다. CPU 집약적 작업에서는 멀티코어 이점을 활용할 수 없지만, I/O 작업에서는 스레딩이 여전히 유효합니다.",
+        "explanation": "**`print(f\"\\nFinal counter: {shared_counter}\")`**\n\n최종 카운터 값을 확인합니다. GIL이 있어도 `shared_counter += 1` 자체는 동기화 없이 안전하다고 보장되지 않습니다. 이 예시에서는 10이 나올 수 있지만, 공유 상태 갱신은 `Lock`으로 보호하는 것이 원칙입니다. CPU 집약적 작업에서는 멀티코어 이점을 활용할 수 없지만, I/O 작업에서는 스레딩이 여전히 유효합니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"\\nFinal counter: {shared_counter}\")",
         "pythonMemoryState": {

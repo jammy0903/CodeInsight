@@ -174,7 +174,7 @@
       },
       {
         "title": "Long String Identity Check",
-        "explanation": "**`print(f\"x is y: {x is y}\")`** -- Checks if `x` and `y` are the same object. In this example, the result is **False**.\n\n`x` (0x2000) and `y` (0x2001) have **the same content but are different objects**, so the `is` comparison returns `False`.\n\n**Key lesson:** **Never use `is` for string content comparison!** `is` compares object identity (memory address), and String Interning is **just an optimization, not something guaranteed by the language specification**.\n\n**The correct way to compare:**\n- `x == y` -> **True** (because the contents are the same) -- always use this!\n- `x is y` -> **Unpredictable** (True or False depending on whether interning occurred)\n\n**Analogy:** Checking if two letters have the same content (==) vs checking if they're the same piece of paper (is) are different things. To compare content, use `==`.\n\n**How Python works internally:** The `is` operator is identical to `id(x) == id(y)`. Since the addresses are different (0x2000 != 0x2001), False is returned. In contrast, `==` calls `x.__eq__(y)` to compare each character of the strings, so it returns True.\n\n**Execution order**: is check (id(x)!=id(y), 0x2000!=0x2001) -> False -> f-string evaluated -> output",
+        "explanation": "**`print(f\"x is y: {x is y}\")`** -- Checks whether `x` and `y` are the exact same object. In this scripted run, the shown result is **False**.\n\nFor strings like `\"hello world\"`, identity with `is` is not a language guarantee and can vary by interpreter/runtime optimization details. So treat this as an example snapshot, not a universal rule.\n\nUse `==` for content comparison; reserve `is` for identity checks (e.g., `x is None`).",
         "visualizationType": "pythonMemory",
         "code": "print(f\"x is y: {x is y}\")",
         "pythonMemoryState": {
@@ -344,7 +344,7 @@
       },
       {
         "title": "Comparing Strings Created Differently",
-        "explanation": "**`print(f\"s1 is s2: {s1 is s2}\")`** -- Checks if `s1` (created with `+`) and `s2` (literal) are the same object. The result is **False**.\n\n`s1` (0x3000, dynamically created at runtime) and `s2` (0x2001, compile-time literal) have the same content but are **different objects**, so the result is `False`.\n\n**Full comparison summary:**\n- `a is b` -> **True** (short literal, interned)\n- `x is y` -> **False** (string with spaces, interning not guaranteed)\n- `s1 is s2` -> **False** (dynamically created vs literal, different objects)\n- `a == b`, `x == y`, `s1 == s2` -> **All True** (because the contents are the same)\n\n**Analogy:** When comparing letters with the same content, don't ask if they're the same piece of paper (`is`) -- ask if the content is the same (`==`)!",
+        "explanation": "**`print(f\"s1 is s2: {s1 is s2}\")`** -- Compares identity between `s1` (built via `+`) and `s2` (literal). In this run, it is shown as **False**.\n\nEven when string contents match, identity can differ depending on creation path and optimization.\n\n**Summary:**\n- `a is b` -> often True for interned short literals\n- `x is y` -> may be True or False\n- `s1 is s2` -> may be True or False\n- `a == b`, `x == y`, `s1 == s2` -> True when contents match\n\nFor string comparison in real code, always use `==`.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"s1 is s2: {s1 is s2}\")",
         "pythonMemoryState": {

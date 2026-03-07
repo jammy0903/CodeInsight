@@ -19,12 +19,7 @@
         "explanation": "`func`는 실행 코드가 아니라 함수 정의(설계) 단계입니다.\n\n실제 스택 프레임 생성과 실행은 `func();` 호출 시점에 일어납니다.",
         "visualizationType": "cMemory",
         "code": "void func() {",
-        "highlightOffset": [
-          0,
-          1,
-          2,
-          3
-        ]
+        "highlightOffset": [0, 1, 2, 3]
       },
       {
         "title": "프로그램 실행 시작",
@@ -33,9 +28,10 @@
         "code": "int main() {",
         "stack": [
           {
-            "frame": "main",
-            "value": "main",
-            "name": "main"
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
           }
         ]
       },
@@ -46,15 +42,17 @@
         "code": "func();",
         "stack": [
           {
-            "frame": "main",
-            "value": "main",
-            "name": "main"
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
           },
           {
-            "frame": "func",
-            "highlight": true,
-            "value": "func",
-            "name": "func"
+            "name": "func",
+            "type": "frame",
+            "func": "func",
+            "value": "frame",
+            "highlight": true
           }
         ]
       },
@@ -65,21 +63,22 @@
         "code": "int a = 10;",
         "stack": [
           {
-            "frame": "main",
-            "value": "main",
-            "name": "main"
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
           },
           {
-            "frame": "func",
-            "variables": [
-              {
-                "name": "a",
-                "type": "int",
-                "value": "10"
-              }
-            ],
-            "value": "func",
-            "name": "func"
+            "name": "func",
+            "type": "frame",
+            "func": "func",
+            "value": "frame"
+          },
+          {
+            "name": "a",
+            "type": "int",
+            "value": "10",
+            "frame": "func"
           }
         ]
       },
@@ -97,10 +96,11 @@
         "code": "}",
         "stack": [
           {
-            "frame": "main",
-            "highlight": true,
-            "value": "main",
-            "name": "main"
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame",
+            "highlight": true
           }
         ]
       },
@@ -111,9 +111,10 @@
         "code": "printf(\"Back in main\\n\");",
         "stack": [
           {
-            "frame": "main",
-            "value": "main",
-            "name": "main"
+            "name": "main",
+            "type": "frame",
+            "func": "main",
+            "value": "frame"
           }
         ],
         "stdout": "Inside func: 10, Addr: 0x...\nBack in main"
