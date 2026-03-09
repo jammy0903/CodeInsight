@@ -302,6 +302,13 @@ async function seed() {
   });
   console.log('    ✅ Python (업무 자동화)');
 
+  await prisma.language.upsert({
+    where: { id: 'ai-literacy' },
+    update: { name: 'AI Code Literacy', description: 'AI가 작성한 코드를 이해하고 검증하고 수정하는 실전 트랙', icon: '🛡️', color: '#0EA5E9', isSequential: false, order: 7 },
+    create: { id: 'ai-literacy', name: 'AI Code Literacy', description: 'AI가 작성한 코드를 이해하고 검증하고 수정하는 실전 트랙', icon: '🛡️', color: '#0EA5E9', isSequential: false, order: 7 },
+  });
+  console.log('    ✅ AI Code Literacy');
+
   // 3. C 커리큘럼 로드 및 생성
   console.log('  📚 Loading C curriculum from JSON...');
   const cCurriculum = loadCurriculum('c');
@@ -860,7 +867,101 @@ async function seed() {
     await deactivateStaleChapters('python-practical', ppValidChapterIds);
   }
 
-  // 9. 결과 확인
+  // 9. AI Code Literacy 커리큘럼 upsert
+  console.log('  📚 Loading AI Code Literacy curriculum from JSON...');
+  const aiLiteracyCurriculum = loadCurriculum('ai-literacy');
+
+  if (aiLiteracyCurriculum) {
+    let contentCount = 0;
+    let quizCount = 0;
+    const aiValidLessonIds: string[] = [];
+    const aiValidChapterIds: string[] = [];
+
+    for (const chapterData of aiLiteracyCurriculum.chapters) {
+      console.log(`    Ch ${chapterData.order}: ${chapterData.title}`);
+
+      const chapterId = getChapterId(chapterData);
+      aiValidChapterIds.push(chapterId);
+      const chapterPayload = {
+        languageId: 'ai-literacy',
+        title: chapterData.title,
+        description: chapterData.description,
+        keyQuestion: chapterData.keyQuestion || '',
+        part: chapterData.part || 'verification',
+        partLabel: chapterData.partLabel || 'AI 검증',
+        order: chapterData.order,
+      };
+      const chapter = await prisma.chapter.upsert({
+        where: { id: chapterId },
+        update: chapterPayload,
+        create: { id: chapterId, ...chapterPayload },
+      });
+
+      for (let lessonIdx = 0; lessonIdx < chapterData.lessons.length; lessonIdx++) {
+        const lessonItem = chapterData.lessons[lessonIdx];
+        const lessonData = typeof lessonItem === 'string' ? null : lessonItem;
+        if (!lessonData) continue;
+
+        const content = loadLessonContent('ai-literacy', lessonData.id);
+        if (content) {
+          console.log(`      ├─ Lesson: ${content.title}`);
+
+          const lessonPayload = {
+            chapterId: chapter.id,
+            title: content.title,
+            description: content.concept,
+            difficulty: lessonData.difficulty || 'basic',
+            order: lessonData.order || lessonIdx + 1,
+            estimatedTime: lessonData.estimatedTime || 10,
+          };
+          const lesson = await prisma.lesson.upsert({
+            where: { id: lessonData.id },
+            update: lessonPayload,
+            create: { id: lessonData.id, ...lessonPayload },
+          });
+          aiValidLessonIds.push(lessonData.id);
+
+          const contentPayload = {
+            lessonId: lesson.id,
+            code: content.content.code,
+            language: 'ai-literacy',
+            steps: JSON.stringify(expandDeltaSteps(content.content.steps, content.content.deltaFormat === true)),
+          };
+          await prisma.lessonContent.upsert({
+            where: { id: `content-${lessonData.id}` },
+            update: contentPayload,
+            create: { id: `content-${lessonData.id}`, ...contentPayload },
+          });
+          contentCount++;
+
+          if (content.quiz) {
+            const quizPayload = {
+              lessonId: lesson.id,
+              type: 'multiple_choice',
+              question: content.quiz.question,
+              options: content.quiz.options,
+              answer: String(content.quiz.correctIndex),
+              explanation: content.quiz.explanation,
+              order: 1,
+            };
+            await prisma.quiz.upsert({
+              where: { id: `quiz-${lessonData.id}` },
+              update: quizPayload,
+              create: { id: `quiz-${lessonData.id}`, ...quizPayload },
+            });
+            quizCount++;
+          }
+        }
+      }
+    }
+
+    console.log(`    📄 Loaded ${contentCount} lesson contents`);
+    console.log(`    ❓ Loaded ${quizCount} quizzes`);
+    await deactivateStaleLessons('ai-literacy', aiValidLessonIds);
+    await deactivateStaleChapters('ai-literacy', aiValidChapterIds);
+  }
+
+  // 10. 결과 확인
   const stats = {
     languages: await prisma.language.count(),
     chapters: await prisma.chapter.count(),

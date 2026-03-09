@@ -54,12 +54,13 @@ function NotFoundView({ message, backPath }: { message: string; backPath: string
 
 // --- 메인 컴포넌트 ---
 
-const LANGUAGE_IDS = new Set(['c', 'cpp', 'java', 'python', 'javascript', 'python-practical']);
+const LANGUAGE_IDS = new Set(['c', 'cpp', 'java', 'python', 'javascript', 'python-practical', 'ai-literacy']);
 
 function resolveLanguageId(lessonId: string | undefined, contentLanguage: string | undefined): string | undefined {
   if (contentLanguage) return contentLanguage;
   if (!lessonId) return undefined;
   if (lessonId.startsWith('py-practical-')) return 'python-practical';
+  if (lessonId.startsWith('ai-')) return 'ai-literacy';
   if (lessonId.startsWith('py-')) return 'python';
   if (lessonId.startsWith('js-')) return 'javascript';
   if (lessonId.startsWith('java-')) return 'java';

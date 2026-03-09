@@ -34,6 +34,7 @@ const getLanguageColor = (lang: string | undefined) => {
     case 'cpp': return '#818CF8';
     case 'python': return '#FFD54F';
     case 'python-practical': return '#9E9E9E';
+    case 'ai-literacy': return '#38BDF8';
     case 'java': return '#EC4899';
     case 'javascript': return '#81C784';
     default: return '#87CEEB';

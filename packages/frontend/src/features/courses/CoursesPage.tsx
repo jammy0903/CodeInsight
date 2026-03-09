@@ -88,6 +88,7 @@ const STATIC_LANGUAGES: Array<{ id: string; icon: string }> = [
   { id: 'java', icon: '☕' },
   { id: 'javascript', icon: '⚡' },
   { id: 'python-practical', icon: '🤖' },
+  { id: 'ai-literacy', icon: '🛡️' },
 ];
 
 // 언어별 색상 매핑
@@ -127,6 +128,12 @@ const LANGUAGE_COLORS: Record<string, { bg: string; border: string; stitch: stri
     border: '#9E9E9E',
     stitch: 'rgba(117, 117, 117, 0.5)',
     text: '#424242',
+  },
+  'ai-literacy': {
+    bg: 'linear-gradient(135deg, #E0F2FE 0%, #D0E8FF 100%)',
+    border: '#38BDF8',
+    stitch: 'rgba(56, 189, 248, 0.5)',
+    text: '#0369A1',
   },
 };
 

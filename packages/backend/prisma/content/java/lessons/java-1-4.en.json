@@ -29,7 +29,7 @@
       },
       {
         "title": "Create a second array",
-        "explanation": "**Execution order:**\n1. Create a new array `[1, 2, 3]` in the heap.\n2. Save the address (0x002) in `arr2`.\n\nThe contents are the same as `[1, 2, 3]`, but a new array is created in a **different space** of the heap.",
+        "explanation": "**Execution order:**\n1. Run `int[] arr2 = {1, 2, 3}`.\n2. Array literals behave like `new int[]{1, 2, 3}` internally.\n3. Create a new heap array (0x002), then store its address in `arr2`.\n\nSo it is correct that the memory viewer shows a `New` sticker on the object referenced by `arr2`.\nEven though the contents are the same, this is a **different object** from `arr1` (0x001).",
         "visualizationType": "javaMemory",
         "code": "int[] arr2 = {1, 2, 3};",
         "javaMemoryState": {
@@ -67,6 +67,7 @@
           "output": [
             "false"
           ],
+          "warning": "Why false? arr1 (0x001) and arr2 (0x002) point to different array objects (different addresses).",
           "stack": [
             {
               "name": "arr1",

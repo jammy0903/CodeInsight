@@ -65,7 +65,26 @@ function formatExplanation(text: string): React.ReactNode[] {
               </strong>
             );
           }
-          return part;
+
+          // `inline code` 처리
+          const inlineCodeParts = part.split(/(`[^`]+`)/g);
+          return (
+            <span key={partIdx}>
+              {inlineCodeParts.map((inlinePart, inlineIdx) => {
+                if (inlinePart.startsWith('`') && inlinePart.endsWith('`')) {
+                  return (
+                    <code
+                      key={inlineIdx}
+                      className="px-1.5 py-0.5 rounded text-[0.82em] font-mono bg-rose-50 text-rose-800 border border-rose-200"
+                    >
+                      {inlinePart.slice(1, -1)}
+                    </code>
+                  );
+                }
+                return <span key={inlineIdx}>{inlinePart}</span>;
+              })}
+            </span>
+          );
         });
 
         return <span key={blockIdx}>{formattedParts}</span>;

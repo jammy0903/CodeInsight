@@ -66,6 +66,14 @@ const LANGUAGE_THEMES: Record<string, {
     border: 'rgba(158, 158, 158, 0.5)',
     stitch: 'rgba(117, 117, 117, 0.5)',
   },
+  'ai-literacy': {
+    primary: '#0369A1',
+    primaryLight: '#38BDF8',
+    bg: 'linear-gradient(135deg, #E0F2FE 0%, #D0E8FF 100%)',
+    bgHover: 'linear-gradient(135deg, #D6EDFE 0%, #C5E1FF 100%)',
+    border: 'rgba(56, 189, 248, 0.45)',
+    stitch: 'rgba(56, 189, 248, 0.5)',
+  },
 };
 
 const DEFAULT_THEME = {
