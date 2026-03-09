@@ -70,6 +70,13 @@ const LANGUAGE_THEMES: Record<string, {
     bgActive: 'linear-gradient(135deg, #EEEEEE 0%, #D6D6D6 100%)',
     textColor: '#424242',
   },
+  'ai-literacy': {
+    primary: '#0369A1',
+    primaryRgb: '56, 189, 248',
+    bg: 'linear-gradient(135deg, #E0F2FE 0%, #D0E8FF 100%)',
+    bgActive: 'linear-gradient(135deg, #CBEAFE 0%, #BAE6FD 100%)',
+    textColor: '#0369A1',
+  },
 };
 
 const DEFAULT_THEME = {

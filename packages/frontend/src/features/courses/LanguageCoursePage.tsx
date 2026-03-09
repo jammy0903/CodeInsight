@@ -92,6 +92,13 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
           color: '#9E9E9E',
           description: t('language_desc.python_practical')
         };
+      case 'ai-literacy':
+        return {
+          name: t('languages.ai-literacy'),
+          icon: '🛡️',
+          color: '#38BDF8',
+          description: t('language_desc.ai-literacy')
+        };
       default:
         return {
           name: lang?.toUpperCase() || '',

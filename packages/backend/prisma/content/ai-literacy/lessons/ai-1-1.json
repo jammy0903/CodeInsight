@@ -1,0 +1,77 @@
+{
+  "lessonId": "ai-1-1",
+  "title": "API 응답 필드 착각 잡기",
+  "concept": "AI 코드의 가장 흔한 실패는 '버전/응답 스키마 착각'이다.",
+  "content": {
+    "code": "const response = {\n  choices: [\n    { message: { content: 'Hello from API' } }\n  ]\n};\n\n// AI가 자주 주는 오래된 예시\nconst text = response.choices[0].text;\nconsole.log(text);\n",
+    "steps": [
+      {
+        "title": "실패 코드를 먼저 본다",
+        "explanation": "AI가 준 코드라도 바로 믿지 않고, 어떤 필드를 읽는지 먼저 확인합니다.\n지금 코드는 `response.choices[0].text`를 읽으려 합니다.",
+        "keyInsight": "검증 1단계: 코드가 가정하는 데이터 구조를 확인",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "inspect",
+          "checklist": [
+            "필드 경로 확인",
+            "실제 응답 구조 확인"
+          ]
+        },
+        "code": "const text = response.choices[0].text;"
+      },
+      {
+        "title": "실제 응답 구조와 대조한다",
+        "explanation": "실제 객체에는 `text`가 없고, `message.content`가 있습니다.\n즉 코드의 경로 가정이 틀렸습니다.",
+        "keyInsight": "증상보다 원인: 런타임 에러는 '잘못된 경로 가정'에서 시작",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "compare",
+          "expectedPath": "choices[0].text",
+          "actualPath": "choices[0].message.content"
+        },
+        "code": "{ message: { content: 'Hello from API' } }"
+      },
+      {
+        "title": "최소 수정만 적용한다",
+        "explanation": "필드 경로만 바꿔서 수정 범위를 최소화합니다.\n`response.choices[0].message.content`로 교체합니다.",
+        "keyInsight": "수정 원칙: 최소 변경으로 원인만 제거",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "patch",
+          "patch": "text -> message.content"
+        },
+        "code": "const text = response.choices[0].message.content;"
+      },
+      {
+        "title": "수정 후 결과를 재검증한다",
+        "explanation": "수정 뒤에는 반드시 출력으로 검증합니다.\n이제 `Hello from API`가 정상 출력됩니다.",
+        "keyInsight": "검증 2단계: 수정 후 결과 확인",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "verify",
+          "output": "Hello from API"
+        },
+        "code": "console.log(text);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "아래 응답에서 문자열 내용을 읽는 안전한 경로는?\n\n{ choices: [{ message: { content: 'ok' } }] }",
+    "options": [
+      "choices[0].text",
+      "choices[0].message.content",
+      "choices.message[0].content",
+      "message.choices[0].content"
+    ],
+    "correctIndex": 1,
+    "explanation": "현재 응답 구조 기준으로 내용은 `choices[0].message.content`에 있습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "AI 코드가 실행만 되면 구조 검증은 생략해도 된다",
+      "correct": "실행 전후에 응답 스키마를 항상 확인해야 합니다.",
+      "why": "AI 예시는 종종 이전 버전 API 필드를 섞어서 제시합니다."
+    }
+  ],
+  "keyTakeaway": "AI 코드 검증 루프: 경로 확인 -> 실제 구조 대조 -> 최소 수정 -> 재검증"
+}
