@@ -96,6 +96,14 @@ export const router = createBrowserRouter([
         }
       },
       {
+        path: 'courses/ai-literacy',
+        lazy: async () => {
+          const { LanguageCoursePage } = await import('./features/courses/LanguageCoursePage');
+          const Component = () => <LanguageCoursePage langOverride="ai-literacy" />;
+          return { Component };
+        }
+      },
+      {
         path: 'courses/:lessonId',
         lazy: async () => {
           const { LessonPage } = await import('./features/courses/LessonPage');

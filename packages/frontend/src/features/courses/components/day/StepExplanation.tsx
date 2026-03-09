@@ -10,6 +10,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface StepExplanationProps {
   explanation: string;
   stepIndex: number;
+  illustrations?: Array<{
+    src: string;
+    alt?: string;
+    caption?: string;
+  }>;
 }
 
 function forceLineBreaks(text: string): string {
@@ -106,7 +111,7 @@ function formatExplanation(text: string): React.ReactNode[] {
   });
 }
 
-export function StepExplanation({ explanation, stepIndex }: StepExplanationProps) {
+export function StepExplanation({ explanation, stepIndex, illustrations }: StepExplanationProps) {
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -119,6 +124,23 @@ export function StepExplanation({ explanation, stepIndex }: StepExplanationProps
         style={{ fontFamily: 'var(--font-handwriting)' }}
       >
         {formatExplanation(explanation || '')}
+        {Array.isArray(illustrations) && illustrations.length > 0 && (
+          <div className="mt-4 space-y-3">
+            {illustrations.map((item, idx) => (
+              <figure key={`${item.src}-${idx}`} className="rounded-lg border border-amber-200 bg-white/80 p-2">
+                <img
+                  src={item.src}
+                  alt={item.alt || 'lesson illustration'}
+                  loading="lazy"
+                  className="w-full h-auto rounded-md"
+                />
+                {item.caption && (
+                  <figcaption className="mt-2 text-sm text-amber-800">{item.caption}</figcaption>
+                )}
+              </figure>
+            ))}
+          </div>
+        )}
       </motion.div>
     </AnimatePresence>
   );

@@ -7,7 +7,7 @@
  *   - 온보딩 프로필 (나이대, 직업, 경험, 목표) 표시/수정
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, ChevronRight, Check, Loader2, Edit2, X, LogOut, AlertTriangle, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -54,6 +54,7 @@ export function ProfilePage() {
   const [nicknameError, setNicknameError] = useState('');
   const [isCheckingNickname, setIsCheckingNickname] = useState(false);
   const [isSavingNickname, setIsSavingNickname] = useState(false);
+  const nicknameCheckRequestRef = useRef(0);
 
   // 회원탈퇴 상태
 const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -113,10 +114,11 @@ function getErrorMessage(error: unknown, fallback: string): string {
     setNicknameError('');
   };
 
-  // 닉네임 입력 변경 (실시간 검증)
-  const handleNicknameChange = async (value: string) => {
+  // 닉네임 입력 변경 (동기 검증만 수행, 중복체크는 effect에서 debounce 처리)
+  const handleNicknameChange = (value: string) => {
     setNewNickname(value);
     setNicknameError('');
+    setIsCheckingNickname(false);
 
     // 빈 값
     if (!value.trim()) {
@@ -141,20 +143,45 @@ function getErrorMessage(error: unknown, fallback: string): string {
       setNicknameError('영문, 숫자, 한글, 언더스코어(_)만 사용 가능합니다');
       return;
     }
-
-    // 중복 체크 (debounce 없이 즉시)
-    setIsCheckingNickname(true);
-    try {
-      const result = await checkNickname(value);
-      if (!result.available) {
-        setNicknameError(result.error || '이미 사용 중인 닉네임입니다');
-      }
-    } catch (_error) {
-      setNicknameError('닉네임 확인 중 오류가 발생했습니다');
-    } finally {
-      setIsCheckingNickname(false);
-    }
   };
+
+  // 닉네임 중복 체크 (debounce + 최신 요청만 반영)
+  useEffect(() => {
+    if (!isEditingNickname) return;
+
+    const value = newNickname;
+    const normalizedCurrent = (appUser?.nickname ?? '').trim().toLowerCase();
+    const normalizedNext = value.trim().toLowerCase();
+
+    // 동기 검증 에러가 있거나 현재 닉네임과 동일하면 중복 체크 불필요
+    if (nicknameError || !value.trim() || normalizedNext === normalizedCurrent) {
+      setIsCheckingNickname(false);
+      return;
+    }
+
+    const requestId = ++nicknameCheckRequestRef.current;
+    const timer = setTimeout(async () => {
+      setIsCheckingNickname(true);
+      try {
+        const result = await checkNickname(value);
+        if (nicknameCheckRequestRef.current !== requestId) return;
+        if (!result.available) {
+          setNicknameError(result.error || '이미 사용 중인 닉네임입니다');
+        }
+      } catch (_error) {
+        if (nicknameCheckRequestRef.current !== requestId) return;
+        setNicknameError('닉네임 확인 중 오류가 발생했습니다');
+      } finally {
+        if (nicknameCheckRequestRef.current === requestId) {
+          setIsCheckingNickname(false);
+        }
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [newNickname, isEditingNickname, appUser?.nickname, nicknameError]);
 
   // 닉네임 저장
   const handleSaveNickname = async () => {
