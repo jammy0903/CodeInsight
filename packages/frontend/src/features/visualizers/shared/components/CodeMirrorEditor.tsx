@@ -36,6 +36,7 @@ interface CodeMirrorEditorProps {
   code: string;
   language?: SupportedLanguage;
   highlightLine?: number;
+  pointerLine?: number;
   editable?: boolean;
   onChange?: (code: string) => void;
   onSelectionChange?: (sel: CodeSelection) => void;
@@ -57,6 +58,7 @@ export function CodeMirrorEditor({
   code,
   language = 'c',
   highlightLine,
+  pointerLine,
   editable = false,
   onChange,
   onSelectionChange,
@@ -90,8 +92,14 @@ export function CodeMirrorEditor({
         minWidth: isMobile ? '24px' : '36px',
         fontSize: isMobile ? 'clamp(9px, 2vw, 11px)' : 'clamp(10px, 1vw, 12px)',
       },
+      '.cm-lineNumbers .cm-gutterElement': {
+        minWidth: pointerLine ? '4.2em' : undefined,
+        textAlign: pointerLine ? 'left' : undefined,
+        whiteSpace: 'pre',
+        overflow: 'visible',
+      },
     });
-  }, [isMobile, mobileFontSizeOffset]);
+  }, [isMobile, mobileFontSizeOffset, pointerLine]);
 
   // Bottom padding extension (for terminal overlay clearance)
   const bottomPaddingExtension = useMemo(() => {
@@ -116,7 +124,9 @@ export function CodeMirrorEditor({
   const extensions = useMemo(() => {
     const langExtension = languageExtensions[language] || languageExtensions.c;
     const exts = [
-      lineNumbers(),
+      lineNumbers({
+        formatNumber: (lineNo) => (pointerLine && lineNo === pointerLine ? `▶ ${lineNo}` : String(lineNo)),
+      }),
       langExtension(),
       ...themeExtension,
       styleExtension,
@@ -169,7 +179,7 @@ export function CodeMirrorEditor({
     // NOTE: onSelectionChange is intentionally excluded for read-only to avoid
     // unnecessary re-creation; it's captured via closure at creation time.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language, themeExtension, styleExtension, bottomPaddingExtension, editable, handleChange]);
+  }, [language, themeExtension, styleExtension, bottomPaddingExtension, editable, handleChange, pointerLine]);
 
   // Create editor
   useEffect(() => {

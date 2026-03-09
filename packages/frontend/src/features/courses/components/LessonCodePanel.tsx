@@ -16,6 +16,7 @@ import { TerminalOutput, type TerminalLine } from '@/features/visualizers/shared
 interface LessonCodePanelProps {
   code: string;
   highlightLine: number;
+  pointerLine?: number;
   terminalLines: TerminalLine[];
   onSelectionChange?: (selection: CodeSelection) => void;
   defaultRatio?: number;
@@ -29,6 +30,7 @@ interface LessonCodePanelProps {
 export function LessonCodePanel({
   code,
   highlightLine,
+  pointerLine,
   terminalLines,
   onSelectionChange,
   defaultRatio = 0.5,
@@ -106,6 +108,7 @@ export function LessonCodePanel({
           <CodeMirrorEditor
             code={code}
             highlightLine={highlightLine}
+            pointerLine={pointerLine}
             onSelectionChange={onSelectionChange}
             bottomPadding={0}
             mobileFontSizeOffset={2}

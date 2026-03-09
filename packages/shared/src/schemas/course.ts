@@ -186,6 +186,11 @@ export const LessonStepSchema = z.object({
   highlightLines: z.array(z.number()).optional(), // 레거시
   title: z.string().optional(),
   explanation: z.string(),
+  illustrations: z.array(z.object({
+    src: z.string(),                 // /lesson-illustrations/foo.svg
+    alt: z.string().optional(),      // 접근성 텍스트
+    caption: z.string().optional(),  // 설명 캡션
+  })).optional(),
   // WHY: 각 언어마다 다른 메모리 모델을 사용 (C: stack/heap, Python: objects/names, Java: 혼합)
   // TRADEOFF: 타입 안전성 < 언어별 유연성
   memoryChanges: z.array(MemoryChangeSchema).optional(),

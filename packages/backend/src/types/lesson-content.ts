@@ -33,6 +33,11 @@ export interface LessonStep {
   occurrence?: number;        // 동일 코드 라인 구분 (기본값: 1)
   title?: string;
   explanation: string;
+  illustrations?: Array<{
+    src: string;
+    alt?: string;
+    caption?: string;
+  }>;
   highlight?: number[];
   highlightOffset?: number[]; // step.line 기준 상대 오프셋
   misconception?: string;

@@ -58,6 +58,8 @@ const capacitorOrigins = ['capacitor://localhost', 'https://localhost', 'http://
 const allowedOrigins = [...config.server.corsOrigins, ...capacitorOrigins];
 
 app.register(cors, {
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   origin: config.server.isDev ? true : (origin, callback) => {
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {

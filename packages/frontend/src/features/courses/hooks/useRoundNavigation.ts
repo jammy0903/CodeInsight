@@ -20,6 +20,7 @@ interface UseRoundNavigationOptions {
   lessonId: string;
   onStepChange?: (stepIndex: number) => void;
   onQuiz?: () => void;
+  forceSingleRound?: boolean;
 }
 
 interface UseRoundNavigationReturn {
@@ -52,6 +53,7 @@ export function useRoundNavigation({
   lessonId,
   onStepChange,
   onQuiz,
+  forceSingleRound = false,
 }: UseRoundNavigationOptions): UseRoundNavigationReturn {
   const lessonKey = lessonId || '__default_lesson__';
   const [roundState, setRoundState] = useState<RoundState>(() => ({
@@ -85,7 +87,7 @@ export function useRoundNavigation({
     [steps]
   );
 
-  const hasVizRound = vizStepIndices.length > 0;
+  const hasVizRound = !forceSingleRound && vizStepIndices.length > 0;
 
   // Map (round, stepIndex) → actual index in steps[]
   const actualStepIndex = useMemo(() => {

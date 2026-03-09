@@ -52,6 +52,43 @@ function asString(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
+interface AiEvidenceData {
+  phase?: string;
+  expectedPath?: string;
+  actualPath?: string;
+  patch?: string;
+  output?: string;
+  checklist: string[];
+  lineRef?: number;
+  codeRef?: string;
+}
+
+function getAiEvidenceData(
+  stepRecord: Record<string, unknown> | undefined,
+  lineRef?: number
+): AiEvidenceData {
+  if (!stepRecord) {
+    return { checklist: [], lineRef };
+  }
+
+  const state = isRecord(stepRecord.algorithmState) ? stepRecord.algorithmState : undefined;
+  const rawChecklist = state?.checklist;
+  const checklist = Array.isArray(rawChecklist)
+    ? rawChecklist.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+    : [];
+
+  return {
+    phase: asString(state?.phase),
+    expectedPath: asString(state?.expectedPath),
+    actualPath: asString(state?.actualPath),
+    patch: asString(state?.patch),
+    output: asString(state?.output),
+    checklist,
+    lineRef,
+    codeRef: asString(stepRecord.code),
+  };
+}
+
 export function LessonUnifiedView({
   code,
   steps,
@@ -62,6 +99,7 @@ export function LessonUnifiedView({
 }: LessonUnifiedViewProps) {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const isAiLiteracy = languageId === 'ai-literacy';
   const [activeVizTab, setActiveVizTab] = useState<'flow' | 'memory' | 'jsMemory'>('flow');
   const [isConceptOpen, setIsConceptOpen] = useState(false);
 
@@ -70,10 +108,15 @@ export function LessonUnifiedView({
     steps,
     lessonId,
     onQuiz,
+    forceSingleRound: isAiLiteracy,
   });
 
   const currentStep = steps[nav.actualStepIndex];
   const currentStepRecord = currentStep as Record<string, unknown> | undefined;
+  const currentStepIllustrations = Array.isArray(currentStepRecord?.illustrations)
+    ? (currentStepRecord.illustrations as Array<{ src: string; alt?: string; caption?: string }>)
+    : undefined;
+  const aiEvidence = getAiEvidenceData(currentStepRecord, currentStep?.line);
   const isExplanationRound = nav.round === 'explanation';
   const { showMemoryTab, showJsMemoryTab } = useMemo(() => {
     const vizSteps = nav.vizStepIndices.map(i => steps[i]);
@@ -86,7 +129,9 @@ export function LessonUnifiedView({
     };
   }, [languageId, nav.vizStepIndices, steps]);
   const hasVizTabs = showMemoryTab || showJsMemoryTab;
-  const flowLanguage = languageId === 'python-practical' ? 'python' : (languageId || 'c');
+  const flowLanguage = languageId === 'python-practical'
+    ? 'python'
+    : (languageId === 'ai-literacy' ? 'javascript' : (languageId || 'c'));
   const rawConceptType = asString(currentStepRecord?.conceptVisualizationType) || asString(currentStepRecord?.visualizationType);
   const conceptType = rawConceptType && CONCEPT_TYPES.has(rawConceptType) ? rawConceptType : undefined;
   const conceptState = isRecord(currentStepRecord?.conceptState) ? currentStepRecord.conceptState : undefined;
@@ -167,16 +212,23 @@ export function LessonUnifiedView({
         borderColor: 'var(--theme-lesson-panel-border)',
       }}
     >
-      <div className="flex gap-1">
-        <span className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full ${isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
-          {t('lesson.explanation')}
-        </span>
-        {nav.hasVizRound && (
-          <span className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full ${!isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
-            {t('lesson.visualization')}
+      {!isAiLiteracy && (
+        <div className="flex gap-1">
+          <span className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full ${isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
+            {t('lesson.explanation')}
           </span>
-        )}
-      </div>
+          {nav.hasVizRound && (
+            <span className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full ${!isExplanationRound ? 'round-tab-active' : 'round-tab-inactive'}`}>
+              {t('lesson.visualization')}
+            </span>
+          )}
+        </div>
+      )}
+      {isAiLiteracy && (
+        <span className="text-xs md:text-sm font-semibold opacity-80">
+          AI Verification
+        </span>
+      )}
       <span className="ml-auto text-xs md:text-sm font-semibold opacity-60">
         {nav.stepIndex + 1}/{nav.totalInRound} · L{currentStep?.line || 1}
       </span>
@@ -199,7 +251,65 @@ export function LessonUnifiedView({
             <StepExplanation
               explanation={currentStep?.explanation || ''}
               stepIndex={nav.stepIndex}
+              illustrations={currentStepIllustrations}
             />
+            {isAiLiteracy && (
+              <div className="mt-4 rounded-xl border border-[var(--theme-lesson-panel-border)] bg-[var(--theme-lesson-panel-bg)] overflow-hidden">
+                <div className="px-3 py-2 text-sm font-semibold border-b border-[var(--theme-lesson-panel-border)]">
+                  Evidence
+                </div>
+                <div className="px-3 py-3 space-y-2.5 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold opacity-70 min-w-[56px]">Phase</span>
+                    <span className="rounded-md border border-[var(--theme-lesson-panel-border)] px-2 py-1 font-semibold">
+                      {aiEvidence.phase || 'inspect'}
+                    </span>
+                  </div>
+                  {aiEvidence.codeRef && (
+                    <div className="rounded-lg border border-[var(--theme-lesson-panel-border)] px-2.5 py-2">
+                      <div className="font-semibold opacity-70 mb-1">Reference</div>
+                      <div className="font-mono break-all text-[11px]">{aiEvidence.codeRef}</div>
+                    </div>
+                  )}
+                  {(aiEvidence.expectedPath || aiEvidence.actualPath) && (
+                    <div className="rounded-lg border border-[var(--theme-lesson-panel-border)] px-2.5 py-2">
+                      <div className="font-semibold opacity-70 mb-1">Path Check</div>
+                      {aiEvidence.expectedPath && (
+                        <div className="font-mono break-all">expect: {aiEvidence.expectedPath}</div>
+                      )}
+                      {aiEvidence.actualPath && (
+                        <div className="font-mono break-all">real: {aiEvidence.actualPath}</div>
+                      )}
+                      {aiEvidence.expectedPath && aiEvidence.actualPath && (
+                        <div className="font-mono mt-1 opacity-80">→ {aiEvidence.expectedPath} to {aiEvidence.actualPath}</div>
+                      )}
+                    </div>
+                  )}
+                  {aiEvidence.patch && (
+                    <div className="rounded-lg border border-[var(--theme-lesson-panel-border)] px-2.5 py-2">
+                      <div className="font-semibold opacity-70 mb-1">Patch</div>
+                      <div className="font-mono break-all">{aiEvidence.patch}</div>
+                    </div>
+                  )}
+                  {aiEvidence.output && (
+                    <div className="rounded-lg border border-[var(--theme-lesson-panel-border)] px-2.5 py-2">
+                      <div className="font-semibold opacity-70 mb-1">Output</div>
+                      <div className="font-mono break-all">{aiEvidence.output}</div>
+                    </div>
+                  )}
+                  {aiEvidence.checklist.length > 0 && (
+                    <div className="rounded-lg border border-[var(--theme-lesson-panel-border)] px-2.5 py-2">
+                      <div className="font-semibold opacity-70 mb-1">Checklist</div>
+                      <div className="space-y-1">
+                        {aiEvidence.checklist.map((item) => (
+                          <div key={item} className="font-mono">- {item}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </motion.div>
         ) : (
           <motion.div
@@ -300,6 +410,7 @@ export function LessonUnifiedView({
       <LessonCodePanel
         code={code}
         highlightLine={currentStep?.line || 1}
+        pointerLine={isAiLiteracy ? currentStep?.line : undefined}
         terminalLines={terminalLines}
         onSelectionChange={onSelectionChange}
         orientation={isMobile ? 'vertical' : 'horizontal'}
