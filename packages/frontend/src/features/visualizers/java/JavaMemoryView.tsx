@@ -65,6 +65,8 @@ export interface JavaMemoryViewProps {
   heap: JavaHeapObject[];
   /** 변경된 변수/객체 주소 목록 */
   changedTargets?: string[];
+  /** 메모리 비어있을 때 표시할 대체 문구 */
+  emptyMessage?: string;
 }
 
 // ============================================================
@@ -350,6 +352,7 @@ export function JavaMemoryView({
   frames,
   heap,
   changedTargets = [],
+  emptyMessage,
 }: JavaMemoryViewProps) {
   const [hoveredRef, setHoveredRef] = useState<string | null>(null);
   const changedSet = new Set(changedTargets);
@@ -428,7 +431,7 @@ export function JavaMemoryView({
         <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {frames.length === 0 ? (
             <div style={{ padding: '24px', textAlign: 'center', color: COLORS.variable.muted, fontSize: '12px' }}>
-              No active frames
+              {emptyMessage || 'No active frames'}
             </div>
           ) : (
             [...framesWithChanges].reverse().map((frame, idx) => (

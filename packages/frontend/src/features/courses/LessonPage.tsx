@@ -102,6 +102,7 @@ export function LessonPage() {
       try {
         await updateProgress({ lessonId, status: 'completed' });
         queryClient.invalidateQueries({ queryKey: ['progress', appUser?.id] });
+        queryClient.invalidateQueries({ queryKey: ['chapter-progress'] });
         queryClient.invalidateQueries({ queryKey: ['language'] });
         await refreshStreak();
       } catch (err) {

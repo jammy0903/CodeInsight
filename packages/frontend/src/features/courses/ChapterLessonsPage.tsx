@@ -14,11 +14,11 @@ import { CourseGrid } from './components/CourseGrid';
 import { LessonCard } from './components/LessonCard';
 import { useStore } from '@/stores/store';
 import { ChevronLeft, BookOpen, Target, CheckCircle2, Circle } from 'lucide-react';
-import { useIsMobile, useChapter, useChapterProgress } from '@/hooks';
+import { useIsMobile, useChapter, useChapterProgress, useUserProgress } from '@/hooks';
 import { getLessonFull } from '@/services/courses';
 
 type LessonProgressSnapshot = {
-  status?: 'not_started' | 'in_progress' | 'completed';
+  status: 'not_started' | 'in_progress' | 'completed';
 };
 
 type LessonWithProgress = {
@@ -53,14 +53,22 @@ export function ChapterLessonsPage() {
   // TanStack Query: 챕터 단건 + 진행 상태 단건(로그인 시)
   const { data: chapter, isLoading, isError, error } = useChapter(chapterId);
   const { data: chapterProgressData } = useChapterProgress(chapterId);
+  const { data: userProgressData } = useUserProgress();
 
   const progressByLessonId = useMemo(() => {
     const map = new Map<string, LessonProgressSnapshot | null>();
     for (const lesson of chapterProgressData?.lessons ?? []) {
-      map.set(lesson.id, lesson.progress ?? null);
+      const status = lesson.progress?.status;
+      map.set(lesson.id, status ? { status } : null);
+    }
+    // Fallback: chapter-progress 응답이 비어도 전체 progress로 카드 상태 복원
+    for (const progress of userProgressData ?? []) {
+      if (!map.has(progress.lessonId)) {
+        map.set(progress.lessonId, { status: progress.status });
+      }
     }
     return map;
-  }, [chapterProgressData]);
+  }, [chapterProgressData, userProgressData]);
 
   const getLessonProgress = useCallback((lesson: LessonWithProgress): LessonProgressSnapshot | null => {
     return progressByLessonId.get(lesson.id) ?? null;
@@ -103,11 +111,12 @@ export function ChapterLessonsPage() {
   // 진행률: 로그인 사용자는 /chapters/:id/progress 값 사용, 비로그인은 0%
   const chapterProgress = useMemo(() => {
     if (!chapter) return { total: 0, completed: 0, percentage: 0 };
-    const total = chapterProgressData?.totalCount ?? chapter.lessons?.length ?? 0;
-    const completed = chapterProgressData?.completedCount ?? 0;
+    const total = chapter.lessons?.length ?? 0;
+    const completed = chapterProgressData?.completedCount
+      ?? chapter.lessons.filter((lesson) => getLessonProgress(lesson as LessonWithProgress)?.status === 'completed').length;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
     return { total, completed, percentage };
-  }, [chapter, chapterProgressData]);
+  }, [chapter, chapterProgressData, getLessonProgress]);
 
   const totalLessons = chapterProgress.total;
   const completedLessons = chapterProgress.completed;

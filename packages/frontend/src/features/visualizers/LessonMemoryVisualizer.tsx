@@ -21,6 +21,18 @@ import type { MemoryState, ChangedBlocksType, MemoryAdapter } from './shared/ada
 import { CMemoryAdapter } from './c/adapters/CMemoryAdapter';
 import { JavaMemoryAdapter } from './java/adapters/JavaMemoryAdapter';
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function hasText(value: unknown): boolean {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function hasList(value: unknown): boolean {
+  return Array.isArray(value) && value.length > 0;
+}
+
 function createMemoryAdapter(language: string): MemoryAdapter {
   const lang = language.toLowerCase();
   switch (lang) {
@@ -77,11 +89,30 @@ export const LessonMemoryVisualizer = memo(function LessonMemoryVisualizer({
     return null;
   }
 
+  const stepRecord = step as Record<string, unknown>;
+  const javaState = isRecord(stepRecord.javaMemoryState) ? stepRecord.javaMemoryState : undefined;
+  const genericMemoryState = isRecord(stepRecord.memoryState) ? stepRecord.memoryState : undefined;
+  const isComparisonOrOutputStep = (
+    hasText(javaState?.comparison) ||
+    hasText(genericMemoryState?.comparison) ||
+    hasList(javaState?.output) ||
+    hasList(genericMemoryState?.output) ||
+    hasText(javaState?.warning) ||
+    hasText(javaState?.note) ||
+    hasText(stepRecord.stdout)
+  );
+  const emptyMessage = isComparisonOrOutputStep
+    ? '이 단계는 비교/출력 중심이라 메모리 스냅샷을 생략했어요.'
+    : undefined;
+
   // Java
   if (language.toLowerCase() === 'java') {
     return (
       <div className={className}>
-        <JavaMemoryView {...(props as unknown as ComponentProps<typeof JavaMemoryView>)} />
+        <JavaMemoryView
+          {...(props as unknown as ComponentProps<typeof JavaMemoryView>)}
+          emptyMessage={emptyMessage}
+        />
       </div>
     );
   }
@@ -90,7 +121,10 @@ export const LessonMemoryVisualizer = memo(function LessonMemoryVisualizer({
   if (language.toLowerCase() === 'c' || language.toLowerCase() === 'cpp' || language.toLowerCase() === 'c++') {
     return (
       <div className={className}>
-        <MemoryPanel {...(props as unknown as ComponentProps<typeof MemoryPanel>)} />
+        <MemoryPanel
+          {...(props as unknown as ComponentProps<typeof MemoryPanel>)}
+          emptyMessage={emptyMessage}
+        />
       </div>
     );
   }

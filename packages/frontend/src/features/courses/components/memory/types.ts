@@ -28,6 +28,8 @@ export interface MemoryPanelProps {
   stack: MemoryBlock[];
   heap: MemoryBlock[];
   changedBlocks: ChangedBlocksType;
+  /** 메모리 비어있을 때 표시할 대체 문구 */
+  emptyMessage?: string;
   /** 스택 프레임 정보 (함수별 구분용) */
   frames?: Array<{ name: string }>;
   /** Data 영역 (문자열 리터럴, 초기화된 전역변수) */

@@ -18,6 +18,7 @@ export function MemoryPanel({
   stack,
   heap,
   changedBlocks = INITIAL_CHANGED_BLOCKS,
+  emptyMessage,
   frames = [{ name: 'main' }],
   dataSection = [],
   textSection = [],
@@ -31,7 +32,7 @@ export function MemoryPanel({
           className="text-center py-8 text-sm italic"
           style={{ color: 'var(--theme-memory-card-muted)' }}
         >
-          메모리 할당 없음
+          {emptyMessage || '메모리 할당 없음'}
         </div>
       ) : (
         <>
