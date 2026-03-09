@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "create array",
-        "explanation": "**Execution order:**\n1. Create an `int` type array object `{1, 2, 3}` in the heap (0x100).\n2. Assign address `0x100` to `nums` variable on Stack.\n\n**Key:**\nIn Java, an array is an **Object**.\nSo `nums` contains the **address** of where the array is, not the array itself.\n\n**Analog**: `nums` is like a remote control that controls the main body (an array in the Heap).",
+        "explanation": "**Key:**\nIn Java, an array is an **Object**.\nSo `nums` contains the **address** of where the array is, not the array itself.\n\n**Analog**: `nums` is like a remote control that controls the main body (an array in the Heap).",
         "visualizationType": "javaMemory",
         "code": "int[] nums = {1, 2, 3};",
         "javaMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "Initial array output",
-        "explanation": "**Execution order:**\n1. See `nums`.\n2. Output the contents `[1, 2, 3]`.\n\nThis is the current contents of address `0x100`.",
+        "explanation": "This is the current contents of address `0x100`.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Arrays.toString(nums));",
         "javaMemoryState": {
@@ -57,7 +57,7 @@
       },
       {
         "title": "Call modifyElement(nums)",
-        "explanation": "**Execution order:**\n1. Copy the value of `nums` (address `0x100`).\n2. Passed to the parameter `arr` of `modifyElement`.\n\nNow `nums` and `arr` share the same array (`0x100`).",
+        "explanation": "Now `nums` and `arr` share the same array (`0x100`).",
         "visualizationType": "javaMemory",
         "code": "modifyElement(nums);",
         "javaMemoryState": {
@@ -80,7 +80,7 @@
       },
       {
         "title": "Editing Array Elements (Side Effect)",
-        "explanation": "**Execution order:**\n1. Move to address `0x100` pointed to by `arr`.\n2. Overwrite index value 0 with `100`.\n\n**Result:**\nThe original array itself has been modified.\n`nums` is also affected because it is looking in the same place.",
+        "explanation": "**Result:**\nThe original array itself has been modified.\n`nums` is also affected because it is looking in the same place.",
         "keyInsight": "Modify array contents = change original",
         "visualizationType": "javaMemory",
         "code": "arr[0] = 100;",
@@ -111,7 +111,7 @@
       },
       {
         "title": "Confirm after editing",
-        "explanation": "**Execution order:**\n1. End `modifyElement`.\n2. Print `nums`.\n\nYou can see that the first element has been changed to `100`.",
+        "explanation": "You can see that the first element has been changed to `100`.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Arrays.toString(nums));",
         "occurrence": 2,
@@ -138,7 +138,7 @@
       },
       {
         "title": "Call reassignArray(nums)",
-        "explanation": "**Execution order:**\n1. Copy the `nums` address (`0x100`) again.\n2. Passed to `arr` of `reassignArray`.\n\nOnce again the address is copied and forwarded.",
+        "explanation": "Once again the address is copied and forwarded.",
         "visualizationType": "javaMemory",
         "code": "reassignArray(nums);",
         "javaMemoryState": {
@@ -161,7 +161,7 @@
       },
       {
         "title": "Reassign variables (New Array)",
-        "explanation": "**Execution order:**\n1. Create a new array `{999, 888, 777}` in the heap (0x300).\n2. Assign the address `0x300` to the `arr` variable.\n\n**Result:**\nOnly the local variable `arr` points to the new array.\n`nums` in `main` is still holding on to address `0x100`.",
+        "explanation": "**Result:**\nOnly the local variable `arr` points to the new array.\n`nums` in `main` is still holding on to address `0x100`.",
         "keyInsight": "Reassigning variable = only local reference changed",
         "visualizationType": "javaMemory",
         "code": "arr = new int[]{999, 888, 777};",
@@ -198,7 +198,7 @@
       },
       {
         "title": "final confirmation",
-        "explanation": "**Execution order:**\n1. End `reassignArray`.\n2. Print `nums`.\n\nSince the reallocation only affected the local variable (`arr`), `nums` remains `[100, 2, 3]`.",
+        "explanation": "Since the reallocation only affected the local variable (`arr`), `nums` remains `[100, 2, 3]`.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Arrays.toString(nums));",
         "occurrence": 3,

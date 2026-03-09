@@ -1,0 +1,25 @@
+--- a/src/apiClient.ts
++++ b/src/apiClient.ts
+@@
+ export interface RequestOptions {
+   retries?: number;
+ }
++
++interface HttpLikeError extends Error {
++  status?: number;
++}
++
++function isRetriable(error: unknown): boolean {
++  const status = (error as HttpLikeError | undefined)?.status;
++  return status === 429 || status === 500 || status === 502 || status === 503 || status === 504;
++}
+@@
+     } catch (error) {
+       lastError = error;
+-
+-      if (attempt === retries) {
++
++      if (!isRetriable(error) || attempt === retries) {
+         throw error;
+       }
+     }

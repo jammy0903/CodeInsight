@@ -68,6 +68,10 @@ type JavaCacheInfo = {
 type HashSetBucket = { index: string; content: string; searched?: boolean };
 type JavaHashSetInfo = { buckets?: HashSetBucket[] };
 
+function normalizeFrameName(raw: string): string {
+  return raw.replace(/\(\)$/, '').split('.').pop()?.trim().toLowerCase() || raw.trim().toLowerCase();
+}
+
 function isRecord(value: unknown): value is StepRecord {
   return typeof value === 'object' && value !== null;
 }
@@ -337,9 +341,54 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
     const error = asString(jmsRecord?.error);
     const cache = (isRecord(jmsRecord?.cache) ? jmsRecord.cache : undefined) as JavaCacheInfo | undefined;
     const hashSet = (isRecord(jmsRecord?.hashSet) ? jmsRecord.hashSet : undefined) as JavaHashSetInfo | undefined;
+    const explicitCallEvent = asString(jmsRecord?.callEvent);
+    const explicitStackAction = asString(jmsRecord?.stackAction);
+    const explicitCurrentFrame = asString(jmsRecord?.currentFrame);
+    const flowFrames = flowStepWithAnimations.frames
+      .map((f) => f.name)
+      .filter((name) => {
+        const n = name.toLowerCase();
+        return n !== 'heap' && n !== 'string pool';
+      });
+    const prevFrames = (prevFlowStep?.frames ?? [])
+      .map((f) => f.name)
+      .filter((name) => {
+        const n = name.toLowerCase();
+        return n !== 'heap' && n !== 'string pool';
+      });
+    const flowFrameSet = new Set(flowFrames.map(normalizeFrameName));
+    const prevFrameSet = new Set(prevFrames.map(normalizeFrameName));
+    const pushedFrame =
+      flowFrames.find((frame) => !prevFrameSet.has(normalizeFrameName(frame)));
+    const poppedFrame =
+      prevFrames.find((frame) => !flowFrameSet.has(normalizeFrameName(frame)));
+    const stackAction = explicitStackAction || (pushedFrame ? 'PUSH' : poppedFrame ? 'POP' : undefined);
+    const currentFrame =
+      explicitCurrentFrame ||
+      flowFrames.find((name) => normalizeFrameName(name) !== 'main') ||
+      flowFrames[0];
+    const callEvent = explicitCallEvent || (pushedFrame ? `CALL ${pushedFrame}()` : poppedFrame ? `RETURN ${poppedFrame}()` : undefined);
 
     return (
       <div className={className}>
+        {(callEvent || stackAction || currentFrame) && (
+          <div
+            className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg text-xs font-semibold"
+            style={{ background: '#f8fafc', border: '1px solid #cbd5e1', color: '#0f172a' }}
+          >
+            {stackAction && (
+              <span className="px-2 py-0.5 rounded-full font-mono" style={{ background: '#dbeafe', color: '#1d4ed8' }}>
+                {stackAction}
+              </span>
+            )}
+            {callEvent && <span className="font-mono">{callEvent}</span>}
+            {currentFrame && (
+              <span className="ml-auto px-2 py-0.5 rounded-full font-mono" style={{ background: '#ecfeff', color: '#0e7490' }}>
+                current: {currentFrame}()
+              </span>
+            )}
+          </div>
+        )}
         {comparison && (
           <div
             className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg text-sm font-mono"
@@ -379,6 +428,8 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
         <JavaReferenceView
           step={flowStepWithAnimations}
           prevStep={prevFlowStep}
+          activeFrameName={currentFrame}
+          frameAction={stackAction}
         />
         {/* Integer Cache visualization */}
         {cache && (
@@ -406,11 +457,6 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
               <span>-128</span>
               <span>127</span>
             </div>
-            {cache.refCount != null && (
-              <div className="text-xs text-amber-700 mt-1">
-                refs: {cache.refCount}
-              </div>
-            )}
             {cache.note && (
               <div className="text-xs text-amber-800 mt-1 font-medium">
                 {cache.note}

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "final 기본 타입",
-        "explanation": "**실행 순서:**\n1. `final int x = 10;` 선언을 만납니다.\n2. 스택 메모리에 변수 `x`를 위한 공간을 할당합니다.\n3. 값 `10`을 저장하고, '수정 불가(Read-only)' 표시를 남깁니다.\n\n**용접된 상자:**\n`x`라는 상자에 `10`을 넣고 뚜껑을 **용접**해버린 것과 같습니다.\n이제 내용물을 바꿀 수 없습니다.",
+        "explanation": "**용접된 상자:**\n`x`라는 상자에 `10`을 넣고 뚜껑을 **용접**해버린 것과 같습니다.\n이제 내용물을 바꿀 수 없습니다.",
         "visualizationType": "javaMemory",
         "code": "final int x = 10;",
         "javaMemoryState": {
@@ -26,7 +26,7 @@
       },
       {
         "title": "final 배열 참조",
-        "explanation": "**실행 순서:**\n1. `final int[] arr` 변수를 스택에 생성합니다.\n2. 힙 메모리에 `{1, 2, 3}` 배열 객체(`0x001`)를 만듭니다.\n3. `arr`가 `0x001`을 가리키도록 설정하고, 이 '화살표'를 고정합니다.\n\n**고정된 화살표:**\n이제 `arr` 변수는 오직 저쪽 집(`0x001`)만 가리킬 수 있습니다.",
+        "explanation": "**고정된 화살표:**\n이제 `arr` 변수는 오직 저쪽 집(`0x001`)만 가리킬 수 있습니다.",
         "visualizationType": "javaMemory",
         "code": "final int[] arr = {1, 2, 3};",
         "javaMemoryState": {
@@ -58,7 +58,7 @@
       },
       {
         "title": "배열 요소 수정 (OK!)",
-        "explanation": "**실행 순서:**\n1. `arr`가 가리키는 힙 메모리의 `0x001` 주소를 찾아갑니다.\n2. 그 집의 0번째 방 내용을 `100`으로 바꿉니다.\n\n**내부는 자유:**\n'화살표'는 못 바꾸지만, 화살표가 가리키는 **집 안의 내용물**은 마음대로 바꿀 수 있습니다.\n이사는 못 가지만 인테리어 공사는 되는 거죠!",
+        "explanation": "**내부는 자유:**\n'화살표'는 못 바꾸지만, 화살표가 가리키는 **집 안의 내용물**은 마음대로 바꿀 수 있습니다.\n이사는 못 가지만 인테리어 공사는 되는 거죠!",
         "visualizationType": "javaMemory",
         "code": "arr[0] = 100;  // OK!",
         "javaMemoryState": {
@@ -74,7 +74,7 @@
       },
       {
         "title": "final StringBuilder",
-        "explanation": "**실행 순서:**\n1. 힙 메모리에 `StringBuilder` 객체(`0x002`)를 생성합니다.\n2. 스택의 `sb` 변수가 이를 가리키게 하고, 마찬가지로 화살표를 고정합니다.",
+        "explanation": "",
         "visualizationType": "javaMemory",
         "code": "final StringBuilder sb = new StringBuilder(\"Hello\");",
         "javaMemoryState": {
@@ -118,7 +118,7 @@
       },
       {
         "title": "내용 수정 (OK!)",
-        "explanation": "**실행 순서:**\n1. `0x002` 객체 내부의 `append` 메서드를 호출합니다.\n2. 객체 내부 문자열이 \"Hello World\"로 변경됩니다.\n\n**핵심:**\n`sb`라는 화살표는 그대로지만, 도착지의 상태는 얼마든지 변할 수 있습니다.",
+        "explanation": "**핵심:**\n`sb`라는 화살표는 그대로지만, 도착지의 상태는 얼마든지 변할 수 있습니다.",
         "visualizationType": "javaMemory",
         "code": "sb.append(\" World\");  // OK!",
         "javaMemoryState": {

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Optional.of() - 创建一个盒子",
-        "explanation": "**执行顺序：**\n1. 调用 `Optional.of(\"hello\")`。\n2. 在堆中创建一个“Optional”对象（框）。\n3. 在内部存储“hello”值。\n\n**内存中发生了什么：**\n在堆上创建一个名为“Optional”的**硬包装**，并将字符串“hello”安全地放置在框中。\n\n**警告：** `of()` 绝不允许 `null`。\n如果输入 null，则在创建框之前就会发生 NPE。",
+        "explanation": "**内存中发生了什么：**\n在堆上创建一个名为“Optional”的**硬包装**，并将字符串“hello”安全地放置在框中。\n\n**警告：** `of()` 绝不允许 `null`。\n如果输入 null，则在创建框之前就会发生 NPE。",
         "keyInsight": "of() = 永不为空",
         "visualizationType": "javaMemory",
         "code": "Optional<String> opt1 = Optional.of(\"hello\");",
@@ -36,7 +36,7 @@
       },
       {
         "title": "Optional.empty() - 空框",
-        "explanation": "**执行顺序：**\n1. 调用`Optional.empty()`。\n2. 返回一个空的`Optional`对象。\n\n创建一个没有内容的“空盒子”对象。\n这是一种清楚地说“我有一个盒子，但没有内容”的方法，而不是使用“null”变量。\n返回“Optional”会让你立即知道，“哦，也许它不在那里。”",
+        "explanation": "创建一个没有内容的“空盒子”对象。\n这是一种清楚地说“我有一个盒子，但没有内容”的方法，而不是使用“null”变量。\n返回“Optional”会让你立即知道，“哦，也许它不在那里。”",
         "keyInsight": "empty() = 明确表示没有值",
         "visualizationType": "javaMemory",
         "code": "Optional<String> opt2 = Optional.empty();",
@@ -68,7 +68,7 @@
       },
       {
         "title": "Optional.ofNullable() - 灵活的盒子",
-        "explanation": "**执行顺序：**\n1. 调用`Optional.ofNullable(null)`。\n2. 确认参数为“null”。\n3. 内部返回`Optional.empty()`。\n\n如果该值存在，则将其放置在框中 (`of`) 中。如果它是“null”，则创建一个空框（“empty”）。\nIn reality, this is the most commonly used creation method.",
+        "explanation": "如果该值存在，则将其放置在框中 (`of`) 中。如果它是“null”，则创建一个空框（“empty”）。\nIn reality, this is the most commonly used creation method.",
         "visualizationType": "javaMemory",
         "code": "Optional<String> opt3 = Optional.ofNullable(null);",
         "javaMemoryState": {
@@ -91,7 +91,7 @@
       },
       {
         "title": "get() - 强制弹出（危险！！）",
-        "explanation": "**执行顺序：**\n1. 调用`opt1.get()`。\n2. 检查是否存在价值。\n3.返回“你好”。\n\n我盲目地打开盒子。\n我很高兴我现在有了这个值，但是如果我在它为空时调用 `get()` ，它会抛出 **`NoSuchElementException`** 异常。\n\n**警告：** `get()` 是最后的手段。\n尽可能避免使用它。",
+        "explanation": "3.返回“你好”。\n\n我盲目地打开盒子。\n我很高兴我现在有了这个值，但是如果我在它为空时调用 `get()` ，它会抛出 **`NoSuchElementException`** 异常。\n\n**警告：** `get()` 是最后的手段。\n尽可能避免使用它。",
         "keyInsight": "推荐使用 orElse() 而不是 get()",
         "visualizationType": "javaMemory",
         "code": "String value = opt1.get();",
@@ -108,7 +108,7 @@
       },
       {
         "title": "isPresent() - 检查",
-        "explanation": "**执行顺序：**\n1. 调用`opt2.isPresent()`。\n2. `opt2` 为空，因此返回**false**。\n3. 跳过“if”块。\n\n它询问“这个盒子有价值吗？” （“存在”）。\n由于“opt2”为空，因此返回“false”，并且不执行“if”块。",
+        "explanation": "它询问“这个盒子有价值吗？” （“存在”）。\n由于“opt2”为空，因此返回“false”，并且不执行“if”块。",
         "visualizationType": "javaMemory",
         "code": "if (opt2.isPresent()) {",
         "javaMemoryState": {
@@ -124,7 +124,7 @@
       },
       {
         "title": "orElse() - 提供安全的默认值",
-        "explanation": "**执行顺序：**\n1. 调用`opt3.orElse(\"default\")`。\n2. 检查“opt3”是否为空。\n3. 返回作为参数传递的“默认”。\n\n**最推荐的方法：** 《打开盒子。\n如果有一个值，就使用它。 **如果为空，则使用“默认”。**”\n您可以在一行中整齐、安全地获取该值。",
+        "explanation": "**最推荐的方法：** 《打开盒子。\n如果有一个值，就使用它。 **如果为空，则使用“默认”。**”\n您可以在一行中整齐、安全地获取该值。",
         "keyInsight": "orElse() = 安全默认模式",
         "visualizationType": "javaMemory",
         "code": "String result = opt3.orElse(\"default\");",
@@ -141,7 +141,7 @@
       },
       {
         "title": "ifPresent() - 函数式风格",
-        "explanation": "**执行顺序：**\n1. 调用`opt1.ifPresent(...)`。\n2. 确认“opt1”具有值。\n3. 执行 lambda 函数 `s -> println(s)`。\n4. 输出“你好”。\n\n“如果有值，则执行这个函数（lambda）。\n“Not if you don’t have it.”\n这是一种在盒子内做事的优雅方式，无需拉出值。",
+        "explanation": "“如果有值，则执行这个函数（lambda）。\n“Not if you don’t have it.”\n这是一种在盒子内做事的优雅方式，无需拉出值。",
         "keyInsight": "ifPresent() = 仅当有值时执行",
         "visualizationType": "javaMemory",
         "code": "opt1.ifPresent(s -> System.out.println(s));",

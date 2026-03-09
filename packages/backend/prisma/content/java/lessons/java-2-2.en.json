@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Receiving a value that may be null",
-        "explanation": "**Execution order:**\n1. Call `getValueMaybeNull()`.\n2. Return a value (or `null`).\n3. Save it to the `str` variable.\n\n**Situation:** When you receive a value from outside (DB, API, user input), you should always suspect that it could be `null`.\nThis `str` is like a time bomb that you never know will explode.",
+        "explanation": "**Situation:** When you receive a value from outside (DB, API, user input), you should always suspect that it could be `null`.\nThis `str` is like a time bomb that you never know will explode.",
         "visualizationType": "javaMemory",
         "code": "String str = getValueMaybeNull();",
         "javaMemoryState": {
@@ -25,7 +25,7 @@
       },
       {
         "title": "Short-circuit Evaluation",
-        "explanation": "**Execution order:**\n1. Check `str != null` -> **false** (if null).\n2. **Break immediately** (do not execute subsequent `str.length()`).\n\n**The magic of logical operations:** The `&&` (AND) operator does not even check the right side if the left condition is `false`.\nFirst, it checks `str != null` and if it is `null`, the subsequent `str.length()` is not executed, safely avoiding `NullPointerException`.",
+        "explanation": "**The magic of logical operations:** The `&&` (AND) operator does not even check the right side if the left condition is `false`.\nFirst, it checks `str != null` and if it is `null`, the subsequent `str.length()` is not executed, safely avoiding `NullPointerException`.",
         "keyInsight": "&& shortcut evaluation: if the first one is false, the second one is not executed",
         "visualizationType": "javaMemory",
         "code": "if (str != null && str.length() > 0) {",
@@ -44,7 +44,7 @@
       },
       {
         "title": "conditional execution",
-        "explanation": "**Execution order:**\n1. If the previous `if` condition is `true`...\n2. Execute `println(str)`.\n\nThis line is executed only if all conditions in the preceding `if` statement (`str != null && str.length() > 0`) are `true`.\nPrints safely with `str` guaranteed to be a valid string.",
+        "explanation": "This line is executed only if all conditions in the preceding `if` statement (`str != null && str.length() > 0`) are `true`.\nPrints safely with `str` guaranteed to be a valid string.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(str);",
         "javaMemoryState": {
@@ -56,12 +56,15 @@
             }
           ],
           "note": "This line is only reachable when str is safe",
-          "evaluation": null
+          "evaluation": null,
+          "output": [
+            "hello"
+          ]
         }
       },
       {
         "title": "Objects.requireNonNull (Fail-fast)",
-        "explanation": "**Execution order:**\n1. Call `Objects.requireNonNull(str, ...)`.\n2. Check whether `str` is `null`.\n3. If `null`, an exception occurs immediately.\n\n**Fail-fast strategy:** “If there is a problem, solve it clearly right now instead of worrying about it later!” If `str` is `null`, it immediately throws a `NullPointerException` with a clear message, making debugging easier.",
+        "explanation": "**Fail-fast strategy:** “If there is a problem, solve it clearly right now instead of worrying about it later!” If `str` is `null`, it immediately throws a `NullPointerException` with a clear message, making debugging easier.",
         "keyInsight": "Fail-fast pattern",
         "visualizationType": "javaMemory",
         "code": "Objects.requireNonNull(str, \"str must not be null\");",
@@ -81,7 +84,7 @@
       },
       {
         "title": "Provide default values ​​with ternary operator",
-        "explanation": "**Execution order:**\n1. `str != null` check.\n2. Select `str` if true, `\"default\"` if false.\n3. Assign the result to `result`.\n\nIf `str` is not `null`, `str` itself is assigned, and if `str` is `null`, the default value `\"default\"` is assigned to the `result` variable.",
+        "explanation": "If `str` is not `null`, `str` itself is assigned, and if `str` is `null`, the default value `\"default\"` is assigned to the `result` variable.",
         "visualizationType": "javaMemory",
         "code": "String result = (str != null) ? str : \"default\";",
         "javaMemoryState": {
@@ -103,7 +106,7 @@
       },
       {
         "title": "Objects.requireNonNullElse",
-        "explanation": "**Execution order:**\n1. Call `Objects.requireNonNullElse`.\n2. Internally check for null.\n3. If `null`, `\"default\"` is returned.\n4. Assignment to `value`.\n\nA more readable approach available since Java 9.\nIt has the same function as the ternary operator, but the intent is clearly revealed: \"If not null, this, otherwise that.\"",
+        "explanation": "A more readable approach available since Java 9.\nIt has the same function as the ternary operator, but the intent is clearly revealed: \"If not null, this, otherwise that.\"",
         "keyInsight": "Java 9+: Using requireNonNullElse",
         "visualizationType": "javaMemory",
         "code": "String value = Objects.requireNonNullElse(str, \"default\");",

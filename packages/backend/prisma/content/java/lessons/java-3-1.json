@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "변수 a 선언",
-        "explanation": "**실행 순서:**\n1. Stack 메모리의 `main` 프레임 생성.\n2. `int`형 변수 `a` 공간 확보.\n3. 값 `10` 저장.\n\n**메모리에서 일어나는 일:**\n`main`이라는 작업 공간(Stack Frame)에 `a`라는 이름표를 붙인 상자를 만들고, 숫자 `10`을 넣습니다.",
+        "explanation": "**메모리에서 일어나는 일:**\n`main`이라는 작업 공간(Stack Frame)에 `a`라는 이름표를 붙인 상자를 만들고, 숫자 `10`을 넣습니다.",
         "visualizationType": "javaMemory",
         "code": "int a = 10;",
         "javaMemoryState": {
@@ -25,7 +25,7 @@
       },
       {
         "title": "메서드 호출 전 출력",
-        "explanation": "**실행 순서:**\n1. `a`의 현재 값 조회.\n2. `System.out.println` 호출.\n\n현재 `a` 상자에 들어있는 `10`을 화면에 출력합니다.",
+        "explanation": "현재 `a` 상자에 들어있는 `10`을 화면에 출력합니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"before: \" + a);",
         "javaMemoryState": {
@@ -45,7 +45,7 @@
       },
       {
         "title": "increment(a) 호출 - 값의 복사",
-        "explanation": "**실행 순서:**\n1. `increment` 메서드용 새 Stack Frame 생성.\n2. 파라미터 `x` 변수 공간 생성.\n3. `a`의 값 `10`을 읽어서 `x`에 **복사**.\n\n**핵심 (Call by Value):**\n`a` 그 자체가 넘어가는 게 아닙니다.\n`a`에 들어있는 값 `10`을 복사해서 `x`라는 새 상자에 넣어줍니다.\n이제 `a`와 `x`는 완전히 남남입니다.",
+        "explanation": "**핵심 (Call by Value):**\n`a` 그 자체가 넘어가는 게 아닙니다.\n`a`에 들어있는 값 `10`을 복사해서 `x`라는 새 상자에 넣어줍니다.\n이제 `a`와 `x`는 완전히 남남입니다.",
         "keyInsight": "변수 자체가 아닌 '값'만 복사됨",
         "visualizationType": "javaMemory",
         "code": "increment(a);",
@@ -70,7 +70,7 @@
       },
       {
         "title": "파라미터 x 값 변경",
-        "explanation": "**실행 순서:**\n1. `x`의 값 `10`을 읽음.\n2. `1`을 더해 `11` 생성.\n3. `x` 상자에 `11`을 다시 저장.\n\n**원본은?**\n`x`는 `increment` 프레임에 있는 별도의 상자입니다.\n여기서 무슨 짓을 해도 `main` 프레임에 있는 `a` 상자는 영향을 받지 않습니다.",
+        "explanation": "**원본은?**\n`x`는 `increment` 프레임에 있는 별도의 상자입니다.\n여기서 무슨 짓을 해도 `main` 프레임에 있는 `a` 상자는 영향을 받지 않습니다.",
         "keyInsight": "복사본(x)을 수정해도 원본(a)은 그대로",
         "visualizationType": "javaMemory",
         "code": "x = x + 1;",
@@ -95,7 +95,7 @@
       },
       {
         "title": "함수 내부 출력",
-        "explanation": "**실행 순서:**\n1. `x`의 값 `11` 조회.\n2. 출력.\n\n함수 내부에서는 변경된 값 `11`이 보입니다.",
+        "explanation": "함수 내부에서는 변경된 값 `11`이 보입니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"inside: \" + x);",
         "javaMemoryState": {
@@ -120,7 +120,7 @@
       },
       {
         "title": "함수 반환 및 결과 확인",
-        "explanation": "**실행 순서:**\n1. `increment` 메서드 종료.\n2. `increment` 스택 프레임(x 포함) 삭제.\n3. `main`으로 복귀.\n4. `a` 값 출력.\n\n**결과:**\n`a`는 여전히 `10`입니다.\n복사본(`x`)이 사라졌을 뿐, 원본(`a`)은 건드린 적이 없기 때문입니다.",
+        "explanation": "**결과:**\n`a`는 여전히 `10`입니다.\n복사본(`x`)이 사라졌을 뿐, 원본(`a`)은 건드린 적이 없기 때문입니다.",
         "keyInsight": "메서드 종료 시 복사본은 소멸됨",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"after: \" + a);",

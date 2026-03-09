@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Person 클래스 정의",
-        "explanation": "**실행 순서:**\n1. Person 클래스 로드.\n2. `equals` 오버라이드 확인.\n3. `hashCode` 누락 확인 (경고).\n\n`equals()`는 재정의했지만, `hashCode()`는 빠뜨린 '반쪽짜리' 클래스입니다.\n이 클래스를 `HashSet`이나 `HashMap` 같은 곳에 쓰면 **대형 사고**가 터집니다.",
+        "explanation": "`Person`은 이름(`name`)이 같으면 같은 사람이라고 보도록 `equals()`를 재정의했습니다.\n문제는 `hashCode()`를 함께 재정의하지 않았다는 점입니다.\n\n[BROWN_BOX]\n**hashCode가 뭐예요?**\n`hashCode`는 객체를 해시 기반 컬렉션(`HashSet`, `HashMap`)의 어느 칸(버킷)에 넣을지 정하는 숫자입니다.\n쉽게 말해 `equals`가 \"같은 사람인지 최종 판정\"이라면, `hashCode`는 \"먼저 찾아갈 주소 힌트\"입니다.\n\n**왜 여기서 중요해요?**\n둘은 반드시 같이 맞아야 합니다.\n같다고 판정되는 객체라면 같은 `hashCode`가 나와야 같은 버킷에서 만나고,\n그래야 `contains`/`get`이 정상 동작합니다.\n[/BROWN_BOX]\n\n지금 코드는 이 규칙을 깨고 있어서, 값은 같은데도 찾기 실패하는 버그가 생길 수 있습니다.",
         "visualizationType": "javaMemory",
         "code": "class Person {",
         "highlightOffset": [
@@ -23,7 +23,7 @@
           9
         ],
         "javaMemoryState": {
-          "note": "equals()는 오버라이드, hashCode()는 누락 (위험!)",
+          "note": "이 단계는 객체 생성 단계가 아니라 클래스 정의/메타데이터 로딩 단계입니다.",
           "stack": [],
           "heap": [],
           "output": []
@@ -31,7 +31,7 @@
       },
       {
         "title": "첫 번째 Person 객체 생성",
-        "explanation": "**실행 순서:**\n1. `new Person(\"Alice\")` 호출.\n2. Heap 할당 (0x001).\n3. 기본 `hashCode`(예: 123) 생성.\n\n이 객체는 고유한 메모리 주소(0x001)와 그에 기반한 기본 해시코드(123)를 갖습니다.",
+        "explanation": "`p1`이라는 첫 번째 사람 객체를 하나 만든 상태입니다.\n이 객체 이름은 \"Alice\"예요.\n\n중요한 점은 딱 하나입니다.\n지금 `hashCode()`를 직접 만들지 않았기 때문에,\nJava가 객체마다 기본 번호(예: 123)를 자동으로 붙입니다.\n\n즉, 같은 이름 \"Alice\"를 가진 다른 객체를 나중에 또 만들어도\n기본 번호는 다르게 붙을 수 있습니다.\n이게 뒤에서 `HashSet` 검색이 꼬이는 출발점입니다.",
         "visualizationType": "javaMemory",
         "code": "Person p1 = new Person(\"Alice\");",
         "javaMemoryState": {
@@ -54,7 +54,7 @@
       },
       {
         "title": "두 번째 Person 객체 생성",
-        "explanation": "**실행 순서:**\n1. `new Person(\"Alice\")` 호출.\n2. 새 Heap 할당 (0x002).\n3. 새 기본 `hashCode`(예: 456) 생성.\n\n`p2`는 내용이 같더라도 `p1`과 다른 해시코드를 갖게 됩니다.\n`hashCode()`가 재정의되지 않았기 때문입니다.",
+        "explanation": "`p2`라는 두 번째 사람 객체를 또 만들었습니다.\n이름은 똑같이 \"Alice\"예요.\n\n하지만 `p2`는 `p1`과는 다른 **새 객체**입니다.\n그래서 Java가 또 다른 기본 번호(예: 456)를 붙입니다.\n\n결과적으로 `p1`과 `p2`는 값은 같아 보여도\n해시코드는 서로 다를 수 있습니다.\n이 차이 때문에 곧 `HashSet`에서 이상한 결과가 나옵니다.",
         "visualizationType": "javaMemory",
         "code": "Person p2 = new Person(\"Alice\");",
         "javaMemoryState": {
@@ -87,7 +87,7 @@
       },
       {
         "title": "equals() 비교",
-        "explanation": "**실행 순서:**\n1. `p1.equals(p2)` 호출.\n2. 이름(\"Alice\") 비교.\n3. 일치하므로 **true**.\n\n여기까지는 문제가 없어 보입니다.",
+        "explanation": "이제 `p1.equals(p2)`를 해보면 결과는 `true`입니다.\n이름이 둘 다 \"Alice\"라서, 우리가 만든 `equals()` 기준으로는 같은 사람으로 보기 때문입니다.\n\n그래서 여기까지만 보면 \"문제 없네?\"라고 느껴집니다.\n하지만 `HashSet`은 `equals()`만 보는 게 아니라,\n먼저 `hashCode()`로 방(버킷)을 찾는다는 점이 핵심입니다.",
         "keyInsight": "equals() 오버라이드 = 값 비교 가능",
         "visualizationType": "javaMemory",
         "code": "System.out.println(p1.equals(p2));",
@@ -125,7 +125,7 @@
       },
       {
         "title": "HashSet 생성",
-        "explanation": "**실행 순서:**\n1. `new HashSet<>()` 호출.\n2. 초기 버킷(배열) 생성.\n\n해시 기반 자료구조는 객체를 저장하고 검색할 때 `hashCode()`를 사용합니다.",
+        "explanation": "`HashSet`은 값을 보관하는 여러 개의 \"방(버킷)\"을 가진 구조라고 생각하면 쉽습니다.\n객체를 넣거나 찾을 때는 먼저 `hashCode()`로 어느 방을 볼지 정합니다.\n\n즉, `equals()`는 나중 단계이고,\n첫 단계는 항상 `hashCode()`입니다.",
         "visualizationType": "javaMemory",
         "code": "Set<Person> set = new HashSet<>();",
         "javaMemoryState": {
@@ -162,13 +162,33 @@
               "content": "HashSet"
             }
           ],
+          "hashSet": {
+            "buckets": [
+              {
+                "index": "bucket[0]",
+                "content": "(empty)"
+              },
+              {
+                "index": "bucket[1]",
+                "content": "(empty)"
+              },
+              {
+                "index": "bucket[2]",
+                "content": "(empty)"
+              },
+              {
+                "index": "bucket[3]",
+                "content": "(empty)"
+              }
+            ]
+          },
           "output": [],
           "note": null
         }
       },
       {
         "title": "HashSet에 p1 추가",
-        "explanation": "**실행 순서:**\n1. `set.add(p1)` 호출.\n2. `p1.hashCode()` 계산 -> **123**.\n3. 123번 버킷에 `p1` 저장.",
+        "explanation": "`set.add(p1)`를 하면 `p1`의 `hashCode`(예: 123)를 기준으로 방을 정하고,\n그 방에 `p1`을 넣습니다.\n\n지금 시점에는 `hash(123)` 방에만 `p1`이 들어 있는 상태입니다.",
         "keyInsight": "HashSet/HashMap = hashCode()로 방 배정",
         "visualizationType": "javaMemory",
         "code": "set.add(p1);",
@@ -185,7 +205,7 @@
       },
       {
         "title": "contains(p2) 호출 (검색 실패)",
-        "explanation": "**실행 순서:**\n1. `set.contains(p2)` 호출.\n2. `p2.hashCode()` 계산 -> **456**.\n3. 456번 버킷 확인.\n4. **비어있음** -> **false** 반환.\n\n`equals()`가 `true`여도, `hashCode()`가 달라서 아예 다른 방을 뒤졌습니다.\n찾을 리가 없죠.",
+        "explanation": "이제 `set.contains(p2)`를 호출하면,\n`HashSet`은 먼저 `p2`의 `hashCode`(예: 456) 방으로 갑니다.\n\n그런데 `p1`은 `hash(123)` 방에 들어가 있었죠.\n즉, 아예 다른 방을 보고 있으니 못 찾고 `false`가 됩니다.\n\n중요한 포인트:\n`equals()`가 `true`여도, `hashCode()`가 다르면 `HashSet` 검색은 실패할 수 있습니다.",
         "keyInsight": "hashCode 다름 = 다른 버킷 = 찾기 실패",
         "visualizationType": "javaMemory",
         "code": "System.out.println(set.contains(p2));",

@@ -6,8 +6,8 @@
  */
 
 import { useEffect, useRef, useMemo, useCallback } from 'react';
-import { EditorState } from '@codemirror/state';
-import { EditorView, lineNumbers, keymap, type ViewUpdate } from '@codemirror/view';
+import { EditorState, StateEffect, StateField } from '@codemirror/state';
+import { EditorView, lineNumbers, keymap, Decoration, type DecorationSet, type ViewUpdate } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { autocompletion, closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { bracketMatching, indentOnInput } from '@codemirror/language';
@@ -37,6 +37,11 @@ interface CodeMirrorEditorProps {
   language?: SupportedLanguage;
   highlightLine?: number;
   pointerLine?: number;
+  pulseLine?: number;
+  inlineHint?: {
+    line: number;
+    text: string;
+  } | null;
   editable?: boolean;
   onChange?: (code: string) => void;
   onSelectionChange?: (sel: CodeSelection) => void;
@@ -54,11 +59,85 @@ const languageExtensions: Record<string, () => ReturnType<typeof cpp>> = {
   'python-practical': python,
 };
 
+const setInlineHintEffect = StateEffect.define<{ line: number | null; text: string | null }>();
+const setPulseLineEffect = StateEffect.define<number | null>();
+
+function buildInlineHintDecorations(
+  doc: EditorState['doc'],
+  line: number | null,
+  text: string | null
+): DecorationSet {
+  if (!line || !text) return Decoration.none;
+  if (line < 1 || line > doc.lines) return Decoration.none;
+
+  const lineInfo = doc.line(line);
+  const deco = Decoration.line({
+    attributes: {
+      class: 'cm-ai-inline-hint-line',
+      'data-ai-inline-hint': text,
+    },
+  }).range(lineInfo.from);
+
+  return Decoration.set([deco]);
+}
+
+const inlineHintField = StateField.define<{
+  line: number | null;
+  text: string | null;
+  decorations: DecorationSet;
+}>({
+  create() {
+    return { line: null, text: null, decorations: Decoration.none };
+  },
+  update(value, tr) {
+    let nextLine = value.line;
+    let nextText = value.text;
+    for (const effect of tr.effects) {
+      if (effect.is(setInlineHintEffect)) {
+        nextLine = effect.value.line;
+        nextText = effect.value.text;
+      }
+    }
+    return {
+      line: nextLine,
+      text: nextText,
+      decorations: buildInlineHintDecorations(tr.state.doc, nextLine, nextText),
+    };
+  },
+  provide: (field) => EditorView.decorations.from(field, (v) => v.decorations),
+});
+
+const pulseLineField = StateField.define<DecorationSet>({
+  create() {
+    return Decoration.none;
+  },
+  update(_value, tr) {
+    let line: number | null = null;
+    for (const effect of tr.effects) {
+      if (effect.is(setPulseLineEffect)) {
+        line = effect.value;
+      }
+    }
+    if (!line || line < 1 || line > tr.state.doc.lines) {
+      return Decoration.none;
+    }
+    const lineInfo = tr.state.doc.line(line);
+    return Decoration.set([
+      Decoration.line({
+        attributes: { class: 'cm-ai-pulse-line' },
+      }).range(lineInfo.from),
+    ]);
+  },
+  provide: (field) => EditorView.decorations.from(field),
+});
+
 export function CodeMirrorEditor({
   code,
   language = 'c',
   highlightLine,
   pointerLine,
+  pulseLine,
+  inlineHint,
   editable = false,
   onChange,
   onSelectionChange,
@@ -98,6 +177,25 @@ export function CodeMirrorEditor({
         whiteSpace: 'pre',
         overflow: 'visible',
       },
+      '.cm-line.cm-ai-inline-hint-line': {
+        position: 'relative',
+      },
+      '.cm-line.cm-ai-inline-hint-line::before': {
+        content: 'attr(data-ai-inline-hint)',
+        display: 'inline-block',
+        marginBottom: '4px',
+        padding: '2px 8px',
+        borderRadius: '9999px',
+        fontSize: isMobile ? '10px' : '11px',
+        fontWeight: '600',
+        color: '#7F1D1D',
+        backgroundColor: '#FEE2E2',
+        border: '1px solid #FECACA',
+      },
+      '.cm-line.cm-ai-pulse-line': {
+        backgroundColor: '#FFF7ED',
+        boxShadow: 'inset 3px 0 0 #F97316',
+      },
     });
   }, [isMobile, mobileFontSizeOffset, pointerLine]);
 
@@ -131,6 +229,8 @@ export function CodeMirrorEditor({
       ...themeExtension,
       styleExtension,
       bottomPaddingExtension,
+      inlineHintField,
+      pulseLineField,
       lineHighlightExtension,
       lineHighlightTheme,
       EditorView.lineWrapping,
@@ -205,6 +305,11 @@ export function CodeMirrorEditor({
     if (highlightLine) {
       view.dispatch({ effects: setHighlightedLine.of(highlightLine) });
     }
+    if (inlineHint?.line && inlineHint?.text) {
+      view.dispatch({
+        effects: setInlineHintEffect.of({ line: inlineHint.line, text: inlineHint.text }),
+      });
+    }
 
     return () => {
       view.destroy();
@@ -244,6 +349,23 @@ export function CodeMirrorEditor({
       }
     }
   }, [highlightLine]);
+
+  useEffect(() => {
+    if (!viewRef.current) return;
+    viewRef.current.dispatch({
+      effects: setInlineHintEffect.of({
+        line: inlineHint?.line ?? null,
+        text: inlineHint?.text ?? null,
+      }),
+    });
+  }, [inlineHint?.line, inlineHint?.text]);
+
+  useEffect(() => {
+    if (!viewRef.current) return;
+    viewRef.current.dispatch({
+      effects: setPulseLineEffect.of(pulseLine ?? null),
+    });
+  }, [pulseLine]);
 
   return (
     <div

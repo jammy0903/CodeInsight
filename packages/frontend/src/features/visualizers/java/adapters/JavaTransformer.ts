@@ -150,6 +150,55 @@ function getCodeAtLine(fullCode: string, line: number): string {
   return lines[line - 1]?.trim() || '';
 }
 
+/**
+ * 시뮬레이터가 frame prefix를 변수명에 포함하는 경우 정규화
+ * 예: "main:result", "Main.main:result", "main.result" -> "result"
+ */
+function normalizeJavaVariableName(rawName: string, frameName?: string): string {
+  if (!rawName) return rawName;
+  let name = rawName.trim();
+
+  const colonIdx = name.lastIndexOf(':');
+  if (colonIdx >= 0 && colonIdx < name.length - 1) {
+    name = name.slice(colonIdx + 1);
+  }
+
+  if (frameName) {
+    const dotPrefix = `${frameName}.`;
+    if (name.startsWith(dotPrefix)) {
+      name = name.slice(dotPrefix.length);
+    }
+  }
+
+  return name;
+}
+
+function isMethodFrameTag(rawType?: string): boolean {
+  if (!rawType) return false;
+  return /^([A-Za-z_]\w*\.)?[A-Za-z_]\w*\(\)$/.test(rawType.trim());
+}
+
+function extractFrameName(rawType?: string, rawName?: string): string {
+  const fallback = 'main';
+  if (rawType && isMethodFrameTag(rawType)) {
+    const normalized = rawType.trim().replace(/\(\)$/, '');
+    const pieces = normalized.split('.');
+    return pieces[pieces.length - 1] || fallback;
+  }
+  if (rawName && rawName.includes(':')) {
+    const prefix = rawName.split(':')[0]?.trim();
+    if (prefix) return prefix;
+  }
+  return fallback;
+}
+
+function inferTypeFromParsedValue(value: string | number | boolean | null): string {
+  if (value === null) return 'null';
+  if (typeof value === 'boolean') return 'boolean';
+  if (typeof value === 'number') return Number.isInteger(value) ? 'int' : 'double';
+  return 'String';
+}
+
 export class JavaTransformer implements IFlowTransformer {
   /**
    * LessonStep → FlowStep 변환
@@ -167,7 +216,11 @@ export class JavaTransformer implements IFlowTransformer {
       if (!ids) {
         ids = [];
         frameVarMap.set(normalized, ids);
-        frameOrder.push(normalized);
+        if (normalized === 'main') {
+          frameOrder.unshift(normalized);
+        } else {
+          frameOrder.push(normalized);
+        }
       }
       return ids;
     };
@@ -182,20 +235,25 @@ export class JavaTransformer implements IFlowTransformer {
     for (const item of stackData) {
       // 형태 1: 단순 형태 {name, value, type?} - 레슨 JSON
       if (isStackVariableItem(item)) {
-        const frameVars = getFrameVarIds('main');
+        const frameName = extractFrameName(item.type, item.name);
+        const frameVars = getFrameVarIds(frameName);
+        const varName = normalizeJavaVariableName(item.name, frameName);
         const pointsTo = extractPointsTo(item.value);
         const isReference = !!pointsTo;
+        const parsedValue = parseValue(item.value);
+        const derivedType = inferTypeFromParsedValue(parsedValue);
+        const varType = isMethodFrameTag(item.type) ? derivedType : (item.type || derivedType);
 
         const meta: Record<string, unknown> = {};
         if (item.sameRef === true) meta.sameRef = true;
 
         const variable: FlowVariable = {
-          id: `main-${item.name}`,
-          name: item.name,
-          value: parseValue(item.value),
-          type: item.type || 'unknown',
+          id: `${frameName}-${varName}`,
+          name: varName,
+          value: parsedValue,
+          type: varType,
           state: 'idle',
-          scope: 'main',
+          scope: frameName,
           isPointer: isReference,
           // ArrowLayer는 variable.id로 매칭하므로 heap-${address} 형식 필요
           pointsTo: pointsTo ? `heap-${pointsTo}` : undefined,
@@ -247,9 +305,11 @@ export class JavaTransformer implements IFlowTransformer {
               type = typeof val;
             }
 
+            const normalizedVarName = normalizeJavaVariableName(varName, frameName);
+
             const variable: FlowVariable = {
-              id: `${frameName}-${varName}`,
-              name: varName,
+              id: `${frameName}-${normalizedVarName}`,
+              name: normalizedVarName,
               value,
               type,
               state: 'idle',

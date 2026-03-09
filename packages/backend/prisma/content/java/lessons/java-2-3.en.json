@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Optional.of() - Create a box",
-        "explanation": "**Execution order:**\n1. Call `Optional.of(\"hello\")`.\n2. Create an `Optional` object (box) in the Heap.\n3. Store the “hello” value internally.\n\n**What happens in memory:**\nCreate a **hard wrapper** called `Optional` on the heap and safely place the string \"hello\" inside the box.\n\n**Warning:** `of()` never allows `null`.\nIf you enter null, an NPE will occur before the box is even created.",
+        "explanation": "**What happens in memory:**\nCreate a **hard wrapper** called `Optional` on the heap and safely place the string \"hello\" inside the box.\n\n**Warning:** `of()` never allows `null`.\nIf you enter null, an NPE will occur before the box is even created.",
         "keyInsight": "of() = never null",
         "visualizationType": "javaMemory",
         "code": "Optional<String> opt1 = Optional.of(\"hello\");",
@@ -36,7 +36,7 @@
       },
       {
         "title": "Optional.empty() - empty box",
-        "explanation": "**Execution order:**\n1. Call `Optional.empty()`.\n2. Returns an empty `Optional` object.\n\nCreates an 'empty box' object with no content.\nInstead of using a `null` variable, this is a way to clearly say \"I have a box, but no content.\"\nReturning `Optional` lets you know right away, “Oh, maybe it’s not there.”",
+        "explanation": "Creates an 'empty box' object with no content.\nInstead of using a `null` variable, this is a way to clearly say \"I have a box, but no content.\"\nReturning `Optional` lets you know right away, “Oh, maybe it’s not there.”",
         "keyInsight": "empty() = explicitly expresses no value",
         "visualizationType": "javaMemory",
         "code": "Optional<String> opt2 = Optional.empty();",
@@ -68,7 +68,7 @@
       },
       {
         "title": "Optional.ofNullable() - flexible box",
-        "explanation": "**Execution order:**\n1. Call `Optional.ofNullable(null)`.\n2. Confirm that the argument is `null`.\n3. Returns `Optional.empty()` internally.\n\nIf the value is present, it is placed in a box (`of`). If it is `null`, an empty box is created (`empty`).\nIn reality, this is the most commonly used creation method.",
+        "explanation": "If the value is present, it is placed in a box (`of`). If it is `null`, an empty box is created (`empty`).\nIn reality, this is the most commonly used creation method.",
         "visualizationType": "javaMemory",
         "code": "Optional<String> opt3 = Optional.ofNullable(null);",
         "javaMemoryState": {
@@ -91,7 +91,7 @@
       },
       {
         "title": "get() - force eject (dangerous!!)",
-        "explanation": "**Execution order:**\n1. Call `opt1.get()`.\n2. Check for existence of value.\n3. Returns \"hello\".\n\nI open the box blindly.\nI'm glad I have the value now, but if I call `get()` when it's empty, it throws a **`NoSuchElementException`** exception.\n\n**Warning:** `get()` is a last resort.\nAvoid using it as much as possible.",
+        "explanation": "I open the box blindly.\nI'm glad I have the value now, but if I call `get()` when it's empty, it throws a **`NoSuchElementException`** exception.\n\n**Warning:** `get()` is a last resort.\nAvoid using it as much as possible.",
         "keyInsight": "Recommended to use orElse() instead of get()",
         "visualizationType": "javaMemory",
         "code": "String value = opt1.get();",
@@ -108,7 +108,7 @@
       },
       {
         "title": "isPresent() - Check",
-        "explanation": "**Execution order:**\n1. Call `opt2.isPresent()`.\n2. `opt2` is empty, so **false** is returned.\n3. Skip the `if` block.\n\nIt asks \"Does the box have a value?\" (`isPresent`).\nSince `opt2` is empty, it returns `false`, and the `if` block is not executed.",
+        "explanation": "It asks \"Does the box have a value?\" (`isPresent`).\nSince `opt2` is empty, it returns `false`, and the `if` block is not executed.",
         "visualizationType": "javaMemory",
         "code": "if (opt2.isPresent()) {",
         "javaMemoryState": {
@@ -124,7 +124,7 @@
       },
       {
         "title": "orElse() - Provides safe default values",
-        "explanation": "**Execution order:**\n1. Call `opt3.orElse(\"default\")`.\n2. Check that `opt3` is empty.\n3. Returns `\"default\"` passed as argument.\n\n**Most recommended method:** “Open the box.\nIf there is a value, use that. **If it is empty, use 'default' instead.**\"\nYou can get the value neatly and safely in one line.",
+        "explanation": "**Most recommended method:** “Open the box.\nIf there is a value, use that. **If it is empty, use 'default' instead.**\"\nYou can get the value neatly and safely in one line.",
         "keyInsight": "orElse() = safe default pattern",
         "visualizationType": "javaMemory",
         "code": "String result = opt3.orElse(\"default\");",
@@ -141,7 +141,7 @@
       },
       {
         "title": "ifPresent() - functional style",
-        "explanation": "**Execution order:**\n1. Call `opt1.ifPresent(...)`.\n2. Confirm that `opt1` has a value.\n3. Execute the lambda function `s -> println(s)`.\n4. Output “hello”.\n\n“If there is a value, execute this function (lambda).\n“Not if you don’t have it.”\nIt's an elegant way to do things inside the box without pulling out the values.",
+        "explanation": "“If there is a value, execute this function (lambda).\n“Not if you don’t have it.”\nIt's an elegant way to do things inside the box without pulling out the values.",
         "keyInsight": "ifPresent() = Executes only when there is a value",
         "visualizationType": "javaMemory",
         "code": "opt1.ifPresent(s -> System.out.println(s));",

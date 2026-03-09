@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Person class definition",
-        "explanation": "**Execution order:**\n1. Load the Person class.\n2. Check `equals` override.\n3. Check for missing `hashCode` (warning).\n\nIt is a 'half-full' class that redefines `equals()` but omits `hashCode()`.\nIf you use this class in something like `HashSet` or `HashMap`, a **big accident** will occur.",
+        "explanation": "`Person` overrides `equals()` so two objects with the same `name` are treated as equal.\nThe problem is that `hashCode()` is not overridden together.\n\nThat breaks the **equals/hashCode contract**:\nif two objects are equal, they must have the same hash code.\n\nBecause of this, hash-based collections like `HashSet`/`HashMap` can behave inconsistently and fail lookups in surprising ways.",
         "visualizationType": "javaMemory",
         "code": "class Person {",
         "highlightOffset": [
@@ -31,7 +31,7 @@
       },
       {
         "title": "Create your first Person object",
-        "explanation": "**Execution order:**\n1. Call `new Person(\"Alice\")`.\n2. Heap allocation (0x001).\n3. Create a default `hashCode` (e.g. 123).\n\nThis object has a unique memory address (0x001) and a default hash code (123) based on it.",
+        "explanation": "`p1` is the first person object named \"Alice\".\n\nOne key point: we did not implement `hashCode()` ourselves,\nso Java assigns a default object-based number (for example, 123).\n\nThat means another object with the same name can still get a different number.\nThis is the starting point of the HashSet lookup issue.",
         "visualizationType": "javaMemory",
         "code": "Person p1 = new Person(\"Alice\");",
         "javaMemoryState": {
@@ -54,7 +54,7 @@
       },
       {
         "title": "Create a second Person object",
-        "explanation": "**Execution order:**\n1. Call `new Person(\"Alice\")`.\n2. New Heap allocation (0x002).\n3. Create a new default `hashCode` (e.g. 456).\n\n`p2` will have a different hash code than `p1` even if the contents are the same.\nThis is because `hashCode()` is not overridden.",
+        "explanation": "`p2` is a second person object, also named \"Alice\".\n\nBut `p2` is still a different object from `p1`,\nso Java gives it a different default hash code (for example, 456).\n\nNow we have two objects that look equal by value,\nbut may have different hash codes.\nThis mismatch is why HashSet behavior becomes confusing in the next steps.",
         "visualizationType": "javaMemory",
         "code": "Person p2 = new Person(\"Alice\");",
         "javaMemoryState": {
@@ -87,7 +87,7 @@
       },
       {
         "title": "equals() comparison",
-        "explanation": "**Execution order:**\n1. Call `p1.equals(p2)`.\n2. Compare name (\"Alice\").\n3. Matches, so **true**.\n\nThere seems to be no problem up to this point.",
+        "explanation": "When we call `p1.equals(p2)`, the result is `true`.\nBoth names are \"Alice\", so by our `equals()` rule they are equal.\n\nSo it looks fine so far.\nBut this is the trap: `HashSet` does not start with `equals()`.\nIt starts with `hashCode()` to choose a bucket first.",
         "keyInsight": "equals() override = values ​​can be compared",
         "visualizationType": "javaMemory",
         "code": "System.out.println(p1.equals(p2));",
@@ -125,7 +125,7 @@
       },
       {
         "title": "Create HashSet",
-        "explanation": "**Execution order:**\n1. Call `new HashSet<>()`.\n2. Create initial bucket (array).\n\nHash-based data structures use `hashCode()` to store and retrieve objects.",
+        "explanation": "Think of `HashSet` as many small rooms (buckets).\nWhen storing or searching, it first uses `hashCode()` to choose which room to check.\n\nSo `equals()` is a later step.\nThe first gate is always `hashCode()`.",
         "visualizationType": "javaMemory",
         "code": "Set<Person> set = new HashSet<>();",
         "javaMemoryState": {
@@ -162,13 +162,33 @@
               "content": "HashSet"
             }
           ],
+          "hashSet": {
+            "buckets": [
+              {
+                "index": "bucket[0]",
+                "content": "(empty)"
+              },
+              {
+                "index": "bucket[1]",
+                "content": "(empty)"
+              },
+              {
+                "index": "bucket[2]",
+                "content": "(empty)"
+              },
+              {
+                "index": "bucket[3]",
+                "content": "(empty)"
+              }
+            ]
+          },
           "output": [],
           "note": null
         }
       },
       {
         "title": "Add p1 to HashSet",
-        "explanation": "**Execution order:**\n1. Call `set.add(p1)`.\n2. Calculate `p1.hashCode()` -> **123**.\n3. Save `p1` in bucket 123.",
+        "explanation": "When we run `set.add(p1)`, `HashSet` uses `p1`'s hash code (for example, 123)\nto pick a bucket and stores `p1` there.\n\nRight now, only bucket `hash(123)` contains `p1`.",
         "keyInsight": "HashSet/HashMap = Room assignment with hashCode()",
         "visualizationType": "javaMemory",
         "code": "set.add(p1);",
@@ -185,7 +205,7 @@
       },
       {
         "title": "calls contains(p2) (search fails)",
-        "explanation": "**Execution order:**\n1. Call `set.contains(p2)`.\n2. Calculate `p2.hashCode()` -> **456**.\n3. Check bucket 456.\n4. **Empty** -> **false** returns.\n\nEven though `equals()` was `true`, `hashCode()` was different, so I searched a completely different room.\nThere's no way you can find it.",
+        "explanation": "Now `set.contains(p2)` checks the bucket from `p2`'s hash code (for example, 456).\n\nBut `p1` was stored in bucket `hash(123)`.\nSo it is looking in a different room and returns `false`.\n\nKey point:\nEven if `equals()` says two objects are equal,\n`HashSet` lookup can fail when their `hashCode()` values differ.",
         "keyInsight": "hashCode different = different bucket = find failed",
         "visualizationType": "javaMemory",
         "code": "System.out.println(set.contains(p2));",

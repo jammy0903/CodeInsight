@@ -3,11 +3,11 @@
   "title": "Understanding NullPointerException",
   "concept": "Calling a method on a null reference throws a NullPointerException",
   "content": {
-    "code": "String str = null;\n\nint len = str.length();\n\nString text = null;\nboolean result = text.equals(\"hello\");\n\nboolean safe = \"hello\".equals(text);",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        String str = null;\n\n        try {\n            int len = str.length();\n            System.out.println(\"len = \" + len);\n        } catch (NullPointerException e) {\n            System.out.println(\"len check: NPE\");\n        }\n\n        String text = null;\n        try {\n            boolean result = text.equals(\"hello\");\n            System.out.println(\"result = \" + result);\n        } catch (NullPointerException e) {\n            System.out.println(\"result check: NPE\");\n        }\n\n        boolean safe = \"hello\".equals(text);\n        System.out.println(\"safe = \" + safe);\n    }\n}",
     "steps": [
       {
         "title": "null assignment",
-        "explanation": "**Execution order:**\n1. Create `str` variable space (Stack).\n2. Assigning the value `null`(0x0).\n\n**What happens in memory:**\nCreate a space called `str` on the Stack and insert a special value called `null`.\n\n**What is null?**\nIt is a sign meaning “does not point to anything.”\nIt's like an 'empty envelope' with no address written on it.\nInternally, it is usually expressed as an invalid address such as 0x0.",
+        "explanation": "**What happens in memory:**\nCreate a space called `str` on the Stack and insert a special value called `null`.\n\n**What is null?**\nIt is a sign meaning “does not point to anything.”\nIt's like an 'empty envelope' with no address written on it.\nInternally, it is usually expressed as an invalid address such as 0x0.",
         "keyInsight": "null = no reference (address 0x0)",
         "visualizationType": "javaMemory",
         "code": "String str = null;",
@@ -25,7 +25,7 @@
       },
       {
         "title": "Calling method on null (occurs NPE)",
-        "explanation": "**Execution order:**\n1. Attempt to dereference `str`.\n2. Confirm that the value is `null`.\n3. **`NullPointerException`** occurs.\n\nTo call `str.length()`, you need to **move (dereference)** to the address pointed to by `str`.\nHowever, since the address is `null` (empty envelope), an error is immediately thrown and the program stops, saying “I have nowhere to go?”\n\n**What is Dereference?**\nThis refers to the act of following an address and accessing the actual object there (`.` operator).",
+        "explanation": "To call `str.length()`, you need to **move (dereference)** to the address pointed to by `str`.\nHowever, since the address is `null` (empty envelope), an error is immediately thrown and the program stops, saying “I have nowhere to go?”\n\n**What is Dereference?**\nThis refers to the act of following an address and accessing the actual object there (`.` operator).",
         "keyInsight": "null.method() = NullPointerException",
         "visualizationType": "javaMemory",
         "code": "int len = str.length();",
@@ -46,11 +46,16 @@
       },
       {
         "title": "another null variable",
-        "explanation": "**Execution order:**\n1. Create a `text` variable.\n2. Assignment of `null` value.\n\nThe `text` variable is likewise initialized to point to no object (`null`).\nThis is the starting point of the most common errors encountered by Java developers.",
+        "explanation": "The `text` variable is likewise initialized to point to no object (`null`).\nThis is the starting point of the most common errors encountered by Java developers.",
         "visualizationType": "javaMemory",
         "code": "String text = null;",
         "javaMemoryState": {
           "stack": [
+            {
+              "name": "str",
+              "value": "null",
+              "type": "String"
+            },
             {
               "name": "text",
               "value": "null",
@@ -63,7 +68,7 @@
       },
       {
         "title": "Calling null.equals() (danger!)",
-        "explanation": "**Execution order:**\n1. Attempt to dereference `text` (text.equals...).\n2. **NPE occurs** because `text` is `null`.\n\nSince `text` is `null`, any attempt to do something with `text` (`.equals`) will inevitably fail.\n\n**Warning:**\nIf there is even a 0.1% chance that the variable is `null`, never call the method first.",
+        "explanation": "Since `text` is `null`, any attempt to do something with `text` (`.equals`) will inevitably fail.\n\n**Warning:**\nIf there is even a 0.1% chance that the variable is `null`, never call the method first.",
         "keyInsight": "null.equals(x) = NPE!",
         "visualizationType": "javaMemory",
         "code": "boolean result = text.equals(\"hello\");",
@@ -74,6 +79,11 @@
           "error": "NullPointerException",
           "stack": [
             {
+              "name": "str",
+              "value": "null",
+              "type": "String"
+            },
+            {
               "name": "text",
               "value": "null",
               "type": "String"
@@ -83,12 +93,22 @@
       },
       {
         "title": "How to Compare Safely (Yoda Condition)",
-        "explanation": "**Execution order:**\n1. See `\"hello\"` literal (String Pool).\n2. Calling `\"hello\".equals(null)`.\n3. Accepts `null` argument and safely returns **false**.\n4. Store false in `safe` variable.\n\n**They just changed the order?**\nSince `\"hello\"` is a literal, it is **an actual object that exists in the String Pool**.\n(never null)\nThe `equals` method is designed to elegantly return `false` if it takes `null` as an argument.\nThese patterns are also called ‘Yoda Conditions’.",
+        "explanation": "**They just changed the order?**\nSince `\"hello\"` is a literal, it is **an actual object that exists in the String Pool**.\n(never null)\nThe `equals` method is designed to elegantly return `false` if it takes `null` as an argument.\nThese patterns are also called ‘Yoda Conditions’.",
         "keyInsight": "\"literal\".equals(variable) = null-safe",
         "visualizationType": "javaMemory",
         "code": "boolean safe = \"hello\".equals(text);",
         "javaMemoryState": {
           "stack": [
+            {
+              "name": "str",
+              "value": "null",
+              "type": "String"
+            },
+            {
+              "name": "text",
+              "value": "null",
+              "type": "String"
+            },
             {
               "name": "safe",
               "value": "false",
@@ -101,9 +121,12 @@
               "address": "Pool:0x100"
             }
           ],
-          "note": "\"hello\" is not null, so the method can be called safely",
-          "output": [],
-          "error": null
+          "note": "The method is called on the literal object, so no NPE occurs.",
+          "output": [
+            "safe = false"
+          ],
+          "error": null,
+          "comparison": "receiver=\"hello\" (non-null), arg=text (null) => false"
         }
       }
     ],

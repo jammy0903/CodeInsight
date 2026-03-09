@@ -39,6 +39,8 @@ interface UseRoundNavigationReturn {
   isLastOverall: boolean;
   goNext: () => void;
   goPrev: () => void;
+  goToExplanationStart: () => void;
+  goToVisualizationStart: () => void;
   reset: () => void;
 }
 
@@ -153,6 +155,17 @@ export function useRoundNavigation({
     }
   }, [round, stepIndex, steps.length, vizStepIndices, onStepChange, updateRoundState]);
 
+  const goToExplanationStart = useCallback(() => {
+    updateRoundState(() => ({ round: 'explanation', stepIndex: 0 }));
+    onStepChange?.(0);
+  }, [onStepChange, updateRoundState]);
+
+  const goToVisualizationStart = useCallback(() => {
+    if (!hasVizRound || vizStepIndices.length === 0) return;
+    updateRoundState(() => ({ round: 'visualization', stepIndex: 0 }));
+    onStepChange?.(vizStepIndices[0]);
+  }, [hasVizRound, vizStepIndices, onStepChange, updateRoundState]);
+
   const reset = useCallback(() => {
     updateRoundState(() => ({ round: 'explanation', stepIndex: 0 }));
   }, [updateRoundState]);
@@ -168,6 +181,8 @@ export function useRoundNavigation({
     isLastOverall,
     goNext,
     goPrev,
+    goToExplanationStart,
+    goToVisualizationStart,
     reset,
   };
 }

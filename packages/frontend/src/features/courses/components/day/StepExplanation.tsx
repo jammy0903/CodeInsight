@@ -17,6 +17,10 @@ interface StepExplanationProps {
   }>;
 }
 
+type ExplanationBlock =
+  | { kind: 'text'; content: string }
+  | { kind: 'brownBox'; content: string };
+
 function forceLineBreaks(text: string): string {
   return text
     .replace(/\r\n/g, '\n')
@@ -64,9 +68,23 @@ function formatExplanation(text: string): React.ReactNode[] {
         const parts = block.split(/(\*\*[^*]+\*\*)/g);
         const formattedParts = parts.map((part, partIdx) => {
           if (part.startsWith('**') && part.endsWith('**')) {
+            const boldInner = part.slice(2, -2);
+            const boldInlineParts = boldInner.split(/(`[^`]+`)/g);
             return (
               <strong key={partIdx} className="font-bold text-amber-700">
-                {part.slice(2, -2)}
+                {boldInlineParts.map((inlinePart, inlineIdx) => {
+                  if (inlinePart.startsWith('`') && inlinePart.endsWith('`')) {
+                    return (
+                      <code
+                        key={inlineIdx}
+                        className="px-1.5 py-0.5 rounded text-[0.82em] font-mono bg-rose-50 text-rose-800 border border-rose-200"
+                      >
+                        {inlinePart.slice(1, -1)}
+                      </code>
+                    );
+                  }
+                  return <span key={inlineIdx}>{inlinePart}</span>;
+                })}
               </strong>
             );
           }
@@ -111,7 +129,30 @@ function formatExplanation(text: string): React.ReactNode[] {
   });
 }
 
+function parseExplanationBlocks(text: string): ExplanationBlock[] {
+  const blocks: ExplanationBlock[] = [];
+  const pattern = /\[BROWN_BOX\]([\s\S]*?)\[\/BROWN_BOX\]/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      blocks.push({ kind: 'text', content: text.slice(lastIndex, match.index) });
+    }
+    blocks.push({ kind: 'brownBox', content: match[1].trim() });
+    lastIndex = pattern.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    blocks.push({ kind: 'text', content: text.slice(lastIndex) });
+  }
+
+  return blocks.length > 0 ? blocks : [{ kind: 'text', content: text }];
+}
+
 export function StepExplanation({ explanation, stepIndex, illustrations }: StepExplanationProps) {
+  const blocks = parseExplanationBlocks(explanation || '');
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -123,7 +164,24 @@ export function StepExplanation({ explanation, stepIndex, illustrations }: StepE
         className="text-lg leading-relaxed text-stack-text"
         style={{ fontFamily: 'var(--font-handwriting)' }}
       >
-        {formatExplanation(explanation || '')}
+        {blocks.map((block, idx) => {
+          if (block.kind === 'brownBox') {
+            return (
+              <div
+                key={`brown-box-${idx}`}
+                className="mt-4 rounded-xl border px-4 py-3 text-[0.92em]"
+                style={{
+                  background: '#f8f1e8',
+                  borderColor: '#d6b899',
+                  color: '#5a3f2a',
+                }}
+              >
+                {formatExplanation(block.content)}
+              </div>
+            );
+          }
+          return <div key={`text-${idx}`}>{formatExplanation(block.content)}</div>;
+        })}
         {Array.isArray(illustrations) && illustrations.length > 0 && (
           <div className="mt-4 space-y-3">
             {illustrations.map((item, idx) => (

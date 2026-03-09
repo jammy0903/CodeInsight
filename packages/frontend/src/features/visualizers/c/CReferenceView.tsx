@@ -338,16 +338,6 @@ const HeapCard = memo(function HeapCard({
         </div>
       )}
 
-      {nameCount > 0 && (
-        <span className="absolute -bottom-2 left-2 px-1.5 py-0.5 rounded text-[10px] font-mono"
-          style={{
-            background: isShared ? '#ede9fe' : '#dcfce7',
-            color: isShared ? '#6d28d9' : '#166534',
-            border: `1px solid ${isShared ? '#a78bfa' : '#86efac'}`,
-          }}>
-          refs: {nameCount}
-        </span>
-      )}
     </motion.div>
   );
 });

@@ -80,7 +80,7 @@ export function useLessonTerminal({
       return [];
     }
 
-    // Java: javaMemoryState.output (JSON 레슨) 또는 stdout (시뮬레이터)
+    // Java: javaMemoryState.output (JSON 레슨) 또는 memoryState.output (legacy) 또는 stdout (시뮬레이터)
     if (languageId === 'java') {
       const jmsOutput = getOutputList(currentStep, 'javaMemoryState');
       if (jmsOutput.length > 0) {
@@ -89,6 +89,16 @@ export function useLessonTerminal({
         }
         const prevOutput = getOutputList(prevStep, 'javaMemoryState');
         return jmsOutput.slice(prevOutput.length)
+          .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+      }
+      // fallback: memoryState.output (legacy memory vizType 레슨)
+      const msOutput = getOutputList(currentStep, 'memoryState');
+      if (msOutput.length > 0) {
+        if (!diffMode) {
+          return msOutput.map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
+        }
+        const prevMsOutput = getOutputList(prevStep, 'memoryState');
+        return msOutput.slice(prevMsOutput.length)
           .map((line): TerminalLine => ({ content: String(line), type: 'stdout' }));
       }
       // fallback: stdout (시뮬레이터 경로)

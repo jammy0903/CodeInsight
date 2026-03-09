@@ -175,11 +175,6 @@ export const CppFlowVisualizer = memo(function CppFlowVisualizer({
                     <span className="text-[9px] px-1 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">
                       {String(v.metadata.ownership)}_ptr
                     </span>
-                    {v.metadata.refCount != null && (
-                      <span className="text-[9px] text-emerald-500">
-                        refs: {String(v.metadata.refCount)}
-                      </span>
-                    )}
                   </div>
                 )}
               </div>

@@ -3,11 +3,11 @@
   "title": "了解空指针异常",
   "concept": "在空引用上调用方法会引发 NullPointerException",
   "content": {
-    "code": "String str = null;\n\nint len = str.length();\n\nString text = null;\nboolean result = text.equals(\"hello\");\n\nboolean safe = \"hello\".equals(text);",
+    "code": "public class Main {\n    public static void main(String[] args) {\n        String str = null;\n\n        try {\n            int len = str.length();\n            System.out.println(\"len = \" + len);\n        } catch (NullPointerException e) {\n            System.out.println(\"len 检查: NPE\");\n        }\n\n        String text = null;\n        try {\n            boolean result = text.equals(\"hello\");\n            System.out.println(\"result = \" + result);\n        } catch (NullPointerException e) {\n            System.out.println(\"result 检查: NPE\");\n        }\n\n        boolean safe = \"hello\".equals(text);\n        System.out.println(\"safe = \" + safe);\n    }\n}",
     "steps": [
       {
         "title": "空赋值",
-        "explanation": "**执行顺序：**\n1. 创建`str`变量空间（堆栈）。\n2. 分配值“null”(0x0)。\n\n**内存中发生了什么：**\n在堆栈上创建一个名为“str”的空间，并插入一个名为“null”的特殊值。\n\n**什么是空？**\n这是一个符号，意思是“不指向任何东西”。\n这就像一个“空信封”，上面没有写地址。\n在内部，通常表示为无效地址，例如0x0。",
+        "explanation": "**内存中发生了什么：**\n在堆栈上创建一个名为“str”的空间，并插入一个名为“null”的特殊值。\n\n**什么是空？**\n这是一个符号，意思是“不指向任何东西”。\n这就像一个“空信封”，上面没有写地址。\n在内部，通常表示为无效地址，例如0x0。",
         "keyInsight": "null = 无引用（地址 0x0）",
         "visualizationType": "javaMemory",
         "code": "String str = null;",
@@ -25,7 +25,7 @@
       },
       {
         "title": "在 null 上调用方法（发生 NPE）",
-        "explanation": "**执行顺序：**\n1. 尝试取消引用 `str`。\n2. 确认该值为“null”。\n3. **`NullPointerException`**发生。\n\n要调用“str.length()”，您需要**移动（取消引用）**到“str”指向的地址。\n然而，由于地址为“null”（空信封），因此会立即抛出错误并且程序停止，并说“我无处可去？”\n\n**什么是解引用？**\n这是指跟随地址并访问那里的实际对象的行为（“.”运算符）。",
+        "explanation": "要调用“str.length()”，您需要**移动（取消引用）**到“str”指向的地址。\n然而，由于地址为“null”（空信封），因此会立即抛出错误并且程序停止，并说“我无处可去？”\n\n**什么是解引用？**\n这是指跟随地址并访问那里的实际对象的行为（“.”运算符）。",
         "keyInsight": "null.method() = NullPointerException",
         "visualizationType": "javaMemory",
         "code": "int len = str.length();",
@@ -46,11 +46,16 @@
       },
       {
         "title": "另一个空变量",
-        "explanation": "**执行顺序：**\n1. 创建一个“文本”变量。\n2. 赋值“null”。\n\n“text”变量同样被初始化为不指向任何对象（“null”）。\n这是 Java 开发人员遇到的最常见错误的起点。",
+        "explanation": "“text”变量同样被初始化为不指向任何对象（“null”）。\n这是 Java 开发人员遇到的最常见错误的起点。",
         "visualizationType": "javaMemory",
         "code": "String text = null;",
         "javaMemoryState": {
           "stack": [
+            {
+              "name": "str",
+              "value": "null",
+              "type": "String"
+            },
             {
               "name": "text",
               "value": "null",
@@ -63,7 +68,7 @@
       },
       {
         "title": "调用 null.equals() （危险！）",
-        "explanation": "**执行顺序：**\n1. 尝试取消引用 `text` (text.equals...)。\n2. **NPE发生**因为`text`是`null`。\n\n由于“text”为“null”，任何使用“text”（“.equals”）执行某些操作的尝试都将不可避免地失败。\n\n**警告：**\n如果变量为“null”的可能性哪怕只有 0.1%，也不要先调用该方法。",
+        "explanation": "由于“text”为“null”，任何使用“text”（“.equals”）执行某些操作的尝试都将不可避免地失败。\n\n**警告：**\n如果变量为“null”的可能性哪怕只有 0.1%，也不要先调用该方法。",
         "keyInsight": "null.equals(x) = NPE!",
         "visualizationType": "javaMemory",
         "code": "boolean result = text.equals(\"hello\");",
@@ -74,6 +79,11 @@
           "error": "NullPointerException",
           "stack": [
             {
+              "name": "str",
+              "value": "null",
+              "type": "String"
+            },
+            {
               "name": "text",
               "value": "null",
               "type": "String"
@@ -83,12 +93,22 @@
       },
       {
         "title": "如何安全比较（尤​​达条件）",
-        "explanation": "**执行顺序：**\n1. 请参阅“hello”文字（字符串池）。\n2. 调用 `\"hello\".equals(null)`。\n3. 接受“null”参数并安全返回**false**。\n4. 将 false 存储在 `safe` 变量中。\n\n**他们刚刚改变了顺序？**\n由于“hello”是一个文字，因此它是**存在于字符串池中的实际对象**。\n（绝不为空）\n“equals”方法被设计为在接受“null”作为参数时优雅地返回“false”。\n这些模式也称为“尤达条件”。",
+        "explanation": "**他们刚刚改变了顺序？**\n由于“hello”是一个文字，因此它是**存在于字符串池中的实际对象**。\n（绝不为空）\n“equals”方法被设计为在接受“null”作为参数时优雅地返回“false”。\n这些模式也称为“尤达条件”。",
         "keyInsight": "\"literal\".equals(variable) = null-safe",
         "visualizationType": "javaMemory",
         "code": "boolean safe = \"hello\".equals(text);",
         "javaMemoryState": {
           "stack": [
+            {
+              "name": "str",
+              "value": "null",
+              "type": "String"
+            },
+            {
+              "name": "text",
+              "value": "null",
+              "type": "String"
+            },
             {
               "name": "safe",
               "value": "false",
@@ -101,9 +121,12 @@
               "address": "Pool:0x100"
             }
           ],
-          "note": "\"hello\"는 null이 아니므로 안전하게 메서드 호출 가능",
-          "output": [],
-          "error": null
+          "note": "方法调用发生在字面量对象上，因此不会发生 NPE。",
+          "output": [
+            "safe = false"
+          ],
+          "error": null,
+          "comparison": "receiver=\"hello\"（非空）, arg=text（null） => false"
         }
       }
     ],

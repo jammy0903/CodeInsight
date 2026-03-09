@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Create your first array",
-        "explanation": "**Execution order:**\n1. Create array `[1, 2, 3]` in the heap.\n2. Save the address (0x001) in `arr1`.\n\n**Is an array an object?**\nYes, arrays are **special objects** in Java.\nHowever, it is an 'unfriendly' object because convenience functions such as `equals` are not properly implemented.",
+        "explanation": "**Is an array an object?**\nYes, arrays are **special objects** in Java.\nHowever, it is an 'unfriendly' object because convenience functions such as `equals` are not properly implemented.",
         "visualizationType": "javaMemory",
         "code": "int[] arr1 = {1, 2, 3};",
         "javaMemoryState": {
@@ -29,7 +29,7 @@
       },
       {
         "title": "Create a second array",
-        "explanation": "**Execution order:**\n1. Run `int[] arr2 = {1, 2, 3}`.\n2. Array literals behave like `new int[]{1, 2, 3}` internally.\n3. Create a new heap array (0x002), then store its address in `arr2`.\n\nSo it is correct that the memory viewer shows a `New` sticker on the object referenced by `arr2`.\nEven though the contents are the same, this is a **different object** from `arr1` (0x001).",
+        "explanation": "So it is correct that the memory viewer shows a `New` sticker on the object referenced by `arr2`.\nEven though the contents are the same, this is a **different object** from `arr1` (0x001).",
         "visualizationType": "javaMemory",
         "code": "int[] arr2 = {1, 2, 3};",
         "javaMemoryState": {
@@ -60,7 +60,7 @@
       },
       {
         "title": "== comparison (reference comparison)",
-        "explanation": "**Execution order:**\n1. Compare arr1(0x001) == arr2(0x002).\n2. **false** because the addresses are different.",
+        "explanation": "",
         "visualizationType": "javaMemory",
         "code": "System.out.println(arr1 == arr2);",
         "javaMemoryState": {
@@ -95,7 +95,7 @@
       },
       {
         "title": ".equals() comparison (array pitfalls!)",
-        "explanation": "**Execution order:**\n1. Call `arr1.equals(arr2)`.\n2. Performs `==` (address comparison) internally.\n3. Returns **false**.\n\nI get deceived a lot here!\n`.equals()` on an array does not check its contents.\nUse `Object.equals()` as is to **compare only addresses**.",
+        "explanation": "I get deceived a lot here!\n`.equals()` on an array does not check its contents.\nUse `Object.equals()` as is to **compare only addresses**.",
         "keyInsight": "Array.equals() = Object.equals() = Reference comparison!",
         "visualizationType": "javaMemory",
         "code": "System.out.println(arr1.equals(arr2));",
@@ -131,7 +131,7 @@
       },
       {
         "title": "Using Arrays.equals()",
-        "explanation": "**Execution order:**\n1. Call `Arrays.equals(arr1, arr2)`.\n2. Compare length -> Pass.\n3. Compare contents (1==1, 2==2, 3==3).\n4. All are equal, so **true**.",
+        "explanation": "",
         "illustrations": [
           {
             "src": "/lesson-illustrations/java-arrays-equals.svg",
@@ -175,7 +175,7 @@
       },
       {
         "title": "Create your first two-dimensional array",
-        "explanation": "**Execution order:**\n1. Create a two-dimensional array (shell) (0x010).\n2. Create internal arrays (columns) (0x011, 0x012).\n3. After connecting the address, assign it to `deep1`.\n\nA two-dimensional array is **'an array pointing to an array'**.",
+        "explanation": "A two-dimensional array is **'an array pointing to an array'**.",
         "visualizationType": "javaMemory",
         "code": "int[][] deep1 = {{1, 2}, {3, 4}};",
         "javaMemoryState": {
@@ -206,7 +206,7 @@
       },
       {
         "title": "Create a second two-dimensional array",
-        "explanation": "**Execution order:**\n1. Create a new two-dimensional array (0x020).\n2. Create new internal arrays (0x021, 0x022).\n3. Assign to `deep2`.\n\nThe content is the same as the first two-dimensional array, but it is a completely new object structure.",
+        "explanation": "The content is the same as the first two-dimensional array, but it is a completely new object structure.",
         "visualizationType": "javaMemory",
         "code": "int[][] deep2 = {{1, 2}, {3, 4}};",
         "javaMemoryState": {
@@ -245,7 +245,7 @@
       },
       {
         "title": "Arrays.equals() - 2D (trap!)",
-        "explanation": "**Execution order:**\n1. Call `Arrays.equals`.\n2. Comparison of shell (one-dimensional) elements.\n3. deep1[0](0x011) != deep2[0](0x021).\n4. **false** because the addresses are different.\n\n`Arrays.equals` compares **one dimension** only.\nIt does not check whether the inner contents (`[1, 2]`) are the same.",
+        "explanation": "`Arrays.equals` compares **one dimension** only.\nIt does not check whether the inner contents (`[1, 2]`) are the same.",
         "keyInsight": "Arrays.equals() compares only one dimension",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Arrays.equals(deep1, deep2));",
@@ -292,7 +292,7 @@
       },
       {
         "title": "Using Arrays.deepEquals()",
-        "explanation": "**Execution order:**\n1. Call `Arrays.deepEquals`.\n2. Detect that the element is an array -> Recursive entry.\n3. Compare internal array contents (`[1,2]`, `[3,4]`).\n4. Match all -> **true**.",
+        "explanation": "",
         "keyInsight": "Multidimensional array = using Arrays.deepEquals()",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Arrays.deepEquals(deep1, deep2));",
@@ -301,6 +301,7 @@
             "true"
           ],
           "warning": null,
+          "note": "Why true? Arrays.deepEquals(deep1, deep2) recursively compares nested array elements, not just outer references.",
           "stack": [
             {
               "name": "deep1",

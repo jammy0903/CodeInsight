@@ -1,0 +1,15 @@
+--- a/src/apiClient.ts
++++ b/src/apiClient.ts
+@@
+ function isRetriable(error: unknown): boolean {
+   const status = (error as HttpLikeError | undefined)?.status;
+   return status === 429 || status === 500 || status === 502 || status === 503 || status === 504;
+ }
++
++function normalizeRetries(value: number | undefined): number {
++  if (typeof value !== 'number' || Number.isNaN(value)) return 2;
++  return Math.min(5, Math.max(0, Math.floor(value)));
++}
+@@
+-  const retries = options.retries ?? 2;
++  const retries = normalizeRetries(options.retries);

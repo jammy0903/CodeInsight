@@ -169,19 +169,6 @@ const HeapCard = memo(function HeapCard({
         </motion.span>
       </div>
 
-      {/* Ref count badge */}
-      {nameCount > 0 && (
-        <span
-          className="absolute -bottom-2 left-2 px-1.5 py-0.5 rounded text-[10px] font-mono"
-          style={{
-            background: isShared ? '#ede9fe' : '#dbeafe',
-            color: isShared ? '#6d28d9' : '#1e40af',
-            border: `1px solid ${isShared ? '#a78bfa' : '#60a5fa'}`,
-          }}
-        >
-          refs: {nameCount}
-        </span>
-      )}
     </motion.div>
   );
 });

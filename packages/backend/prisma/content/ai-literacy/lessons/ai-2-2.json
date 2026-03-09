@@ -1,0 +1,97 @@
+{
+  "lessonId": "ai-2-2",
+  "title": "매핑 로직 불일치 잡기",
+  "concept": "공통 file set에서 필드 버전 차이를 흡수하는 매핑을 만든다.",
+  "content": {
+    "code": "// File: src/mapper.ts\nexport interface ChatApiResponse {\n  choices?: Array<{\n    text?: string;\n    message?: { content?: string };\n  }>;\n}\n\nexport function mapAssistantText(response: ChatApiResponse): string {\n  const first = response.choices?.[0];\n  return first?.message?.content ?? '';\n}\n",
+    "steps": [
+      {
+        "title": "증상을 재현한다",
+        "explanation": "일부 응답은 `message.content` 대신 `text` 필드만 내려옵니다.\n현재 코드는 빈 문자열을 반환해 데이터가 사라집니다.",
+        "keyInsight": "동일 API라도 응답 버전에 따라 필드가 다를 수 있다",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "inspect",
+          "checklist": [
+            "입력 1: message.content 응답",
+            "입력 2: legacy text 응답",
+            "legacy 응답에서 빈 문자열 재현"
+          ]
+        },
+        "code": "return first?.message?.content ?? '';"
+      },
+      {
+        "title": "원인을 좁힌다",
+        "explanation": "매핑 경로가 하나(`message.content`)만 있어서, `text` 응답을 놓칩니다.",
+        "keyInsight": "버전 호환 매핑은 우선순위 fallback 체인으로 설계한다",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "compare",
+          "expectedPath": "first?.message?.content ?? ''",
+          "actualPath": "first?.message?.content ?? first?.text ?? ''"
+        },
+        "code": "return first?.message?.content ?? '';"
+      },
+      {
+        "title": "최소 수정으로 패치한다",
+        "explanation": "`text` fallback 한 줄만 추가해 영향 범위를 최소화합니다.",
+        "keyInsight": "작은 패치로 호환성만 정확히 보강",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "patch",
+          "patch": "return first?.message?.content ?? ''; -> return first?.message?.content ?? first?.text ?? '';"
+        },
+        "code": "return first?.message?.content ?? first?.text ?? '';"
+      },
+      {
+        "title": "결과를 재검증한다",
+        "explanation": "이제 신규/레거시 응답 모두 문자열이 정상 매핑됩니다.",
+        "keyInsight": "패치 완료 조건은 다중 입력 정상화",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "verify",
+          "expectedOutput": "legacy text 응답 -> ''",
+          "actualOutput": "legacy text 응답 -> 'Legacy text'"
+        },
+        "code": "return first?.message?.content ?? first?.text ?? '';"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "`message.content`와 `text`를 동시에 지원하는 안전한 매핑은?",
+    "options": [
+      "`first?.message?.content ?? first?.text ?? ''`",
+      "`first?.message?.content || ''`",
+      "`first!.text!`",
+      "`JSON.stringify(first)`"
+    ],
+    "correctIndex": 0,
+    "explanation": "우선순위 fallback으로 버전 차이를 흡수해야 합니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "최신 응답 스키마만 맞추면 충분하다",
+      "correct": "실제 운영에서는 혼재 응답을 고려한 fallback이 필요하다",
+      "why": "구버전 응답이 섞이면 일부 요청이 조용히 실패할 수 있습니다."
+    }
+  ],
+  "keyTakeaway": "매핑 로직은 단일 경로 가정 대신 버전 fallback으로 설계한다",
+  "fileSet": {
+    "id": "ch2-api-client-debug-lab",
+    "root": "packages/backend/prisma/content/ai-literacy/file-sets/ch2-api-client-debug-lab",
+    "manifest": "packages/backend/prisma/content/ai-literacy/file-sets/ch2-api-client-debug-lab/manifest.json",
+    "baseSnapshot": "snapshots/ai-2-1-fixed",
+    "lessonSnapshots": {
+      "broken": "snapshots/ai-2-1-fixed",
+      "fixed": "snapshots/ai-2-2-fixed"
+    },
+    "patches": [
+      "patches/ai-2-2.patch"
+    ],
+    "files": [
+      "src/apiClient.ts",
+      "src/mapper.ts",
+      "tests/apiClient.test.ts"
+    ]
+  }
+}

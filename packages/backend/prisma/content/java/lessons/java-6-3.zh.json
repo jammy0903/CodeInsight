@@ -18,7 +18,7 @@
       },
       {
         "title": "위험한 메서드 호출",
-        "explanation": "**실행 순서:**\n1. `main`에서 `dangerousTask()`를 호출합니다.\n2. 새로운 스택 프레임이 생성됩니다.\n\n**해설:**\n이 메서드는 `throws InterruptedException`이라고 선언되어 있습니다.\n즉, \"나를 부르려면 반드시 그 예외를 처리할 준비를 해!\"라고 경고장을 날린 것입니다.",
+        "explanation": "**해설:**\n이 메서드는 `throws InterruptedException`이라고 선언되어 있습니다.\n즉, \"나를 부르려면 반드시 그 예외를 처리할 준비를 해!\"라고 경고장을 날린 것입니다.",
         "visualizationType": "javaMemory",
         "code": "dangerousTask();",
         "javaMemoryState": {
@@ -40,7 +40,7 @@
       },
       {
         "title": "예외 발생 (Throw)",
-        "explanation": "**실행 순서:**\n1. `dangerousTask` 실행 중 `InterruptedException`이 발생합니다.\n2. 메서드 내부의 `try` 블록이 실행 중단됩니다.\n\n**해설:**\n펑! 예외가 발생했습니다.\n하지만 바로 탈출하지 못합니다.\n왜냐하면 **마무리 요정 `finally`**가 기다리고 있기 때문입니다.",
+        "explanation": "**해설:**\n펑! 예외가 발생했습니다.\n하지만 바로 탈출하지 못합니다.\n왜냐하면 **마무리 요정 `finally`**가 기다리고 있기 때문입니다.",
         "visualizationType": "javaMemory",
         "code": "try {",
         "occurrence": 2,
@@ -73,7 +73,7 @@
       },
       {
         "title": "Finally 실행",
-        "explanation": "**실행 순서:**\n1. 예외가 발생했지만, 메서드를 빠져나가기 전 `finally` 블록으로 이동합니다.\n2. \"Cleanup\"을 출력합니다.\n\n**해설:**\n**절대 규칙:** `finally`는 성공하든 실패하든(예외 발생) **무조건** 실행됩니다.\n주로 문을 닫거나(Close), 청소하는 작업에 쓰입니다.",
+        "explanation": "**해설:**\n**절대 규칙:** `finally`는 성공하든 실패하든(예외 발생) **무조건** 실행됩니다.\n주로 문을 닫거나(Close), 청소하는 작업에 쓰입니다.",
         "visualizationType": "javaMemory",
         "code": "Thread.sleep(1000);",
         "highlightOffset": [
@@ -101,7 +101,7 @@
       },
       {
         "title": "예외 떠넘기기 (Propagation)",
-        "explanation": "**실행 순서:**\n1. `finally` 실행 후, 잡지 못한 예외(`0x500`)는 호출자(`main`)에게 던져집니다.\n2. `dangerousTask` 스택 프레임이 파기(Pop)됩니다.\n\n**해설:**\n`dangerousTask` 안에는 catch가 없었습니다.\n그래서 예외는 \"난 몰라!\" 하고 자기를 부른 `main`한테 날아갑니다.\n이게 **예외 전파(Propagation)**입니다.",
+        "explanation": "**해설:**\n`dangerousTask` 안에는 catch가 없었습니다.\n그래서 예외는 \"난 몰라!\" 하고 자기를 부른 `main`한테 날아갑니다.\n이게 **예외 전파(Propagation)**입니다.",
         "visualizationType": "javaMemory",
         "code": "// throws: \"난 이거 처리 못해, 네가 해!\"",
         "javaMemoryState": {
@@ -125,7 +125,7 @@
       },
       {
         "title": "Main에서 Catch",
-        "explanation": "**실행 순서:**\n1. `main`의 `catch` 블록이 날아온 예외를 잡습니다.\n2. \"Caught!\"를 출력하고 상황을 수습합니다.\n\n**해설:**\n폭탄 돌리기 끝에 `main`이 최종적으로 처리했습니다.\nChecked Exception은 누군가는 반드시 처리해야 합니다.",
+        "explanation": "**해설:**\n폭탄 돌리기 끝에 `main`이 최종적으로 처리했습니다.\nChecked Exception은 누군가는 반드시 처리해야 합니다.",
         "visualizationType": "javaMemory",
         "code": "} catch (InterruptedException e) {",
         "highlightOffset": [
