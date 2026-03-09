@@ -10,6 +10,8 @@ import i18n from 'i18next';
 
 // Helper to get translated string
 const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, options) as string;
+let lastUnauthorizedToastAt = 0;
+const UNAUTHORIZED_TOAST_COOLDOWN_MS = 15000;
 
 // ============================================
 // 타입 정의
@@ -159,6 +161,9 @@ export const notifyNetwork = {
 
   /** 인증 실패 (401) */
   unauthorized: () => {
+    const now = Date.now();
+    if (now - lastUnauthorizedToastAt < UNAUTHORIZED_TOAST_COOLDOWN_MS) return;
+    lastUnauthorizedToastAt = now;
     notify.warning(t('toast.auth_expired'), {
       description: t('toast.please_login_again'),
       duration: 4000,

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Create your first String object",
-        "explanation": "**Execution order:**\n1. Call `new String(...)` (create “hello” in the Heap).\n2. Assign the object address (0x001) to `a`.\n\n**What is Heap?**\nIt is a huge memory space where data can be freely stored during program execution.\nEverything you create with `new` goes here.\n\n**What is a reference variable (a)?**\nIt is not the object itself, but a variable that only holds the address (sign) that tells **where** the object is.",
+        "explanation": "**What is Heap?**\nIt is a huge memory space where data can be freely stored during program execution.\nEverything you create with `new` goes here.\n\n**What is a reference variable (a)?**\nIt is not the object itself, but a variable that only holds the address (sign) that tells **where** the object is.",
         "keyInsight": "new = always creates a new object (Heap)",
         "visualizationType": "javaMemory",
         "code": "String a = new String(\"hello\");",
@@ -30,7 +30,7 @@
       },
       {
         "title": "Create a second String object",
-        "explanation": "**Execution order:**\n1. Call `new String(...)` again.\n2. Create a new object (0x002) in the Heap.\n3. Assign address to `b`.\n\nThe JVM unconditionally creates **new objects** without reusing existing ones.\nThe content is the same in both “hello”, but the **home (address)** is completely different.\nIt's like twins living in different houses.",
+        "explanation": "The JVM unconditionally creates **new objects** without reusing existing ones.\nThe content is the same in both “hello”, but the **home (address)** is completely different.\nIt's like twins living in different houses.",
         "keyInsight": "Even if the contents are the same, different objects = different addresses",
         "visualizationType": "javaMemory",
         "code": "String b = new String(\"hello\");",
@@ -62,7 +62,7 @@
       },
       {
         "title": "== comparison (reference comparison)",
-        "explanation": "**Execution order:**\n1. Search for the value of a (0x001).\n2. Search for the value of b (0x002).\n3. Compare `0x001 == 0x002` -> **false**.\n\nThe `==` operator is very simple.\n**Only the values ​​(addresses) contained within the variable** are compared.\n\n**What is a reference comparison?**\nRather than opening the ‘contents’, we only check that the ‘packaging (address)’ is the same.",
+        "explanation": "The `==` operator is very simple.\n**Only the values ​​(addresses) contained within the variable** are compared.\n\n**What is a reference comparison?**\nRather than opening the ‘contents’, we only check that the ‘packaging (address)’ is the same.",
         "keyInsight": "== compares address values",
         "visualizationType": "javaMemory",
         "code": "System.out.println(a == b);",
@@ -98,7 +98,7 @@
       },
       {
         "title": ".equals() comparison (compare values)",
-        "explanation": "**Execution order:**\n1. Move to the object pointed to by a.\n2. Compare the object pointed to by b and its content (“hello”).\n3. Content match -> **true**.\n\n`.equals()` is meticulous.\nFollow the address and see the **actual content** (“hello”) inside it.\n\n**What is Value Comparison?**\nEven if the memory location of the object is different, it checks whether the data it logically contains is the same.",
+        "explanation": "`.equals()` is meticulous.\nFollow the address and see the **actual content** (“hello”) inside it.\n\n**What is Value Comparison?**\nEven if the memory location of the object is different, it checks whether the data it logically contains is the same.",
         "keyInsight": ".equals() compares contents",
         "visualizationType": "javaMemory",
         "code": "System.out.println(a.equals(b));",
@@ -134,7 +134,7 @@
       },
       {
         "title": "same reference assignment",
-        "explanation": "**Execution order:**\n1. Copy the value of a (0x001) to c.\n2. c also points to 0x001.\n\n`String c = a;`\nThis code doesn't copy an object.\nOnly the **address (0x001)** held by `a` is copied to `c`.\nNow `a` and `c` point to the **same house**.\n\n**What is Aliasing?**\nThis is a situation where multiple variables point to one object at the same time.\n`c` is just another name for `a`.",
+        "explanation": "`String c = a;`\nThis code doesn't copy an object.\nOnly the **address (0x001)** held by `a` is copied to `c`.\nNow `a` and `c` point to the **same house**.\n\n**What is Aliasing?**\nThis is a situation where multiple variables point to one object at the same time.\n`c` is just another name for `a`.",
         "visualizationType": "javaMemory",
         "code": "String c = a;",
         "javaMemoryState": {
@@ -173,7 +173,7 @@
       },
       {
         "title": "Same reference comparison",
-        "explanation": "**Execution order:**\n1. Compare a(0x001) == c(0x001).\n2. Equal -> **true**.\n\n**Summary:**\n- `==`: Do you guys live in the **same house**? (address comparison)\n- `.equals()`: Are your **looks (contents)** the same? (compare values)",
+        "explanation": "**Summary:**\n- `==`: Do you guys live in the **same house**? (address comparison)\n- `.equals()`: Are your **looks (contents)** the same? (compare values)",
         "keyInsight": "== is also true if it points to the same object",
         "visualizationType": "javaMemory",
         "code": "System.out.println(a == c);",

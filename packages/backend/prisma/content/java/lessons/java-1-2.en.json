@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Creating a String from a literal",
-        "explanation": "**Execution order:**\n1. JVM searches **String Pool**.\n2. Since there is no “hello”, it is created in the Pool.\n3. Assign address (Pool:0x100) to `a`.\n\n**What is String Pool?**\nThis is a ‘recycling center’ that collects frequently used strings.\nTo save memory, Java creates and shares only one identical string literal.\n\n**What is Literal?**\nThese refer to values (`\"hello\"`) typed directly into the code.",
+        "explanation": "**What is String Pool?**\nThis is a ‘recycling center’ that collects frequently used strings.\nTo save memory, Java creates and shares only one identical string literal.\n\n**What is Literal?**\nThese refer to values (`\"hello\"`) typed directly into the code.",
         "keyInsight": "If you create it with quotation marks (\"\"), it will be stored in the Pool.",
         "visualizationType": "javaMemory",
         "javaMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "Reusing the same literal",
-        "explanation": "**Execution order:**\n1. String Pool Search.\n2. Discovery (reuse) of \"hello\".\n3. Assign the existing address (Pool:0x100) to `b`.\n\nAre you trying to make “hello” again?\nThe JVM searches the Pool and asks, “Huh? Is there something you created earlier?” and reuse the **existing address**.\nSo `b` also points to the same **Pool:0x100** as `a`.\n\n**Flyweight Pattern:**\nIt is a design pattern that saves memory by sharing identical objects rather than creating many.\nString Pool is this pattern.",
+        "explanation": "Are you trying to make “hello” again?\nThe JVM searches the Pool and asks, “Huh? Is there something you created earlier?” and reuse the **existing address**.\nSo `b` also points to the same **Pool:0x100** as `a`.\n\n**Flyweight Pattern:**\nIt is a design pattern that saves memory by sharing identical objects rather than creating many.\nString Pool is this pattern.",
         "keyInsight": "Same literal = same address reuse",
         "visualizationType": "javaMemory",
         "javaMemoryState": {
@@ -62,7 +62,7 @@
       },
       {
         "title": "== Comparison between literals",
-        "explanation": "**Execution order:**\n1. Compare a(Pool:0x100) == b(Pool:0x100).\n2. **true** because the addresses are the same.\n\nSince `a` and `b` point to the **same address**, the result of `==` (address comparison) is **true**.\nBut be careful! This is not because the strings are the same, but because they **coincidentally share the same object**.",
+        "explanation": "Since `a` and `b` point to the **same address**, the result of `==` (address comparison) is **true**.\nBut be careful! This is not because the strings are the same, but because they **coincidentally share the same object**.",
         "keyInsight": "== is true between literals (but .equals is recommended)",
         "visualizationType": "javaMemory",
         "javaMemoryState": {
@@ -97,7 +97,7 @@
       },
       {
         "title": "Create String with new",
-        "explanation": "**Execution order:**\n1. `new` keyword found -> New object is unconditionally created.\n2. Allocate 0x200 to Heap.\n\nThe `new` keyword is a command that says **“Don’t recycle, just give us a new one!”**\nIt doesn't care whether \"hello\" is in the Pool or not, it creates a new object in the regular **Heap** area.\n\n**Heap String vs Pooled String:**\n- `new`: My own private object (reusable\n- `\"...\"`: public object (reuse O)",
+        "explanation": "The `new` keyword is a command that says **“Don’t recycle, just give us a new one!”**\nIt doesn't care whether \"hello\" is in the Pool or not, it creates a new object in the regular **Heap** area.\n\n**Heap String vs Pooled String:**\n- `new`: My own private object (reusable\n- `\"...\"`: public object (reuse O)",
         "keyInsight": "new = refuse recycling, unconditionally new object",
         "visualizationType": "javaMemory",
         "javaMemoryState": {
@@ -132,7 +132,7 @@
       },
       {
         "title": "Literal vs new comparison",
-        "explanation": "**Execution order:**\n1. Compare a(Pool:0x100) == c(0x200).\n2. **false** because the addresses are different.\n\n`a` is from the recycling center (Pool),\n`c` is a new product freshly released from the factory (Heap).\nSince our origins are different, our addresses are also different.",
+        "explanation": "`a` is from the recycling center (Pool),\n`c` is a new product freshly released from the factory (Heap).\nSince our origins are different, our addresses are also different.",
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "comparison": "Pool:0x100 != 0x200",
@@ -169,7 +169,7 @@
       },
       {
         "title": "Register Pool with intern()",
-        "explanation": "**Execution order:**\n1. Call `c.intern()`.\n2. Find the same content (\"hello\") in String Pool.\n3. Return the address (Pool:0x100) of the found Pool object.\n\nThe `intern()` method requests **“Please join me in that Pool too”**.\nEventually, `d` will have the same address as `a`.",
+        "explanation": "The `intern()` method requests **“Please join me in that Pool too”**.\nEventually, `d` will have the same address as `a`.",
         "keyInsight": "intern() = Convert Heap string to Pool address",
         "visualizationType": "javaMemory",
         "javaMemoryState": {
@@ -199,7 +199,7 @@
       },
       {
         "title": "Compare intern() results",
-        "explanation": "**Execution order:**\n1. Compare a(Pool:0x100) == d(Pool:0x100).\n2. **true** because the addresses are the same.\n\n`a` and `d` now point to the same Pool object.\n`true`!\n\n**Practical Tip:**\nWhen you have to deal with millions of duplicate strings, using `intern()` can dramatically reduce memory.",
+        "explanation": "`a` and `d` now point to the same Pool object.\n`true`!\n\n**Practical Tip:**\nWhen you have to deal with millions of duplicate strings, using `intern()` can dramatically reduce memory.",
         "visualizationType": "javaMemory",
         "javaMemoryState": {
           "output": [

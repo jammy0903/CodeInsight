@@ -72,6 +72,7 @@ function resolveLanguageId(lessonId: string | undefined, contentLanguage: string
 export function LessonPage() {
   const { t } = useTranslation();
   const { lessonId } = useParams<{ lessonId: string }>();
+  const navigate = useNavigate();
 
   if (lessonId && LANGUAGE_IDS.has(lessonId)) {
     return <Navigate to={`/courses/${lessonId}`} replace />;
@@ -159,6 +160,15 @@ export function LessonPage() {
       {/* 신고 UI는 의도적으로 LessonPage에 두지 않는다.
           플로팅 버튼은 하단 내비(Prev/Next)와 충돌 가능성이 있어 제거했고,
           신고 진입은 Sidebar에서만 제공한다. */}
+      <div className="px-3 pt-3">
+        <button
+          onClick={() => navigate(languageCoursePath)}
+          className="inline-flex items-center gap-1.5 rounded-md border border-[var(--theme-lesson-panel-border)] bg-[var(--theme-lesson-panel-bg)] px-3 py-1.5 text-sm font-semibold hover:bg-[var(--theme-lesson-panel-border)]/30 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t('lesson.back_to_chapter')}
+        </button>
+      </div>
       {navigation.phase === 'completed' ? (
         <LessonCompletedView
           lessonOrder={lesson.order}

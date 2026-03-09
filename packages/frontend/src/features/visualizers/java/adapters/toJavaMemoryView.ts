@@ -42,6 +42,25 @@ function stringifyUnknown(value: unknown): string {
   }
 }
 
+function normalizeJavaVariableName(rawName: string, frameName?: string): string {
+  if (!rawName) return rawName;
+  let name = rawName.trim();
+
+  const colonIdx = name.lastIndexOf(':');
+  if (colonIdx >= 0 && colonIdx < name.length - 1) {
+    name = name.slice(colonIdx + 1);
+  }
+
+  if (frameName) {
+    const dotPrefix = `${frameName}.`;
+    if (name.startsWith(dotPrefix)) {
+      name = name.slice(dotPrefix.length);
+    }
+  }
+
+  return name;
+}
+
 /**
  * 시뮬레이터 변수 값을 JavaVariable로 변환
  */
@@ -128,7 +147,7 @@ function parseStackFrame(frame: unknown): JavaStackFrame {
       // args 배열은 스킵 (너무 복잡함)
       if (varName === 'args') continue;
 
-      variables.push(parseVariable(varName, value));
+      variables.push(parseVariable(normalizeJavaVariableName(varName, frameName), value));
     }
   }
 
@@ -201,7 +220,7 @@ export function toJavaMemoryViewProps(step: LessonStep): {
       const mainVariables: JavaVariable[] = [];
       for (const variableEntry of stackData) {
         if (!hasNameAndValue(variableEntry)) continue;
-        mainVariables.push(parseVariable(variableEntry.name, variableEntry.value));
+        mainVariables.push(parseVariable(normalizeJavaVariableName(variableEntry.name, 'main'), variableEntry.value));
       }
 
       const mainFrame: JavaStackFrame = {

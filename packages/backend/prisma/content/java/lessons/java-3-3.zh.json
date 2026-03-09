@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "创建数组",
-        "explanation": "**执行顺序：**\n1、在堆（0x100）中创建一个`int`类型数组对象`{1,2,3}`。\n2. 将地址“0x100”分配给堆栈上的“nums”变量。\n\n**关键：**\n在Java中，数组是一个**对象**。\n因此“nums”包含数组所在的**地址**，而不是数组本身。\n\n**类比**：`nums`就像一个遥控器，控制主体（Heap中的数组）。",
+        "explanation": "**关键：**\n在Java中，数组是一个**对象**。\n因此“nums”包含数组所在的**地址**，而不是数组本身。\n\n**类比**：`nums`就像一个遥控器，控制主体（Heap中的数组）。",
         "visualizationType": "javaMemory",
         "code": "int[] nums = {1, 2, 3};",
         "javaMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "初始数组输出",
-        "explanation": "**执行顺序：**\n1. 请参阅“nums”。\n2. 输出内容`[1,2,3]`。\n\n这是地址“0x100”的当前内容。",
+        "explanation": "这是地址“0x100”的当前内容。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Arrays.toString(nums));",
         "javaMemoryState": {
@@ -57,7 +57,7 @@
       },
       {
         "title": "调用modifyElement(nums)",
-        "explanation": "**执行顺序：**\n1. 复制“nums”的值（地址“0x100”）。\n2. 传递给`modifyElement`的参数`arr`。\n\n现在“nums”和“arr”共享同一个数组（“0x100”）。",
+        "explanation": "现在“nums”和“arr”共享同一个数组（“0x100”）。",
         "visualizationType": "javaMemory",
         "code": "modifyElement(nums);",
         "javaMemoryState": {
@@ -80,7 +80,7 @@
       },
       {
         "title": "编辑数组元素（副作用）",
-        "explanation": "**执行顺序：**\n1. 移动到“arr”指向的地址“0x100”。\n2. 用“100”覆盖索引值0。\n\n**结果：**\n原始数组本身已被修改。\n`nums` 也会受到影响，因为它在同一个地方查找。",
+        "explanation": "**结果：**\n原始数组本身已被修改。\n`nums` 也会受到影响，因为它在同一个地方查找。",
         "keyInsight": "修改数组内容=更改原始数组内容",
         "visualizationType": "javaMemory",
         "code": "arr[0] = 100;",
@@ -111,7 +111,7 @@
       },
       {
         "title": "编辑后确认",
-        "explanation": "**执行顺序：**\n1. 结束`modifyElement`。\n2. 打印“nums”。\n\n您可以看到第一个元素已更改为“100”。",
+        "explanation": "您可以看到第一个元素已更改为“100”。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Arrays.toString(nums));",
         "occurrence": 2,
@@ -138,7 +138,7 @@
       },
       {
         "title": "调用重新分配数组（nums）",
-        "explanation": "**执行顺序：**\n1. 再次复制“nums”地址（“0x100”）。\n2. 传递给`reassignArray`的`arr`。\n\n地址再次被复制并转发。",
+        "explanation": "地址再次被复制并转发。",
         "visualizationType": "javaMemory",
         "code": "reassignArray(nums);",
         "javaMemoryState": {
@@ -161,7 +161,7 @@
       },
       {
         "title": "重新分配变量（新数组）",
-        "explanation": "**执行顺序：**\n1. 在堆（0x300）中创建一个新数组 `{999, 888, 777}`。\n2. 将地址“0x300”分配给“arr”变量。\n\n**结果：**\n只有局部变量“arr”指向新数组。\n“main”中的“nums”仍然保留地址“0x100”。",
+        "explanation": "**结果：**\n只有局部变量“arr”指向新数组。\n“main”中的“nums”仍然保留地址“0x100”。",
         "keyInsight": "重新分配变量=仅更改本地引用",
         "visualizationType": "javaMemory",
         "code": "arr = new int[]{999, 888, 777};",
@@ -198,7 +198,7 @@
       },
       {
         "title": "最终确认",
-        "explanation": "**执行顺序：**\n1. 结束`reassignArray`。\n2. 打印“nums”。\n\n由于重新分配仅影响局部变量（`arr`），因此`nums`仍然是`[100, 2, 3]`。",
+        "explanation": "由于重新分配仅影响局部变量（`arr`），因此`nums`仍然是`[100, 2, 3]`。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(Arrays.toString(nums));",
         "occurrence": 3,

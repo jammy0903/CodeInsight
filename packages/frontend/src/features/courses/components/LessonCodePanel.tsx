@@ -17,6 +17,11 @@ interface LessonCodePanelProps {
   code: string;
   highlightLine: number;
   pointerLine?: number;
+  pulseLine?: number;
+  inlineHint?: {
+    line: number;
+    text: string;
+  } | null;
   terminalLines: TerminalLine[];
   onSelectionChange?: (selection: CodeSelection) => void;
   defaultRatio?: number;
@@ -31,6 +36,8 @@ export function LessonCodePanel({
   code,
   highlightLine,
   pointerLine,
+  pulseLine,
+  inlineHint,
   terminalLines,
   onSelectionChange,
   defaultRatio = 0.5,
@@ -109,6 +116,8 @@ export function LessonCodePanel({
             code={code}
             highlightLine={highlightLine}
             pointerLine={pointerLine}
+            pulseLine={pulseLine}
+            inlineHint={inlineHint}
             onSelectionChange={onSelectionChange}
             bottomPadding={0}
             mobileFontSizeOffset={2}

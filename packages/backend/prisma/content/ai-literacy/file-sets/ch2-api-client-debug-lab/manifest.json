@@ -1,0 +1,64 @@
+{
+  "id": "ch2-api-client-debug-lab",
+  "version": 1,
+  "strategy": "base-plus-patch-chain",
+  "root": "packages/backend/prisma/content/ai-literacy/file-sets/ch2-api-client-debug-lab",
+  "files": [
+    "src/apiClient.ts",
+    "src/mapper.ts",
+    "tests/apiClient.test.ts"
+  ],
+  "entrypoints": {
+    "repro": "tests/apiClient.test.ts",
+    "verify": "tests/apiClient.test.ts"
+  },
+  "snapshots": [
+    {
+      "id": "base",
+      "path": "snapshots/base",
+      "description": "챕터 시작 상태 (의도적 버그 포함)"
+    },
+    {
+      "id": "ai-2-1-fixed",
+      "path": "snapshots/ai-2-1-fixed",
+      "description": "mapper 필드 경로 버그 수정 완료 상태",
+      "from": "base",
+      "patch": "patches/ai-2-1.patch"
+    },
+    {
+      "id": "ai-2-2-fixed",
+      "path": "snapshots/ai-2-2-fixed",
+      "description": "legacy text fallback 매핑 보강 상태",
+      "from": "ai-2-1-fixed",
+      "patch": "patches/ai-2-2.patch"
+    },
+    {
+      "id": "ai-2-3-fixed",
+      "path": "snapshots/ai-2-3-fixed",
+      "description": "누락 응답 fail-fast 예외 처리 상태",
+      "from": "ai-2-2-fixed",
+      "patch": "patches/ai-2-3.patch"
+    },
+    {
+      "id": "ai-2-4-fixed",
+      "path": "snapshots/ai-2-4-fixed",
+      "description": "재시도 조건(4xx 제외, transient만 재시도) 수정 상태",
+      "from": "ai-2-3-fixed",
+      "patch": "patches/ai-2-4.patch"
+    },
+    {
+      "id": "ai-2-5-fixed",
+      "path": "snapshots/ai-2-5-fixed",
+      "description": "retries 정규화로 패치 영향 범위 안정화 상태",
+      "from": "ai-2-4-fixed",
+      "patch": "patches/ai-2-5.patch"
+    },
+    {
+      "id": "ai-2-6-fixed",
+      "path": "snapshots/ai-2-6-fixed",
+      "description": "회귀 테스트 스위트 확장 완료 상태",
+      "from": "ai-2-5-fixed",
+      "patch": "patches/ai-2-6.patch"
+    }
+  ]
+}

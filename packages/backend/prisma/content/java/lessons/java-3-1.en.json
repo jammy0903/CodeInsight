@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "declare variable a",
-        "explanation": "**Execution order:**\n1. Creation of `main` frame in stack memory.\n2. Secure space for `int` type variable `a`.\n3. Save the value `10`.\n\n**What happens in memory:**\nIn the workspace (Stack Frame) called `main`, create a box labeled `a` and enter the number `10`.",
+        "explanation": "**What happens in memory:**\nIn the workspace (Stack Frame) called `main`, create a box labeled `a` and enter the number `10`.",
         "visualizationType": "javaMemory",
         "code": "int a = 10;",
         "javaMemoryState": {
@@ -25,7 +25,7 @@
       },
       {
         "title": "Output before method call",
-        "explanation": "**Execution order:**\n1. Check the current value of `a`.\n2. Call `System.out.println`.\n\nPrints the number `10` currently contained in the `a` box to the screen.",
+        "explanation": "Prints the number `10` currently contained in the `a` box to the screen.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"before: \" + a);",
         "javaMemoryState": {
@@ -45,7 +45,7 @@
       },
       {
         "title": "call increment(a) - copy the value",
-        "explanation": "**Execution order:**\n1. Create a new Stack Frame for the `increment` method.\n2. Create parameter `x` variable space.\n3. Read the value `10` of `a` and **copy** it to `x`.\n\n**Call by Value:**\n`a` itself is not passed over.\nCopy the value `10` in `a` and place it in a new box called `x`.\nNow `a` and `x` are completely south and south.",
+        "explanation": "**Call by Value:**\n`a` itself is not passed over.\nCopy the value `10` in `a` and place it in a new box called `x`.\nNow `a` and `x` are completely south and south.",
         "keyInsight": "Only the 'value' is copied, not the variable itself",
         "visualizationType": "javaMemory",
         "code": "increment(a);",
@@ -70,7 +70,7 @@
       },
       {
         "title": "Change parameter x value",
-        "explanation": "**Execution order:**\n1. Read the value `10` of `x`.\n2. Add `1` to create `11`.\n3. Save `11` again in the `x` box.\n\n**What is the original?**\n`x` is a separate box in the `increment` frame.\nWhatever you do here will not affect the `a` box in the `main` frame.",
+        "explanation": "**What is the original?**\n`x` is a separate box in the `increment` frame.\nWhatever you do here will not affect the `a` box in the `main` frame.",
         "keyInsight": "Even if you modify the copy (x), the original (a) remains the same.",
         "visualizationType": "javaMemory",
         "code": "x = x + 1;",
@@ -95,7 +95,7 @@
       },
       {
         "title": "Function internal output",
-        "explanation": "**Execution order:**\n1. Search for the value `11` of `x`.\n2. Output.\n\nInside the function, the changed value `11` is visible.",
+        "explanation": "Inside the function, the changed value `11` is visible.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"inside: \" + x);",
         "javaMemoryState": {
@@ -120,7 +120,7 @@
       },
       {
         "title": "Return a function and check the result",
-        "explanation": "**Execution order:**\n1. Exit the `increment` method.\n2. Delete `increment` stack frame (including x).\n3. Return to `main`.\n4. Print the value of `a`.\n\n**Result:**\n`a` is still `10`.\nThis is because the copy (`x`) has disappeared, and the original (`a`) has never been touched.",
+        "explanation": "**Result:**\n`a` is still `10`.\nThis is because the copy (`x`) has disappeared, and the original (`a`) has never been touched.",
         "keyInsight": "The copy is destroyed when the method ends.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"after: \" + a);",

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "接收一个可能为 null 的值",
-        "explanation": "**执行顺序：**\n1. 调用`getValueMaybeNull()`。\n2. 返回一个值（或“null”）。\n3. 将其保存到“str”变量中。\n\n**情况：** 当您从外部（数据库、API、用户输入）接收到值时，您应该始终怀疑它可能为“null”。\n这个“str”就像一个你永远不知道会爆炸的定时炸弹。",
+        "explanation": "**情况：** 当您从外部（数据库、API、用户输入）接收到值时，您应该始终怀疑它可能为“null”。\n这个“str”就像一个你永远不知道会爆炸的定时炸弹。",
         "visualizationType": "javaMemory",
         "code": "String str = getValueMaybeNull();",
         "javaMemoryState": {
@@ -25,7 +25,7 @@
       },
       {
         "title": "短路评估",
-        "explanation": "**执行顺序：**\n1. 检查 `str != null` -> **false** （如果为 null）。\n2. **立即中断**（不执行后续的`str.length()`）。\n\n**逻辑运算的魔力：** 如果左侧条件为“假”，“&&”（AND）运算符甚至不会检查右侧。\n首先，它检查“str != null”，如果是“null”，则不执行后续的“str.length()”，从而安全地避免“NullPointerException”。",
+        "explanation": "**逻辑运算的魔力：** 如果左侧条件为“假”，“&&”（AND）运算符甚至不会检查右侧。\n首先，它检查“str != null”，如果是“null”，则不执行后续的“str.length()”，从而安全地避免“NullPointerException”。",
         "keyInsight": "&& 快捷方式求值：如果第一个为 false，则不执行第二个",
         "visualizationType": "javaMemory",
         "code": "if (str != null && str.length() > 0) {",
@@ -44,7 +44,7 @@
       },
       {
         "title": "条件执行",
-        "explanation": "**执行顺序：**\n1. 如果前面的“if”条件为“true”...\n2. 执行`println(str)`。\n\n仅当前面的 if 语句 (str != null && str.length() > 0) 中的所有条件都为 true 时，才会执行此行。\n安全打印，并保证“str”是有效字符串。",
+        "explanation": "仅当前面的 if 语句 (str != null && str.length() > 0) 中的所有条件都为 true 时，才会执行此行。\n安全打印，并保证“str”是有效字符串。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(str);",
         "javaMemoryState": {
@@ -56,12 +56,15 @@
             }
           ],
           "note": "이 라인은 str이 안전할 때만 도달 가능",
-          "evaluation": null
+          "evaluation": null,
+          "output": [
+            "hello"
+          ]
         }
       },
       {
         "title": "Objects.requireNonNull（快速失败）",
-        "explanation": "**执行顺序：**\n1. 调用`Objects.requireNonNull(str, ...)`。\n2. 检查“str”是否为“null”。\n3. 如果为“null”，则立即发生异常。\n\n**快速失败策略：**“如果出现问题，现在就明确解决，而不是以后再担心！”如果“str”为“null”，它会立即抛出“NullPointerException”并带有明确的消息，从而使调试更容易。",
+        "explanation": "**快速失败策略：**“如果出现问题，现在就明确解决，而不是以后再担心！”如果“str”为“null”，它会立即抛出“NullPointerException”并带有明确的消息，从而使调试更容易。",
         "keyInsight": "快速失败模式",
         "visualizationType": "javaMemory",
         "code": "Objects.requireNonNull(str, \"str must not be null\");",
@@ -81,7 +84,7 @@
       },
       {
         "title": "用三元运算符提供默认值",
-        "explanation": "**执行顺序：**\n1. `str != null` 检查。\n2. 如果为 true，则选择“str”；如果为 false，则选择“默认”。\n3. 将结果分配给“result”。\n\n如果“str”不为“null”，则为“str”本身赋值，如果“str”为“null”，则将默认值“default”赋给“result”变量。",
+        "explanation": "如果“str”不为“null”，则为“str”本身赋值，如果“str”为“null”，则将默认值“default”赋给“result”变量。",
         "visualizationType": "javaMemory",
         "code": "String result = (str != null) ? str : \"default\";",
         "javaMemoryState": {
@@ -103,7 +106,7 @@
       },
       {
         "title": "对象.requireNonNullElse",
-        "explanation": "**执行顺序：**\n1. 调用`Objects.requireNonNullElse`。\n2. 内部检查是否为空。\n3. 如果为 null，则返回“default”。\n4. 赋值给“value”。\n\n自 Java 9 以来提供了一种更具可读性的方法。\n它与三元运算符的功能相同，但意图却暴露得很清楚：“如果不为空，则为这个，否则为那个”。",
+        "explanation": "自 Java 9 以来提供了一种更具可读性的方法。\n它与三元运算符的功能相同，但意图却暴露得很清楚：“如果不为空，则为这个，否则为那个”。",
         "keyInsight": "Java 9+：使用 requireNonNullElse",
         "visualizationType": "javaMemory",
         "code": "String value = Objects.requireNonNullElse(str, \"default\");",

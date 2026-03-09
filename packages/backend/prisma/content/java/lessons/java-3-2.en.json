@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Create a Dog object",
-        "explanation": "**Execution order:**\n1. Create a `Dog` object in the heap memory (“Buddy”).\n2. Generate address value (assuming `0x100`).\n3. Save this address `0x100` in the `myDog` variable of Stack.\n\n**Memory Status:**\n`myDog` is the remote control.\nIt points to the TV (object) at address 0x100.",
+        "explanation": "**Memory Status:**\n`myDog` is the remote control.\nIt points to the TV (object) at address 0x100.",
         "visualizationType": "javaMemory",
         "code": "Dog myDog = new Dog(\"Buddy\");",
         "javaMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "Call changeName(myDog) - copy remote control",
-        "explanation": "**Execution order:**\n1. Reading the value of `myDog` (address `0x100`).\n2. Copy to parameter `d` of `changeName`.\n\n**Key:**\nThe object was not copied, but the **address pointing to the object** was copied.\nNow `myDog` and `d` are **two remote controls** that can operate the same TV.",
+        "explanation": "**Key:**\nThe object was not copied, but the **address pointing to the object** was copied.\nNow `myDog` and `d` are **two remote controls** that can operate the same TV.",
         "keyInsight": "Copy address = Create another remote control",
         "visualizationType": "javaMemory",
         "code": "changeName(myDog);",
@@ -55,7 +55,7 @@
       },
       {
         "title": "Change inside object (Side Effect)",
-        "explanation": "**Execution order:**\n1. Access object `0x100` using the `d` remote control (dereference).\n2. Modify the `name` field to “Max”.\n\n**Memory Change:**\nSince both remotes are watching the same TV, changing the channel with `d` will also change what `myDog` sees.",
+        "explanation": "**Memory Change:**\nSince both remotes are watching the same TV, changing the channel with `d` will also change what `myDog` sees.",
         "keyInsight": "Modify shared object = original affected",
         "visualizationType": "javaMemory",
         "code": "d.name = \"Max\";",
@@ -86,7 +86,7 @@
       },
       {
         "title": "Check the first results",
-        "explanation": "**Execution order:**\n1. `changeName` ends (d destroys).\n2. Output `myDog.name`.\n\nThe TV channel has changed, so “Max” appears.",
+        "explanation": "The TV channel has changed, so “Max” appears.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(myDog.name);",
         "javaMemoryState": {
@@ -112,7 +112,7 @@
       },
       {
         "title": "call reassign(myDog)",
-        "explanation": "**Execution order:**\n1. Read the address `0x100` of `myDog` again.\n2. Copy to `d` in the `reassign` method.\n\nA copy of the remote control `d` was created, again pointing to the same TV.",
+        "explanation": "A copy of the remote control `d` was created, again pointing to the same TV.",
         "visualizationType": "javaMemory",
         "code": "reassign(myDog);",
         "javaMemoryState": {
@@ -135,7 +135,7 @@
       },
       {
         "title": "Reassign variables (New Object)",
-        "explanation": "**Execution order:**\n1. Execute `new Dog(\"Rex\")` -> Create a new object (0x200).\n2. Assign the new address `0x200` to the `d` variable.\n\n**Important:**\nThe remote control named `d` is now pointed at **new TV** (`0x200`).\nThe original remote control at home (`myDog`) is still pointing to the old TV (`0x100`).",
+        "explanation": "**Important:**\nThe remote control named `d` is now pointed at **new TV** (`0x200`).\nThe original remote control at home (`myDog`) is still pointing to the old TV (`0x100`).",
         "keyInsight": "Reassigning variable = only changes my connection (regardless of origin)",
         "visualizationType": "javaMemory",
         "code": "d = new Dog(\"Rex\");",
@@ -172,7 +172,7 @@
       },
       {
         "title": "Check the final result",
-        "explanation": "**Execution order:**\n1. `reassign` ends (d disappears).\n2. Output `myDog.name`.\n\n`myDog` is still watching TV at `0x100`.\nTherefore, \"Max\" is output.",
+        "explanation": "`myDog` is still watching TV at `0x100`.\nTherefore, \"Max\" is output.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(myDog.name);",
         "occurrence": 2,

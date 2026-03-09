@@ -2,7 +2,7 @@
  * Auth Token Manager
  *
  * 단순한 토큰 캐시 모듈.
- * AuthProvider(firebase.ts)가 onAuthStateChanged에서 setAuthToken()으로 토큰을 설정하고,
+ * AuthProvider(firebase.ts)가 onIdTokenChanged에서 setAuthToken()으로 토큰을 설정하고,
  * axios 인터셉터와 기타 서비스가 getAuthToken()으로 동기적으로 읽음.
  *
  * WHY 동기적 설계:

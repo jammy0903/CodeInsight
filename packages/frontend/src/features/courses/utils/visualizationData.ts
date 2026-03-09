@@ -36,6 +36,10 @@ export function hasVisualizationPayload(step: LessonStep): boolean {
 }
 
 export function hasVisualizationData(step: LessonStep): boolean {
+  const stepRecord = step as UnknownRecord;
+  if (stepRecord.hideVisualization === true) {
+    return false;
+  }
   if (typeof step.visualizationType === 'string' && step.visualizationType.trim().length > 0) {
     return true;
   }

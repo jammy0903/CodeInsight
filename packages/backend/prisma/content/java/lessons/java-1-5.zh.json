@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "人员类别定义",
-        "explanation": "**执行顺序：**\n1. 加载Person类。\n2. 检查“等于”覆盖。\n3. 检查是否缺少“hashCode”（警告）。\n\n它是一个“半满”类，重新定义了“equals()”，但省略了“hashCode()”。\n如果你在`HashSet`或`HashMap`之类的东西中使用这个类，就会发生**大事故**。",
+        "explanation": "`Person` 重写了 `equals()`，因此 `name` 相同会被判定为“相等”。\n问题在于它没有同时重写 `hashCode()`。\n\n这会违反 **equals/hashCode 合约**：\n如果两个对象相等，它们的哈希值也必须相同。\n\n因此在 `HashSet` / `HashMap` 这类哈希容器中，可能出现“看起来相等却查找失败”的异常行为。",
         "visualizationType": "javaMemory",
         "code": "class Person {",
         "highlightOffset": [
@@ -31,7 +31,7 @@
       },
       {
         "title": "创建您的第一个 Person 对象",
-        "explanation": "**执行顺序：**\n1. 调用 `new Person(\"Alice\")`。\n2. 堆分配（0x001）。\n3. 创建默认的“hashCode”（例如 123）。\n\n该对象具有唯一的内存地址（0x001）和基于它的默认哈希码（123）。",
+        "explanation": "`p1` 是第一个名字为 \"Alice\" 的 `Person` 对象。\n\n关键点只有一个：我们没有自己实现 `hashCode()`，\n所以 Java 会给它一个默认的对象编号（例如 123）。\n\n这意味着后面就算再创建一个同名对象，\n也可能拿到不同的编号。\n这就是后面 HashSet 查找问题的起点。",
         "visualizationType": "javaMemory",
         "code": "Person p1 = new Person(\"Alice\");",
         "javaMemoryState": {
@@ -54,7 +54,7 @@
       },
       {
         "title": "创建第二个 Person 对象",
-        "explanation": "**执行顺序：**\n1. 调用 `new Person(\"Alice\")`。\n2. 新的堆分配 (0x002)。\n3. 创建一个新的默认“hashCode”（例如 456）。\n\n即使内容相同，“p2”也将具有与“p1”不同的哈希码。\n这是因为 `hashCode()` 没有被覆盖。",
+        "explanation": "`p2` 是第二个对象，名字也同样是 \"Alice\"。\n\n但它仍然是和 `p1` 不同的**新对象**，\n所以 Java 会给它另一个默认编号（例如 456）。\n\n现在就出现了：值看起来一样，\n哈希值却可能不同。\n这正是后面 HashSet 结果看起来“反直觉”的原因。",
         "visualizationType": "javaMemory",
         "code": "Person p2 = new Person(\"Alice\");",
         "javaMemoryState": {
@@ -87,7 +87,7 @@
       },
       {
         "title": "equals() 比较",
-        "explanation": "**执行顺序：**\n1. 调用`p1.equals(p2)`。\n2. 比较名字（“Alice”）。\n3. 匹配，所以**真实**。\n\n到目前为止似乎还没有问题。",
+        "explanation": "现在调用 `p1.equals(p2)`，结果是 `true`。\n因为两个人的名字都是 \"Alice\"，按我们写的 `equals()` 规则就是相等。\n\n到这里看起来没问题。\n但关键陷阱是：`HashSet` 不是先看 `equals()`，\n它会先用 `hashCode()` 找桶。",
         "keyInsight": "equals() override = 可以比较值",
         "visualizationType": "javaMemory",
         "code": "System.out.println(p1.equals(p2));",
@@ -125,7 +125,7 @@
       },
       {
         "title": "创建哈希集",
-        "explanation": "**执行顺序：**\n1. 调用`new HashSet<>()`。\n2. 创建初始桶（数组）。\n\n基于哈希的数据结构使用“hashCode()”来存储和检索对象。",
+        "explanation": "你可以把 `HashSet` 想成很多小房间（桶）。\n放入或查找对象时，它先用 `hashCode()` 决定去哪个房间。\n\n所以 `equals()` 是后一步，\n第一步永远是 `hashCode()`。",
         "visualizationType": "javaMemory",
         "code": "Set<Person> set = new HashSet<>();",
         "javaMemoryState": {
@@ -162,13 +162,33 @@
               "content": "HashSet"
             }
           ],
+          "hashSet": {
+            "buckets": [
+              {
+                "index": "bucket[0]",
+                "content": "(empty)"
+              },
+              {
+                "index": "bucket[1]",
+                "content": "(empty)"
+              },
+              {
+                "index": "bucket[2]",
+                "content": "(empty)"
+              },
+              {
+                "index": "bucket[3]",
+                "content": "(empty)"
+              }
+            ]
+          },
           "output": [],
           "note": null
         }
       },
       {
         "title": "将 p1 添加到 HashSet",
-        "explanation": "**执行顺序：**\n1. 调用`set.add(p1)`。\n2. 计算`p1.hashCode()` -> **123**。\n3. 将`p1`保存到桶123中。",
+        "explanation": "执行 `set.add(p1)` 时，`HashSet` 会根据 `p1` 的哈希值（例如 123）\n先选好桶，再把 `p1` 放进去。\n\n现在只有 `hash(123)` 这个桶里有 `p1`。",
         "keyInsight": "HashSet/HashMap = 使用 hashCode() 分配房间",
         "visualizationType": "javaMemory",
         "code": "set.add(p1);",
@@ -185,7 +205,7 @@
       },
       {
         "title": "调用 contains(p2) （搜索失败）",
-        "explanation": "**执行顺序：**\n1. 调用`set.contains(p2)`。\n2. 计算`p2.hashCode()` -> **456**。\n3. 检查铲斗 456。\n4. **空** -> **假** 返回。\n\n尽管“equals()”是“true”，但“hashCode()”不同，所以我搜索了一个完全不同的房间。\n你没有办法找到它。",
+        "explanation": "调用 `set.contains(p2)` 时，\n`HashSet` 会先去 `p2` 的哈希桶（例如 `hash(456)`）。\n\n但 `p1` 实际上在 `hash(123)` 的桶里。\n也就是它找的是另一个房间，所以返回 `false`。\n\n关键点：\n就算 `equals()` 判定相等，\n只要 `hashCode()` 不一致，`HashSet` 仍可能查找失败。",
         "keyInsight": "hashCode不同=桶不同=查找失败",
         "visualizationType": "javaMemory",
         "code": "System.out.println(set.contains(p2));",

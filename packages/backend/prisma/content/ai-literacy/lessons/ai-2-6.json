@@ -1,0 +1,97 @@
+{
+  "lessonId": "ai-2-6",
+  "title": "회귀 테스트로 마무리",
+  "concept": "최종 단계는 패치를 코드가 아니라 테스트로 고정하는 것이다.",
+  "content": {
+    "code": "// File: tests/apiClient.test.ts\nimport { fetchAssistantText } from '../src/apiClient';\n\nasync function fakeMessageContentOk() { /* ... */ }\nasync function fakeLegacyTextOk() { /* ... */ }\nasync function fakeBadRequest() { /* status=400 */ }\n\n(async () => {\n  // 1) message.content 케이스\n  // 2) legacy text 케이스\n  // 3) 400 즉시 실패 케이스\n})();\n",
+    "steps": [
+      {
+        "title": "회귀 시나리오를 정리한다",
+        "explanation": "이번 챕터에서 고친 핵심 동작을 테스트 항목으로 고정합니다.",
+        "keyInsight": "테스트 목록이 곧 패치 계약서",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "inspect",
+          "checklist": [
+            "message.content 매핑",
+            "legacy text fallback",
+            "400 에러 즉시 실패"
+          ]
+        },
+        "code": "import { fetchAssistantText } from '../src/apiClient';"
+      },
+      {
+        "title": "테스트 누락 경로를 찾는다",
+        "explanation": "기존 테스트는 성공 케이스 1개만 검증해 회귀를 막기 부족합니다.",
+        "keyInsight": "단일 성공 케이스는 방어선이 약하다",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "compare",
+          "expectedPath": "single happy-path test",
+          "actualPath": "multi-case regression suite"
+        },
+        "code": "const result = await fetchAssistantText(fakeOk);"
+      },
+      {
+        "title": "회귀 테스트를 확장한다",
+        "explanation": "3개 시나리오를 하나의 회귀 스위트로 묶어 수정사항을 고정합니다.",
+        "keyInsight": "회귀 테스트는 과거 버그 재발 방지장치",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "patch",
+          "patch": "single happy-path test -> multi-case regression suite (content, legacy, 400)"
+        },
+        "code": "const b = await fetchAssistantText(fakeLegacyTextOk);"
+      },
+      {
+        "title": "최종 상태를 검증한다",
+        "explanation": "회귀 스위트가 모두 통과하면 ch2 패치 체인이 테스트로 고정됩니다.",
+        "keyInsight": "디버깅의 끝은 수정이 아니라 재발 방지",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "verify",
+          "expectedOutput": "happy-path만 PASS",
+          "actualOutput": "regression suite 3케이스 PASS"
+        },
+        "code": "console.log('PASS: regression suite for apiClient');"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "회귀 테스트 설계에서 가장 중요한 원칙은?",
+    "options": [
+      "이번에 고친 버그 경로를 입력 케이스로 명시적으로 고정한다",
+      "성공 케이스 하나만 길게 검증한다",
+      "테스트 이름을 짧게 만든다",
+      "실패 케이스는 로그만 남긴다"
+    ],
+    "correctIndex": 0,
+    "explanation": "수정한 경로를 테스트로 고정해야 같은 버그가 다시 들어와도 즉시 탐지됩니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "버그를 고쳤다면 테스트 추가는 선택사항이다",
+      "correct": "버그 수정과 회귀 테스트는 한 세트로 처리해야 한다",
+      "why": "테스트가 없으면 동일 회귀가 다음 변경에서 쉽게 재발합니다."
+    }
+  ],
+  "keyTakeaway": "패치를 테스트로 고정해야 디버깅이 완료된다",
+  "fileSet": {
+    "id": "ch2-api-client-debug-lab",
+    "root": "packages/backend/prisma/content/ai-literacy/file-sets/ch2-api-client-debug-lab",
+    "manifest": "packages/backend/prisma/content/ai-literacy/file-sets/ch2-api-client-debug-lab/manifest.json",
+    "baseSnapshot": "snapshots/ai-2-5-fixed",
+    "lessonSnapshots": {
+      "broken": "snapshots/ai-2-5-fixed",
+      "fixed": "snapshots/ai-2-6-fixed"
+    },
+    "patches": [
+      "patches/ai-2-6.patch"
+    ],
+    "files": [
+      "src/apiClient.ts",
+      "src/mapper.ts",
+      "tests/apiClient.test.ts"
+    ]
+  }
+}

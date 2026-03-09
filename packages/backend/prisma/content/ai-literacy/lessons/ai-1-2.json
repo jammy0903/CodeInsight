@@ -1,0 +1,78 @@
+{
+  "lessonId": "ai-1-2",
+  "title": "null/undefined 처리 누락 잡기",
+  "concept": "null/undefined는 데이터 누락이 아니라 '조건 분기 지점'이다.",
+  "content": {
+    "code": "const usersById = {\n  u1: { profile: { nickname: 'Mina' } },\n  u2: {},\n};\n\nfunction getDisplayName(userId) {\n  const user = usersById[userId];\n\n  // AI가 자주 내는 취약한 코드\n  return user.profile.nickname.toUpperCase();\n}\n\nconsole.log(getDisplayName('u2'));\n",
+    "steps": [
+      {
+        "title": "실패를 먼저 재현한다",
+        "explanation": "`u2`는 profile 정보가 비어 있는데, 코드는 `user.profile.nickname`을 바로 읽습니다.\n실행하면 TypeError가 발생합니다.",
+        "keyInsight": "디버깅 시작점은 '어떤 입력에서 터지는지'를 고정하는 것",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "inspect",
+          "checklist": [
+            "실패 입력 고정: u2",
+            "에러 메시지 기록: Cannot read properties of undefined"
+          ]
+        },
+        "code": "console.log(getDisplayName('u2'));"
+      },
+      {
+        "title": "원인을 경로 단위로 확인한다",
+        "explanation": "`usersById['u2']`는 `{}`라서 `profile`이 `undefined`입니다.\n즉 실패 원인은 `profile`/`nickname` 존재 여부를 확인하지 않은 것입니다.",
+        "keyInsight": "증상(TypeError)보다 원인(누락 필드 무검사 접근)을 고쳐야 재발을 막는다",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "compare",
+          "expectedPath": "user.profile.nickname",
+          "actualPath": "user?.profile?.nickname"
+        },
+        "code": "return user.profile.nickname.toUpperCase();"
+      },
+      {
+        "title": "최소 수정으로 방어 로직을 넣는다",
+        "explanation": "핵심 로직은 유지하고 접근 경로만 안전하게 바꿉니다.\n값이 없으면 기본값 `UNKNOWN`을 반환하도록 처리합니다.",
+        "keyInsight": "최소 수정 원칙: 필요한 줄만 바꾸고 동작 의도를 명확히 한다",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "patch",
+          "patch": "return user.profile.nickname.toUpperCase(); -> return (user?.profile?.nickname ?? 'UNKNOWN').toUpperCase();"
+        },
+        "code": "return (user?.profile?.nickname ?? 'UNKNOWN').toUpperCase();"
+      },
+      {
+        "title": "수정 후 다중 입력으로 재검증한다",
+        "explanation": "정상 케이스(u1)와 누락 케이스(u2, u3)를 함께 확인합니다.\nu1은 `MINA`, u2/u3는 `UNKNOWN`이어야 합니다.",
+        "keyInsight": "패치 완료 기준은 '에러 제거'가 아니라 '입력별 기대 동작 충족'",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "verify",
+          "expectedOutput": "TypeError: Cannot read properties of undefined (reading 'nickname') at input u2",
+          "actualOutput": "u1 -> MINA, u2 -> UNKNOWN, u3 -> UNKNOWN"
+        },
+        "code": "console.log(getDisplayName('u1'));\nconsole.log(getDisplayName('u2'));\nconsole.log(getDisplayName('u3'));"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "`user.profile.nickname` 접근에서 null/undefined 오류를 막는 가장 직접적인 수정은?",
+    "options": [
+      "`user?.profile?.nickname ?? 'UNKNOWN'` 형태로 안전 접근 + 기본값 처리",
+      "try/catch로 전체 함수를 감싸고 에러를 무시한다",
+      "nickname이 없으면 빈 문자열을 강제로 대입한다",
+      "입력이 항상 정상이라고 가정하고 테스트만 늘린다"
+    ],
+    "correctIndex": 0,
+    "explanation": "누락 가능 경로를 코드에서 직접 방어해야 런타임 오류와 데이터 누락을 함께 처리할 수 있습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "에러는 try/catch로만 잡으면 충분하다",
+      "correct": "원인 경로에서 null/undefined를 안전하게 처리해야 재발을 막을 수 있다",
+      "why": "예외를 덮는 방식은 문제를 숨기고 잘못된 데이터 흐름을 남깁니다."
+    }
+  ],
+  "keyTakeaway": "null/undefined는 예외가 아니라 정상 입력 시나리오로 가정하고 경로를 설계한다"
+}

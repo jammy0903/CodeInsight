@@ -1,0 +1,97 @@
+{
+  "lessonId": "ai-2-4",
+  "title": "재시도 로직 버그 수정",
+  "concept": "재시도는 모든 오류가 아니라 일시적(transient) 오류에만 적용해야 한다.",
+  "content": {
+    "code": "// File: src/apiClient.ts\nfor (let attempt = 0; attempt <= retries; attempt += 1) {\n  try {\n    const response = await request();\n    return mapAssistantText(response);\n  } catch (error) {\n    lastError = error;\n\n    // BUG: 모든 에러를 재시도\n    if (attempt === retries) {\n      throw error;\n    }\n  }\n}\n",
+    "steps": [
+      {
+        "title": "증상을 재현한다",
+        "explanation": "400 같은 요청 오류도 불필요하게 재시도되어 지연과 로그 노이즈가 커집니다.",
+        "keyInsight": "재시도 대상 분류가 없으면 장애가 증폭된다",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "inspect",
+          "checklist": [
+            "입력: status=400 에러",
+            "현재 동작: retries 횟수만큼 반복",
+            "불필요한 대기/트래픽 확인"
+          ]
+        },
+        "code": "if (attempt === retries) { throw error; }"
+      },
+      {
+        "title": "원인을 좁힌다",
+        "explanation": "catch 블록에 `retriable` 판별이 없어 모든 에러가 동일 처리됩니다.",
+        "keyInsight": "핵심 누락은 오류 분류 함수",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "compare",
+          "expectedPath": "if (attempt === retries) throw error;",
+          "actualPath": "if (!isRetriable(error) || attempt === retries) throw error;"
+        },
+        "code": "if (attempt === retries) { throw error; }"
+      },
+      {
+        "title": "최소 수정으로 패치한다",
+        "explanation": "`isRetriable`를 추가하고 429/5xx만 재시도하도록 조건을 좁힙니다.",
+        "keyInsight": "재시도 조건 축소가 핵심",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "patch",
+          "patch": "if (attempt === retries) throw error; -> if (!isRetriable(error) || attempt === retries) throw error;"
+        },
+        "code": "if (!isRetriable(error) || attempt === retries) {\n  throw error;\n}"
+      },
+      {
+        "title": "결과를 재검증한다",
+        "explanation": "400은 즉시 실패하고, 429/5xx만 재시도 경로로 들어갑니다.",
+        "keyInsight": "retry 정책은 오류 클래스 기준으로 검증해야 한다",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "verify",
+          "expectedOutput": "400 -> retry 3회",
+          "actualOutput": "400 -> 즉시 throw (retry 없음)"
+        },
+        "code": "if (!isRetriable(error) || attempt === retries) { throw error; }"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "재시도 정책에서 일반적으로 즉시 실패 처리해야 하는 것은?",
+    "options": [
+      "400 같은 client error",
+      "429 rate limit",
+      "503 service unavailable",
+      "502 bad gateway"
+    ],
+    "correctIndex": 0,
+    "explanation": "4xx는 보통 요청 자체 문제라 같은 요청 재시도가 효과가 없습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "재시도는 많을수록 안정적이다",
+      "correct": "오류 유형을 구분해 필요한 경우에만 재시도해야 한다",
+      "why": "무차별 재시도는 장애를 확대하고 복구를 늦춥니다."
+    }
+  ],
+  "keyTakeaway": "retry는 에러 분류(transient vs non-transient) 뒤에 적용한다",
+  "fileSet": {
+    "id": "ch2-api-client-debug-lab",
+    "root": "packages/backend/prisma/content/ai-literacy/file-sets/ch2-api-client-debug-lab",
+    "manifest": "packages/backend/prisma/content/ai-literacy/file-sets/ch2-api-client-debug-lab/manifest.json",
+    "baseSnapshot": "snapshots/ai-2-3-fixed",
+    "lessonSnapshots": {
+      "broken": "snapshots/ai-2-3-fixed",
+      "fixed": "snapshots/ai-2-4-fixed"
+    },
+    "patches": [
+      "patches/ai-2-4.patch"
+    ],
+    "files": [
+      "src/apiClient.ts",
+      "src/mapper.ts",
+      "tests/apiClient.test.ts"
+    ]
+  }
+}

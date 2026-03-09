@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "声明变量a",
-        "explanation": "**执行顺序：**\n1. 在堆栈内存中创建“main”帧。\n2. 为“int”类型变量“a”预留空间。\n3. 保存值“10”。\n\n**内存中发生了什么：**\n在名为“main”的工作区（堆栈框架）中，创建一个标记为“a”的框并输入数字“10”。",
+        "explanation": "**内存中发生了什么：**\n在名为“main”的工作区（堆栈框架）中，创建一个标记为“a”的框并输入数字“10”。",
         "visualizationType": "javaMemory",
         "code": "int a = 10;",
         "javaMemoryState": {
@@ -25,7 +25,7 @@
       },
       {
         "title": "方法调用前的输出",
-        "explanation": "**执行顺序：**\n1. 检查`a`的当前值。\n2. 调用`System.out.println`。\n\n将当前包含在“a”框中的数字“10”打印到屏幕上。",
+        "explanation": "将当前包含在“a”框中的数字“10”打印到屏幕上。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"before: \" + a);",
         "javaMemoryState": {
@@ -45,7 +45,7 @@
       },
       {
         "title": "调用increment(a) - 复制值",
-        "explanation": "**执行顺序：**\n1. 为“increment”方法创建一个新的堆栈帧。\n2. 创建参数`x`变量空间。\n3. 读取“a”的值“10”并将其**复制**到“x”。\n\n**按值调用：**\n`a` 本身不会被忽略。\n复制“a”中的值“10”并将其放入名为“x”的新框中。\n现在‘a’和‘x’完全是南向南。",
+        "explanation": "**按值调用：**\n`a` 本身不会被忽略。\n复制“a”中的值“10”并将其放入名为“x”的新框中。\n现在‘a’和‘x’完全是南向南。",
         "keyInsight": "仅复制“值”，而不复制变量本身",
         "visualizationType": "javaMemory",
         "code": "increment(a);",
@@ -70,7 +70,7 @@
       },
       {
         "title": "更改参数 x 值",
-        "explanation": "**执行顺序：**\n1. 读取“x”的值“10”。\n2. 添加“1”以创建“11”。\n3. 再次将“11”保存到“x”框中。\n\n**原版是什么？**\n“x”是“increment”框架中的一个单独的框。\n无论你在这里做什么都不会影响“main”框架中的“a”框。",
+        "explanation": "**原版是什么？**\n“x”是“increment”框架中的一个单独的框。\n无论你在这里做什么都不会影响“main”框架中的“a”框。",
         "keyInsight": "即使修改副本 (x)，原始 (a) 仍保持不变。",
         "visualizationType": "javaMemory",
         "code": "x = x + 1;",
@@ -95,7 +95,7 @@
       },
       {
         "title": "功能内部输出",
-        "explanation": "**执行顺序：**\n1. 搜索“x”的值“11”。\n2.输出。\n\n在函数内部，更改后的值“11”是可见的。",
+        "explanation": "2.输出。\n\n在函数内部，更改后的值“11”是可见的。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"inside: \" + x);",
         "javaMemoryState": {
@@ -120,7 +120,7 @@
       },
       {
         "title": "返回一个函数并检查结果",
-        "explanation": "**执行顺序：**\n1. 退出`increment`方法。\n2. 删除`increment`栈帧（包括x）。\n3.返回`main`。\n4. 打印`a`的值。\n\n**结果：**\n`a` 仍然是 `10`。\n这是因为副本 (`x`) 已经消失，而原始 (`a`) 从未被触及。",
+        "explanation": "3.返回`main`。\n4. 打印`a`的值。\n\n**结果：**\n`a` 仍然是 `10`。\n这是因为副本 (`x`) 已经消失，而原始 (`a`) 从未被触及。",
         "keyInsight": "当方法结束时，副本将被销毁。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"after: \" + a);",

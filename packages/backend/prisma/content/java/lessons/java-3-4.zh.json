@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "변수 생성 (Boxing)",
-        "explanation": "**실행 순서:**\n1. `Integer(1)` 객체 생성 (0x100, Auto-boxing).\n2. `Integer(2)` 객체 생성 (0x200).\n3. `x`에 `0x100`, `y`에 `0x200` 저장.\n\n**메모리 상태:**\n`Stack`에 `x`, `y` 변수가 있고, 각각 `Heap`의 Integer 객체를 가리킵니다.",
+        "explanation": "**메모리 상태:**\n`Stack`에 `x`, `y` 변수가 있고, 각각 `Heap`의 Integer 객체를 가리킵니다.",
         "visualizationType": "javaMemory",
         "code": "Integer x = 1;",
         "javaMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "변수 y 생성",
-        "explanation": "**실행 순서:**\n1. `y` 변수 생성 및 초기화.\n\n이제 두 개의 객체가 준비되었습니다.",
+        "explanation": "이제 두 개의 객체가 준비되었습니다.",
         "visualizationType": "javaMemory",
         "code": "Integer y = 2;",
         "javaMemoryState": {
@@ -65,7 +65,7 @@
       },
       {
         "title": "초기 상태 출력",
-        "explanation": "**실행 순서:**\n1. `x`, `y` 값 출력.\n\n\"before: x=1, y=2\"가 출력됩니다.",
+        "explanation": "\"before: x=1, y=2\"가 출력됩니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"before: x=\" + x + \", y=\" + y);",
         "javaMemoryState": {
@@ -102,7 +102,7 @@
       },
       {
         "title": "swap(x, y) 호출 - 주소 복사",
-        "explanation": "**실행 순서:**\n1. `x`의 주소(`0x100`) -> `a`에 복사.\n2. `y`의 주소(`0x200`) -> `b`에 복사.\n\n**핵심:**\n`a`와 `b`는 `x`, `y`의 **복사본 리모컨**입니다.",
+        "explanation": "**핵심:**\n`a`와 `b`는 `x`, `y`의 **복사본 리모컨**입니다.",
         "keyInsight": "파라미터 전달 = 리모컨 복사",
         "visualizationType": "javaMemory",
         "code": "swap(x, y);",
@@ -139,7 +139,7 @@
       },
       {
         "title": "temp = a",
-        "explanation": "**실행 순서:**\n1. `a`가 가리키는 주소 `0x100`을 `temp`에 저장.\n\n`swap` 메서드 내부에서 교환 작업을 시작합니다.",
+        "explanation": "`swap` 메서드 내부에서 교환 작업을 시작합니다.",
         "visualizationType": "javaMemory",
         "code": "Integer temp = a;",
         "javaMemoryState": {
@@ -167,7 +167,7 @@
       },
       {
         "title": "a = b",
-        "explanation": "**실행 순서:**\n1. `b`의 주소 `0x200`을 `a`에 대입.\n\n이제 `a`는 `0x200`번 TV를 가리킵니다.\n(원래 `main`의 `x`는 여전히 `0x100`입니다!)",
+        "explanation": "이제 `a`는 `0x200`번 TV를 가리킵니다.\n(원래 `main`의 `x`는 여전히 `0x100`입니다!)",
         "visualizationType": "javaMemory",
         "code": "a = b;",
         "javaMemoryState": {
@@ -196,7 +196,7 @@
       },
       {
         "title": "b = temp",
-        "explanation": "**실행 순서:**\n1. `temp`의 주소 `0x100`을 `b`에 대입.\n\n**상태:**\n`swap` 함수 내부에서는 `a`와 `b`가 서로 주소를 맞바꾸었습니다.\n교환 성공!",
+        "explanation": "**상태:**\n`swap` 함수 내부에서는 `a`와 `b`가 서로 주소를 맞바꾸었습니다.\n교환 성공!",
         "visualizationType": "javaMemory",
         "code": "b = temp;",
         "javaMemoryState": {
@@ -225,7 +225,7 @@
       },
       {
         "title": "내부 확인",
-        "explanation": "**실행 순서:**\n1. `a`, `b` 출력.\n\n함수 내부에서는 \"a=2, b=1\"로 잘 교환된 것처럼 보입니다.",
+        "explanation": "함수 내부에서는 \"a=2, b=1\"로 잘 교환된 것처럼 보입니다.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"inside: a=\" + a + \", b=\" + b);",
         "javaMemoryState": {
@@ -250,7 +250,7 @@
       },
       {
         "title": "메서드 종료 및 최종 확인",
-        "explanation": "**실행 순서:**\n1. `swap` 종료 -> `a`, `b`, `temp` 모두 삭제.\n2. `main` 복귀.\n3. `x`, `y` 출력.\n\n**충격적인 결과:**\n`x`, `y`는 자신들의 복사본(`a`, `b`)이 무슨 짓을 했는지 전혀 모릅니다.\n여전히 원래 주소(`0x100`, `0x200`)를 꽉 잡고 있습니다.",
+        "explanation": "**충격적인 결과:**\n`x`, `y`는 자신들의 복사본(`a`, `b`)이 무슨 짓을 했는지 전혀 모릅니다.\n여전히 원래 주소(`0x100`, `0x200`)를 꽉 잡고 있습니다.",
         "keyInsight": "Swap 실패! 리모컨만 바꿨을 뿐.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"after: x=\" + x + \", y=\" + y);",

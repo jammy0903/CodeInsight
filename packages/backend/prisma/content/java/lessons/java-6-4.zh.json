@@ -19,7 +19,7 @@
       },
       {
         "title": "커스텀 예외 클래스 정의",
-        "explanation": "**실행 순서:**\n1. `BankException`을 상속받은 `NoMoneyException` 클래스가 로딩됩니다.\n\n**해설:**\n자바가 제공하는 기본 예외만으로는 \"잔고 부족\", \"아이디 중복\" 같은 구체적인 상황을 표현하기 어렵습니다.\n이럴 때 우리만의 예외 클래스를 만들어 쓰면 코드 읽기가 훨씬 좋아집니다.",
+        "explanation": "**해설:**\n자바가 제공하는 기본 예외만으로는 \"잔고 부족\", \"아이디 중복\" 같은 구체적인 상황을 표현하기 어렵습니다.\n이럴 때 우리만의 예외 클래스를 만들어 쓰면 코드 읽기가 훨씬 좋아집니다.",
         "visualizationType": "javaMemory",
         "code": "class NoMoneyException extends BankException {",
         "highlightOffset": [
@@ -44,7 +44,7 @@
       },
       {
         "title": "메서드 호출",
-        "explanation": "**실행 순서:**\n1. `main`에서 `withdraw(1000)`을 호출합니다.\n2. `balance` 변수가 스택 프레임에 생성됩니다.\n\n**해설:**\n출금액(1000)이 잔고(500)보다 많습니다.\n문제가 터지기 일보 직전입니다.",
+        "explanation": "**해설:**\n출금액(1000)이 잔고(500)보다 많습니다.\n문제가 터지기 일보 직전입니다.",
         "visualizationType": "javaMemory",
         "code": "try {",
         "highlightOffset": [
@@ -72,7 +72,7 @@
       },
       {
         "title": "커스텀 예외 발생",
-        "explanation": "**실행 순서:**\n1. `money > balance` 조건이 참이 되어 `if`문 안으로 들어갑니다.\n2. `NoMoneyException` 객체가 Heap에 생성됩니다.\n이때 메시지는 \"부족한 금액: 500\"이 됩니다.\n3. `throw`로 예외를 던집니다.\n\n**해설:**\n단순히 `throw new Exception()` 하는 것보다, `throw new NoMoneyException(...)` 이라고 하면 \"아, 돈이 없어서 터졌구나!\" 라고 바로 알 수 있습니다.",
+        "explanation": "이때 메시지는 \"부족한 금액: 500\"이 됩니다.\n3. `throw`로 예외를 던집니다.\n\n**해설:**\n단순히 `throw new Exception()` 하는 것보다, `throw new NoMoneyException(...)` 이라고 하면 \"아, 돈이 없어서 터졌구나!\" 라고 바로 알 수 있습니다.",
         "visualizationType": "javaMemory",
         "code": "}",
         "occurrence": 4,
@@ -98,7 +98,7 @@
       },
       {
         "title": "구체적인 Catch",
-        "explanation": "**실행 순서:**\n1. `main` 메서드로 돌아와 `catch (NoMoneyException e)` 블록이 실행됩니다.\n2. 예외 메시지를 출력합니다.\n\n**해설:**\n부모인 `BankException`보다 자식인 `NoMoneyException`을 잡는 `catch` 블록이 먼저 와야 합니다.\n(구체적인 것 먼저!) 덕분에 우리는 정확한 에러 메시지를 볼 수 있습니다.",
+        "explanation": "**해설:**\n부모인 `BankException`보다 자식인 `NoMoneyException`을 잡는 `catch` 블록이 먼저 와야 합니다.\n(구체적인 것 먼저!) 덕분에 우리는 정확한 에러 메시지를 볼 수 있습니다.",
         "visualizationType": "javaMemory",
         "code": "withdraw(1000);",
         "highlightOffset": [

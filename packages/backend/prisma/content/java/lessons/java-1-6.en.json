@@ -41,6 +41,9 @@
             }
           ],
           "output": [],
+          "stackAction": "PUSH",
+          "callEvent": "CALL main() -> add(3, 7)",
+          "currentFrame": "add",
           "note": "Line 3 executed"
         }
       },
@@ -52,11 +55,29 @@
         "javaMemoryState": {
           "stack": [
             {
+              "name": "add:sum",
+              "value": "10",
+              "type": "Main.add()"
+            },
+            {
+              "name": "add:b",
+              "value": "7",
+              "type": "Main.add()"
+            },
+            {
+              "name": "add:a",
+              "value": "3",
+              "type": "Main.add()"
+            },
+            {
               "name": "main:args",
               "value": "0x036",
               "type": "Main.main()"
             }
           ],
+          "stackAction": "RETURN",
+          "callEvent": "RETURN add() -> 10",
+          "currentFrame": "add",
           "note": "Line 4 executed"
         }
       },
@@ -68,20 +89,21 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "add:a",
-              "value": "3",
-              "type": "Main.add()"
-            },
-            {
-              "name": "add:b",
-              "value": "7",
-              "type": "Main.add()"
+              "name": "main:result",
+              "value": "10",
+              "type": "Main.main()"
             },
             {
               "name": "main:args",
               "value": "0x036",
               "type": "Main.main()"
             }
+          ],
+          "stackAction": "POP",
+          "callEvent": "resume main() with result = 10",
+          "currentFrame": "main",
+          "output": [
+            "3 + 7 = 10"
           ],
           "note": "Line 12 executed"
         }
@@ -94,9 +116,9 @@
         "javaMemoryState": {
           "stack": [
             {
-              "name": "square:n",
-              "value": "5",
-              "type": "Main.square()"
+              "name": "main:squared",
+              "value": "25",
+              "type": "Main.main()"
             },
             {
               "name": "main:result",
@@ -109,6 +131,13 @@
               "type": "Main.main()"
             }
           ],
+          "stackAction": "CALL/RETURN",
+          "callEvent": "CALL main() -> square(5) -> RETURN 25",
+          "currentFrame": "main",
+          "output": [
+            "3 + 7 = 10",
+            "5^2 = 25"
+          ],
           "note": "Line 15 executed"
         }
       }
@@ -116,14 +145,14 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "What if you give a return value from a void method?",
+    "question": "Right after `int squared = square(5);`, which local-variable state in `main` is correct?",
     "options": [
-      "normal operation",
-      "compile error",
-      "runtime error",
-      "value is ignored"
+      "result=10, squared=25, and args still exists",
+      "Only result=10 exists; squared is not created yet",
+      "Only squared=25 exists; result is gone",
+      "result=17, squared=25"
     ],
-    "correctIndex": 1,
-    "explanation": "void: A method with no return value.\n\nIf you return a value like `return 5;`, a compilation error occurs!\nIn void methods, only `return;` can be used or omitted."
+    "correctIndex": 0,
+    "explanation": "After `add(3, 7)` returns, `result=10` remains in `main`. After `square(5)` returns, `squared=25` is added to `main`. So at that point, `main` has `result`, `squared`, and `args` together."
   }
 }

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "创建一个狗对象",
-        "explanation": "**执行顺序：**\n1. 在堆内存中创建一个 `Dog` 对象（“Buddy”）。\n2. 生成地址值（假设“0x100”）。\n3. 将此地址“0x100”保存到堆栈的“myDog”变量中。\n\n**内存状态：**\n“myDog”是遥控器。\n它指向地址 0x100 处的电视（对象）。",
+        "explanation": "**内存状态：**\n“myDog”是遥控器。\n它指向地址 0x100 处的电视（对象）。",
         "visualizationType": "javaMemory",
         "code": "Dog myDog = new Dog(\"Buddy\");",
         "javaMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "调用changeName(myDog) - 复制远程控制",
-        "explanation": "**执行顺序：**\n1. 读取`myDog`的值（地址`0x100`）。\n2. 复制到`changeName`的参数`d`。\n\n**关键：**\n对象没有被复制，但**指向该对象的地址**被复制了。\n现在“myDog”和“d”是可以操作同一台电视的**两个遥控器**。",
+        "explanation": "**关键：**\n对象没有被复制，但**指向该对象的地址**被复制了。\n现在“myDog”和“d”是可以操作同一台电视的**两个遥控器**。",
         "keyInsight": "复制地址=创建另一个遥控器",
         "visualizationType": "javaMemory",
         "code": "changeName(myDog);",
@@ -55,7 +55,7 @@
       },
       {
         "title": "更改内部对象（副作用）",
-        "explanation": "**执行顺序：**\n1. 使用“d”遥控器访问对象“0x100”（解除引用）。\n2. 将“名称”字段修改为“Max”。\n\n**内存变化：**\n由于两个遥控器都在观看同一台电视，因此使用“d”更改频道也会改变“myDog”看到的内容。",
+        "explanation": "**内存变化：**\n由于两个遥控器都在观看同一台电视，因此使用“d”更改频道也会改变“myDog”看到的内容。",
         "keyInsight": "修改共享对象=原始受影响的",
         "visualizationType": "javaMemory",
         "code": "d.name = \"Max\";",
@@ -86,7 +86,7 @@
       },
       {
         "title": "检查第一个结果",
-        "explanation": "**执行顺序：**\n1. `changeName` 结束（d 销毁）。\n2. 输出`myDog.name`。\n\n电视频道已更改，因此出现“Max”。",
+        "explanation": "电视频道已更改，因此出现“Max”。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(myDog.name);",
         "javaMemoryState": {
@@ -112,7 +112,7 @@
       },
       {
         "title": "调用重新分配（myDog）",
-        "explanation": "**执行顺序：**\n1. 再次读取`myDog`的地址`0x100`。\n2. 复制到`reassign`方法中的`d`。\n\n创建了遥控器“d”的副本，再次指向同一台电视。",
+        "explanation": "创建了遥控器“d”的副本，再次指向同一台电视。",
         "visualizationType": "javaMemory",
         "code": "reassign(myDog);",
         "javaMemoryState": {
@@ -135,7 +135,7 @@
       },
       {
         "title": "重新分配变量（新对象）",
-        "explanation": "**执行顺序：**\n1. 执行 `new Dog(\"Rex\")` -> 创建一个新对象 (0x200)。\n2. 将新地址“0x200”分配给“d”变量。\n\n**重要：**\n名为“d”的遥控器现在指向**新电视**（“0x200”）。\n家里原来的遥控器（“myDog”）仍然指向旧电视（“0x100”）。",
+        "explanation": "**重要：**\n名为“d”的遥控器现在指向**新电视**（“0x200”）。\n家里原来的遥控器（“myDog”）仍然指向旧电视（“0x100”）。",
         "keyInsight": "重新分配变量=仅更改我的连接（无论来源如何）",
         "visualizationType": "javaMemory",
         "code": "d = new Dog(\"Rex\");",
@@ -172,7 +172,7 @@
       },
       {
         "title": "检查最终结果",
-        "explanation": "**执行顺序：**\n1. `reassign` 结束（d 消失）。\n2. 输出`myDog.name`。\n\n“myDog”仍在“0x100”看电视。\n因此，输出“Max”。",
+        "explanation": "“myDog”仍在“0x100”看电视。\n因此，输出“Max”。",
         "visualizationType": "javaMemory",
         "code": "System.out.println(myDog.name);",
         "occurrence": 2,

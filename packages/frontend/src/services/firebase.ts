@@ -21,7 +21,7 @@ import {
   GithubAuthProvider,
   OAuthProvider,
   signOut,
-  onAuthStateChanged,
+  onIdTokenChanged,
   browserLocalPersistence,
   setPersistence,
 } from 'firebase/auth';
@@ -39,9 +39,9 @@ import { setAuthToken } from './api/tokenManager';
 const app = initializeApp(config.firebase);
 export const auth = getAuth(app);
 
-// 세션 관리: 3일 미활동 시 자동 로그아웃
+// 세션 관리: 24시간 미활동 시 자동 로그아웃
 const SESSION_KEY = 'codeinsight_session_active';
-const SESSION_MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000; // 3일
+const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24시간
 
 function isSessionExpired(): boolean {
   const lastActive = localStorage.getItem(SESSION_KEY);
@@ -57,7 +57,7 @@ function clearSession(): void {
   localStorage.removeItem(SESSION_KEY);
 }
 
-// 브라우저 닫아도 로그인 유지 (localStorage 사용, 3일 미활동 시 만료)
+// 브라우저 닫아도 로그인 유지 (localStorage 사용, 24시간 미활동 시 만료)
 setPersistence(auth, browserLocalPersistence).catch((error) => {
   console.error('Failed to set auth persistence:', error);
 });
@@ -68,14 +68,14 @@ const githubProvider = new GithubAuthProvider();
 const kakaoProvider = new OAuthProvider('oidc.kakao');
 
 /**
- * 인증 상태 변경 시 store 업데이트 및 토큰 설정
+ * ID 토큰 변경 시 store 업데이트 및 토큰 설정
  * NOTE: 앱 초기화 시 한 번 호출
  */
 export function initializeAuthListener(): () => void {
   const store = useStore.getState();
   store.setAuthLoading(true);
 
-  return onAuthStateChanged(auth, async (firebaseUser) => {
+  return onIdTokenChanged(auth, async (firebaseUser) => {
     const {
       setFirebaseUser,
       setAppUser,
@@ -84,12 +84,12 @@ export function initializeAuthListener(): () => void {
       setAuthLoading,
     } = useStore.getState();
 
-    // 세션 만료 체크: 웹에서만 3일 초과 시 강제 로그아웃 (앱은 영구 유지)
+    // 세션 만료 체크: 웹에서만 24시간 초과 시 강제 로그아웃 (앱은 영구 유지)
     if (firebaseUser && !Capacitor.isNativePlatform() && isSessionExpired()) {
-      logger.info('Session expired (3d), forcing logout');
+      logger.info('Session expired (24h), forcing logout');
       clearSession();
       await signOut(auth);
-      return; // onAuthStateChanged가 다시 호출됨 (firebaseUser=null)
+      return; // onIdTokenChanged가 다시 호출됨 (firebaseUser=null)
     }
 
     setFirebaseUser(firebaseUser);

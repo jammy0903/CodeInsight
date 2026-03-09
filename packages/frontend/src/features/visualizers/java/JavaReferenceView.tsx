@@ -76,6 +76,8 @@ interface JavaReferenceViewProps {
   step: FlowStep;
   prevStep?: FlowStep | null;
   className?: string;
+  activeFrameName?: string;
+  frameAction?: string;
 }
 
 interface StackFrameGroup {
@@ -177,19 +179,6 @@ const HeapCard = memo(function HeapCard({
         </div>
       )}
 
-      {/* Ref count badge */}
-      {nameCount > 0 && (
-        <span
-          className="absolute -bottom-2 left-2 px-1.5 py-0.5 rounded text-[10px] font-mono"
-          style={{
-            background: isShared ? '#ede9fe' : '#dbeafe',
-            color: isShared ? '#6d28d9' : '#1e40af',
-            border: `1px solid ${isShared ? '#a78bfa' : '#60a5fa'}`,
-          }}
-        >
-          refs: {meta?.refCount != null ? String(meta.refCount) : nameCount}
-        </span>
-      )}
     </motion.div>
   );
 });
@@ -270,6 +259,8 @@ export const JavaReferenceView = memo(function JavaReferenceView({
   step,
   prevStep,
   className = '',
+  activeFrameName,
+  frameAction,
 }: JavaReferenceViewProps) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -451,6 +442,7 @@ export const JavaReferenceView = memo(function JavaReferenceView({
 
   const anyHovered = hoveredId !== null;
   const hasAnyMemoryData = stackVariables.length > 0 || orderedHeapObjects.length > 0;
+  const normalizedActive = activeFrameName?.replace(/\(\)$/, '').split('.').pop()?.trim().toLowerCase();
 
   if (!hasAnyMemoryData) {
     return (
@@ -479,20 +471,36 @@ export const JavaReferenceView = memo(function JavaReferenceView({
           <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Stack</div>
 
           {[...stackFrames].reverse().map((frame, idx) => (
+            (() => {
+              const frameNorm = frame.name.replace(/\(\)$/, '').split('.').pop()?.trim().toLowerCase();
+              const isActiveFrame = !!normalizedActive && frameNorm === normalizedActive;
+              return (
             <motion.div
               key={`${frame.name}-${idx}`}
               layout
               className="rounded-xl border-2 overflow-hidden shadow-sm"
-              style={{ backgroundColor: FRAME_COLORS.main.bg, borderColor: FRAME_COLORS.main.border }}
+              style={{
+                backgroundColor: isActiveFrame ? '#fefce8' : FRAME_COLORS.main.bg,
+                borderColor: isActiveFrame ? '#f59e0b' : FRAME_COLORS.main.border,
+                boxShadow: isActiveFrame ? '0 0 0 2px #f59e0b33, 0 4px 14px rgba(0,0,0,0.08)' : undefined,
+              }}
             >
               <div
                 className="flex items-center gap-2 px-3 py-2"
-                style={{ backgroundColor: FRAME_COLORS.main.header }}
+                style={{ backgroundColor: isActiveFrame ? '#fef3c7' : FRAME_COLORS.main.header }}
               >
                 <span className="text-sm">☕</span>
                 <span className="font-mono text-sm font-semibold" style={{ color: FRAME_COLORS.main.headerText }}>
                   {frame.name}
                 </span>
+                {isActiveFrame && frameAction && (
+                  <span
+                    className="ml-auto px-1.5 py-0.5 rounded text-[10px] font-mono font-bold"
+                    style={{ background: '#f59e0b', color: 'white' }}
+                  >
+                    {frameAction}
+                  </span>
+                )}
               </div>
               <div className="p-3 flex flex-col gap-2 min-h-[40px]">
                 {frame.variables.length === 0 ? (
@@ -510,6 +518,8 @@ export const JavaReferenceView = memo(function JavaReferenceView({
                 )}
               </div>
             </motion.div>
+              );
+            })()
           ))}
         </div>
 

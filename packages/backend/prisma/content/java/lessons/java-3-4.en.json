@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Variable Creation (Boxing)",
-        "explanation": "**Execution order:**\n1. `Integer(1)` object created (0x100, Auto-boxing).\n2. `Integer(2)` object created (0x200).\n3. `0x100` stored in `x`, `0x200` stored in `y`.\n\n**Memory state:**\nVariables `x` and `y` are on the `Stack`, each pointing to an Integer object on the `Heap`.",
+        "explanation": "**Memory state:**\nVariables `x` and `y` are on the `Stack`, each pointing to an Integer object on the `Heap`.",
         "visualizationType": "javaMemory",
         "code": "Integer x = 1;",
         "javaMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "Creating Variable y",
-        "explanation": "**Execution order:**\n1. Variable `y` is created and initialized.\n\nNow two objects are ready.",
+        "explanation": "Now two objects are ready.",
         "visualizationType": "javaMemory",
         "code": "Integer y = 2;",
         "javaMemoryState": {
@@ -65,7 +65,7 @@
       },
       {
         "title": "Printing Initial State",
-        "explanation": "**Execution order:**\n1. Print `x`, `y` values.\n\n\"before: x=1, y=2\" is printed.",
+        "explanation": "\"before: x=1, y=2\" is printed.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"before: x=\" + x + \", y=\" + y);",
         "javaMemoryState": {
@@ -102,7 +102,7 @@
       },
       {
         "title": "Calling swap(x, y) - Address Copy",
-        "explanation": "**Execution order:**\n1. `x`'s address (`0x100`) -> copied to `a`.\n2. `y`'s address (`0x200`) -> copied to `b`.\n\n**Key point:**\n`a` and `b` are **copy remote controls** of `x` and `y`.",
+        "explanation": "**Key point:**\n`a` and `b` are **copy remote controls** of `x` and `y`.",
         "keyInsight": "Parameter passing = remote control copy",
         "visualizationType": "javaMemory",
         "code": "swap(x, y);",
@@ -139,7 +139,7 @@
       },
       {
         "title": "temp = a",
-        "explanation": "**Execution order:**\n1. Store the address `0x100` that `a` points to into `temp`.\n\nThe swap operation begins inside the `swap` method.",
+        "explanation": "The swap operation begins inside the `swap` method.",
         "visualizationType": "javaMemory",
         "code": "Integer temp = a;",
         "javaMemoryState": {
@@ -167,7 +167,7 @@
       },
       {
         "title": "a = b",
-        "explanation": "**Execution order:**\n1. Assign `b`'s address `0x200` to `a`.\n\nNow `a` points to TV number `0x200`.\n(The original `x` in `main` is still `0x100`!)",
+        "explanation": "Now `a` points to TV number `0x200`.\n(The original `x` in `main` is still `0x100`!)",
         "visualizationType": "javaMemory",
         "code": "a = b;",
         "javaMemoryState": {
@@ -196,7 +196,7 @@
       },
       {
         "title": "b = temp",
-        "explanation": "**Execution order:**\n1. Assign `temp`'s address `0x100` to `b`.\n\n**State:**\nInside the `swap` function, `a` and `b` have successfully swapped their addresses.\nSwap successful!",
+        "explanation": "**State:**\nInside the `swap` function, `a` and `b` have successfully swapped their addresses.\nSwap successful!",
         "visualizationType": "javaMemory",
         "code": "b = temp;",
         "javaMemoryState": {
@@ -225,7 +225,7 @@
       },
       {
         "title": "Internal Verification",
-        "explanation": "**Execution order:**\n1. Print `a`, `b`.\n\nInside the function, it appears that \"a=2, b=1\" -- the swap looks successful.",
+        "explanation": "Inside the function, it appears that \"a=2, b=1\" -- the swap looks successful.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"inside: a=\" + a + \", b=\" + b);",
         "javaMemoryState": {
@@ -250,7 +250,7 @@
       },
       {
         "title": "Method Exit and Final Check",
-        "explanation": "**Execution order:**\n1. `swap` ends -> `a`, `b`, `temp` are all deleted.\n2. Return to `main`.\n3. Print `x`, `y`.\n\n**Shocking result:**\n`x` and `y` have no idea what their copies (`a`, `b`) did.\nThey're still holding onto their original addresses (`0x100`, `0x200`).",
+        "explanation": "**Shocking result:**\n`x` and `y` have no idea what their copies (`a`, `b`) did.\nThey're still holding onto their original addresses (`0x100`, `0x200`).",
         "keyInsight": "Swap failed! Only the remote controls were swapped.",
         "visualizationType": "javaMemory",
         "code": "System.out.println(\"after: x=\" + x + \", y=\" + y);",

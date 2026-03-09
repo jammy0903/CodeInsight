@@ -1,0 +1,8 @@
+--- a/src/mapper.ts
++++ b/src/mapper.ts
+@@
+ export function mapAssistantText(response: ChatApiResponse): string {
+-  return response.choices?.[0]?.message?.content ?? '';
++  const first = response.choices?.[0];
++  return first?.message?.content ?? first?.text ?? '';
+ }

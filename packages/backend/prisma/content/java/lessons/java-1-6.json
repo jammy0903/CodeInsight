@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "메서드 본문",
-        "explanation": "**`int sum = a + b;`**\n\n매개변수 a와 b를 더해 sum에 저장합니다.\na=3, b=7이므로 sum=10\n",
+        "explanation": "**`int sum = a + b;`**\n\n매개변수 a와 b를 더해 sum에 저장합니다.\na=3, b=7이므로 sum=10",
         "visualizationType": "javaMemory",
         "code": "int sum = a + b;",
         "javaMemoryState": {
@@ -41,35 +41,22 @@
             }
           ],
           "output": [],
+          "stackAction": "PUSH",
+          "callEvent": "CALL main() -> add(3, 7)",
+          "currentFrame": "add",
           "note": "Line 3 executed"
         }
       },
       {
         "title": "return문",
-        "explanation": "**`return sum;`**\n\n**return**: 메서드의 결과를 호출한 곳으로 **돌려보냅니다**.\n\nsum(10)이 메서드를 호출한 곳으로 반환됩니다.\n",
+        "explanation": "**`return sum;`**\n\n**return**: 메서드의 결과를 호출한 곳으로 **돌려보냅니다**.\n\nsum(10)이 메서드를 호출한 곳으로 반환됩니다.",
         "visualizationType": "javaMemory",
         "code": "return sum;",
         "javaMemoryState": {
           "stack": [
             {
-              "name": "main:args",
-              "value": "0x036",
-              "type": "Main.main()"
-            }
-          ],
-          "note": "Line 4 executed"
-        }
-      },
-      {
-        "title": "결과 출력",
-        "explanation": "**`System.out.println(\"3 + 7 = \" + result);`**\n\n**출력 결과**: `3 + 7 = 10`\n",
-        "visualizationType": "javaMemory",
-        "code": "int result = add(3, 7);",
-        "javaMemoryState": {
-          "stack": [
-            {
-              "name": "add:a",
-              "value": "3",
+              "name": "add:sum",
+              "value": "10",
               "type": "Main.add()"
             },
             {
@@ -78,25 +65,60 @@
               "type": "Main.add()"
             },
             {
+              "name": "add:a",
+              "value": "3",
+              "type": "Main.add()"
+            },
+            {
               "name": "main:args",
               "value": "0x036",
               "type": "Main.main()"
             }
+          ],
+          "stackAction": "RETURN",
+          "callEvent": "RETURN add() -> 10",
+          "currentFrame": "add",
+          "note": "Line 4 executed"
+        }
+      },
+      {
+        "title": "결과 출력",
+        "explanation": "**`System.out.println(\"3 + 7 = \" + result);`**\n\n**출력 결과**: `3 + 7 = 10`",
+        "visualizationType": "javaMemory",
+        "code": "int result = add(3, 7);",
+        "javaMemoryState": {
+          "stack": [
+            {
+              "name": "main:result",
+              "value": "10",
+              "type": "Main.main()"
+            },
+            {
+              "name": "main:args",
+              "value": "0x036",
+              "type": "Main.main()"
+            }
+          ],
+          "stackAction": "POP",
+          "callEvent": "resume main() with result = 10",
+          "currentFrame": "main",
+          "output": [
+            "3 + 7 = 10"
           ],
           "note": "Line 12 executed"
         }
       },
       {
         "title": "제곱 결과 출력",
-        "explanation": "**`System.out.println(\"5^2 = \" + squared);`**\n\n**출력 결과**: `5^2 = 25`\n",
+        "explanation": "**`System.out.println(\"5^2 = \" + squared);`**\n\n**출력 결과**: `5^2 = 25`",
         "visualizationType": "javaMemory",
         "code": "int squared = square(5);",
         "javaMemoryState": {
           "stack": [
             {
-              "name": "square:n",
-              "value": "5",
-              "type": "Main.square()"
+              "name": "main:squared",
+              "value": "25",
+              "type": "Main.main()"
             },
             {
               "name": "main:result",
@@ -109,6 +131,13 @@
               "type": "Main.main()"
             }
           ],
+          "stackAction": "CALL/RETURN",
+          "callEvent": "CALL main() -> square(5) -> RETURN 25",
+          "currentFrame": "main",
+          "output": [
+            "3 + 7 = 10",
+            "5^2 = 25"
+          ],
           "note": "Line 15 executed"
         }
       }
@@ -116,14 +145,14 @@
     "deltaFormat": true
   },
   "quiz": {
-    "question": "void 메서드에서 return 값을 주면?",
+    "question": "`int squared = square(5);` 실행 직후, `main` 프레임의 지역변수 상태로 맞는 것은?",
     "options": [
-      "정상 동작",
-      "컴파일 에러",
-      "런타임 에러",
-      "값이 무시됨"
+      "result=10, squared=25, args는 여전히 존재",
+      "result=10만 있고 squared는 아직 없음",
+      "squared=25만 있고 result는 사라짐",
+      "result=17, squared=25"
     ],
-    "correctIndex": 1,
-    "explanation": "void: 반환값이 없는 메서드입니다.\n\n`return 5;` 같이 값을 반환하면 컴파일 에러 발생!\nvoid 메서드에서는 `return;`만 사용하거나 생략 가능합니다.\n"
+    "correctIndex": 0,
+    "explanation": "`add(3, 7)` 호출이 끝난 뒤 `result=10`이 유지되고, `square(5)` 호출이 끝난 뒤 `squared=25`가 `main` 프레임에 추가됩니다. 따라서 이 시점의 `main`에는 `result`, `squared`, `args`가 함께 있습니다.\n"
   }
 }

@@ -1,0 +1,78 @@
+{
+  "lessonId": "ai-4-6",
+  "title": "사후 분석 문서화",
+  "concept": "디버깅 루프: 재현 -> 원인 분석 -> 최소 수정 -> 재검증",
+  "content": {
+    "code": "// TODO: chapter shared file-set code snapshot\nfunction runCase(input) {\n  return input;\n}\n",
+    "steps": [
+      {
+        "title": "증상을 재현한다",
+        "explanation": "실패 조건을 재현하고 기대 결과와 실제 결과를 분리해 기록합니다.",
+        "keyInsight": "재현 가능한 실패가 디버깅의 시작점입니다.",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "inspect",
+          "checklist": [
+            "재현 입력 고정",
+            "기대/실제 분리 기록"
+          ]
+        },
+        "code": "runCase(input);"
+      },
+      {
+        "title": "원인을 좁힌다",
+        "explanation": "가설을 1~2개로 압축하고, 코드 경로를 비교해 핵심 원인을 특정합니다.",
+        "keyInsight": "증상이 아니라 원인을 수정해야 재발을 막을 수 있습니다.",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "compare",
+          "expectedPath": "expected.path",
+          "actualPath": "actual.path"
+        },
+        "code": "const value = source.actual.path;"
+      },
+      {
+        "title": "최소 수정으로 패치한다",
+        "explanation": "영향 범위를 최소화하도록 작은 패치를 적용합니다.",
+        "keyInsight": "작은 변경은 검증과 롤백을 쉽게 만듭니다.",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "patch",
+          "patch": "actual.path -> expected.path"
+        },
+        "code": "const value = source.expected.path;"
+      },
+      {
+        "title": "결과를 재검증한다",
+        "explanation": "수정 전/후 결과를 비교하고 회귀 체크를 추가합니다.",
+        "keyInsight": "패치의 완성은 수정이 아니라 검증입니다.",
+        "visualizationType": "algorithm",
+        "algorithmState": {
+          "phase": "verify",
+          "expectedOutput": "error (or wrong output)",
+          "actualOutput": "expected output"
+        },
+        "code": "console.log(value);"
+      }
+    ]
+  },
+  "quiz": {
+    "question": "디버깅에서 최소 수정 원칙이 중요한 이유는?",
+    "options": [
+      "영향 범위를 줄여 검증과 롤백을 쉽게 하기 위해",
+      "코드를 짧게 만들기 위해",
+      "AI가 좋아하는 스타일이라서",
+      "로그를 줄이기 위해"
+    ],
+    "correctIndex": 0,
+    "explanation": "작은 패치는 영향도를 제한해 원인-수정의 인과관계를 명확히 검증할 수 있습니다."
+  },
+  "misconceptions": [
+    {
+      "wrong": "에러가 사라지면 원인을 찾지 않아도 된다",
+      "correct": "에러가 사라져도 원인과 영향 범위를 확인해야 재발을 막을 수 있다",
+      "why": "우연히 통과한 패치는 다른 입력에서 다시 실패할 수 있습니다."
+    }
+  ],
+  "keyTakeaway": "재현 -> 비교 -> 최소 패치 -> 재검증 루프를 습관화한다"
+}

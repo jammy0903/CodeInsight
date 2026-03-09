@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Create HashMap",
-        "explanation": "**Execution order:**\n1. Call `new HashMap<>()`.\n2. Create HashMap object in Heap.\n\n**HashMap's policy:** \"Anything is acceptable.\"\nIt is a generous friend that can store both `null` keys and `null` values.\nIt is the most commonly used Map implementation.",
+        "explanation": "**HashMap's policy:** \"Anything is acceptable.\"\nIt is a generous friend that can store both `null` keys and `null` values.\nIt is the most commonly used Map implementation.",
         "visualizationType": "javaMemory",
         "code": "Map<String, Integer> hashMap = new HashMap<>();",
         "javaMemoryState": {
@@ -30,7 +30,7 @@
       },
       {
         "title": "Save null value",
-        "explanation": "**Execution order:**\n1. Call `hashMap.put(\"key\", null)`.\n2. Calculate hash code of “key”.\n3. Save (key, null) to the bucket.\n\nThe value was saved as `null`.\nIt can be used when you want to display \"There is no data for this key,\" but when you `get()`, you may be confused as to whether \"the key does not exist or the value is null.\"",
+        "explanation": "The value was saved as `null`.\nIt can be used when you want to display \"There is no data for this key,\" but when you `get()`, you may be confused as to whether \"the key does not exist or the value is null.\"",
         "visualizationType": "javaMemory",
         "code": "hashMap.put(\"key\", null);",
         "javaMemoryState": {
@@ -46,7 +46,7 @@
       },
       {
         "title": "Save null key",
-        "explanation": "**Execution order:**\n1. Call `hashMap.put(null, 100)`.\n2. Detects that the key is `null`.\n3. Save (null, 100) in bucket 0 (reserved seat).\n\n**Special feature:** Keys of `null` are also saved!\nSince the hash value cannot be calculated internally, it is stored separately in bucket 0.\nOf course, the Key must be unique, so there can only be one `null` Key.",
+        "explanation": "**Special feature:** Keys of `null` are also saved!\nSince the hash value cannot be calculated internally, it is stored separately in bucket 0.\nOf course, the Key must be unique, so there can only be one `null` Key.",
         "keyInsight": "HashMap: 1 null key, unlimited null values",
         "visualizationType": "javaMemory",
         "code": "hashMap.put(null, 100);",
@@ -63,7 +63,7 @@
       },
       {
         "title": "Create ConcurrentHashMap",
-        "explanation": "**Execution order:**\n1. Call `new ConcurrentHashMap<>()`.\n2. Create object in Heap.\n\n**ConcurrentHashMap's policy:** \"Never allow null!\"\nDesigned for multithreaded environments, this map is very strict.\nIt is designed to be safe even when multiple threads access it simultaneously.",
+        "explanation": "**ConcurrentHashMap's policy:** \"Never allow null!\"\nDesigned for multithreaded environments, this map is very strict.\nIt is designed to be safe even when multiple threads access it simultaneously.",
         "visualizationType": "javaMemory",
         "code": "Map<String, Integer> concurrentMap = new ConcurrentHashMap<>();",
         "javaMemoryState": {
@@ -85,7 +85,7 @@
       },
       {
         "title": "Putting null in ConcurrentHashMap (NPE!)",
-        "explanation": "**Execution order:**\n1. Enter the `put` method.\n2. Check Key/Value null.\n3. `null` found -> **NPE occurs**.\n\n**Why are you so strict?**\nThis is because it is ambiguous when `get(key)` returns `null` in a multithreaded environment.\nIt's easy to run into concurrency bugs if you're not sure if it's missing because someone just `removed` it or if it was originally `null`.",
+        "explanation": "**Why are you so strict?**\nThis is because it is ambiguous when `get(key)` returns `null` in a multithreaded environment.\nIt's easy to run into concurrency bugs if you're not sure if it's missing because someone just `removed` it or if it was originally `null`.",
         "keyInsight": "ConcurrentHashMap: Never null!",
         "visualizationType": "javaMemory",
         "code": "concurrentMap.put(\"key\", null);",
@@ -110,7 +110,7 @@
       },
       {
         "title": "List.of() immutable list",
-        "explanation": "**Execution order:**\n1. Call the `List.of(...)` factory method.\n2. Internally checks for null inclusion.\n3. Create an immutable list object.\n\n`List.of()` from Java 9 also does not allow `null`.\nThis is because of modern Java's philosophy that \"Immutable objects should be clean and complete.\"",
+        "explanation": "`List.of()` from Java 9 also does not allow `null`.\nThis is because of modern Java's philosophy that \"Immutable objects should be clean and complete.\"",
         "keyInsight": "List.of(): immutable list, cannot contain null",
         "visualizationType": "javaMemory",
         "code": "List<String> list = List.of(\"a\", \"b\", \"c\");",
@@ -136,7 +136,7 @@
       },
       {
         "title": "calls contains(null) (NPE!)",
-        "explanation": "**Execution order:**\n1. Call `list.contains(null)`.\n2. Detection that the argument is `null`.\n3. **NPE occurs**.\n\nEven asking \"Does it contain `null`?\" (`contains`) is not allowed and throws an NPE.",
+        "explanation": "Even asking \"Does it contain `null`?\" (`contains`) is not allowed and throws an NPE.",
         "visualizationType": "javaMemory",
         "code": "list.contains(null);",
         "javaMemoryState": {
@@ -146,7 +146,7 @@
       },
       {
         "title": "getOrDefault() - null-safe lookup",
-        "explanation": "**Execution order:**\n1. Call `hashMap.getOrDefault(\"missing\", 0)`.\n2. Attempt to lookup the “missing” key.\n3. Check for null.\n4. Returns the default value of `0`.\n\n**Recommended Method:**\n\"If the key does not exist, give 0, not `null`.\"\nThis is a ‘cheat key’ used when it is inconvenient to handle `null` with an `if` statement every time.",
+        "explanation": "**Recommended Method:**\n\"If the key does not exist, give 0, not `null`.\"\nThis is a ‘cheat key’ used when it is inconvenient to handle `null` with an `if` statement every time.",
         "keyInsight": "getOrDefault() = Get default value instead of null",
         "visualizationType": "javaMemory",
         "code": "Integer value = hashMap.getOrDefault(\"missing\", 0);",
