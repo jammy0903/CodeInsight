@@ -30,7 +30,7 @@ i18n
       order: ['localStorage', 'querystring'], // 브라우저 언어 자동감지 비활성화 → 기본 영어
       caches: ['localStorage'],
     },
-    debug: process.env.NODE_ENV === 'development', // 개발 환경에서만 디버그 로그 출력
+    debug: import.meta.env.DEV, // 개발 환경에서만 디버그 로그 출력
   });
 
 export default i18n;

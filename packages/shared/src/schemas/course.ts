@@ -391,7 +391,7 @@ export const LessonFullSchema = LessonSchema.extend({
 });
 
 export const LessonWithProgressSchema = LessonSchema.extend({
-  progress: UserProgressSchema.optional(),
+  progress: UserProgressSchema.nullable().optional(),
 });
 
 export const ChapterWithProgressSchema = ChapterSchema.extend({

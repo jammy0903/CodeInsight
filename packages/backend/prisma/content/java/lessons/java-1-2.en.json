@@ -70,7 +70,28 @@
           "output": [
             "true"
           ],
-          "warning": "Literals return true with ==! But you shouldn't rely on this"
+          "warning": "Literals return true with ==! But you shouldn't rely on this",
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool:0x100",
+              "type": "String"
+            },
+            {
+              "name": "b",
+              "value": "-> Pool:0x100",
+              "sameRef": true,
+              "type": "String"
+            }
+          ],
+          "heap": [],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100",
+              "refCount": 2
+            }
+          ]
         },
         "code": "System.out.println(a == b);"
       },
@@ -117,6 +138,31 @@
           "comparison": "Pool:0x100 != 0x200",
           "output": [
             "false"
+          ],
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool:0x100",
+              "type": "String"
+            },
+            {
+              "name": "c",
+              "value": "-> 0x200",
+              "type": "String"
+            }
+          ],
+          "heap": [
+            {
+              "address": "0x200",
+              "content": "\"hello\"",
+              "new": true
+            }
+          ],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
           ]
         },
         "code": "System.out.println(a == c);"
@@ -158,6 +204,26 @@
         "javaMemoryState": {
           "output": [
             "true"
+          ],
+          "stack": [
+            {
+              "name": "a",
+              "value": "-> Pool:0x100",
+              "type": "String"
+            },
+            {
+              "name": "d",
+              "value": "-> Pool:0x100",
+              "sameRef": true,
+              "type": "String"
+            }
+          ],
+          "heap": [],
+          "stringPool": [
+            {
+              "value": "\"hello\"",
+              "address": "Pool:0x100"
+            }
           ]
         },
         "code": "System.out.println(a == d);"

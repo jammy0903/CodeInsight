@@ -23,6 +23,35 @@ BACKEND_PORT=3002
 FRONTEND_PORT=5174
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# Ensure Node/pnpm are available even when shell PATH is minimal.
+ensure_node_toolchain() {
+    if command -v node >/dev/null 2>&1 && command -v pnpm >/dev/null 2>&1; then
+        return 0
+    fi
+
+    local nvm_root="${NVM_DIR:-/home/jammy/.nvm}"
+    if [ ! -d "$nvm_root" ] && [ -d "$HOME/.nvm" ]; then
+        nvm_root="$HOME/.nvm"
+    fi
+
+    local candidates=(
+        "$nvm_root/versions/node/v22.22.0/bin"
+        "$nvm_root/versions/node/v20.19.4/bin"
+    )
+
+    for candidate in "${candidates[@]}"; do
+        if [ -x "$candidate/node" ] && [ -x "$candidate/pnpm" ]; then
+            export PATH="$candidate:$PATH"
+            return 0
+        fi
+    done
+
+    echo "[x] node/pnpm not found. Install Node.js (nvm) or add it to PATH."
+    exit 1
+}
+
+ensure_node_toolchain
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
