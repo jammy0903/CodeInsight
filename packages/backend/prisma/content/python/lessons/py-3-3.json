@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "딕셔너리 첫 번째 항목",
-        "explanation": "**`\"name\": \"Alice\"`**\n\n딕셔너리의 첫 번째 키-값 쌍입니다. 키 `\"name\"`으로 값 `\"Alice\"`를 찾을 수 있습니다. 딕셔너리는 내부적으로 해시 테이블로 구현되어 O(1) 조회 속도를 제공합니다. 키는 Immutable 타입(문자열, 숫자, 튜플)만 사용 가능합니다.",
+        "explanation": "`\"name\": \"Alice\"`는 첫 번째 키-값 쌍입니다.\n\n키 `name`으로 값 `Alice`를 찾을 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "\"name\": \"Alice\",",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "딕셔너리 두 번째 항목",
-        "explanation": "**`\"age\": 25`**\n\n두 번째 키-값 쌍을 추가합니다. 딕셔너리의 값(Value)은 문자열·정수·리스트·딕셔너리 등 어떤 타입이든 가능합니다. Python 3.7+부터 삽입 순서가 보장됩니다.",
+        "explanation": "`\"age\": 25`는 두 번째 키-값 쌍입니다.\n\n딕셔너리는 이런 쌍을 여러 개 저장합니다.",
         "visualizationType": "pythonMemory",
         "code": "\"age\": 25",
         "pythonMemoryState": {
@@ -48,7 +48,9 @@
       },
       {
         "title": "딕셔너리 생성 완료",
-        "explanation": "**`user = {...}`**\n\n딕셔너리 객체 생성이 완료되어 `user` 변수에 할당됩니다. 딕셔너리는 Mutable이므로 이후 항목을 추가·수정·삭제할 수 있으며, 해시 테이블 덕분에 데이터가 많아도 O(1)로 빠르게 조회합니다.",
+        "explanation": "이제 딕셔너리 생성이 끝났습니다.\n\n`user`가 이 딕셔너리를 가리킵니다.\n\n딕셔너리는 값을 추가하거나 수정할 수 있습니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "딕셔너리는 키로 값을 찾는 자료형이다.",
         "visualizationType": "pythonMemory",
         "code": "user = {",
         "highlightOffset": [
@@ -72,7 +74,9 @@
       },
       {
         "title": "값 접근",
-        "explanation": "**`print(user[\"name\"])`**\n\n대괄호 `[]`에 키를 넣어 값 `\"Alice\"`를 조회합니다. 없는 키를 조회하면 `KeyError`가 발생합니다. 키가 있는지 확실하지 않을 때는 `user.get(\"name\")` 또는 `user.get(\"name\", 기본값)`을 사용하세요.",
+        "explanation": "`print(user[\"name\"])`는 `name` 키의 값을 꺼냅니다.\n\n여기서는 `Alice`가 출력됩니다.",
+        "keyInsightTitle": "주의",
+        "keyInsight": "없는 키를 바로 조회하면 에러가 날 수 있다.",
         "visualizationType": "pythonMemory",
         "code": "print(user[\"name\"])",
         "pythonMemoryState": {
@@ -92,7 +96,7 @@
       },
       {
         "title": "값 수정",
-        "explanation": "**`user[\"age\"] = 26`**\n\n이미 존재하는 키 `\"age\"`의 값을 25에서 26으로 수정합니다. 딕셔너리는 Mutable이므로 새 객체를 만들지 않고 기존 객체 내부를 직접 변경합니다.",
+        "explanation": "`user[\"age\"] = 26`은 기존 값을 바꾸는 코드입니다.\n\n`age`가 25에서 26으로 바뀝니다.",
         "visualizationType": "pythonMemory",
         "code": "user[\"age\"] = 26      # 수정",
         "pythonMemoryState": {
@@ -117,7 +121,9 @@
       },
       {
         "title": "새 항목 추가",
-        "explanation": "**`user[\"city\"] = \"Seoul\"`**\n\n존재하지 않는 키 `\"city\"`에 할당하면 새 키-값 쌍이 **자동으로 추가**됩니다. 리스트에서 없는 인덱스에 할당하면 `IndexError`가 나는 것과 달리, 딕셔너리는 자동으로 확장됩니다.",
+        "explanation": "`user[\"city\"] = \"Seoul\"`은 새 항목을 추가합니다.\n\n없던 키에 넣으면 자동으로 추가됩니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "딕셔너리는 없는 키에 넣으면 새 항목이 된다.",
         "visualizationType": "pythonMemory",
         "code": "user[\"city\"] = \"Seoul\" # 추가",
         "pythonMemoryState": {
@@ -135,7 +141,9 @@
       },
       {
         "title": "키 존재 여부 확인",
-        "explanation": "**`if \"job\" in user:`**\n\n`in` 연산자로 키 존재 여부를 O(1)로 확인합니다. `\"job\"` 키가 없으므로 `False`가 되어 `print` 블록이 실행되지 않습니다. 없는 키 조회 시 `KeyError`를 방지하는 기본 패턴입니다.",
+        "explanation": "`if \"job\" in user:`는 `job` 키가 있는지 확인합니다.\n\n지금은 없으므로 조건은 거짓입니다.\n\n그래서 아래 블록은 실행되지 않습니다.",
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`in`으로 먼저 확인하면 KeyError를 피할 수 있다.",
         "visualizationType": "pythonMemory",
         "code": "if \"job\" in user:",
         "pythonMemoryState": {

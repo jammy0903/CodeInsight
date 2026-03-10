@@ -8,7 +8,7 @@
       {
         "line": 1,
         "title": "라이브러리 불러오기",
-        "explanation": "**`import ...`**\n\n자동화에 필요한 모든 도구 상자를 엽니다.\n- `pandas`: 엑셀 다루기\n- `seaborn`, `matplotlib`: 그림 그리기\n- `openpyxl`: 진짜 엑셀 파일 만들기\n- `python-pptx`: PPT 만들기\n- `os`, `datetime`: 파일 관리 및 날짜 확인\n\n이제 이 도구들로 '1초 자동화' 마법을 부릴 준비가 되었습니다.",
+        "explanation": "보고서 자동화에 필요한 핵심 라이브러리를 한 번에 불러옵니다.\n이 프로젝트는 데이터 처리, 시각화, 문서 생성을 모두 연결합니다.",
         "highlight": [
           1,
           2,
@@ -23,53 +23,63 @@
         "pythonMemoryState": {
           "names": [],
           "objects": []
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "최종 프로젝트는 여러 도구를 한 흐름으로 묶는다."
       },
       {
         "line": 2,
         "title": "Step 2: 라이브러리 불러오기 (시각화)",
-        "explanation": "**seaborn + matplotlib**: 그래프 생성\n\n**배운 내용**:\n- `sns.barplot()`: 막대 그래프\n- `plt.savefig()`: 이미지 저장\n\n**실무 의미**: 숫자를 시각적으로 표현",
+        "explanation": "시각화용 라이브러리도 준비합니다.\n숫자 표만 보는 것보다 그래프로 보여 주면 보고서 이해가 훨씬 빨라집니다.",
         "highlight": [
           2,
           3
         ],
-        "visualizationType": "python"
+        "visualizationType": "python",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "보고서 자동화에는 표와 그래프가 함께 간다."
       },
       {
         "line": 4,
         "title": "Step 3: 라이브러리 불러오기 (문서 생성)",
-        "explanation": "**openpyxl**: Excel 파일 생성\n**python-pptx**: PowerPoint 파일 생성\n\n**배운 내용**:\n- `Workbook()`: 엑셀 생성\n- `Presentation()`: PPT 생성\n\n**실무 의미**: 분석 결과를 보고서 형식으로 출력",
+        "explanation": "문서 생성용 라이브러리를 불러옵니다.\n분석 결과를 Excel과 PPT 같은 산출물로 내보내기 위한 단계입니다.",
         "highlight": [
           4,
           5,
           6
         ],
-        "visualizationType": "python"
+        "visualizationType": "python",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "분석 결과는 최종 문서까지 이어져야 한다."
       },
       {
         "line": 7,
         "title": "Step 4: 라이브러리 불러오기 (유틸리티)",
-        "explanation": "**os**: 파일/폴더 관리\n**datetime**: 날짜/시간 처리\n\n**배운 내용**:\n- `os.path.exists()`: 파일 존재 확인\n- `datetime.now()`: 현재 날짜\n\n**실무 의미**: 보고서에 날짜 표시, 폴더 자동 생성",
+        "explanation": "파일과 날짜를 다루는 유틸리티도 준비합니다.\n자동화에서는 파일명과 생성 시점을 관리하는 일이 자주 필요합니다.",
         "highlight": [
           7,
           8
         ],
-        "visualizationType": "python"
+        "visualizationType": "python",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "자동화에는 파일 관리와 날짜 처리도 중요하다."
       },
       {
         "line": 10,
         "title": "Step 5: 데이터 읽기",
-        "explanation": "`pd.read_csv('monthly_sales.csv')`로 **월간 매출 데이터**를 읽습니다.\n\n**예시 데이터**:\n```\n부서,월,매출\n개발,1월,5000\n영업,1월,4000\n...\n```\n\n**실무**: DB에서 추출한 CSV 또는 자동 수집된 데이터",
+        "explanation": "월간 매출 CSV를 읽어 원본 데이터를 준비합니다.\n이 데이터가 이후 피봇, 그래프, 보고서의 공통 입력이 됩니다.",
         "highlight": [
           10,
           11
         ],
-        "visualizationType": "python"
+        "visualizationType": "python",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "하나의 입력 데이터가 여러 결과물로 이어진다."
       },
       {
         "line": 14,
         "title": "Step 6: 피봇 테이블 생성",
-        "explanation": "부서별 × 월별 매출을 **교차 표**로 만듭니다.\n\n**결과 형식**:\n```\n월       1월    2월\n부서\n개발   5000  5500\n영업   4000  4200\n```\n\n**왜 필요한가?** 한눈에 트렌드 파악, Excel에 붙이기 쉬움",
+        "explanation": "부서별 × 월별 피봇 테이블을 만듭니다.\n숫자를 교차표로 정리하면 보고서에 넣기 쉬운 구조가 됩니다.",
         "highlight": [
           13,
           14,
@@ -101,12 +111,14 @@
               "pyId": "5002"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "피봇은 보고서용 표를 만드는 단계다."
       },
       {
         "line": 17,
         "title": "Step 7: 그래프 생성",
-        "explanation": "`sns.barplot()`로 **부서별 매출 막대 그래프**를 그립니다.\n\n**제목**: 현재 연월 자동 표시 (`2026-01`)\n**저장**: 고해상도 PNG (dpi=300)\n\n**plt.close()**: 메모리 정리 (다음 그래프를 위해)",
+        "explanation": "`sns.barplot()`으로 그래프를 만들고 PNG로 저장합니다.\n표만으로 보이지 않는 비교와 추세를 시각적으로 보여 줍니다.",
         "highlight": [
           17,
           18,
@@ -171,12 +183,14 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "그래프는 숫자의 차이를 더 빠르게 보여 준다."
       },
       {
         "line": 23,
         "title": "Step 8: Excel 보고서 생성",
-        "explanation": "**피봇 테이블을 Excel에 저장**합니다.\n\n**동작 과정**:\n1. 새 워크북 생성\n2. A1에 제목 입력\n3. 피봇 테이블 데이터를 3행부터 입력\n4. report.xlsx로 저장\n\n**실무 활용**: 상사에게 이메일 첨부",
+        "explanation": "피봇 테이블을 Excel 보고서로 저장합니다.\n실무에서는 이런 파일이 바로 공유용 산출물이 됩니다.",
         "highlight": [
           23,
           24,
@@ -220,12 +234,14 @@
               "pyId": "5005"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "DataFrame 결과는 Excel 보고서로 이어질 수 있다."
       },
       {
         "line": 31,
         "title": "Step 9: PPT 보고서 생성",
-        "explanation": "**PowerPoint 파일을 자동 생성**합니다.\n\n**동작 과정**:\n1. 새 프레젠테이션 생성\n2. 빈 슬라이드 추가 (레이아웃 5)\n3. 제목 설정\n4. report.pptx로 저장\n\n**확장 가능**: 그래프 이미지 삽입, 여러 슬라이드 추가",
+        "explanation": "PPT 파일도 자동으로 생성합니다.\n이제 같은 데이터를 바탕으로 발표용 자료까지 만들 수 있습니다.",
         "highlight": [
           31,
           32,
@@ -308,12 +324,14 @@
               "pyId": "5007"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "같은 데이터로 PPT까지 자동 생성할 수 있다."
       },
       {
         "line": 36,
         "title": "Step 10: 완료 메시지",
-        "explanation": "**보고서 생성 완료!**\n\n**생성된 파일들**:\n- `chart.png`: 부서별 매출 그래프\n- `report.xlsx`: 피봇 테이블 엑셀\n- `report.pptx`: 보고서 PPT\n\n**실무 활용**:\n1. 매월 1일 자동 실행 (작업 스케줄러)\n2. 생성된 파일을 이메일 자동 발송\n3. 클라우드 자동 업로드",
+        "explanation": "마지막으로 완료 메시지와 결과 파일을 안내합니다.\n자동화는 실행이 끝난 뒤 산출물을 분명히 알려 주는 것도 중요합니다.",
         "highlight": [
           36
         ],
@@ -404,7 +422,9 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "결론",
+        "keyInsight": "자동화의 끝은 결과 파일을 남기는 것이다."
       }
     ],
     "deltaFormat": true

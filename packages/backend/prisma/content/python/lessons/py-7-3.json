@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "Node 클래스 정의 시작",
-        "explanation": "**`class Node:`**\n\n**Node 클래스를 정의합니다** - \"연결 노드\"를 만들기 위한 설계도입니다.\nNode는 다른 Node를 가리킬 수 있는 `next` 속성을 가지고 있어, **체인처럼 연결**할 수 있습니다.",
+        "explanation": "`class Node:`는 연결용 노드 클래스를 정의합니다.\n\n이 노드는 `next`로 다른 노드를 가리킬 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "class Node:",
         "pythonMemoryState": {
@@ -19,7 +19,7 @@
       },
       {
         "title": "클래스 본문 진입",
-        "explanation": "**`class Node:` (본문 전체)**\n\nPython이 클래스 본문 전체를 읽어 **Node 클래스 객체**를 완성합니다.\n클래스 본문에는 `__init__` 메서드가 정의되어 있습니다.",
+        "explanation": "Python이 클래스 본문을 읽어 `Node` 클래스를 완성합니다.\n\n안에는 `__init__` 메서드가 들어 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "class Node:",
         "highlightOffset": [
@@ -34,7 +34,7 @@
       },
       {
         "title": "__init__ 메서드 정의",
-        "explanation": "**`def __init__(self, name):`**\n\nNode 클래스의 **초기화 메서드**를 정의합니다.\n`Node(\"A\")` 형태로 객체를 만들면, 이 `__init__`이 자동으로 호출됩니다.",
+        "explanation": "`def __init__(self, name):`는 초기화 메서드입니다.\n\n`Node(\"A\")`처럼 만들면 자동으로 호출됩니다.",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self, name):",
         "highlightOffset": [
@@ -64,7 +64,7 @@
       },
       {
         "title": "첫 번째 노드 생성",
-        "explanation": "**`a = Node(\"A\")`**\n\nNode 클래스를 호출하여 **첫 번째 노드 객체(인스턴스)**를 생성합니다.\n이름이 \"A\"인 노드가 메모리(0x2000)에 만들어집니다.",
+        "explanation": "`a = Node(\"A\")`는 첫 번째 노드를 만듭니다.\n\n이 노드의 이름은 `A`입니다.",
         "visualizationType": "pythonMemory",
         "code": "a = Node(\"A\")",
         "pythonMemoryState": {
@@ -87,7 +87,7 @@
       },
       {
         "title": "Node A 초기화 (1)",
-        "explanation": "**`self.name = name`**\n\n`__init__` 메서드 안에서 실행됩니다.\n매개변수 `name`으로 받은 문자열 `\"A\"`를 인스턴스(0x2000)의 `name` 속성에 저장합니다.\n\n**self가 가리키는 것**: 방금 만들어진 새 객체 0x2000입니다.\n`self.name = name`은 \"0x2000 객체에 name이라는 속성을 추가하고, 거기에 \"A\"를 넣어라\"라는 뜻입니다.\n\n**비유**: 기차 칸에 이름표를 붙이는 것입니다. \"이 칸의 이름은 A입니다!\"\n\n**왜 이름이 필요한가?** 나중에 순환 참조가 만들어졌을 때, 어떤 노드가 어떤 노드를 가리키는지 구분하기 위해서입니다.\n\n**왜 이 순서인가?** __init__ 안에서 self.name을 먼저 설정하고, 그 다음 self.next를 설정합니다.\n\n**실행 순서**: self(0x2000)에 name 속성 추가 → \"A\" 문자열 할당 → 0x2000.name = \"A\" 완료",
+        "explanation": "`self.name = name`은 노드 안에 이름을 저장합니다.\n\n여기서는 `A`가 들어갑니다.",
         "visualizationType": "pythonMemory",
         "code": "self.name = name",
         "pythonMemoryState": {
@@ -122,7 +122,7 @@
       },
       {
         "title": "Node A 초기화 (2)",
-        "explanation": "**`self.next = None`**\n\n인스턴스(0x2000)의 `next` 속성을 `None`으로 설정합니다.\n`next`는 **다음 노드를 가리키는 포인터** 역할을 합니다.\n`None`은 \"아직 아무것도 가리키지 않음\"을 의미합니다.",
+        "explanation": "`self.next = None`은 아직 다음 노드가 없다는 뜻입니다.\n\n처음에는 아무것도 가리키지 않습니다.",
         "visualizationType": "pythonMemory",
         "code": "self.next = None",
         "pythonMemoryState": {
@@ -157,7 +157,7 @@
       },
       {
         "title": "두 번째 노드 생성",
-        "explanation": "**`b = Node(\"B\")`**\n\n이름이 \"B\"인 **두 번째 노드 객체**를 메모리(0x3000)에 생성합니다.\n순환 참조를 만들려면 **최소 두 개의 객체**가 필요하므로, 두 번째 노드를 만듭니다.\n\n**현재까지의 상황**:\n- Node A (0x2000): name=\"A\", next=None, refcount=1 (변수 a)\n- Node B (0x3000): 지금 생성 중... refcount=1 (변수 b)\n- 두 노드는 아직 **독립적**입니다 (서로 연결 X)\n\n**비유**: 기차 칸 두 개가 나란히 놓여 있지만, 아직 연결 고리로 이어지지 않은 상태입니다.\n\n**왜 이 순서인가?** Node A를 만든 후, 순환 참조를 위한 상대 노드 B를 만들 차례입니다.\n다음 스텝에서 A와 B를 서로 연결하게 됩니다.\n\n**실행 순서**: Node(\"B\") 호출 → 인스턴스 0x3000 생성 → __init__(self, \"B\") 호출 → 초기화 진행...",
+        "explanation": "`b = Node(\"B\")`는 두 번째 노드를 만듭니다.\n\n이 노드의 이름은 `B`입니다.",
         "visualizationType": "pythonMemory",
         "code": "b = Node(\"B\")",
         "pythonMemoryState": {
@@ -190,7 +190,7 @@
       },
       {
         "title": "Node B 초기화 (1)",
-        "explanation": "**`self.name = name`**\n\n이번에는 Node B(0x3000)의 `name` 속성을 `\"B\"`로 설정합니다.\n같은 `__init__` 메서드이지만, 이번에 `self`는 0x3000(Node B)를 가리킵니다.\n\n**같은 클래스, 다른 인스턴스**:\n- Node A의 __init__ 때: self = 0x2000, name = \"A\"\n- Node B의 __init__ 때: self = 0x3000, name = \"B\" ← 지금 이것!\n\n클래스는 하나의 설계도이지만, 이 설계도로 만든 각 인스턴스는 독립적인 데이터를 가집니다.\n\n**비유**: 같은 공장(클래스)에서 만든 기차 칸이지만, 각 칸에는 다른 이름표가 붙습니다.\n\n**왜 이 순서인가?** Node B의 __init__ 안에서 name 속성을 먼저 설정합니다.\n\n**실행 순서**: self(0x3000)에 name 속성 추가 → \"B\" 할당 → 0x3000.name = \"B\" 완료",
+        "explanation": "이번 `self.name = name`은 두 번째 노드의 이름을 저장합니다.\n\n여기서는 `B`가 들어갑니다.",
         "visualizationType": "pythonMemory",
         "code": "self.name = name",
         "pythonMemoryState": {

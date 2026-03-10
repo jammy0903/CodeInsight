@@ -7,7 +7,9 @@
     "steps": [
       {
         "title": "gc 모듈 임포트",
-        "explanation": "**`import gc`**\n\nPython의 **가비지 컬렉터(Garbage Collector) 모듈**을 메모리에 로드합니다.\n`gc`는 Python에 내장된 모듈로, 참조 카운팅만으로 처리할 수 없는 **순환 참조를 탐지하고 제거**하는 기능을 제공합니다.",
+        "explanation": "`import gc`는 가비지 컬렉터 모듈을 가져옵니다.\n\n이 모듈은 순환 참조를 정리할 수 있습니다.",
+        "keyInsightTitle": "핵심",
+        "keyInsight": "gc는 참조 카운팅만으로 못 지우는 객체를 정리한다.",
         "visualizationType": "pythonMemory",
         "code": "import gc",
         "pythonMemoryState": {
@@ -33,7 +35,7 @@
       },
       {
         "title": "Node 클래스 정의 시작",
-        "explanation": "**`class Node:`**\n\n이전 레슨(py-7-3)과 **동일한 Node 클래스**를 정의합니다.\n각 노드는 이름(`name`)과 다음 노드를 가리키는 포인터(`next`)를 가집니다.\n\n**이번 레슨의 목표가 다릅니다!**\n이전 레슨에서는 순환 참조의 **문제점**을 보여줬고, 이번에는 **gc.collect()로 해결**하는 방법을 보여줍니다.\n같은 순환 참조를 만들되, 이번에는 gc가 어떻게 정리하는지 관찰합니다.\n\n**비유**: 이전 레슨에서는 \"이런 쓰레기가 쌓인다\"를 보여줬고, 이번에는 \"청소 업체가 이렇게 치운다\"를 보여줍니다.\n\n**왜 이 순서인가?** gc 모듈 임포트 후, 순환 참조를 만들기 위한 클래스를 정의합니다.\n\n**실행 순서**: class 키워드 → Node 클래스 객체 생성 준비 → 본문 실행 대기",
+        "explanation": "`class Node:`는 순환 참조를 만들기 위한 노드 클래스를 정의합니다.\n\n이번에는 gc가 이 객체들을 어떻게 치우는지 봅니다.",
         "visualizationType": "pythonMemory",
         "code": "class Node:",
         "pythonMemoryState": {
@@ -56,7 +58,7 @@
       },
       {
         "title": "클래스 본문 진입",
-        "explanation": "**`class Node:` (본문 전체)**\n\nPython이 클래스 본문을 실행하여 Node 클래스를 완성합니다.\n`__init__` 메서드가 정의되어 `name`과 `next` 속성을 초기화할 수 있게 됩니다.\n\n**아직 인스턴스는 하나도 만들어지지 않았습니다!**\n지금은 설계도만 준비된 상태입니다. 실제 Node 객체(A, B)는 나중에 `Node(\"A\")`, `Node(\"B\")`로 생성합니다.\n\n**왜 이 순서인가?** class 키워드를 만났으므로, 본문의 모든 메서드를 등록하여 클래스를 완성합니다.\n\n**실행 순서**: 클래스 본문 실행 시작 → __init__ 메서드 정의 및 등록",
+        "explanation": "Python이 클래스 본문을 읽어 `Node` 클래스를 완성합니다.\n\n지금은 아직 설계도만 준비된 상태입니다.",
         "visualizationType": "pythonMemory",
         "code": "class Node:",
         "highlightOffset": [
@@ -85,7 +87,7 @@
       },
       {
         "title": "__init__ 메서드 정의",
-        "explanation": "**`def __init__(self, name):`**\n\nNode 클래스의 **초기화 메서드(생성자)**를 정의합니다.\n`Node(\"A\")`처럼 호출하면 이 `__init__`이 자동으로 실행되어 인스턴스를 설정합니다.\n\n**이 메서드가 설정하는 두 가지 속성**:\n- `self.name = name`: 노드의 이름 (\"A\" 또는 \"B\")\n- `self.next = None`: 다음 노드를 가리키는 포인터 (초기에는 연결 없음)\n\n**비유**: 기차 칸의 제조 공정입니다. 칸에 이름표를 붙이고(name), 연결 고리를 비워두는(next=None) 과정입니다.\n\n**왜 이 순서인가?** 클래스 본문 안에서 __init__ 메서드를 정의하여 Node 클래스를 완성합니다.\n\n**실행 순서**: __init__ 함수 객체 생성 → Node 클래스에 메서드로 등록 → Node 클래스 완성 (ID: 0x1000)",
+        "explanation": "`def __init__(self, name):`는 초기화 메서드입니다.\n\n노드가 만들어질 때 이름과 `next`를 준비합니다.",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self, name):",
         "highlightOffset": [
@@ -125,7 +127,7 @@
       },
       {
         "title": "첫 번째 노드 생성",
-        "explanation": "**`a = Node(\"A\")`**\n\nNode 클래스를 호출하여 **이름이 \"A\"인 첫 번째 노드**를 메모리(0x2000)에 생성합니다.\n`__init__(self, \"A\")`가 자동으로 호출되어 name과 next 속성이 설정됩니다.\n\n**이전 레슨(py-7-3)과 동일한 과정입니다.**\n순환 참조를 만들기 위해 두 개의 노드가 필요하고, 그 중 첫 번째를 만드는 단계입니다.\n\n**생성 후 상태**: Node A = {name: \"A\", next: None}, refcount = 1 (변수 a만 참조)\n\n**왜 이 순서인가?** 클래스 정의가 끝났으니 실제 인스턴스를 생성합니다.\n\n**실행 순서**: Node(\"A\") 호출 → 인스턴스 0x2000 생성 → __init__(self, \"A\") 호출 → 초기화 진행...",
+        "explanation": "`a = Node(\"A\")`는 첫 번째 노드를 만듭니다.\n\n이 노드는 이름이 `A`입니다.",
         "visualizationType": "pythonMemory",
         "code": "a = Node(\"A\")",
         "pythonMemoryState": {

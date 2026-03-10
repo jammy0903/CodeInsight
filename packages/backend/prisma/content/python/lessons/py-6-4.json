@@ -7,7 +7,9 @@
     "steps": [
       {
         "title": "Student 클래스 정의",
-        "explanation": "**`class Student:`**\n\n`Student` 클래스를 정의합니다. 이 레슨에서는 클래스 변수로 **가변 객체(리스트)**를 사용했을 때 발생하는 함정을 확인합니다. 모든 인스턴스가 같은 리스트를 공유하는 의도치 않은 버그가 발생합니다.",
+        "explanation": "`class Student:`는 `Student` 클래스를 정의합니다.\n\n이번에는 클래스 변수 공유 문제를 봅니다.",
+        "keyInsightTitle": "주의",
+        "keyInsight": "클래스 변수에 리스트를 두면 모두가 함께 쓴다.",
         "visualizationType": "pythonMemory",
         "code": "class Student:",
         "pythonMemoryState": {
@@ -31,7 +33,9 @@
       },
       {
         "title": "클래스 변수 정의 (⚠️ 함정!)",
-        "explanation": "**`grades = []`**\n\n이것이 **함정**입니다. `self` 없이 클래스 본문에 정의하면 클래스 변수가 됩니다. 빈 리스트 객체가 **딱 하나만** 생성되어 모든 Student 인스턴스가 공유합니다. 올바른 방법은 `__init__`에서 `self.grades = []`로 정의하는 것입니다.",
+        "explanation": "`grades = []`는 클래스 변수 리스트를 만듭니다.\n\n문제는 이 리스트를 모든 인스턴스가 함께 쓴다는 점입니다.",
+        "keyInsightTitle": "핵심",
+        "keyInsight": "클래스 변수 리스트는 인스턴스마다 따로 생기지 않는다.",
         "visualizationType": "pythonMemory",
         "code": "grades = []  # 클래스 변수 - 함정!",
         "pythonMemoryState": {
@@ -66,7 +70,7 @@
       },
       {
         "title": "add_grade 메서드 정의",
-        "explanation": "**`def add_grade(self, grade):`**\n\n`self.grades.append(grade)` 실행 시, 인스턴스 자체에는 `grades`가 없으므로 클래스 변수 `Student.grades`를 찾아 append합니다. 이렇게 **공유된 리스트를 수정**하는 것이 문제의 원인입니다.",
+        "explanation": "`def add_grade(self, grade):`는 성적을 추가하는 메서드입니다.\n\n하지만 실제로는 공유된 리스트를 바꾸게 됩니다.",
         "visualizationType": "pythonMemory",
         "code": "def add_grade(self, grade):",
         "highlightOffset": [
@@ -103,7 +107,7 @@
       },
       {
         "title": "첫 번째 학생 생성",
-        "explanation": "**`s1 = Student()`**\n\ns1 객체를 생성합니다. `__init__`이 없으므로 인스턴스 변수는 추가되지 않습니다. `s1.grades`에 접근하면 자동으로 클래스 변수 `Student.grades`(공유 리스트)를 참조합니다.",
+        "explanation": "`s1 = Student()`는 첫 번째 학생 객체를 만듭니다.\n\n아직 자기만의 `grades`는 없습니다.",
         "visualizationType": "pythonMemory",
         "code": "s1 = Student()",
         "pythonMemoryState": {
@@ -148,7 +152,9 @@
       },
       {
         "title": "두 번째 학생 생성",
-        "explanation": "**`s2 = Student()`**\n\ns2도 생성합니다. s1과 s2 모두 인스턴스에 `grades`가 없으므로 `s1.grades`와 `s2.grades`는 **같은 클래스 변수 리스트**를 가리킵니다.",
+        "explanation": "`s2 = Student()`도 두 번째 학생 객체를 만듭니다.\n\n`s1`과 `s2`는 같은 `grades` 리스트를 보게 됩니다.",
+        "keyInsightTitle": "주의",
+        "keyInsight": "인스턴스 둘이 같은 리스트를 공유하게 된다.",
         "visualizationType": "pythonMemory",
         "code": "s2 = Student()",
         "pythonMemoryState": {
@@ -205,7 +211,7 @@
       },
       {
         "title": "s1.add_grade(90) 호출",
-        "explanation": "**`s1.add_grade(90)`**\n\ns1의 `add_grade` 메서드를 호출합니다. `self = s1`, `grade = 90`으로 바인딩됩니다.",
+        "explanation": "`s1.add_grade(90)`은 첫 번째 학생 점수를 추가합니다.\n\n하지만 공유 리스트에 90이 들어갑니다.",
         "visualizationType": "pythonMemory",
         "code": "s1.add_grade(90)",
         "pythonMemoryState": {

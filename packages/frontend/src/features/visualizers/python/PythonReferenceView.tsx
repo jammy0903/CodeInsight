@@ -119,6 +119,7 @@ const HeapCard = memo(function HeapCard({
   const isMutable =
     meta?.mutable === true ||
     (meta?.mutable === undefined && MUTABLE_TYPES.has(object.type));
+  const pyId = typeof meta?.pyId === 'string' ? meta.pyId : undefined;
   const hideBadge =
     object.type === 'function' || object.type === 'class' || object.type === 'NoneType';
   const displayValue = String(object.value ?? 'None');
@@ -158,6 +159,16 @@ const HeapCard = memo(function HeapCard({
       {/* Value display */}
       <div className="flex items-center gap-2">
         <span className="text-sm">{emoji}</span>
+        <span
+          className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wide opacity-75"
+          style={{
+            backgroundColor: '#ffffff66',
+            color: colors.text,
+            border: `1px solid ${colors.border}`,
+          }}
+        >
+          {object.type}
+        </span>
         <motion.span
           key={displayValue}
           initial={isUpdated ? { color: '#2563eb', scale: 1.05 } : false}
@@ -169,6 +180,12 @@ const HeapCard = memo(function HeapCard({
         </motion.span>
       </div>
 
+      {pyId && (
+        <div className="mt-1.5 font-mono text-[11px] opacity-70" style={{ color: colors.text }}>
+          id: {pyId}
+        </div>
+      )}
+
     </motion.div>
   );
 });
@@ -179,21 +196,22 @@ const HeapCard = memo(function HeapCard({
 
 interface StackVariableProps {
   variable: FlowVariable;
+  targetPyId?: string;
   isHighlighted: boolean;
   onHoverStart: (id: string) => void;
   onHoverEnd: () => void;
 }
 
 const StackVariable = memo(function StackVariable({
-  variable, isHighlighted, onHoverStart, onHoverEnd,
+  variable, targetPyId, isHighlighted, onHoverStart, onHoverEnd,
 }: StackVariableProps) {
   const isInline = INLINE_TYPES.has(variable.type);
   const typeColor = getTypeColor(variable.type);
-  const isReference = !isInline;
+  const isReference = Boolean(variable.pointsTo && !isInline);
 
   return (
     <div
-      className="flex items-center gap-2 min-h-[28px] rounded-md px-1 -mx-1"
+      className="flex items-center gap-2 min-h-[28px] rounded-md px-1 -mx-1 flex-wrap"
       data-var-id={isReference ? variable.id : undefined}
       onMouseEnter={isReference ? () => onHoverStart(variable.id) : undefined}
       onMouseLeave={isReference ? onHoverEnd : undefined}
@@ -211,18 +229,48 @@ const StackVariable = memo(function StackVariable({
         {variable.name}
       </span>
 
+      {!isInline && (
+        <div className="flex items-center gap-1.5 text-slate-500">
+          <span className="text-xs">→</span>
+          <span className="text-[10px] font-mono font-semibold uppercase opacity-70">
+            {variable.type}
+          </span>
+        </div>
+      )}
+
       {/* Inline value (primitives only) */}
       {isInline && (
-        <span
-          className="px-2 py-0.5 rounded text-xs font-mono font-semibold whitespace-nowrap"
+        <div
+          className="flex items-center gap-1.5 px-2 py-0.5 rounded whitespace-nowrap"
           style={{
             backgroundColor: typeColor.bg,
             color: typeColor.text,
             border: `1px solid ${typeColor.border}`,
           }}
         >
-          {String(variable.value)}
-        </span>
+          <span className="text-[10px] font-mono font-bold uppercase opacity-70">
+            {variable.type}
+          </span>
+          <span className="text-xs font-mono font-semibold">
+            {String(variable.value)}
+          </span>
+        </div>
+      )}
+
+      {targetPyId && (
+        <div
+          className="px-1.5 py-0.5 rounded whitespace-nowrap"
+          style={{
+            backgroundColor: '#eef2ff',
+            color: '#4338ca',
+            border: '1px solid #c7d2fe',
+          }}
+          title="Object ID"
+        >
+          <span className="text-[10px] font-mono font-semibold">
+            id {targetPyId}
+          </span>
+        </div>
       )}
     </div>
   );
@@ -234,6 +282,7 @@ const StackVariable = memo(function StackVariable({
 
 interface StackFrameProps {
   frame: StackFrameData;
+  objectMap: Map<string, FlowVariable>;
   isActive: boolean;
   highlightedIds: Set<string>;
   onHoverStart: (id: string) => void;
@@ -241,7 +290,7 @@ interface StackFrameProps {
 }
 
 const StackFrame = memo(function StackFrame({
-  frame, isActive, highlightedIds, onHoverStart, onHoverEnd,
+  frame, objectMap, isActive, highlightedIds, onHoverStart, onHoverEnd,
 }: StackFrameProps) {
   const isGlobal = isGlobalFrame(frame.name);
   const colors = isGlobal ? FRAME_COLORS.global : FRAME_COLORS.function;
@@ -282,6 +331,12 @@ const StackFrame = memo(function StackFrame({
             <StackVariable
               key={v.id}
               variable={v}
+              targetPyId={(() => {
+                if (!v.pointsTo) return undefined;
+                const target = objectMap.get(v.pointsTo);
+                const meta = target?.metadata as Record<string, unknown> | undefined;
+                return typeof meta?.pyId === 'string' ? meta.pyId : undefined;
+              })()}
               isHighlighted={highlightedIds.has(v.id)}
               onHoverStart={onHoverStart}
               onHoverEnd={onHoverEnd}
@@ -316,6 +371,14 @@ export const PythonReferenceView = memo(function PythonReferenceView({
     return map;
   }, [step.variables]);
 
+  const objectMap = useMemo(() => {
+    const map = new Map<string, FlowVariable>();
+    step.variables
+      .filter((v) => v.scope === 'objects')
+      .forEach((v) => map.set(v.id, v));
+    return map;
+  }, [step.variables]);
+
   // Stack frames (excluding objects/heap pseudo-frames)
   const stackFrames = useMemo<StackFrameData[]>(
     () =>
@@ -330,12 +393,6 @@ export const PythonReferenceView = memo(function PythonReferenceView({
     [step.frames, variableMap]
   );
 
-  // Heap objects (non-primitive only)
-  const heapObjects = useMemo(
-    () => step.variables.filter((v) => v.scope === 'objects' && !INLINE_TYPES.has(v.type)),
-    [step.variables]
-  );
-
   // Reference count per heap object
   const nameCountMap = useMemo(() => {
     const map = new Map<string, number>();
@@ -344,6 +401,19 @@ export const PythonReferenceView = memo(function PythonReferenceView({
     });
     return map;
   }, [step.variables]);
+
+  // Heap objects:
+  // - keep normal non-primitive heap objects
+  // - also keep unreferenced primitive temporaries (e.g. string literal in print)
+  const heapObjects = useMemo(
+    () =>
+      step.variables.filter((v) => {
+        if (v.scope !== 'objects') return false;
+        if (!INLINE_TYPES.has(v.type)) return true;
+        return (nameCountMap.get(v.id) ?? 0) === 0;
+      }),
+    [step.variables, nameCountMap]
+  );
 
   // Connection map: heapObjId → [varIds that point to it]
   const connectionMap = useMemo(() => {
@@ -476,6 +546,7 @@ export const PythonReferenceView = memo(function PythonReferenceView({
                 <StackFrame
                   key={frame.name}
                   frame={frame}
+                  objectMap={objectMap}
                   isActive={frame.name === activeFrameName}
                   highlightedIds={highlightedIds}
                   onHoverStart={handleHoverStart}
@@ -488,9 +559,9 @@ export const PythonReferenceView = memo(function PythonReferenceView({
           )}
         </div>
 
-        {/* Objects Column — single column, ordered to align with stack */}
+        {/* References Column — single column, ordered to align with stack */}
         <div className="flex-1 flex flex-col gap-3">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Objects</div>
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">References</div>
           <div className="flex flex-col gap-5 pt-1 pb-3">
             <AnimatePresence mode="popLayout">
               {orderedHeapObjects.map((obj) => (
@@ -508,7 +579,7 @@ export const PythonReferenceView = memo(function PythonReferenceView({
             </AnimatePresence>
           </div>
           {orderedHeapObjects.length === 0 && (
-            <span className="text-sm text-gray-400 italic">No objects</span>
+            <span className="text-sm text-gray-400 italic">No references</span>
           )}
         </div>
       </div>

@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "csv, json 모듈 임포트",
-        "explanation": "**`import csv, json`**는 파일 데이터 처리의 기본 도구를 로드합니다.\n\n역할 구분:\n- `csv`: 표 형태(행/열) 데이터\n- `json`: 중첩 구조(dict/list) 데이터\n\n**비유**: CSV는 엑셀 표를 다루는 공구, JSON은 객체 상자를 다루는 공구입니다.\n\n핵심은 \"데이터 모양에 맞는 모듈을 쓰는 것\"입니다.\n그래야 파싱과 저장 코드가 단순해집니다.",
+        "explanation": "`csv`와 `json` 모듈을 가져옵니다.\nCSV는 표 데이터, JSON은 중첩 구조 데이터에 잘 맞습니다.",
         "visualizationType": "pythonMemory",
         "code": "import csv",
         "highlightOffset": [
@@ -45,11 +45,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "데이터 모양에 맞는 모듈을 쓴다."
       },
       {
         "title": "데이터 준비 (딕셔너리 리스트)",
-        "explanation": "**`data = [{\"name\": \"Alice\", \"score\": 95}, {\"name\": \"Bob\", \"score\": 87}]`** -- 딕셔너리 2개로 이루어진 리스트를 만듭니다. 이 구조가 바로 JSON과 가장 자연스럽게 대응되는 Python 자료구조입니다.\n\n**비유:** 이것은 학생 명단표와 같습니다. 각 학생(딕셔너리)의 정보가 적힌 카드를 한 묶음(리스트)으로 모아놓은 것입니다. 이 명단표를 JSON 형식으로 파일에 저장하면, 프로그램을 껐다 켜도 명단이 유지됩니다.",
+        "explanation": "딕셔너리 리스트 `data`를 준비합니다.\nJSON도 객체와 배열로 데이터를 표현하므로, 이 구조를 거의 그대로 저장할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "data = [",
         "highlightOffset": [
@@ -77,11 +79,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "파이썬의 dict/list는 JSON과 잘 대응된다."
       },
       {
         "title": "json.dump()로 파일에 저장",
-        "explanation": "**`json.dump(data, f, indent=2)`**는 Python 객체를 JSON으로 바꿔 파일에 저장합니다.\n\n한 줄 요약:\n- `dump` = file에 저장\n- `dumps` = string으로 변환\n\n**비유**: 메모리 안의 데이터를 \"보관용 포장\"(JSON)으로 바꿔 파일 상자에 넣는 과정입니다.\n\n`indent=2`를 주면 사람이 읽기 쉬운 모양으로 정렬됩니다.\n실무에서 디버깅할 때 매우 유용합니다.\n\n주의할 점:\n- `set`, `datetime` 같은 타입은 기본으로 바로 저장되지 않을 수 있습니다\n- 이 경우 변환 규칙(`default`)을 추가해야 합니다\n\n즉, 이 단계는 \"메모리 데이터 영구 저장\"의 출발점입니다.",
+        "explanation": "`json.dump()`는 파이썬 객체를 JSON 파일로 저장합니다.\n`indent=2`를 주면 보기 좋게 정리됩니다.",
         "visualizationType": "pythonMemory",
         "code": "with open(\"data.json\", \"w\") as f:",
         "highlightOffset": [
@@ -117,11 +121,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`dump`는 파일에 저장하는 함수다."
       },
       {
         "title": "json.dumps()로 문자열 변환",
-        "explanation": "**`json.dumps()`**는 Python 객체를 JSON \"문자열\"로 바꿉니다.\n\n구분만 기억하면 헷갈리지 않습니다:\n- `dump` = file\n- `dumps` = string\n\n문자열로 바꾸면 네트워크 전송, 로그 기록, 메시지 큐 전달에 바로 활용할 수 있습니다.\n\n**비유**: 객체를 택배 가능한 표준 포장(JSON 텍스트)으로 바꾸는 단계입니다.\n\n주의:\n- 한글을 그대로 보려면 `ensure_ascii=False` 옵션을 고려하세요",
+        "explanation": "`json.dumps()`는 객체를 JSON 문자열로 바꿉니다.\n파일이 아니라 문자열이 필요할 때 씁니다.",
         "visualizationType": "pythonMemory",
         "code": "json_str = json.dumps(data[0])",
         "highlightOffset": [
@@ -159,11 +165,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`dumps`의 s는 string이다."
       },
       {
         "title": "json.loads()로 문자열 파싱",
-        "explanation": "**`parsed = json.loads(json_str)`**는 JSON 문자열을 Python 객체로 되돌립니다.\n\n한 줄 요약:\n- `loads` = string에서 읽기\n- `load` = file에서 읽기\n\n변환 결과는 보통 `dict`/`list`입니다.\n그래서 이후에는 일반 Python 자료구조처럼 바로 다루면 됩니다.\n\n**비유**: 택배 박스(JSON)를 열어 실제 물건(Python 객체)으로 꺼내는 과정입니다.\n\n주의할 점:\n- 문자열 형식이 JSON 규칙에 맞지 않으면 `JSONDecodeError` 발생\n- 변환된 객체는 \"같은 내용\"이어도 원본과는 별도 객체입니다",
+        "explanation": "`json.loads()`는 JSON 문자열을 다시 파이썬 객체로 바꿉니다.\n이제 일반 딕셔너리처럼 다룰 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "parsed = json.loads(json_str)",
         "pythonMemoryState": {
@@ -195,11 +203,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`loads`는 문자열에서 읽어 온다."
       },
       {
         "title": "파싱된 데이터 사용",
-        "explanation": "**`parsed['name']`**로 값을 꺼내는 순간, 데이터는 완전히 일반 Python 딕셔너리처럼 동작합니다.\n\n즉 JSON은 저장/전송을 위한 형식이고,\n`load/loads`를 거치면 다시 평소 코드 스타일로 작업하면 됩니다.\n\n**비유**: 압축파일을 풀고 나면, 일반 폴더처럼 쓰는 것과 같습니다.\n\n여기서는:\n- 키 `name` 조회 → `\"Alice\"`\n- f-string으로 `Name: Alice` 출력\n\n실무 포인트:\n- API 응답, 설정 파일, 로그 저장이 모두 같은 패턴입니다\n- 저장(`dump/dumps`) ↔ 복원(`load/loads`)만 정확히 구분하면 헷갈리지 않습니다",
+        "explanation": "파싱한 딕셔너리에서 `name` 값을 꺼내 사용합니다.\n즉, JSON은 저장과 전송용 껍데기이고, 읽고 나면 다시 평소처럼 dict와 list로 다루면 됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Name: {parsed['name']}\")",
         "pythonMemoryState": {
@@ -223,7 +233,9 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "결론",
+        "keyInsight": "JSON은 저장·전송용, dict/list는 사용용이다."
       }
     ],
     "deltaFormat": true

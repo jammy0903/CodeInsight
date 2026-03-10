@@ -356,6 +356,8 @@ export function LessonUnifiedView({
             <StepExplanation
               explanation={currentStep?.explanation || ''}
               stepIndex={nav.stepIndex}
+              keyInsight={currentStep?.keyInsight}
+              keyInsightTitle={currentStep?.keyInsightTitle}
               illustrations={currentStepIllustrations}
             />
             {isAiLiteracy && (

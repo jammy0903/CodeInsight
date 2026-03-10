@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "함수 정의",
-        "explanation": "**`def safe_divide(a, b):`** -- `function` 객체를 생성하고 `safe_divide`라는 이름표를 붙입니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. `def` 키워드로 함수를 정의하면, Python은 함수 본문의 코드를 **코드 객체(code object)**로 컴파일하여 메모리에 저장하고, 그 코드 객체를 감싼 `function` 객체를 만듭니다.",
+        "explanation": "`safe_divide` 함수를 정의합니다.\n이 함수 안에서 `try`, `else`, `finally`를 함께 씁니다.",
         "visualizationType": "pythonMemory",
         "code": "def safe_divide(a, b):",
         "highlightOffset": [
@@ -39,11 +39,13 @@
               "pyId": "3001"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "예외 처리 구조를 함수 안에 모아둘 수 있다."
       },
       {
         "title": "함수 호출 - try 블록 진입",
-        "explanation": "**`answer = safe_divide(10, 3)`** -- 함수를 호출하면 새로운 **로컬 네임스페이스**가 생성되고, 인자가 매개변수에 바인딩됩니다.\n\n`safe_divide`를 `a=10`, `b=3`으로 호출합니다. 함수 내부로 점프하여 `try` 블록에 진입합니다.",
+        "explanation": "`safe_divide(10, 3)`을 호출합니다.\n이번에는 0으로 나누지 않으므로 try 블록이 끝까지 정상 실행됩니다.",
         "visualizationType": "pythonMemory",
         "code": "        result = a / b",
         "pythonMemoryState": {
@@ -97,11 +99,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "에러가 없으면 `except`로 가지 않는다."
       },
       {
         "title": "else 블록 실행 (에러 없을 때만!)",
-        "explanation": "**`else:`** 블록이 실행됩니다! try 블록에서 **에러가 하나도 발생하지 않았을 때**만 실행되는 특별한 블록입니다.\n\n**`print(f\"Success: {a}/{b} = {result}\")`** -- 성공 메시지를 출력합니다: `Success: 10/3 = 3.3333333333333335`",
+        "explanation": "에러가 없었기 때문에 `else` 블록이 실행됩니다.\n여기서 성공 메시지와 반환값을 처리합니다.",
         "visualizationType": "pythonMemory",
         "code": "        print(f\"Success: {a}/{b} = {result}\")",
         "pythonMemoryState": {
@@ -153,11 +157,13 @@
               "pyId": "3004"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`else`는 try가 성공했을 때만 실행된다."
       },
       {
         "title": "finally 블록 실행 (무조건!)",
-        "explanation": "**`finally:`** 블록은 예외 발생 여부와 상관없이 항상 실행됩니다.\n\n즉, 성공하든 실패하든 \"마무리 정리\" 코드를 넣는 자리입니다.\n대표적으로 파일 닫기, 연결 해제, 잠금 해제 같은 리소스 정리에 사용합니다.\n\n**비유**: 회의가 잘 끝났든 싸우고 끝났든, 회의실 불 끄고 문 잠그는 절차는 항상 하는 것과 같습니다.\n\n실무 포인트:\n- 정리 코드가 누락되면 누수(leak)와 장애가 생깁니다\n- 그래서 정리 로직은 `try`가 아니라 `finally`에 두는 게 안전합니다",
+        "explanation": "`finally`는 성공 여부와 상관없이 항상 실행됩니다.\n그래서 파일 닫기나 연결 해제처럼 꼭 해야 하는 정리 코드를 두기 좋습니다.",
         "visualizationType": "pythonMemory",
         "code": "        print(\"Calculation attempt finished\")",
         "pythonMemoryState": {
@@ -209,11 +215,13 @@
               "pyId": "3004"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`finally`는 무조건 실행된다."
       },
       {
         "title": "함수 반환값 확인",
-        "explanation": "함수 반환값 확인은 \"예외 처리 후 최종 상태\"를 검증하는 마지막 단계입니다.\n\n즉, try/except/finally를 거친 뒤에도\n호출자가 기대한 값이 맞는지 확인해야 전체 흐름이 안전합니다.\n\n**비유**: 수리 후 시동만 걸어보는 게 아니라 실제 주행 테스트까지 하는 마무리 점검입니다.\n\n실무 포인트:\n- 에러 메시지 출력만으로 끝내지 말고\n- 반환값/상태값까지 검증해야 회귀를 줄일 수 있습니다",
+        "explanation": "함수 반환값이 `answer`에 저장됩니다.\n즉, 예외 처리를 해도 결과는 계속 사용할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Answer: {answer}\")",
         "pythonMemoryState": {
@@ -247,7 +255,9 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "결론",
+        "keyInsight": "예외 처리 후에도 반환값 흐름은 이어진다."
       }
     ]
   },

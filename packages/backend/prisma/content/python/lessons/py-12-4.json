@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "사용자 정의 예외 클래스",
-        "explanation": "**`class AgeError(Exception):`**는 나이 검증 전용 예외를 만드는 선언입니다.\n\n핵심:\n- 일반 `ValueError`보다 의미가 선명합니다\n- `except AgeError`로 정확히 잡을 수 있습니다\n- 필요하면 잘못된 값(예: age)을 예외 객체에 함께 담을 수 있습니다\n\n**비유**: \"문제 있음\"보다 \"나이 규칙 위반\"이라고 라벨을 붙이면 처리 속도가 훨씬 빨라집니다.\n\n실무 포인트:\n- 도메인 규칙이 있는 검증(나이, 권한, 상태 전이)은 커스텀 예외가 유지보수에 유리합니다\n- 예외 클래스는 보통 `Exception`을 상속해 작성합니다",
+        "explanation": "`AgeError`라는 사용자 정의 예외를 만듭니다.\n이제 나이 검증용 예외를 따로 구분할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "class AgeError(Exception):",
         "highlightOffset": [
@@ -33,11 +33,13 @@
               "pyId": "4001"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "커스텀 예외는 의미를 더 선명하게 만든다."
       },
       {
         "title": "검증 함수 정의",
-        "explanation": "**`def check_age(age):`** -- 나이를 검증하는 함수를 정의합니다. `function` 객체가 생성되고 `check_age`라는 이름표가 붙습니다.\n\n이 함수의 핵심 로직은 **입력값 검증(validation)**입니다:\n- `age < 0` 또는 `age > 150`이면 → **AgeError를 raise**합니다\n- 유효한 나이이면 → 성공 메시지를 return합니다",
+        "explanation": "`check_age(age)` 함수를 정의합니다.\n이 함수는 나이가 정상 범위인지 검사합니다.",
         "visualizationType": "pythonMemory",
         "code": "def check_age(age):",
         "highlightOffset": [
@@ -74,11 +76,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "검증 로직을 함수로 분리할 수 있다."
       },
       {
         "title": "함수 호출 - 나이 검증 시작",
-        "explanation": "**`result = check_age(200)`** -- try 블록 안에서 `check_age`를 **200**이라는 인자로 호출합니다.\n\n함수 내부로 점프합니다. 새로운 스택 프레임이 생성되고, 매개변수 `age`에 정수 `200`이 바인딩됩니다.",
+        "explanation": "`check_age(200)`을 호출합니다.\n200은 비정상 값이라 검사에 걸립니다.",
         "visualizationType": "pythonMemory",
         "code": "    if age < 0 or age > 150:",
         "pythonMemoryState": {
@@ -120,11 +124,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "주의",
+        "keyInsight": "잘못된 입력이 함수로 들어왔다."
       },
       {
         "title": "raise - 에러를 직접 발생!",
-        "explanation": "**`raise AgeError(age)`** -- **raise** 키워드가 `AgeError(200)` 예외를 직접 발생시킵니다!\n\n이 한 줄에서 여러 가지 일이 순서대로 일어납니다:\n1. `AgeError(200)` → 클래스의 `__init__` 메서드 호출\n2. `self.age = 200` → 잘못된 나이값을 에러 객체에 저장\n3. `super().__init__(\"Invalid age: 200\")` → 에러 메시지를 `\"Invalid age: 200\"`으로 설정\n4. **raise** → 이 에러 객체를 던짐(throw)!",
+        "explanation": "`raise AgeError(age)`로 예외를 직접 발생시킵니다.\n이건 파이썬에게 여기서 실패했다고 알리는 코드입니다.",
         "visualizationType": "pythonMemory",
         "code": "        raise AgeError(age)",
         "pythonMemoryState": {
@@ -171,11 +177,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`raise`는 예외를 직접 던지는 키워드다."
       },
       {
         "title": "except가 커스텀 예외를 잡았다!",
-        "explanation": "**`except AgeError as e:`** -- `check_age` 함수에서 발생한 AgeError가 이 except 블록에 잡혔습니다!\n\n**`as e`**: 발생한 `AgeError` 객체를 변수 `e`에 바인딩합니다. `e`는 이제 이 에러 객체를 가리키는 이름표입니다.",
+        "explanation": "`except AgeError as e`가 방금 예외를 잡습니다.\n`e`로 예외 객체도 함께 받을 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "    print(f\"Caught: {e}\")",
         "pythonMemoryState": {
@@ -219,11 +227,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "`as e`로 예외 객체를 변수에 담는다."
       },
       {
         "title": "에러 객체의 속성 접근",
-        "explanation": "**`print(f\"Invalid value was: {e.age}\")`** -- 커스텀 예외 클래스에 저장해둔 **`age` 속성**에 점(`.`) 연산자로 접근합니다.\n\n`e.age`는 **200**입니다. `__init__`에서 `self.age = age`로 저장했기 때문입니다. 이것이 커스텀 예외의 핵심 가치입니다!",
+        "explanation": "예외 객체의 `age` 속성을 읽어 잘못된 값을 확인합니다.\n커스텀 예외는 필요한 정보도 함께 담을 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "    print(f\"Invalid value was: {e.age}\")",
         "pythonMemoryState": {
@@ -265,7 +275,9 @@
               "pyId": "4004"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "결론",
+        "keyInsight": "커스텀 예외는 값까지 함께 전달할 수 있다."
       }
     ]
   },

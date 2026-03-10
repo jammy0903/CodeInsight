@@ -195,6 +195,7 @@ export const LessonStepSchema = z.object({
   // TRADEOFF: 타입 안전성 < 언어별 유연성
   memoryChanges: z.array(MemoryChangeSchema).optional(),
   keyInsight: z.string().optional(),
+  keyInsightTitle: z.string().optional(),
   analogy: z.string().optional(),
   misconception: z.string().optional(),
   tip: z.string().optional(),

@@ -7,7 +7,9 @@
     "steps": [
       {
         "title": "Counter 클래스 정의 시작",
-        "explanation": "**`class Counter:`**\n\n**이터레이터 프로토콜(Iterator Protocol)**을 직접 구현하는 `Counter` 클래스를 정의합니다.",
+        "explanation": "`class Counter:`는 이터레이터를 직접 만드는 클래스입니다.",
+        "keyInsightTitle": "핵심",
+        "keyInsight": "이터레이터는 `__iter__`와 `__next__`로 동작한다.",
         "visualizationType": "pythonMemory",
         "code": "class Counter:",
         "pythonMemoryState": {
@@ -33,7 +35,7 @@
       },
       {
         "title": "클래스 본문 진입",
-        "explanation": "**`class Counter:` (본문 전체)**\n\nPython이 클래스 본문을 읽어 **세 개의 메서드**를 등록합니다:\n- `__init__`: 객체 초기화 (start, end 값 설정)\n- `__iter__`: for 루프가 호출 (이터레이터 반환)\n- `__next__`: for 루프가 반복마다 호출 (다음 값 반환)\n\n**이 세 메서드가 for 루프의 심장입니다!**\n`for num in counter:` 실행 시 Python은 내부적으로:\n1. `counter.__iter__()` 호출 → 이터레이터 얻음\n2. `counter.__next__()` 반복 호출 → 값 하나씩 얻음\n3. `StopIteration` 예외 발생 → 루프 종료\n\n**비유**: 자동판매기의 내부 회로를 설계하는 과정입니다.\n\n**왜 이 순서인가?** class 키워드를 만났으므로, 본문의 모든 메서드를 등록합니다.\n\n**실행 순서**: 클래스 내부 스코프 진입 → 세 개의 메서드 정의 확인",
+        "explanation": "Python이 클래스 본문을 읽어 메서드들을 등록합니다.\n\n이 메서드들이 `for`문의 동작을 만듭니다.",
         "visualizationType": "pythonMemory",
         "code": "class Counter:",
         "highlightOffset": [
@@ -70,7 +72,7 @@
       },
       {
         "title": "__init__ 메서드 정의",
-        "explanation": "**`def __init__(self, start, end):`**\n\nCounter 객체의 **초기화 메서드**를 정의합니다.\n`Counter(0, 3)`처럼 호출하면 start=0, end=3이 전달되어 카운터의 범위를 설정합니다.\n\n**이 메서드가 설정하는 것들**:\n- `self.current = start`: 현재 값 (처음에는 시작값)\n- `self.end = end`: 끝 값 (이 값에 도달하면 반복 종료)\n\n**비유**: 자동판매기에 \"0번부터 시작해서 3번 전까지 나오게\" 설정하는 것입니다.\n\n**왜 이 순서인가?** 객체 생성 시 호출될 생성자를 가장 먼저 정의하는 것이 Python의 관례입니다.\n\n**실행 순서**: __init__ 함수 객체 생성 → Counter 클래스에 메서드로 등록",
+        "explanation": "`def __init__(self, start, end):`는 시작값과 끝값을 저장합니다.",
         "visualizationType": "pythonMemory",
         "code": "def __init__(self, start, end):",
         "highlightOffset": [
@@ -110,7 +112,7 @@
       },
       {
         "title": "__iter__ 메서드 정의",
-        "explanation": "**`def __iter__(self):`**\n\n이터레이터 프로토콜의 **첫 번째 약속**: `__iter__` 메서드를 정의합니다.\n이 메서드는 `return self`로 자기 자신을 반환합니다.",
+        "explanation": "`def __iter__(self):`는 이터레이터를 돌려주는 메서드입니다.\n\n보통 자기 자신을 반환합니다.",
         "visualizationType": "pythonMemory",
         "code": "def __iter__(self):",
         "highlightOffset": [
@@ -149,7 +151,7 @@
       },
       {
         "title": "__next__ 메서드 정의",
-        "explanation": "**`def __next__(self):`**\n\n이터레이터 프로토콜의 **두 번째 약속**: `__next__` 메서드를 정의합니다.\nfor 루프가 **반복할 때마다** 이 메서드를 호출하여 다음 값을 받아갑니다.",
+        "explanation": "`def __next__(self):`는 다음 값을 꺼내주는 메서드입니다.\n\n`for`문은 반복할 때마다 이것을 호출합니다.",
         "visualizationType": "pythonMemory",
         "code": "def __next__(self):",
         "highlightOffset": [
@@ -192,7 +194,7 @@
       },
       {
         "title": "카운터 객체 생성",
-        "explanation": "**`counter = Counter(0, 3)`**\n\nCounter 클래스를 호출하여 **0부터 3 미만까지 세는 카운터 객체**를 생성합니다.\n`__init__(self, 0, 3)`이 자동 호출되어 current=0, end=3으로 초기화됩니다.\n\n**이 객체가 생성하는 값의 순서**: 0, 1, 2 (3은 포함하지 않음 - range(3)과 동일)\n\n**비유**: \"0번부터 시작해서 2번까지 줄 수 있는 자동판매기\"를 만든 것입니다.\n버튼을 누를 때마다 0 → 1 → 2 → \"품절!\" 순서로 나옵니다.\n\n**왜 이 순서인가?** 클래스 정의가 끝났으니, 실제 인스턴스를 만들어 for 루프에서 사용합니다.\n\n**실행 순서**: Counter(0, 3) 호출 → 인스턴스(0x2000) 메모리 할당 → __init__ 자동 호출",
+        "explanation": "`counter = Counter(0, 3)`은 0부터 2까지 내놓는 객체를 만듭니다.\n\n3은 포함되지 않습니다.",
         "visualizationType": "pythonMemory",
         "code": "counter = Counter(0, 3)",
         "pythonMemoryState": {

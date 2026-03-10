@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "sys 모듈 임포트",
-        "explanation": "**`import sys`**\n\nPython의 **내장 시스템 모듈 `sys`**를 메모리에 로드합니다.\n`sys` 모듈에는 Python 인터프리터와 관련된 다양한 유틸리티 함수가 들어있습니다.",
+        "explanation": "`import sys`는 `sys` 모듈을 가져옵니다.\n\n이 모듈로 참조 횟수를 확인할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "import sys",
         "pythonMemoryState": {
@@ -31,7 +31,7 @@
       },
       {
         "title": "리스트 객체 생성과 첫 참조",
-        "explanation": "**`a = [1, 2, 3]`**\n\n**리스트 객체 생성**: Python이 메모리(0x2000)에 `[1, 2, 3]`이라는 새로운 리스트 객체를 만들고, 변수 `a`가 이 객체를 가리키도록(참조하도록) 연결합니다.",
+        "explanation": "`a = [1, 2, 3]`은 리스트를 만듭니다.\n\n그리고 `a`가 그 객체를 가리킵니다.",
         "visualizationType": "pythonMemory",
         "code": "a = [1, 2, 3]",
         "pythonMemoryState": {
@@ -66,7 +66,9 @@
       },
       {
         "title": "참조 횟수 확인 (getrefcount)",
-        "explanation": "**`print(f\"a만 참조: {sys.getrefcount(a)}\")`**\n\n`sys.getrefcount(a)`를 호출하여 `a`가 가리키는 리스트 객체(0x2000)의 **참조 횟수**를 확인합니다.",
+        "explanation": "`sys.getrefcount(a)`는 이 객체를 몇 개가 참조하는지 보여줍니다.\n\n여기서는 `a`만 참조하고 있는 상태를 확인합니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "`getrefcount()` 결과에는 임시 참조 1개가 더해진다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"a만 참조: {sys.getrefcount(a)}\")",
         "pythonMemoryState": {
@@ -104,7 +106,9 @@
       },
       {
         "title": "두 번째 참조 추가 (b = a)",
-        "explanation": "**`b = a`**\n\n**핵심 개념**: 이 줄은 새로운 리스트를 만드는 것이 **아닙니다!**\n변수 `b`가 `a`와 **똑같은 리스트 객체(0x2000)**를 함께 가리키도록 연결하는 것입니다.",
+        "explanation": "`b = a`는 새 리스트를 만드는 코드가 아닙니다.\n\n`b`도 같은 객체를 가리키게 됩니다.",
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`b = a`는 복사가 아니라 같은 객체 참조 추가다.",
         "visualizationType": "pythonMemory",
         "code": "b = a  # 같은 객체 참조",
         "pythonMemoryState": {
@@ -144,7 +148,7 @@
       },
       {
         "title": "늘어난 참조 횟수 확인 (2개)",
-        "explanation": "**`print(f\"a, b 참조: {sys.getrefcount(a)}\")`**\n\n이제 `a`가 가리키는 객체(0x2000)의 참조 횟수를 다시 확인합니다.\n`b = a`로 참조가 하나 늘었으니, 결과도 달라져야 합니다.",
+        "explanation": "이제 참조가 하나 늘었으므로 숫자도 커집니다.\n\n`a`와 `b`가 둘 다 같은 객체를 보고 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"a, b 참조: {sys.getrefcount(a)}\")",
         "pythonMemoryState": {
@@ -184,7 +188,7 @@
       },
       {
         "title": "세 번째 참조 추가 (c = a)",
-        "explanation": "**`c = a`**\n\n변수 `c`도 **같은 리스트 객체(0x2000)**를 가리키도록 연결합니다.\n이제 하나의 리스트 객체를 `a`, `b`, `c` 세 개의 이름으로 접근할 수 있습니다.",
+        "explanation": "`c = a`도 같은 객체를 하나 더 참조하게 합니다.\n\n이제 `a`, `b`, `c`가 모두 같은 객체를 봅니다.",
         "visualizationType": "pythonMemory",
         "code": "c = a  # 또 참조",
         "pythonMemoryState": {

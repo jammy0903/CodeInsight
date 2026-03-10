@@ -5,7 +5,7 @@
  * Bug 5 수정: pythonMemoryState에 names[]/objects[]가 비어있는 스텝 수정
  *
  * 두 가지 작업:
- * 1. py-1-5, py-1-8: variables[] → names[]/objects[] 변환 (이전 변환 작업에서 누락)
+ * 1. py-1-5, py-1-6: variables[] → names[]/objects[] 변환 (이전 변환 작업에서 누락)
  * 2. 모든 영향받는 파일: names/objects가 없는 스텝에 이전 스텝의 데이터 carry-forward
  *
  * Usage:
@@ -21,8 +21,8 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LESSON_DIR = path.resolve(__dirname, '../lessons');
 
-const CONVERT_FILES = ['py-1-5', 'py-1-8'];
-const ALL_FILES = ['py-1-5', 'py-1-8', 'py-2-1', 'py-2-4', 'py-4-4', 'py-4-5', 'py-9-3', 'py-9-4'];
+const CONVERT_FILES = ['py-1-5', 'py-1-6'];
+const ALL_FILES = ['py-1-5', 'py-1-6', 'py-2-1', 'py-2-4', 'py-4-4', 'py-4-5', 'py-9-3', 'py-9-4'];
 
 const isDryRun = process.argv.includes('--dry-run');
 const isValidate = process.argv.includes('--validate');
@@ -174,7 +174,7 @@ for (const fileId of ALL_FILES) {
   let converted = 0;
   let carried = 0;
 
-  // Phase 1: Convert variables → names/objects (py-1-5, py-1-8 only)
+  // Phase 1: Convert variables → names/objects (py-1-5, py-1-6 only)
   if (CONVERT_FILES.includes(fileId)) {
     for (const step of data.content.steps) {
       if (step.pythonMemoryState) {

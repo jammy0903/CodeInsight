@@ -8,7 +8,7 @@
       {
         "line": 1,
         "title": "Step 1: 라이브러리 불러오기",
-        "explanation": "`import pandas as pd`는 **pandas 라이브러리**를 불러와서 **pd라는 짧은 이름**으로 사용하겠다는 의미입니다.\n\n**왜 라이브러리를 쓸까?**\nExcel 파일 읽기, 데이터 필터링 등을 처음부터 만들면 수백 줄이 필요합니다.\npandas는 이미 만들어진 도구를 제공합니다.\n\n**as pd의 의미**:\n- `pandas.read_excel()` 대신 `pd.read_excel()` 처럼 짧게 쓸 수 있습니다.\n- 전 세계 개발자들이 관례적으로 사용하는 이름입니다.",
+        "explanation": "`import pandas as pd`로 pandas를 불러옵니다.\n복잡한 데이터 작업을 직접 다 짜지 않고 라이브러리 힘을 빌리는 단계입니다.",
         "highlight": [
           1
         ],
@@ -16,21 +16,25 @@
         "pythonMemoryState": {
           "names": [],
           "objects": []
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "라이브러리는 이미 만들어진 도구 모음이다."
       },
       {
         "line": 3,
         "title": "Step 2: 함수 정의 시작",
-        "explanation": "`def calculate_bonus(salary):`는 **함수를 정의**합니다.\n\n**구성 요소**:\n- `def`: 함수를 만든다는 키워드\n- `calculate_bonus`: 함수 이름\n- `(salary)`: 입력값 (매개변수)\n- `:` 뒤에 들여쓰기된 코드가 함수 본문\n\n**왜 함수를 만들까?** 보너스 계산 로직을 여러 번 쓸 때, 복붙 대신 함수 호출로 재사용하기 위해서입니다.",
+        "explanation": "`def calculate_bonus(salary):`로 함수를 정의합니다.\n보너스 계산 규칙을 이름 붙여 재사용할 수 있게 만듭니다.",
         "highlight": [
           3
         ],
-        "visualizationType": "python"
+        "visualizationType": "python",
+        "keyInsightTitle": "핵심",
+        "keyInsight": "함수는 같은 계산을 여러 번 쓸 때 만든다."
       },
       {
         "line": 7,
         "title": "Step 5: 함수 호출",
-        "explanation": "`calculate_bonus(5000000)`는 **함수를 실제로 실행**합니다.\n\n**동작 과정**:\n1. 함수 호출: salary = 5000000으로 설정\n2. 4번 줄 실행: bonus = 5000000 * 0.1 = 500000\n3. 5번 줄 실행: return 500000\n4. 반환값 500000이 my_bonus에 저장됨\n\n**함수의 장점**: 다른 급여(3000000, 7000000)로도 재사용 가능합니다.",
+        "explanation": "`calculate_bonus(5000000)`로 함수를 호출합니다.\n이때 5000000이 `salary` 자리에 들어가 계산이 시작됩니다.",
         "highlight": [
           7
         ],
@@ -61,12 +65,14 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "함수는 호출해야 실제로 실행된다."
       },
       {
         "line": 4,
         "title": "Step 3: 보너스 계산",
-        "explanation": "`bonus = salary * 0.1`은 **급여의 10%를 보너스로 계산**합니다.\n\n**아직 실행 안 됨**: 함수는 정의만 되었고, 7번 줄에서 호출될 때 실행됩니다.\n\n**예시**: salary=5000000이면 → bonus = 500000",
+        "explanation": "`bonus = salary * 0.1`로 급여의 10%를 계산합니다.\n이 줄은 함수가 호출된 순간에 실행됩니다.",
         "highlight": [
           4
         ],
@@ -87,12 +93,14 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "함수 본문은 호출 시점에 실행된다."
       },
       {
         "line": 5,
         "title": "Step 4: 결과 반환",
-        "explanation": "`return bonus`는 **계산한 보너스를 함수 호출한 곳으로 돌려줍니다**.\n\n**return의 역할**:\n- 함수 실행 종료\n- 값을 호출한 곳으로 반환\n\n**실무 예시**: `calculate_bonus(5000000)` → 500000 반환",
+        "explanation": "`return bonus`는 계산 결과를 돌려줍니다.\n반환값이 있어야 함수 바깥에서 그 결과를 다시 쓸 수 있습니다.",
         "highlight": [
           5
         ],
@@ -106,12 +114,14 @@
               "pyId": "5001"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`return`은 결과를 호출한 곳으로 돌려준다."
       },
       {
         "line": 8,
         "title": "Step 6: f-string으로 출력",
-        "explanation": "`f\"보너스: {my_bonus}원\"`은 **f-string** (formatted string)입니다.\n\n**동작**:\n- `{my_bonus}` 부분에 변수 값(500000)이 들어갑니다.\n- 최종 출력: \"보너스: 500000원\"\n\n**왜 f-string을 쓸까?**\n- \"보너스: \" + str(my_bonus) + \"원\" (복잡)\n- f\"보너스: {my_bonus}원\" (간결)\n\n**실무 활용**: 로그 메시지, 보고서 텍스트 생성에 많이 사용합니다.",
+        "explanation": "f-string으로 보너스 값을 문장 안에 넣어 출력합니다.\n문자열과 변수를 함께 보여 줄 때 가장 읽기 쉬운 방식입니다.",
         "highlight": [
           8
         ],
@@ -134,7 +144,9 @@
           "output": [
             "보너스: 500000.0원"
           ]
-        }
+        },
+        "keyInsightTitle": "결론",
+        "keyInsight": "f-string은 값 삽입이 가장 직관적이다."
       }
     ],
     "deltaFormat": true

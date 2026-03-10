@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "함수 정의",
-        "explanation": "**`def greet(name):`** -- `def` 키워드로 `greet`라는 이름의 함수를 정의합니다.\n\n이 줄이 실행되면 파이썬은 함수의 **코드 블록을 메모리에 등록**합니다. 아직 함수 내부의 코드가 실행되는 것이 아닙니다! 단지 '나중에 호출하면 이 코드를 실행하겠다'는 설계도를 만드는 것입니다.",
+        "explanation": "`def greet(name):`는 `greet` 함수를 정의하는 코드입니다.\n\n이 단계에서는 함수를 만들기만 합니다.\n\n아직 함수 안의 코드는 실행되지 않습니다.",
         "visualizationType": "pythonMemory",
         "code": "def greet(name):",
         "pythonMemoryState": {
@@ -31,63 +31,88 @@
       },
       {
         "title": "함수 호출",
-        "explanation": "**`result = greet(\"Python\")`** -- 정의된 함수 `greet`를 **호출(call)**합니다.\n\n함수 이름 뒤에 괄호 `()`를 붙이면 함수가 실행됩니다. 괄호 안의 `\"Python\"`은 **인자(argument)**로, 함수의 매개변수 `name`에 전달됩니다.",
+        "explanation": "`result = greet(\"Python\")`는 `greet` 함수를 호출합니다.\n\n호출이 시작되면 `global`의 `greet`를 따라 함수 안으로 들어갑니다.\n\n전달한 `\"Python\"`은 함수 프레임에서 `name`이 받습니다.",
         "visualizationType": "pythonMemory",
         "code": "result = greet(\"Python\")",
         "pythonMemoryState": {
           "note": "Line 5 executed",
           "names": [
             {
+              "name": "greet",
+              "scope": "global",
+              "pointsTo": "function1"
+            },
+            {
               "name": "name",
+              "scope": "greet",
               "pointsTo": "str1"
             }
           ],
           "objects": [
             {
-              "id": "str1",
-              "type": "str",
-              "value": "\"Python\"",
+              "id": "function1",
+              "type": "function",
+              "value": "greet",
               "pyId": "1001"
-            }
-          ]
-        }
-      },
-      {
-        "title": "함수 본문",
-        "explanation": "**`message = f\"Hello, {name}!\"`** -- 함수 본문: f-string으로 인사말 문자열을 만듭니다.\n\n이 코드는 `greet()` 함수가 **호출될 때** 실행됩니다. `def`만 실행된 지금 시점에서는 아직 실행되지 않았습니다.",
-        "visualizationType": "pythonMemory",
-        "code": "message = f\"Hello, {name}!\"",
-        "pythonMemoryState": {
-          "note": "Line 2 executed",
-          "names": [
-            {
-              "name": "name",
-              "pointsTo": "str1"
             },
-            {
-              "name": "message",
-              "pointsTo": "str2"
-            }
-          ],
-          "objects": [
             {
               "id": "str1",
               "type": "str",
               "value": "\"Python\"",
-              "pyId": "1001"
-            },
-            {
-              "id": "str2",
-              "type": "str",
-              "value": "\"Hello, Python!\"",
               "pyId": "1002"
             }
           ]
         }
       },
       {
+        "title": "함수 본문",
+        "explanation": "`message = f\"Hello, {name}!\"`는 인사말 문자열을 만듭니다.\n\n이 줄은 `greet()` 함수 프레임 안에서 실행됩니다.",
+        "visualizationType": "pythonMemory",
+        "code": "message = f\"Hello, {name}!\"",
+        "pythonMemoryState": {
+          "note": "Line 2 executed",
+          "names": [
+            {
+              "name": "greet",
+              "scope": "global",
+              "pointsTo": "function1"
+            },
+            {
+              "name": "name",
+              "scope": "greet",
+              "pointsTo": "str1"
+            },
+            {
+              "name": "message",
+              "scope": "greet",
+              "pointsTo": "str2"
+            }
+          ],
+          "objects": [
+            {
+              "id": "function1",
+              "type": "function",
+              "value": "greet",
+              "pyId": "1001"
+            },
+            {
+              "id": "str1",
+              "type": "str",
+              "value": "\"Python\"",
+              "pyId": "1002"
+            },
+            {
+              "id": "str2",
+              "type": "str",
+              "value": "\"Hello, Python!\"",
+              "pyId": "1003"
+            }
+          ]
+        }
+      },
+      {
         "title": "return 문",
-        "explanation": "**`return message`** -- 함수의 결과값을 호출한 곳으로 **반환(return)**합니다.\n\n`return`이 실행되면 두 가지 일이 일어납니다:\n1. `message`가 가리키는 값(`\"Hello, Python!\"`)을 **호출한 곳으로 전달**합니다\n2. 함수의 실행이 **즉시 종료**됩니다 (return 아래에 코드가 있어도 실행 안 됨)",
+        "explanation": "`return message`는 함수의 결과를 바깥으로 돌려줍니다.\n\n여기서는 `\"Hello, Python!\"`이 반환됩니다.\n\n`return`을 만나면 함수는 바로 끝납니다.",
         "visualizationType": "pythonMemory",
         "code": "return message",
         "pythonMemoryState": {
@@ -120,7 +145,7 @@
       },
       {
         "title": "결과 출력",
-        "explanation": "**`print(f\"결과: {result}\")`** -- 함수의 반환값이 담긴 `result`를 f-string으로 출력합니다.\n\n`result`는 `greet(\"Python\")`의 반환값인 `\"Hello, Python!\"`을 가리키고 있습니다. f-string이 이 값을 삽입하여 `\"결과: Hello, Python!\"`을 출력합니다.",
+        "explanation": "`print(f\"결과: {result}\")`는 `result`에 들어 있는 값을 출력합니다.\n\n`result`에는 함수가 돌려준 문자열이 들어 있습니다.\n\n그래서 `결과: Hello, Python!`가 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"결과: {result}\")",
         "pythonMemoryState": {
@@ -157,6 +182,16 @@
     ],
     "deltaFormat": true
   },
-  "quiz": null,
-  "keyTakeaway": ""
+  "quiz": {
+    "question": "다음 중 함수 호출의 결과가 `result`에 저장되는 코드는?",
+    "options": [
+      "def greet(name):",
+      "message = f\"Hello, {name}!\"",
+      "result = greet(\"Python\")",
+      "print(f\"결과: {result}\")"
+    ],
+    "correctIndex": 2,
+    "explanation": "`result = greet(\"Python\")`는 함수를 실제로 호출하는 코드입니다.\n함수 안에서 `return`한 값이 호출한 자리로 돌아와 `result`에 저장됩니다."
+  },
+  "keyTakeaway": "함수는 `def`로 정의하고, 호출하면 `return` 값이 바깥으로 돌아온다."
 }

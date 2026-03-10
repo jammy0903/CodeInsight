@@ -54,7 +54,7 @@ interface PlaygroundState {
 // 기본 코드
 // ============================================================
 
-const DEFAULT_C_CODE = `#include <stdio.h>
+const LEGACY_DEFAULT_C_CODE = `#include <stdio.h>
 
 void swap(int *a, int *b) {
     int temp = *a;
@@ -71,7 +71,7 @@ int main() {
     return 0;
 }`;
 
-const DEFAULT_PYTHON_CODE = `# 불변 타입 - 참조가 복사되지 않음
+const LEGACY_DEFAULT_PYTHON_CODE = `# 불변 타입 - 참조가 복사되지 않음
 x = 42
 y = x
 x = 100
@@ -102,7 +102,7 @@ z = y
 w = numbers
 `;
 
-const DEFAULT_JAVA_CODE = `import java.util.Scanner;
+const LEGACY_DEFAULT_JAVA_CODE = `import java.util.Scanner;
 
 /**
  * 간단한 은행 계좌 클래스
@@ -165,7 +165,7 @@ public class Main {
     }
 }`;
 
-const DEFAULT_CPP_CODE = `#include <iostream>
+const LEGACY_DEFAULT_CPP_CODE = `#include <iostream>
 #include <vector>
 #include <string>
 #include <memory>
@@ -186,7 +186,7 @@ int main() {
     return 0;
 }`;
 
-const DEFAULT_JAVASCRIPT_CODE = `/**
+const LEGACY_DEFAULT_JAVASCRIPT_CODE = `/**
  * 간단한 은행 계좌 클래스
  */
 class BankAccount {
@@ -241,6 +241,147 @@ myAccount.withdraw(60000); // 잔액 부족 테스트
 myAccount.showInfo();
 `;
 
+const DEFAULT_C_CODE = `#include <stdio.h>
+#include <stdlib.h>
+
+void update(int *valuePtr, int *heapPtr) {
+    int local = 3;
+    *valuePtr += local;
+    *heapPtr = *valuePtr * 2;
+    printf("inside: %d %d\\n", *valuePtr, *heapPtr);
+}
+
+int main() {
+    int x = 5;
+    int *ptr = &x;
+    int *heapValue = malloc(sizeof(int));
+    *heapValue = 10;
+
+    update(ptr, heapValue);
+    printf("main: %d %d\\n", x, *heapValue);
+
+    free(heapValue);
+    return 0;
+}`;
+
+const DEFAULT_PYTHON_CODE = `def update(items, label):
+    alias = items
+    alias.append(label)
+    print("inside", alias, id(alias))
+
+numbers = [1, 2]
+other = numbers
+text = "Py"
+count = 10
+same_count = count
+
+update(numbers, text)
+print(other, id(numbers), id(other))
+print(count, same_count)
+`;
+
+const DEFAULT_JAVA_CODE = `class Box {
+    String name;
+    int value;
+
+    Box(String name, int value) {
+        this.name = name;
+        this.value = value;
+    }
+}
+
+public class Main {
+    static void update(Box box, int[] numbers) {
+        Box alias = box;
+        alias.value += numbers[0];
+        numbers[1] = alias.value;
+        System.out.println(alias.name + " " + alias.value);
+    }
+
+    public static void main(String[] args) {
+        String label = "box";
+        Box box = new Box(label, 10);
+        Box same = box;
+        int[] numbers = {1, 2};
+
+        update(same, numbers);
+        System.out.println(box.value + " " + numbers[1]);
+    }
+}`;
+
+const DEFAULT_CPP_CODE = `#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
+
+void grow(std::vector<int>& nums, std::unique_ptr<int>& heapValue) {
+    int local = nums[0];
+    nums.push_back(local + 2);
+    *heapValue += nums.back();
+    std::cout << "inside: " << *heapValue << "\\n";
+}
+
+int main() {
+    int x = 5;
+    int& ref = x;
+    std::vector<int> nums = {1, 2};
+    std::string label = "cpp";
+    auto heapValue = std::make_unique<int>(10);
+
+    grow(nums, heapValue);
+    ref += nums[1];
+
+    std::cout << label << " " << x << " " << nums.size() << " " << *heapValue << "\\n";
+    return 0;
+}`;
+
+const DEFAULT_JAVASCRIPT_CODE = `function update(user, numbers) {
+  const alias = user;
+  alias.score += numbers[0];
+  numbers.push(alias.score);
+  console.log(alias.name, alias.score);
+}
+
+const user = { name: "Ada", score: 10 };
+const sameUser = user;
+const numbers = [1, 2];
+
+update(sameUser, numbers);
+console.log(user.score, numbers.length);
+`;
+
+const DEFAULT_PYTHON_PRACTICAL_CODE = `rows = [
+    {"name": "Ada", "score": 91},
+    {"name": "Lin", "score": 84},
+]
+
+passed = []
+
+for row in rows:
+    if row["score"] >= 90:
+        passed.append(row["name"])
+
+print(passed)
+`;
+
+const DEFAULT_CODES: Record<SupportedLanguage, string> = {
+  c: DEFAULT_C_CODE,
+  cpp: DEFAULT_CPP_CODE,
+  python: DEFAULT_PYTHON_CODE,
+  java: DEFAULT_JAVA_CODE,
+  javascript: DEFAULT_JAVASCRIPT_CODE,
+  'python-practical': DEFAULT_PYTHON_PRACTICAL_CODE,
+};
+
+const LEGACY_DEFAULT_CODES: Record<SupportedLanguage, string> = {
+  c: LEGACY_DEFAULT_C_CODE,
+  cpp: LEGACY_DEFAULT_CPP_CODE,
+  python: LEGACY_DEFAULT_PYTHON_CODE,
+  java: LEGACY_DEFAULT_JAVA_CODE,
+  javascript: LEGACY_DEFAULT_JAVASCRIPT_CODE,
+  'python-practical': LEGACY_DEFAULT_PYTHON_CODE,
+};
+
 // ============================================================
 // 스토어 생성
 // ============================================================
@@ -264,14 +405,7 @@ export const usePlaygroundStore = create<PlaygroundState>()(
       },
 
       // === 코드 (언어별 분리) ===
-      codes: {
-        c: DEFAULT_C_CODE,
-        cpp: DEFAULT_CPP_CODE,
-        python: DEFAULT_PYTHON_CODE,
-        java: DEFAULT_JAVA_CODE,
-        javascript: DEFAULT_JAVASCRIPT_CODE,
-        'python-practical': DEFAULT_PYTHON_CODE,
-      },
+      codes: { ...DEFAULT_CODES },
       setCode: (code) => {
         const { language, codes } = get();
         set({
@@ -340,6 +474,30 @@ export const usePlaygroundStore = create<PlaygroundState>()(
     }),
     {
       name: 'codeinsight-playground',
+      version: 2,
+      migrate: (persistedState: unknown) => {
+        if (!persistedState || typeof persistedState !== 'object') return persistedState;
+
+        const state = persistedState as {
+          codes?: Partial<Record<SupportedLanguage, string>>;
+        };
+
+        const nextCodes: Record<SupportedLanguage, string> = { ...DEFAULT_CODES };
+
+        (Object.keys(DEFAULT_CODES) as SupportedLanguage[]).forEach((language) => {
+          const saved = state.codes?.[language];
+          if (!saved || saved === LEGACY_DEFAULT_CODES[language]) {
+            nextCodes[language] = DEFAULT_CODES[language];
+            return;
+          }
+          nextCodes[language] = saved;
+        });
+
+        return {
+          ...state,
+          codes: nextCodes,
+        };
+      },
       partialize: (state) => ({
         codes: state.codes,
         stdins: state.stdins,

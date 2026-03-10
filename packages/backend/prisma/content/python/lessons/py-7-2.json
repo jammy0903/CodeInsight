@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "객체 생성",
-        "explanation": "**`a = [1, 2, 3]`**\n\nPython이 메모리(0x2000)에 **리스트 객체 `[1, 2, 3]`**을 새로 만들고, 변수 `a`가 이 객체를 가리키도록 합니다.",
+        "explanation": "`a = [1, 2, 3]`은 리스트를 만들고 `a`가 가리키게 합니다.",
         "visualizationType": "pythonMemory",
         "code": "a = [1, 2, 3]",
         "pythonMemoryState": {
@@ -33,7 +33,9 @@
       },
       {
         "title": "별칭(참조) 생성",
-        "explanation": "**`b = a`**\n\n변수 `b`가 `a`와 **같은 객체(0x2000)**를 가리키도록 연결합니다.\n이것을 **별칭(alias)**이라고 합니다.",
+        "explanation": "`b = a`는 같은 객체를 함께 가리키게 합니다.\n\n이것을 `별칭(alias)`이라고 합니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "별칭은 같은 객체를 가리키는 다른 이름이다.",
         "visualizationType": "pythonMemory",
         "code": "b = a  # 같은 객체",
         "pythonMemoryState": {
@@ -53,7 +55,7 @@
       },
       {
         "title": "삭제 전 상태 확인",
-        "explanation": "**`print(f\"b 삭제 전: {a}\")`**\n\n`del b`를 실행하기 **전**의 상태를 미리 확인합니다.\n`a`를 통해 리스트 객체에 정상적으로 접근할 수 있음을 보여줍니다.",
+        "explanation": "`print(f\"b 삭제 전: {a}\")`는 삭제 전 상태를 보여줍니다.\n\n`a`로는 아직 정상 접근이 됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"b 삭제 전: {a}\")",
         "pythonMemoryState": {
@@ -76,7 +78,9 @@
       },
       {
         "title": "참조 삭제 (del)",
-        "explanation": "**`del b`**\n\n이 레슨의 **핵심 포인트**입니다!\n`del b`는 변수 `b`라는 **이름(참조) 자체**를 Python의 네임스페이스에서 완전히 제거합니다.",
+        "explanation": "`del b`는 객체를 지우는 것이 아니라 이름 `b`를 지웁니다.\n\n객체는 다른 참조가 남아 있으면 계속 살아 있습니다.",
+        "keyInsightTitle": "핵심",
+        "keyInsight": "del은 객체보다 이름을 지운다.",
         "visualizationType": "pythonMemory",
         "code": "del b  # b 참조만 삭제!",
         "pythonMemoryState": {
@@ -99,7 +103,7 @@
       },
       {
         "title": "객체 생존 확인",
-        "explanation": "**`print(f\"a는 여전히: {a}\")`**\n\n`del b` 이후에도 `a`가 여전히 리스트에 접근할 수 있음을 **증명**합니다.",
+        "explanation": "`print(f\"a는 여전히: {a}\")`는 객체가 아직 남아 있음을 보여줍니다.\n\n`a`가 계속 참조하고 있기 때문입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"a는 여전히: {a}\")",
         "pythonMemoryState": {
@@ -127,7 +131,7 @@
       },
       {
         "title": "에러 발생 시도 (try)",
-        "explanation": "**`try:`**\n\n`try...except` 구문으로 **예외 처리**를 시작합니다.\n왜 예외 처리가 필요한가? `del b`로 변수 `b`가 완전히 삭제되었으므로, `b`를 사용하면 에러가 발생하기 때문입니다.",
+        "explanation": "`try:`는 에러가 날 수 있는 코드를 감싸는 시작점입니다.\n\n이제 삭제된 `b`를 써볼 것입니다.",
         "visualizationType": "pythonMemory",
         "code": "try:",
         "pythonMemoryState": {
@@ -150,7 +154,7 @@
       },
       {
         "title": "NameError 발생",
-        "explanation": "**`print(b)`**\n\n삭제된 변수 `b`를 사용하려고 시도합니다.\nPython은 `b`라는 이름을 네임스페이스에서 찾지만, `del b`로 이미 제거되었으므로 찾을 수 없습니다!",
+        "explanation": "`print(b)`는 삭제된 이름 `b`를 쓰려는 시도입니다.\n\n그래서 `NameError`가 납니다.",
         "visualizationType": "pythonMemory",
         "code": "print(b)  # NameError!",
         "pythonMemoryState": {
@@ -173,7 +177,7 @@
       },
       {
         "title": "에러 잡기 (except)",
-        "explanation": "**`except NameError:`**\n\ntry 블록에서 **`NameError`** 예외가 발생했으므로, Python은 이 except 블록으로 제어를 넘깁니다.",
+        "explanation": "`except NameError:`는 방금 난 에러를 잡는 부분입니다.",
         "visualizationType": "pythonMemory",
         "code": "except NameError:",
         "pythonMemoryState": {
@@ -196,7 +200,7 @@
       },
       {
         "title": "에러 처리 메시지 출력",
-        "explanation": "**`print(\"b는 더 이상 존재하지 않음\")`**\n\nexcept 블록 안의 코드가 실행되어, `b`가 더 이상 존재하지 않는다는 메시지를 출력합니다.",
+        "explanation": "에러를 잡았기 때문에 이 메시지가 출력됩니다.\n\n`b`라는 이름은 이제 없습니다.",
         "visualizationType": "pythonMemory",
         "code": "print(\"b는 더 이상 존재하지 않음\")",
         "pythonMemoryState": {

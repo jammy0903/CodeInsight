@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "변수 준비",
-        "explanation": "**`name = \"Alice\"`**\n**`age = 25`**\n\nPython은 위에서 아래로 순서대로 실행됩니다. 문자열 포맷팅에 사용할 두 변수를 생성합니다.",
+        "explanation": "포맷팅에 쓸 `name`과 `age`를 준비합니다.\n이 값들이 문자열 안에 들어갈 예정입니다.",
         "visualizationType": "pythonMemory",
         "code": "age = 25",
         "pythonMemoryState": {
@@ -39,11 +39,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "포맷팅은 값을 문장 안에 넣는 작업이다."
       },
       {
         "title": "f-string으로 변수 삽입",
-        "explanation": "**f-string**은 문자열 안에 변수를 바로 삽입하는 가장 읽기 쉬운 방법입니다.\n\n형태:\n- `f\"... {expr} ...\"`\n\n여기서 `{ }` 안은 단순 변수뿐 아니라 표현식도 가능합니다.\n예: `{price * qty}`\n\n**비유**: 문장 템플릿의 빈칸에 값을 즉시 채워 넣는 방식입니다.\n\n장점:\n- `+` 연결이나 `.format()`보다 짧고 직관적\n- 출력문/로그문 가독성이 크게 좋아짐\n\n주의:\n- 접두사 `f`를 빼면 치환되지 않고 그대로 출력됩니다",
+        "explanation": "f-string은 문자열 안에 변수를 바로 넣는 방법입니다.\n읽기 쉽고 가장 자주 쓰입니다.",
         "visualizationType": "pythonMemory",
         "code": "greeting = f\"Hello, {name}! You are {age} years old.\"",
         "pythonMemoryState": {
@@ -85,11 +87,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "f-string은 가장 직관적인 포맷팅이다."
       },
       {
         "title": "f-string 결과 출력",
-        "explanation": "**`print(greeting)`** -- `greeting`이 가리키는 문자열 `\"Hello, Alice! You are 25 years old.\"`를 출력합니다.\n\n`{name}`이 `\"Alice\"`로, `{age}`가 `\"25\"`로 치환된 결과를 확인할 수 있습니다. f-string은 실행 시점에 변수값을 읽어오므로, 변수를 나중에 변경해도 이미 만들어진 문자열에는 영향이 없습니다.",
+        "explanation": "만들어진 f-string 결과를 출력합니다.\n중괄호 안 값이 실제 값으로 바뀐 것을 볼 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "print(greeting)",
         "pythonMemoryState": {
@@ -133,11 +137,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "중괄호 안 표현식이 값으로 치환된다."
       },
       {
         "title": "f-string 포맷 지정자 (소수점 자릿수)",
-        "explanation": "**f-string 포맷 지정자**를 쓰면 숫자/날짜 표현을 원하는 형태로 고정할 수 있습니다.\n\n예: `{price:.2f}` → 소수점 둘째 자리까지 표시\n\n핵심 효과:\n- 출력 일관성 확보\n- 사용자 화면/로그 가독성 개선\n\n**비유**: 금액 표기에서 자리수와 콤마 규칙을 맞춰 보고서 품질을 올리는 작업입니다.\n\n실무에서 포맷 지정은 \"계산\"이 아니라 \"표현 품질\"을 담당합니다.",
+        "explanation": "`{pi:.2f}`처럼 포맷 지정자를 쓰면 표시 형식을 고정할 수 있습니다.\n여기서는 소수점 둘째 자리까지 보여 줍니다.",
         "visualizationType": "pythonMemory",
         "code": "formatted = f\"Pi is {pi:.2f}\"",
         "pythonMemoryState": {
@@ -201,11 +207,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "포맷 지정자는 표시 모양을 정한다."
       },
       {
         "title": ".format() 메서드",
-        "explanation": "**`template = \"Name: {}, Age: {}\".format(name, age)`** -- f-string 이전(Python 2.6+)부터 사용된 문자열 포맷팅 방법입니다.\n\n**format() 메서드의 동작 과정:**\n1. 문자열 안의 `{}`가 **자리표시자(placeholder)** 역할을 합니다\n2. `.format()`에 전달된 인자가 `{}`에 **순서대로** 삽입됩니다\n3. 첫 번째 `{}` → `name` = `\"Alice\"` 삽입\n4. 두 번째 `{}` → `age` = `25` → `\"25\"`로 변환 후 삽입\n5. 결과: `\"Name: Alice, Age: 25\"`\n\n**비유:** 빈칸 채우기 시험지(template)와 같습니다. `{}`가 빈칸이고, `.format()`의 인자가 답안입니다. 첫 번째 답은 첫 번째 빈칸에, 두 번째 답은 두 번째 빈칸에 들어갑니다.\n\n**주의:** `{}`의 개수와 `.format()` 인자의 개수가 맞지 않으면 `IndexError`가 발생합니다!",
+        "explanation": "`.format()`은 f-string 이전부터 쓰던 방법입니다.\n문자열 안의 `{}`에 값을 순서대로 넣습니다.",
         "visualizationType": "pythonMemory",
         "code": "template = \"Name: {}, Age: {}\".format(name, age)",
         "pythonMemoryState": {
@@ -279,11 +287,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "`.format()`은 빈칸 채우기 방식이다."
       },
       {
         "title": "최종 결과 출력",
-        "explanation": "**`print(template)`** -- `.format()` 메서드로 생성된 문자열 `\"Name: Alice, Age: 25\"`를 출력합니다.\n\n**Python 문자열 포맷팅의 역사와 3가지 방법을 정리합시다:**",
+        "explanation": "최종 포맷 문자열을 출력합니다.\n지금은 보통 f-string을 가장 많이 씁니다.",
         "visualizationType": "pythonMemory",
         "code": "print(template)",
         "pythonMemoryState": {
@@ -357,7 +367,9 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "결론",
+        "keyInsight": "지금은 보통 f-string을 먼저 쓴다."
       }
     ],
     "deltaFormat": true

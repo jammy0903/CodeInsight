@@ -8,7 +8,7 @@
       {
         "line": 1,
         "title": "Step 1: python-pptx 불러오기",
-        "explanation": "`python-pptx`는 **PowerPoint 파일을 생성/수정**하는 라이브러리입니다.\n\n**주요 기능**:\n- 슬라이드 추가/삭제\n- 텍스트, 이미지, 표, 차트 삽입\n- 레이아웃 설정\n\n**실무 활용**: 매주 똑같은 형식의 보고서 PPT 자동 생성",
+        "explanation": "`python-pptx`를 불러옵니다.\n이 라이브러리로 PPT 파일과 슬라이드를 코드로 만들 수 있습니다.",
         "highlight": [
           1
         ],
@@ -16,21 +16,25 @@
         "pythonMemoryState": {
           "names": [],
           "objects": []
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "python-pptx는 PPT 자동화 도구다."
       },
       {
         "line": 2,
         "title": "Step 2: 단위 도구 불러오기",
-        "explanation": "`Inches`, `Pt`는 **크기와 위치를 지정**하는 단위입니다.\n\n**Inches**: 인치 단위 (1 inch = 2.54cm)\n**Pt**: 포인트 단위 (글꼴 크기 등)\n\n**왜 필요한가?** 이미지 크기, 텍스트 위치 등을 지정할 때 사용합니다.\n\n**예시**: `Inches(2)` = 2인치, `Pt(18)` = 18포인트",
+        "explanation": "`Inches`, `Pt` 같은 단위 도구를 가져옵니다.\n슬라이드 안의 위치와 크기를 숫자로 정확히 지정할 때 씁니다.",
         "highlight": [
           2
         ],
-        "visualizationType": "python"
+        "visualizationType": "python",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "PPT 객체는 위치와 크기를 단위로 지정한다."
       },
       {
         "line": 4,
         "title": "Step 3: 새 프레젠테이션 생성",
-        "explanation": "`Presentation()`으로 **빈 PowerPoint 파일**을 메모리에 생성합니다.\n\n**Presentation**: PPT 파일 전체\n**Slide**: 개별 슬라이드\n\n**아직 빈 PPT**: 슬라이드가 하나도 없습니다.\n5번 줄에서 추가합니다.",
+        "explanation": "`Presentation()`으로 빈 프레젠테이션을 만듭니다.\n이제 여기에 슬라이드를 하나씩 추가할 수 있습니다.",
         "highlight": [
           4
         ],
@@ -51,12 +55,14 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "Presentation은 PPT 파일 전체다."
       },
       {
         "line": 5,
         "title": "Step 4: 슬라이드 추가",
-        "explanation": "`prs.slides.add_slide(prs.slide_layouts[0])`로 **새 슬라이드를 추가**합니다.\n\n**slide_layouts[0]**: 제목 슬라이드 레이아웃\n- [0]: 제목 + 부제목\n- [1]: 제목 + 내용\n- [5]: 빈 슬라이드\n\n**레이아웃이 뭐야?** PowerPoint 템플릿의 '슬라이드 레이아웃'과 동일합니다.",
+        "explanation": "레이아웃을 골라 새 슬라이드를 추가합니다.\n레이아웃은 제목 슬라이드, 본문 슬라이드 같은 기본 틀입니다.",
         "highlight": [
           5
         ],
@@ -87,12 +93,14 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "슬라이드는 레이아웃을 골라 추가한다."
       },
       {
         "line": 6,
         "title": "Step 5: 제목 영역 가져오기",
-        "explanation": "`slide.shapes.title`로 **제목 텍스트 박스**를 가져옵니다.\n\n**shapes**: 슬라이드의 모든 도형(텍스트 박스, 이미지 등)\n**title**: 제목 전용 도형\n\n**왜 따로 가져올까?** 제목은 고정 위치에 있으므로 쉽게 접근할 수 있습니다.",
+        "explanation": "`slide.shapes.title`로 제목 영역을 가져옵니다.\n레이아웃이 정해 둔 자리라서 쉽게 접근할 수 있습니다.",
         "highlight": [
           6
         ],
@@ -133,12 +141,14 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "레이아웃이 있으면 제목 영역 접근이 쉽다."
       },
       {
         "line": 7,
         "title": "Step 6: 제목 텍스트 설정",
-        "explanation": "`title.text = 'Weekly Report'`로 **제목 내용을 설정**합니다.\n\n**결과**: 슬라이드 상단에 'Weekly Report' 표시\n\n**실무 활용**: 날짜 자동 삽입\n```python\nfrom datetime import datetime\ntitle.text = f'Weekly Report - {datetime.now():%Y.%m.%d}'\n```",
+        "explanation": "`title.text`에 제목을 넣습니다.\n이 값이 슬라이드 상단 제목으로 바로 보이게 됩니다.",
         "highlight": [
           7
         ],
@@ -164,12 +174,14 @@
               "pyId": "5003"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "텍스트 설정은 `.text` 속성으로 한다."
       },
       {
         "line": 8,
         "title": "Step 7: 부제목 영역 가져오기",
-        "explanation": "`slide.placeholders[1]`로 **부제목 텍스트 박스**를 가져옵니다.\n\n**placeholders**: 레이아웃의 고정 위치 도형들\n- [0]: 제목\n- [1]: 부제목 또는 본문\n\n**레이아웃마다 다름**: slide_layouts[1]은 [1]이 본문 영역입니다.",
+        "explanation": "부제목 placeholder를 가져옵니다.\n제목 아래의 본문이나 부제목 칸을 다루는 단계입니다.",
         "highlight": [
           8
         ],
@@ -220,12 +232,14 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "placeholders는 레이아웃의 고정 영역이다."
       },
       {
         "line": 9,
         "title": "Step 8: 부제목 텍스트 설정",
-        "explanation": "`subtitle.text = 'Sales Summary'`로 **부제목 내용을 설정**합니다.\n\n**결과**: 제목 아래에 'Sales Summary' 표시",
+        "explanation": "부제목 텍스트도 설정합니다.\n제목과 부제목이 함께 들어가면 기본 표지 슬라이드가 완성됩니다.",
         "highlight": [
           9
         ],
@@ -257,16 +271,20 @@
               "pyId": "5004"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "제목과 부제목을 채우면 표지 슬라이드가 된다."
       },
       {
         "line": 10,
         "title": "Step 9: PPT 저장",
-        "explanation": "`prs.save('weekly_report.pptx')`로 **PowerPoint 파일을 저장**합니다.\n\n**결과**: weekly_report.pptx 파일 생성\n- 슬라이드 1개\n- 제목: 'Weekly Report'\n- 부제목: 'Sales Summary'\n\n**실무 팁**: 파일명에 날짜 넣기 → `f'report_{datetime.now():%Y%m%d}.pptx'`",
+        "explanation": "`prs.save()`로 PPT 파일을 저장합니다.\n메모리에서 만든 슬라이드 구성이 실제 `.pptx` 파일이 됩니다.",
         "highlight": [
           10
         ],
-        "visualizationType": "python"
+        "visualizationType": "python",
+        "keyInsightTitle": "결론",
+        "keyInsight": "Presentation도 save() 해야 파일이 된다."
       }
     ],
     "deltaFormat": true

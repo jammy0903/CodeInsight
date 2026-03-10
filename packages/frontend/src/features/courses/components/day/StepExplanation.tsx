@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface StepExplanationProps {
   explanation: string;
   stepIndex: number;
+  keyInsight?: string;
+  keyInsightTitle?: string;
   illustrations?: Array<{
     src: string;
     alt?: string;
@@ -150,7 +152,13 @@ function parseExplanationBlocks(text: string): ExplanationBlock[] {
   return blocks.length > 0 ? blocks : [{ kind: 'text', content: text }];
 }
 
-export function StepExplanation({ explanation, stepIndex, illustrations }: StepExplanationProps) {
+export function StepExplanation({
+  explanation,
+  stepIndex,
+  keyInsight,
+  keyInsightTitle,
+  illustrations,
+}: StepExplanationProps) {
   const blocks = parseExplanationBlocks(explanation || '');
 
   return (
@@ -182,6 +190,19 @@ export function StepExplanation({ explanation, stepIndex, illustrations }: StepE
           }
           return <div key={`text-${idx}`}>{formatExplanation(block.content)}</div>;
         })}
+        {keyInsight && (
+          <div
+            className="mt-4 rounded-xl border px-4 py-3 text-[0.92em]"
+            style={{
+              background: '#f8f1e8',
+              borderColor: '#d6b899',
+              color: '#5a3f2a',
+            }}
+          >
+            <p className="font-bold text-amber-800">{keyInsightTitle || '핵심'}</p>
+            <div className="mt-1">{formatExplanation(keyInsight)}</div>
+          </div>
+        )}
         {Array.isArray(illustrations) && illustrations.length > 0 && (
           <div className="mt-4 space-y-3">
             {illustrations.map((item, idx) => (
