@@ -7,7 +7,9 @@
     "steps": [
       {
         "title": "제너레이터 함수 정의",
-        "explanation": "**`def counter_generator(start, end):`**\n\n`yield` 키워드가 포함된 함수를 정의합니다. Python은 함수 본문에 `yield`가 있으면 이 함수를 **제너레이터 함수**로 인식합니다.",
+        "explanation": "`def counter_generator(start, end):`는 제너레이터 함수를 정의합니다.\n\n`yield`가 있으면 제너레이터 함수가 됩니다.",
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`yield`가 있으면 함수는 제너레이터가 된다.",
         "visualizationType": "pythonMemory",
         "code": "def counter_generator(start, end):",
         "highlightOffset": [
@@ -42,7 +44,9 @@
       },
       {
         "title": "제너레이터 객체 생성",
-        "explanation": "**`counter = counter_generator(0, 3)`**\n\n제너레이터 함수를 호출합니다. **그런데 놀라운 일이 벌어집니다!**\n함수 안의 코드가 전혀 실행되지 않고, 대신 **제너레이터 객체**만 생성되어 반환됩니다.",
+        "explanation": "`counter = counter_generator(0, 3)`는 제너레이터 객체를 만듭니다.\n\n이 시점에는 함수 본문이 아직 실행되지 않습니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "제너레이터 호출 직후에는 객체만 만들어진다.",
         "visualizationType": "pythonMemory",
         "code": "counter = counter_generator(0, 3)",
         "pythonMemoryState": {
@@ -67,7 +71,7 @@
       },
       {
         "title": "타입 확인",
-        "explanation": "**`print(type(counter))`**\n\ncounter의 타입을 확인합니다. 출력 결과는 `<class 'generator'>` -- **제너레이터 객체**입니다!\n\n**타입을 확인해보면 더 확실해집니다:**\n- 일반 함수 호출 결과: `int`, `str`, `list` 등 실제 값\n- 제너레이터 함수 호출 결과: `generator` 객체 (값이 아님!)\n\n**제너레이터 객체는 이터레이터입니다!**\n`__iter__`와 `__next__` 메서드가 자동으로 구현되어 있으므로, for 루프에서 바로 사용할 수 있습니다.\n이전 레슨에서 Counter 클래스에 직접 구현했던 것을 Python이 자동으로 해줍니다!\n\n**왜 이 순서인가?** 제너레이터 함수 호출의 결과가 값이 아닌 객체임을 확인하는 교육적 단계입니다.\n\n**실행 순서**: type(counter) 호출 → 'generator' 타입 확인 → 출력",
+        "explanation": "`print(type(counter))`는 타입을 확인합니다.\n\n결과는 `<class 'generator'>`입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(type(counter))",
         "pythonMemoryState": {
@@ -93,7 +97,7 @@
       },
       {
         "title": "for 루프 시작",
-        "explanation": "**`for num in counter:`**\n\nfor 루프가 제너레이터 객체를 순회하기 시작합니다!\n\n**여기서 이전 레슨과의 연결고리가 보입니다:**\nfor 루프는 이터레이터 프로토콜을 사용합니다:\n1. `counter.__iter__()` 호출 → 자기 자신 반환 (제너레이터는 이터레이터이기도 함)\n2. `counter.__next__()` 호출 → **이 순간!** 드디어 함수 본문이 실행되기 시작합니다!\n\n**핵심**: for 루프가 __next__를 호출하면, 제너레이터 함수의 코드가 처음부터 실행되기 시작하여 첫 번째 `yield`를 만날 때까지 진행합니다.\n\n**비유**: 손님이 \"첫 번째 요리 주세요\"라고 주문한 것입니다. 이제 요리사가 드디어 조리를 시작합니다!\n\n**왜 이 순서인가?** 제너레이터 객체가 준비되었으니, for 루프로 값을 하나씩 꺼냅니다.\n\n**실행 순서**: counter.__iter__() 호출 → 자기 자신 반환 → __next__() 첫 호출 → 함수 본문 실행 시작!",
+        "explanation": "`for num in counter:`가 시작되면 제너레이터가 값을 꺼내기 시작합니다.\n\n이때부터 함수 본문이 실제로 실행됩니다.",
         "visualizationType": "pythonMemory",
         "code": "for num in counter:",
         "pythonMemoryState": {

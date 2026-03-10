@@ -7,50 +7,58 @@
     "steps": [
       {
         "title": "세트 생성",
-        "explanation": "**`fruits = {\"apple\", \"banana\"}`**\n\n중괄호로 세트 객체를 만듭니다. 세트는 중복 불허·순서 없음·Mutable의 특성을 가집니다. 빈 세트는 `{}` 대신 `set()`으로 만들어야 합니다(`{}`는 딕셔너리).",
+        "explanation": "`fruits = {\"apple\", \"banana\"}`는 세트를 만듭니다.\n\n세트는 중복이 없고 수정할 수 있습니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "세트도 Mutable이라 직접 수정된다.",
         "visualizationType": "terminal",
         "code": "fruits = {\"apple\", \"banana\"}"
       },
       {
         "title": "객체 ID 확인",
-        "explanation": "**`print(f\"id = {id(fruits)}\")`**\n\n세트 객체의 고유 ID를 출력합니다. Mutable 객체는 내용을 변경해도 `id()`가 그대로입니다. 이 값을 수정 후와 비교하여 같은 객체임을 확인합니다.",
+        "explanation": "`id(fruits)`는 세트의 번호를 보여줍니다.\n\n나중에 다시 보고 같은 객체인지 확인합니다.",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(fruits)}\")"
       },
       {
         "title": "요소 추가 (add)",
-        "explanation": "**`fruits.add(\"cherry\")`**\n\n세트에 `\"cherry\"`를 추가합니다. 이미 있는 값을 `add()`해도 에러 없이 무시됩니다. 세트는 중복을 허용하지 않기 때문입니다. 기존 객체를 제자리에서 수정합니다.",
+        "explanation": "`fruits.add(\"cherry\")`는 세트에 값을 추가합니다.\n\n기존 세트를 바로 수정합니다.",
         "visualizationType": "terminal",
         "code": "fruits.add(\"cherry\")"
       },
       {
         "title": "요소 삭제 (discard)",
-        "explanation": "**`fruits.discard(\"banana\")`**\n\n`\"banana\"`를 삭제합니다. `discard()`는 없는 값을 삭제해도 에러 없이 무시합니다. `remove()`는 없는 값 삭제 시 `KeyError`를 발생시키므로, 값이 있는지 확실하지 않을 때는 `discard()`가 더 안전합니다.",
+        "explanation": "`fruits.discard(\"banana\")`는 값을 지웁니다.\n\n없는 값이어도 에러 없이 넘어갑니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "discard는 없는 값이어도 안전하다.",
         "visualizationType": "terminal",
         "code": "fruits.discard(\"banana\")"
       },
       {
         "title": "변경 후 내용 확인",
-        "explanation": "**`print(f\"After changes: {fruits}\")`**\n\n`add(\"cherry\")`와 `discard(\"banana\")` 이후 세트의 현재 내용을 출력합니다. 세트는 순서가 없으므로 출력 순서는 매번 다를 수 있습니다. 이것은 버그가 아닌 정상 동작입니다.",
+        "explanation": "`print(f\"After changes: {fruits}\")`는 바뀐 세트를 출력합니다.\n\n세트는 순서가 없어서 출력 순서는 달라질 수 있습니다.",
         "visualizationType": "terminal",
         "code": "print(f\"After changes: {fruits}\")"
       },
       {
         "title": "ID 불변 확인",
-        "explanation": "**`print(f\"id = {id(fruits)}\")`**\n\n수정 후 `id()`가 처음과 동일합니다. add/remove/discard가 모두 **기존 객체를 제자리에서 수정**하는 Mutable 연산임을 증명합니다.",
+        "explanation": "다시 `id(fruits)`를 출력해도 같은 값입니다.\n\n즉, 같은 세트를 수정한 것입니다.",
+        "keyInsightTitle": "핵심",
+        "keyInsight": "세트도 수정해도 객체 자체는 그대로다.",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(fruits)}\")",
         "occurrence": 2
       },
       {
         "title": "frozenset: 수정 불가능한 세트",
-        "explanation": "**`frozen = frozenset([1, 2, 3])`**\n\n`frozenset`은 세트의 **Immutable 버전**입니다. 읽기 기능(포함 확인, 교집합 등)은 사용 가능하지만 `add`·`remove` 등 수정 메서드가 없습니다. Immutable이므로 딕셔너리 키로 사용할 수 있습니다.",
+        "explanation": "`frozenset([1, 2, 3])`은 수정할 수 없는 세트를 만듭니다.\n\n이것이 `frozenset`입니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "frozenset은 세트의 Immutable 버전이다.",
         "visualizationType": "terminal",
         "code": "frozen = frozenset([1, 2, 3])"
       },
       {
         "title": "frozenset 수정 시도 (에러)",
-        "explanation": "**`# frozen.add(4)  # AttributeError!`**\n\n주석을 해제하면 `AttributeError`가 발생합니다. `frozenset`은 수정 메서드 자체가 없기 때문입니다. 변경 불가가 보장되므로 딕셔너리 키나 세트의 원소로 사용할 수 있습니다.",
+        "explanation": "이 코드는 `frozenset`을 바꾸려는 시도입니다.\n\n하지만 `frozenset`은 수정 메서드가 없습니다.\n\n주석을 풀면 `AttributeError`가 납니다.",
         "visualizationType": "terminal",
         "code": "# frozen.add(4)  # AttributeError!"
       }

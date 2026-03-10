@@ -144,6 +144,16 @@ const StackVariable = memo(function StackVariable({
             {String(variable.value)}
           </span>
         )}
+
+        {variable.address && (
+          <span
+            className="px-1.5 py-0.5 rounded text-[10px] font-mono shrink-0"
+            style={{ backgroundColor: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0' }}
+            title="Variable address"
+          >
+            addr {variable.address}
+          </span>
+        )}
       </div>
 
       {/* struct 멤버 */}

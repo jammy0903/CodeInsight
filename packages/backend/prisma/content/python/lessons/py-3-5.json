@@ -7,56 +7,64 @@
     "steps": [
       {
         "title": "딕셔너리 생성",
-        "explanation": "**`person = {\"name\": \"Alice\", \"age\": 25}`**\n\n두 개의 키-값 쌍을 가진 딕셔너리 객체를 생성합니다. 이 레슨에서는 수정 후에도 `id()`가 변하지 않음을 확인하여 딕셔너리의 **Mutable** 특성을 증명합니다.",
+        "explanation": "`person = {\"name\": \"Alice\", \"age\": 25}`는 딕셔너리를 만듭니다.\n\n이 레슨에서는 수정해도 같은 객체인지 확인합니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "딕셔너리는 수정 가능한 자료형이다.",
         "visualizationType": "terminal",
         "code": "person = {\"name\": \"Alice\", \"age\": 25}"
       },
       {
         "title": "객체 ID 확인",
-        "explanation": "**`print(f\"id = {id(person)}\")`**\n\n`id()`로 딕셔너리 객체의 고유 식별자(메모리 주소)를 출력합니다. 이 값을 수정 후와 비교하여 **같은 객체임을 증명**합니다. Mutable 객체는 수정해도 `id()`가 불변합니다.",
+        "explanation": "`id(person)`은 이 딕셔너리의 번호를 보여줍니다.\n\n나중에 다시 보고 같은 객체인지 확인합니다.",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(person)}\")"
       },
       {
         "title": "기존 키 값 수정",
-        "explanation": "**`person[\"age\"] = 26`**\n\n기존 키 `\"age\"`의 값을 25에서 26으로 수정합니다. 딕셔너리는 Mutable이므로 새 객체를 만들지 않고 기존 객체 내부만 변경합니다. 객체의 `id()`는 변하지 않습니다.",
+        "explanation": "`person[\"age\"] = 26`은 기존 값을 수정합니다.\n\n`age`가 26으로 바뀝니다.",
         "visualizationType": "terminal",
         "code": "person[\"age\"] = 26"
       },
       {
         "title": "새로운 키-값 추가",
-        "explanation": "**`person[\"city\"] = \"Seoul\"`**\n\n없는 키에 할당하면 새 키-값 쌍이 자동으로 추가됩니다. 이 작업 역시 기존 객체(같은 `id()`)를 직접 변경합니다.",
+        "explanation": "`person[\"city\"] = \"Seoul\"`은 새 항목을 추가합니다.\n\n이것도 같은 딕셔너리를 바로 바꾸는 동작입니다.",
         "visualizationType": "terminal",
         "code": "person[\"city\"] = \"Seoul\""
       },
       {
         "title": "변경 후 내용 확인",
-        "explanation": "**`print(f\"After changes: {person}\")`**\n\n수정·추가가 반영된 현재 딕셔너리 내용을 출력합니다. 결과: `{'name': 'Alice', 'age': 26, 'city': 'Seoul'}`. 다음 줄에서 `id()`를 다시 확인하여 같은 객체임을 증명합니다.",
+        "explanation": "`print(f\"After changes: {person}\")`는 바뀐 내용을 출력합니다.\n\n결과에는 수정과 추가가 모두 반영됩니다.",
         "visualizationType": "terminal",
         "code": "print(f\"After changes: {person}\")"
       },
       {
         "title": "ID 불변 확인",
-        "explanation": "**`print(f\"id = {id(person)}\")`**\n\n수정 후 다시 확인한 `id()`가 처음과 **동일합니다**. 이것이 Mutable의 핵심 증거입니다. Immutable 객체(정수, 문자열)는 값 변경 시 새 객체가 생겨 `id()`가 바뀝니다.",
+        "explanation": "다시 `id(person)`을 출력해도 같은 값이 나옵니다.\n\n즉, 같은 딕셔너리를 수정한 것입니다.",
+        "keyInsightTitle": "핵심",
+        "keyInsight": "Mutable은 수정해도 객체 자체는 그대로다.",
         "visualizationType": "terminal",
         "code": "print(f\"id = {id(person)}\")",
         "occurrence": 2
       },
       {
         "title": "참조(별명) 생성",
-        "explanation": "**`ref = person`**\n\n`ref`는 복사본이 아닌 **같은 객체의 별명(Alias)**입니다. `id(ref) == id(person)`이 `True`입니다. 한쪽을 통해 수정하면 다른 쪽에도 즉시 반영됩니다.",
+        "explanation": "`ref = person`은 복사가 아닙니다.\n\n`ref`는 같은 딕셔너리를 가리키는 다른 이름입니다.",
+        "keyInsightTitle": "주의",
+        "keyInsight": "`=`는 복사가 아니라 같은 객체 공유일 수 있다.",
         "visualizationType": "terminal",
         "code": "ref = person"
       },
       {
         "title": "참조를 통해 수정",
-        "explanation": "**`ref[\"name\"] = \"Bob\"`**\n\n`ref`를 통해 `\"name\"`을 수정합니다. `ref`와 `person`이 같은 객체를 공유하므로 `person`으로 접근해도 변경된 값이 보입니다. 독립 복사본이 필요하면 `person.copy()` 또는 `copy.deepcopy(person)`을 사용하세요.",
+        "explanation": "`ref[\"name\"] = \"Bob\"`는 `ref`를 통해 값을 바꿉니다.\n\n하지만 실제로는 원래 딕셔너리가 바뀌는 것입니다.",
         "visualizationType": "terminal",
         "code": "ref[\"name\"] = \"Bob\""
       },
       {
         "title": "원본도 변경되었는지 확인",
-        "explanation": "**`print(f\"person: {person}\")`**\n\n`ref`를 수정했지만 `person`을 출력해도 `'name': 'Bob'`으로 바뀌어 있습니다. 이것이 Aliasing의 핵심입니다. `=` 할당은 복사가 아니라 같은 객체에 이름표를 하나 더 붙이는 것입니다.",
+        "explanation": "`print(f\"person: {person}\")`를 보면 `person`도 함께 바뀌어 있습니다.\n\n두 이름이 같은 객체를 보고 있기 때문입니다.",
+        "keyInsightTitle": "결론",
+        "keyInsight": "같은 객체를 공유하면 한쪽 수정이 다른 쪽에도 보인다.",
         "visualizationType": "terminal",
         "code": "print(f\"person: {person}\")"
       }

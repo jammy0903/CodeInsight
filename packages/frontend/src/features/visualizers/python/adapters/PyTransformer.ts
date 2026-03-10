@@ -191,7 +191,13 @@ function truncateDisplay(s: string, max = 40): string {
  */
 function formatValue(value: unknown, type: string): string {
   if (value === null) return 'None';
-  if (type === 'str') return `"${value}"`;
+  if (type === 'str') {
+    const s = String(value);
+    const alreadyQuoted =
+      (s.startsWith('"') && s.endsWith('"')) ||
+      (s.startsWith("'") && s.endsWith("'"));
+    return alreadyQuoted ? s : `"${s}"`;
+  }
   if (type === 'bool') return value ? 'True' : 'False';
   if (type === 'NoneType') return 'None';
   if (type === 'function') {
@@ -258,7 +264,7 @@ export class PyTransformer implements IFlowTransformer {
         type: obj.type,
         state: obj.highlight ? 'updating' : 'idle',
         scope: 'objects',
-        metadata: { mutable: mutableValue },
+        metadata: { mutable: mutableValue, pyId: obj.pyId },
       };
       variables.push(variable);
     });

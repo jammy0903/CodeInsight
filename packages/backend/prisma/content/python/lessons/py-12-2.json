@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "리스트 생성",
-        "explanation": "**`data = [1, 2, 3]`** -- 리스트 객체를 힙(heap) 메모리에 생성하고, `data`라는 이름표를 붙입니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. 먼저 세 개의 정수를 담은 리스트 `data`를 만듭니다.",
+        "explanation": "`data = [1, 2, 3]` 리스트를 준비합니다.\n이후 인덱스로 값을 꺼낼 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "data = [1, 2, 3]",
         "pythonMemoryState": {
@@ -26,11 +26,13 @@
               "pyId": "2001"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "먼저 검사할 데이터를 만든다."
       },
       {
         "title": "try 블록 진입",
-        "explanation": "**`try:`** -- 예외 감시 블록에 진입합니다. 이번에는 **여러 종류의 에러**가 발생할 수 있습니다.\n\ntry 블록 안에는 두 줄의 위험한 코드가 있습니다:\n1. **`int(\"abc\")`** -- 문자열을 숫자로 변환 시도 → **ValueError** 가능\n2. **`data[index]`** -- 리스트 인덱스 접근 → **IndexError** 가능",
+        "explanation": "`try` 안에는 여러 종류의 에러가 날 수 있습니다.\n그래서 `except`도 여러 개 둡니다.",
         "visualizationType": "pythonMemory",
         "code": "try:",
         "pythonMemoryState": {
@@ -50,11 +52,13 @@
               "pyId": "2001"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "하나의 `try`에서 여러 예외를 처리할 수 있다."
       },
       {
         "title": "ValueError 발생!",
-        "explanation": "**`index = int(\"abc\")`** -- `int()` 함수는 문자열을 정수로 변환합니다. 하지만 `\"abc\"`는 숫자가 아닌 문자이므로 **변환이 불가능**합니다!\n\n`int(\"123\")`은 정수 `123`이 되지만, `int(\"abc\")`는 어떤 정수로도 변환할 수 없습니다. Python이 **ValueError** 예외를 발생시킵니다.\n\n**비유:** 자동판매기(int() 함수)에 동전(숫자 문자열)을 넣어야 하는데, 종이(문자 문자열)를 넣은 것과 같습니다. 기계는 \"이건 동전이 아닙니다!\"라고 종이를 뱉어냅니다(ValueError 발생).\n\n**주의:** `int()`에 넣을 수 있는 문자열은 `\"123\"`, `\"-45\"`, `\"0\"` 등 **정수를 표현하는 문자열**뿐입니다. `\"3.14\"`도 실패합니다 (float 형태이므로). `float(\"3.14\")`를 사용해야 합니다.",
+        "explanation": "`int(\"abc\")`는 숫자로 바꿀 수 없습니다.\n그래서 바로 `ValueError`가 납니다.",
         "visualizationType": "pythonMemory",
         "code": "    index = int(\"abc\")",
         "pythonMemoryState": {
@@ -81,11 +85,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "문자열을 숫자로 못 바꾸면 `ValueError`다."
       },
       {
         "title": "첫 번째 except가 잡았다!",
-        "explanation": "**`except ValueError:`** -- Python이 except 블록을 **위에서 아래로** 순서대로 확인하여, 발생한 에러와 일치하는 첫 번째 블록을 실행합니다.\n\n매칭 과정을 따라가 봅시다:\n1. `except ValueError:` -- 발생한 에러가 ValueError인가? **YES!** 이 블록 실행!\n2. `except IndexError:` -- (확인하지 않음, 이미 잡혔으므로 건너뜀)\n3. `except Exception as e:` -- (확인하지 않음, 이미 잡혔으므로 건너뜀)",
+        "explanation": "파이썬은 `except`를 위에서부터 확인합니다.\n처음 맞는 `except ValueError`가 실행됩니다.",
         "visualizationType": "pythonMemory",
         "code": "    print(\"Invalid number format!\")",
         "pythonMemoryState": {
@@ -107,11 +113,13 @@
               "pyId": "2001"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "여러 `except`는 위에서 아래로 검사한다."
       },
       {
         "title": "만약 IndexError였다면?",
-        "explanation": "**`except IndexError:`** -- 이번 실행에서는 ValueError가 먼저 발생했기 때문에 이 블록은 **실행되지 않습니다**.\n\n하지만 **만약 시나리오가 달랐다면?** `int(\"abc\")` 대신 `int(\"100\")`이었다고 상상해봅시다:\n- `index = int(\"100\")` → 성공! `index`에 정수 `100`이 할당됩니다\n- `value = data[100]` → **IndexError 발생!** 리스트 `data`의 유효 인덱스는 0~2인데, 100번 인덱스에 접근하려 했습니다\n- 첫 번째 `except ValueError:` → ValueError인가? **NO!** 건너뜀\n- 두 번째 `except IndexError:` → IndexError인가? **YES!** 이 블록 실행!",
+        "explanation": "이번 실행에서는 `IndexError` 블록이 실행되지 않습니다.\n하지만 다른 입력이라면 이 블록이 쓰일 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "except IndexError:",
         "pythonMemoryState": {
@@ -131,11 +139,13 @@
               "pyId": "2001"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "예외 종류가 달라지면 다른 `except`가 실행된다."
       },
       {
         "title": "Exception: 만능 안전망",
-        "explanation": "**`except Exception as e:`**는 \"마지막 안전망\"입니다.\n\n왜 마지막이냐면, `Exception`은 대부분의 일반 예외를 포괄하기 때문입니다.\n그래서 위에서 더 구체적인 예외(예: `ValueError`, `IndexError`)를 먼저 처리하고,\n맨 마지막에 이 블록을 둬야 의도대로 동작합니다.\n\n**비유**: 출입구별 안내 데스크(구체 except) 다음에,\n마지막 종합안내 데스크(Exception)를 두는 구조입니다.\n\n`as e`를 쓰면 에러 객체를 잡아 메시지 출력이나 로깅이 가능합니다.\n\n주의할 점:\n- `except Exception`을 맨 위에 두면 아래 구체 except가 사실상 무력화됩니다",
+        "explanation": "`Exception as e`는 마지막 안전망입니다.\n구체적인 예외보다 아래에 두는 것이 중요합니다.",
         "visualizationType": "pythonMemory",
         "code": "except Exception as e:",
         "pythonMemoryState": {
@@ -155,7 +165,9 @@
               "pyId": "2001"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "주의",
+        "keyInsight": "일반적인 `Exception`은 맨 아래에 둔다."
       }
     ]
   },

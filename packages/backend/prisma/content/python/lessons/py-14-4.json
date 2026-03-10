@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "학생 데이터 리스트 생성",
-        "explanation": "**`students = [{\"name\": \"Alice\", \"score\": 85}, ...]`** -- 딕셔너리 3개로 이루어진 리스트를 생성합니다. 각 딕셔너리는 학생의 이름과 점수를 담고 있습니다.\n\n**비유:** 학교에서 학생 명단을 관리한다고 상상하세요. 각 학생의 정보가 적힌 카드(딕셔너리)가 있고, 이 카드들을 한 묶음(리스트)으로 모아놓은 것입니다. 카드에는 이름과 점수가 적혀 있지만, 카드들이 정리되지 않은 상태입니다.\n\n**데이터 구조:**\n```\nstudents = [\n    {\"name\": \"Alice\",   \"score\": 85},  -- 인덱스 0\n    {\"name\": \"Bob\",     \"score\": 92},  -- 인덱스 1\n    {\"name\": \"Charlie\", \"score\": 78},  -- 인덱스 2\n]\n```",
+        "explanation": "학생 정보가 담긴 딕셔너리 리스트를 만듭니다.\n이제 점수 기준으로 정렬해 볼 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "students = [",
         "pythonMemoryState": {
@@ -29,11 +29,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "정렬 기준이 필요한 데이터다."
       },
       {
         "title": "sorted() + lambda로 정렬",
-        "explanation": "**`sorted_students = sorted(students, key=lambda s: s[\"score\"], reverse=True)`**\n\n핵심은 간단합니다.\n- `key=...`: \"무엇으로 비교할지\" 정합니다\n- `reverse=True`: 큰 값이 먼저 오도록 뒤집습니다\n\n여기서는 각 학생 딕셔너리에서 `score`를 꺼내 정렬합니다.\n즉, 점수 높은 순서로 새 리스트를 만드는 코드입니다.\n\n**비유**: 시험지 더미를 이름이 아니라 \"점수\" 기준으로 다시 쌓는 느낌입니다.\n\n예시 흐름:\n- Alice(85), Bob(92), Charlie(78)\n- 결과: Bob(92) → Alice(85) → Charlie(78)\n\n주의할 점:\n- `sorted(...)`는 **원본을 바꾸지 않고 새 리스트를 반환**\n- 원본 자체를 바꾸려면 `.sort(...)` 사용",
+        "explanation": "점수를 기준으로 내림차순 정렬합니다.\n`key`는 무엇으로 비교할지 정하는 자리입니다.",
         "visualizationType": "pythonMemory",
         "code": "sorted_students = sorted(students, key=lambda s: s[\"score\"], reverse=True)",
         "pythonMemoryState": {
@@ -65,11 +67,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`key`는 정렬 기준을 정한다."
       },
       {
         "title": "정렬 결과 순회 출력 (1)",
-        "explanation": "**`for s in sorted_students:`**\n**`    print(f\"{s['name']}: {s['score']}\")`** -- 정렬된 리스트를 순회하며 각 학생의 이름과 점수를 f-string으로 출력합니다.\n\n**첫 번째 반복:** `s = {\"name\": \"Bob\", \"score\": 92}` → 출력: `Bob: 92`\n\n**비유:** 시상식에서 수상자를 발표하는 것과 같습니다. 1등(Bob, 92)부터 3등(Charlie, 78)까지 순서대로 호명합니다.\n\n**주의:** `s`는 루프 변수로, 매 반복마다 다른 딕셔너리 객체를 가리킵니다. 루프가 끝난 후에도 `s`는 마지막으로 가리킨 딕셔너리(Charlie)를 여전히 참조합니다.\n\n**f-string에서 딕셔너리 접근 팁:** `f\"{s['name']}\"`에서 바깥 따옴표가 `\"`이므로, 안쪽 딕셔너리 키는 `'`(작은따옴표)로 구분해야 합니다. 같은 따옴표를 쓰면 `SyntaxError`가 발생합니다.",
+        "explanation": "정렬된 리스트를 순회하며 하나씩 출력합니다.\n앞쪽에 높은 점수가 먼저 나와야 정상입니다.",
         "visualizationType": "pythonMemory",
         "code": "    print(f\"{s['name']}: {s['score']}\")",
         "occurrence": 1,
@@ -114,11 +118,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "출력으로 정렬 결과를 바로 확인할 수 있다."
       },
       {
         "title": "정렬 결과 전체 출력 완료",
-        "explanation": "정렬 결과를 출력하면 **순서가 기준대로 정확히 바뀌었는지** 즉시 검증할 수 있습니다.\n\n여기서는 점수 내림차순 기준이므로\n앞에서부터 높은 점수 학생이 나와야 정상입니다.\n\n핵심:\n- 정렬 코드는 \"생성\"과 \"검증\"이 한 세트\n- 출력/확인 단계가 있어야 실수를 빨리 잡습니다\n\n**비유**: 카드 정렬 후 실제로 펼쳐 보고 숫자가 큰 순서인지 눈으로 확인하는 마지막 점검입니다.",
+        "explanation": "전체 출력이 끝나면 정렬이 제대로 됐는지 검증할 수 있습니다.\n정렬은 결과 확인까지 같이 봐야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "    print(f\"{s['name']}: {s['score']}\")",
         "occurrence": 1,
@@ -164,11 +170,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "정렬 후에는 결과 검증도 중요하다."
       },
       {
         "title": "lambda를 변수에 저장",
-        "explanation": "**람다를 변수에 저장**하면 같은 기준 함수를 여러 곳에서 재사용할 수 있습니다.\n\n예를 들어 정렬, 필터링, 테스트에서 같은 로직이 반복된다면\n익명 함수 한 번 정의로 중복을 줄일 수 있습니다.\n\n**비유**: 자주 쓰는 단축키를 등록해 두고 필요할 때마다 누르는 느낌입니다.\n\n주의:\n- 로직이 길어지면 람다보다 `def`로 이름 붙이는 편이 가독성이 더 좋습니다",
+        "explanation": "람다 함수를 변수에 저장하면 재사용할 수 있습니다.\n짧은 규칙 함수를 이름 없이 만들 때 유용합니다.",
         "visualizationType": "pythonMemory",
         "code": "multiply = lambda x, y: x * y",
         "pythonMemoryState": {
@@ -210,11 +218,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "람다는 짧은 함수를 빠르게 만들 때 좋다."
       },
       {
         "title": "lambda 함수 호출",
-        "explanation": "**`print(multiply(3, 4))`** -- `multiply` 함수에 인자 3과 4를 전달하여 호출하고, 결과를 출력합니다.\n\n`multiply`는 `lambda x, y: x * y`이므로 `3 * 4 = 12`가 계산되어 반환됩니다.",
+        "explanation": "저장한 람다를 일반 함수처럼 호출합니다.\n여기서는 `3 * 4 = 12`가 계산됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(multiply(3, 4))",
         "pythonMemoryState": {
@@ -258,7 +268,9 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "결론",
+        "keyInsight": "람다도 결국 함수처럼 호출된다."
       }
     ],
     "deltaFormat": true

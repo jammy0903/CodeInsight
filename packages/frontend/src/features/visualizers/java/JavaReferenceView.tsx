@@ -85,6 +85,11 @@ interface StackFrameGroup {
   variables: FlowVariable[];
 }
 
+interface JavaReferenceInfo {
+  address?: string;
+  hashCode?: string;
+}
+
 // ============================================
 // HeapCard (Heap + String Pool)
 // ============================================
@@ -189,13 +194,15 @@ const HeapCard = memo(function HeapCard({
 
 interface StackVariableProps {
   variable: FlowVariable;
+  targetAddress?: string;
+  targetHashCode?: string;
   isHighlighted: boolean;
   onHoverStart: (id: string) => void;
   onHoverEnd: () => void;
 }
 
 const StackVariable = memo(function StackVariable({
-  variable, isHighlighted, onHoverStart, onHoverEnd,
+  variable, targetAddress, targetHashCode, isHighlighted, onHoverStart, onHoverEnd,
 }: StackVariableProps) {
   const isReference = variable.isPointer;
   const typeColor = getTypeColor(variable.type);
@@ -246,6 +253,30 @@ const StackVariable = memo(function StackVariable({
         >
           {String(variable.value)}
         </span>
+      )}
+
+      {isReference && (
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-xs text-slate-500">→</span>
+          {targetAddress && (
+            <span
+              className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold whitespace-nowrap"
+              style={{ backgroundColor: '#eef2ff', color: '#4338ca', border: '1px solid #c7d2fe' }}
+              title="Referenced object address"
+            >
+              ref {targetAddress}
+            </span>
+          )}
+          {targetHashCode && (
+            <span
+              className="px-1.5 py-0.5 rounded text-[10px] font-mono whitespace-nowrap"
+              style={{ backgroundColor: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0' }}
+              title="Referenced object hashCode"
+            >
+              {targetHashCode}
+            </span>
+          )}
+        </div>
       )}
     </div>
   );
@@ -304,6 +335,20 @@ export const JavaReferenceView = memo(function JavaReferenceView({
     () => stackFrames.flatMap((f) => f.variables),
     [stackFrames]
   );
+
+  const referenceInfoMap = useMemo(() => {
+    const map = new Map<string, JavaReferenceInfo>();
+    step.variables.forEach((v) => {
+      if (!v.pointsTo) return;
+      const target = variableMap.get(v.pointsTo);
+      const meta = target?.metadata as Record<string, unknown> | undefined;
+      map.set(v.id, {
+        address: target?.address,
+        hashCode: typeof meta?.hashCode === 'string' ? meta.hashCode : undefined,
+      });
+    });
+    return map;
+  }, [step.variables, variableMap]);
 
   // Heap objects (참조되지 않는 orphan 제거)
   const referencedIds = useMemo(() => {
@@ -510,6 +555,8 @@ export const JavaReferenceView = memo(function JavaReferenceView({
                     <StackVariable
                       key={v.id}
                       variable={v}
+                      targetAddress={referenceInfoMap.get(v.id)?.address}
+                      targetHashCode={referenceInfoMap.get(v.id)?.hashCode}
                       isHighlighted={highlightedIds.has(v.id)}
                       onHoverStart={handleHoverStart}
                       onHoverEnd={handleHoverEnd}

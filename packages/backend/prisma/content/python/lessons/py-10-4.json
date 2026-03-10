@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "모듈 임포트",
-        "explanation": "**`import asyncio` / `import time`** — 비동기 I/O 프레임워크와 시간 측정 도구를 가져옵니다.\n\n이전 레슨에서 `create_task()`와 `await`를 사용해 작업을 하나씩 스케줄링하고 기다리는 방법을 배웠습니다. 이번에는 더 강력한 도구인 `asyncio.gather()`를 배웁니다. gather는 여러 작업을 한꺼번에 실행하고, **모든 결과를 리스트로 모아서** 돌려주는 편리한 패턴입니다.",
+        "explanation": "`gather`는 여러 작업을 한 번에 모아 기다립니다.\n이번 레슨은 그 흐름을 익히는 단계입니다.",
         "visualizationType": "pythonMemory",
         "code": "import asyncio",
         "highlightOffset": [
@@ -33,11 +33,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "`gather`는 여러 Task를 한꺼번에 다룬다."
       },
       {
         "title": "비동기 작업 함수 정의",
-        "explanation": "**`async def fetch_data(id, delay):`** — 실제 I/O 작업(API 호출, DB 쿼리 등)을 시뮬레이션하는 코루틴 함수입니다.\n\n이 함수는 세 가지를 순서대로 수행합니다:\n1. `print(f\"Fetching data {id}...\")` — 작업 시작을 알립니다\n2. `await asyncio.sleep(delay)` — delay초 동안 I/O 대기를 시뮬레이션합니다\n3. `return {\"id\": id, \"data\": ...}` — 딕셔너리 형태로 결과를 반환합니다",
+        "explanation": "`fetch_data`는 비동기 작업 하나를 나타냅니다.\n시작 메시지를 찍고 기다린 뒤 결과를 반환합니다.",
         "visualizationType": "pythonMemory",
         "code": "async def fetch_data(id, delay):",
         "highlightOffset": [
@@ -65,11 +67,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "코루틴은 결과도 반환할 수 있다."
       },
       {
         "title": "메인 코루틴 정의",
-        "explanation": "**`async def main():`** — 비동기 프로그램의 진입점 코루틴을 정의합니다.\n\n이 main() 함수 안에서 `asyncio.gather()`를 사용하여 3개의 fetch_data 작업을 동시에 실행할 예정입니다. `time.time()`으로 시작 시간을 기록하여 동시 실행이 실제로 시간을 절약하는지 측정합니다.",
+        "explanation": "`main`에서 여러 `fetch_data`를 동시에 실행할 준비를 합니다.\n여기서 전체 시간을 측정합니다.",
         "visualizationType": "pythonMemory",
         "code": "async def main():",
         "pythonMemoryState": {
@@ -90,11 +94,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "`main`이 여러 작업을 모은다."
       },
       {
         "title": "이벤트 루프 실행",
-        "explanation": "**`asyncio.run(main())`** — 이벤트 루프를 생성하고 `main` 코루틴을 실행합니다.\n\n이 줄은 프로그램 전체의 **시작점**이자 **종료점**입니다. `asyncio.run()`이 호출되면:\n1. 새로운 이벤트 루프가 생성됩니다\n2. `main()` 코루틴이 이벤트 루프에서 실행됩니다\n3. main() 안에서 gather()가 3개의 작업을 동시에 실행합니다\n4. 모든 작업이 완료되면 main()이 반환됩니다\n5. 이벤트 루프가 정리되고 닫힙니다",
+        "explanation": "`asyncio.run(main())`으로 이벤트 루프를 실행합니다.\n모든 비동기 흐름은 여기서 시작됩니다.",
         "visualizationType": "pythonMemory",
         "code": "asyncio.run(main())",
         "pythonMemoryState": {
@@ -114,11 +120,13 @@
               "pyId": "1008"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "`asyncio.run()`이 전체 실행을 맡는다."
       },
       {
         "title": "동시 실행 및 결과 수집 (gather)",
-        "explanation": "**`results = await asyncio.gather(fetch_data(1, 2), fetch_data(2, 1), fetch_data(3, 3))`** — 3개의 코루틴을 **동시에 실행**하고, 모든 결과를 **리스트로 수집**합니다.\n\n`gather()`의 동작 과정을 단계별로 살펴봅시다:\n1. `fetch_data(1, 2)` 호출 → 코루틴 객체 생성 (아직 실행 안 됨)\n2. `fetch_data(2, 1)` 호출 → 코루틴 객체 생성\n3. `fetch_data(3, 3)` 호출 → 코루틴 객체 생성\n4. `gather()`가 세 코루틴을 각각 Task로 감싸서 이벤트 루프에 등록\n5. `await`를 만나 main()이 일시정지 → 세 Task가 동시에 실행 시작",
+        "explanation": "`gather`는 세 코루틴을 동시에 실행합니다.\n모든 작업이 끝나면 결과를 한 번에 리스트로 돌려줍니다.",
         "visualizationType": "pythonMemory",
         "code": "results = await asyncio.gather(",
         "highlightOffset": [
@@ -170,11 +178,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`gather`는 동시 실행 + 결과 수집을 같이 한다."
       },
       {
         "title": "gather의 동작 (1초 후)",
-        "explanation": "**gather 내부 실행 중** — 3개의 `fetch_data` 작업이 이벤트 루프에서 **동시에 진행**됩니다.\n\n시간에 따른 실행 흐름을 자세히 추적해봅시다:\n- **0.0초**: 세 작업 모두 시작. 각각 \"Fetching data N...\" 출력\n- **0.0초**: 세 작업 모두 `await asyncio.sleep(delay)`를 만남 → 모두 양보\n- **1.0초**: task_2(1초 대기)가 깨어남 → \"Data 2 fetched!\" 출력 → 결과 반환\n- task_1(2초 대기)과 task_3(3초 대기)은 아직 sleep 중",
+        "explanation": "1초 뒤에는 가장 짧은 작업이 먼저 끝납니다.\n그래도 `gather`는 아직 반환하지 않고, 남은 작업이 모두 끝날 때까지 기다립니다.",
         "visualizationType": "pythonMemory",
         "code": "results = await asyncio.gather(",
         "pythonMemoryState": {
@@ -221,11 +231,13 @@
               "pyId": "1006"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "끝나는 순서와 입력 순서는 다를 수 있다."
       },
       {
         "title": "결과 확인 (3초 후)",
-        "explanation": "**`print(f\"\\nResults: {results}\")`** — gather가 반환한 결과 리스트를 출력합니다.\n\n나머지 시간 흐름:\n- **2초**: task_1(2초 대기) 완료 → \"Data 1 fetched!\" 출력\n- **3초**: task_3(3초 대기) 완료 → \"Data 3 fetched!\" 출력\n- **3초**: 모든 Task 완료 → gather가 결과 리스트를 반환!\n\n비유하면, 주방에서 샐러드가 먼저 나오고, 그 다음 스테이크, 마지막으로 디저트가 완성됩니다. 하지만 트레이에는 주문서에 적힌 순서대로 — 스테이크, 샐러드, 디저트 — 놓입니다.\n\n**실무 팁**: 결과를 딕셔너리로 관리하고 싶다면 `results = dict(zip(ids, await asyncio.gather(*tasks)))` 패턴을 사용할 수 있습니다.",
+        "explanation": "모든 작업이 끝나면 `results` 리스트를 받습니다.\n결과 리스트의 순서는 완료 순서가 아니라 입력 순서입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"\\nResults: {results}\")",
         "pythonMemoryState": {
@@ -251,11 +263,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`gather` 결과 순서는 입력 순서를 따른다."
       },
       {
         "title": "총 소요 시간 확인",
-        "explanation": "**`print(f\"Total time: {time.time() - start:.4f}s\")`** — 총 소요 시간은 약 **3초**입니다.\n\n시간 분석:\n- 순차 실행 시: 2초 + 1초 + 3초 = **6초**\n- gather 동시 실행 시: max(2초, 1초, 3초) = **3초**\n- 절약한 시간: **3초 (50% 단축!)**",
+        "explanation": "총 시간은 가장 오래 걸린 작업 시간에 가깝습니다.\n여기서는 6초가 아니라 약 3초가 걸립니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Total time: {time.time() - start:.4f}s\")",
         "pythonMemoryState": {
@@ -279,7 +293,9 @@
               "pyId": "1008"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "결론",
+        "keyInsight": "동시 실행 시간은 보통 가장 긴 작업에 맞춰진다."
       }
     ],
     "deltaFormat": true

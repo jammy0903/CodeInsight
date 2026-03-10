@@ -7,7 +7,9 @@
     "steps": [
       {
         "title": "for 루프 시작 (range)",
-        "explanation": "**`for i in range(3):`** -- `range(3)`이 만들어내는 숫자들(0, 1, 2)을 하나씩 `i`에 넣으며 반복합니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. `range(3)`은 `0, 1, 2`를 순서대로 만들어내는 **이터레이터(iterator)** 객체입니다. `range(3)`은 실제로 리스트 `[0, 1, 2]`를 만들지 않고, 필요할 때마다 숫자를 하나씩 생성합니다(메모리 효율적).",
+        "explanation": "`for i in range(3):`는 0부터 2까지 반복합니다.\n\n첫 번째 값 `0`이 `i`에 들어갑니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "for는 값을 하나씩 자동으로 가져온다.",
         "visualizationType": "pythonMemory",
         "code": "for i in range(3):  # 0, 1, 2 (3번)",
         "pythonMemoryState": {
@@ -31,7 +33,7 @@
       },
       {
         "title": "루프 본문 실행 (1번째)",
-        "explanation": "**`print(f\"Loop {i}\")`** -- for 루프 블록 안의 코드입니다. 현재 `i` 값(0)을 출력합니다.\n\n들여쓰기된 블록이 실행됩니다. f-string에서 `{i}`가 현재 값 `0`으로 치환되어 `\"Loop 0\"`이 출력됩니다.\n\n**비유:** 첫 번째 과일(0번)을 집어들고 이름을 외치는 것입니다. \"Loop 0!\"\n\n**Python 내부 동작:** f-string은 `i.__format__('')`을 호출하여 `\"0\"` 문자열을 얻고, `\"Loop \"` 리터럴과 합쳐 새 문자열 `\"Loop 0\"`을 생성합니다. 이 문자열이 `print()`에 전달되어 `sys.stdout`에 출력됩니다.\n\n**주의:** 이 코드는 while 루프와 달리 카운터를 증가시키는 코드(`i += 1`)가 **필요 없습니다**. for 루프가 자동으로 다음 값을 가져오기 때문입니다.\n\n**실행 순서**: f-string 평가({i}→0) → print 실행 → 블록 끝 → line 2로 점프",
+        "explanation": "`print(f\"Loop {i}\")`는 현재 `i` 값을 출력합니다.\n\n여기서는 `Loop 0`이 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Loop {i}\")",
         "pythonMemoryState": {
@@ -57,7 +59,7 @@
       },
       {
         "title": "다음 순서 진행 (2번째)",
-        "explanation": "**`for i in range(3):`** -- 블록 끝에서 자동으로 루프 시작점으로 돌아왔습니다. 2번째 반복입니다.\n\n**왜 다시 line 2로 돌아왔는가?** for 루프는 while과 마찬가지로, 블록이 끝나면 자동으로 루프 시작점으로 점프합니다. `range(3)` 이터레이터에게 `next()`로 다음 숫자를 요청하여 `1`을 받아 `i`에 재할당합니다.",
+        "explanation": "블록이 끝나면 for는 다음 값으로 넘어갑니다.\n\n이제 `i`는 `1`입니다.",
         "visualizationType": "pythonMemory",
         "code": "for i in range(3):  # 0, 1, 2 (3번)",
         "pythonMemoryState": {
@@ -82,7 +84,7 @@
       },
       {
         "title": "루프 본문 실행 (2번째)",
-        "explanation": "**`print(f\"Loop {i}\")`** -- 2번째 반복에서 현재 `i` 값(1)을 사용하여 \"Loop 1\"을 출력합니다.\n\nf-string에서 `{i}`가 현재 값 `1`로 치환되어 `\"Loop 1\"`이 출력됩니다.\n\n**출력 추적:** `Loop 0` → **`Loop 1`** → 다음에 `Loop 2`가 출력될 것입니다.\n\n**실행 순서**: f-string 평가({i}→1) → print 실행 → 블록 끝 → line 2로 점프",
+        "explanation": "두 번째 반복에서는 `Loop 1`이 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Loop {i}\")",
         "pythonMemoryState": {
@@ -108,7 +110,9 @@
       },
       {
         "title": "다음 순서 진행 (3번째)",
-        "explanation": "**`for i in range(3):`** -- 3번째(마지막) 반복입니다. 블록 끝에서 다시 line 2로 점프했습니다.\n\n`range(3)` 이터레이터에게 `next()`로 다음 숫자를 요청하여 마지막 값 `2`를 받아 `i`에 재할당합니다.\n\n**왜 2가 마지막인가?** `range(3)`은 `0, 1, 2`를 만들어내고, `3`은 포함하지 않습니다. '3 미만'이기 때문입니다. 이 다음에 `next()`를 호출하면 `StopIteration`이 발생하여 루프가 종료됩니다.\n\n**비유:** 접시의 마지막 과일(2번)을 집어드는 것입니다. 이 과일을 처리하면 접시가 비어서 루프가 끝납니다.\n\n**실행 순서**: 블록 끝 → line 2 점프 → next()로 2 가져옴 → i = 2 → 블록 실행",
+        "explanation": "세 번째 반복에서는 마지막 값 `2`가 들어갑니다.\n\n`range(3)`은 `3`을 포함하지 않습니다.",
+        "keyInsightTitle": "주의",
+        "keyInsight": "`range(3)`은 0, 1, 2까지만 만든다.",
         "visualizationType": "pythonMemory",
         "code": "for i in range(3):  # 0, 1, 2 (3번)",
         "pythonMemoryState": {
@@ -133,7 +137,7 @@
       },
       {
         "title": "루프 본문 실행 (3번째)",
-        "explanation": "**`print(f\"Loop {i}\")`** -- 3번째(마지막) 반복에서 현재 `i` 값(2)을 사용하여 \"Loop 2\"를 출력합니다.\n\n이것이 range(3) 루프의 마지막 출력입니다. 다음에 이터레이터가 소진되어 루프가 종료됩니다.\n\n**전체 출력 추적:** `Loop 0` → `Loop 1` → **`Loop 2`** (총 3번 반복, range(3)이므로)\n\n**실행 순서**: f-string 평가({i}→2) → print 실행 → 블록 끝 → line 2로 점프",
+        "explanation": "세 번째 반복에서는 `Loop 2`가 출력됩니다.\n\n이것이 마지막 출력입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"Loop {i}\")",
         "pythonMemoryState": {
@@ -159,7 +163,9 @@
       },
       {
         "title": "for 루프 종료",
-        "explanation": "**`for i in range(3):`** -- 이터레이터가 소진되어 for 루프가 종료됩니다.\n\n블록 끝에서 다시 line 2로 점프했습니다. `range(3)` 이터레이터에게 `next()`로 다음 숫자를 요청하지만, 0, 1, 2를 모두 소진했으므로 **`StopIteration` 예외**가 발생합니다. for 루프는 이 예외를 자동으로 잡아서 루프를 종료합니다.",
+        "explanation": "더 이상 가져올 값이 없어서 for 루프가 끝납니다.",
+        "keyInsightTitle": "결론",
+        "keyInsight": "for는 값이 끝나면 자동으로 종료된다.",
         "visualizationType": "pythonMemory",
         "code": "for i in range(3):  # 0, 1, 2 (3번)",
         "pythonMemoryState": {
@@ -182,7 +188,7 @@
       },
       {
         "title": "리스트 변수 초기화",
-        "explanation": "**`fruits = [\"Apple\", \"Banana\"]`** -- 문자열 2개를 담은 리스트 객체를 만들고 `fruits` 이름표를 붙입니다.\n\n앞의 for 루프가 종료된 후, 파이썬은 순서대로 다음 줄을 실행합니다. 대괄호 `[]`로 리스트 객체를 생성합니다.",
+        "explanation": "`fruits = [\"Apple\", \"Banana\"]`는 리스트를 만듭니다.\n\n그리고 `fruits`가 그 리스트를 가리킵니다.",
         "visualizationType": "pythonMemory",
         "code": "fruits = [\"Apple\", \"Banana\"]",
         "pythonMemoryState": {
@@ -215,7 +221,9 @@
       },
       {
         "title": "for-each 루프 시작",
-        "explanation": "**`for f in fruits:`** -- 리스트의 각 항목을 하나씩 `f`에 넣으며 반복합니다 (for-each 방식).\n\n**range와의 차이:** `range()`는 숫자를 순서대로 만들어내지만, 여기서는 **리스트의 항목 자체**를 순회합니다. for 루프가 시작되면서 `fruits`의 첫 번째 항목 `\"Apple\"`을 가져와 변수 `f`에 할당합니다.",
+        "explanation": "`for f in fruits:`는 리스트의 항목을 하나씩 꺼냅니다.\n\n먼저 `Apple`이 `f`에 들어갑니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "for는 숫자뿐 아니라 리스트도 순회한다.",
         "visualizationType": "pythonMemory",
         "code": "for f in fruits:",
         "pythonMemoryState": {

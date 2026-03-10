@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "정수 변수 'a' 생성",
-        "explanation": "**`a = 10`** -- 메모리에 정수 객체 `10`을 만들고, `a`라는 이름표를 붙입니다.\n\n파이썬에서는 숫자 `10`조차도 **객체**입니다. C언어에서 `int a = 10;`은 4바이트 메모리 공간을 잡고 그 안에 10을 저장하지만, 파이썬은 힙 메모리에 `int` 타입 객체를 생성하고, `a`는 그 객체를 가리키는 이름표일 뿐입니다.",
+      "explanation": "`a = 10`을 실행하면 정수 `10`이 만들어집니다.\n\n그리고 `a`가 그 값을 가리킵니다.\n\n파이썬은 숫자도 객체로 다룹니다.\n\n다른 언어는 다를 수 있습니다.\nC에서는 숫자를 보통 그냥 값으로 봅니다.\nJava에서는 `int`, `double`은 객체가 아닙니다.\n대신 `Integer`, `Double`은 객체입니다.\nJavaScript에서 숫자는 원시값이라 객체가 아닙니다.\n하지만 Python에서는 숫자도 객체입니다.",
         "visualizationType": "pythonMemory",
         "code": "a = 10",
         "pythonMemoryState": {
@@ -30,7 +30,7 @@
       },
       {
         "title": "정수 변수 'b' 생성",
-        "explanation": "**`b = 3`** -- 메모리에 정수 객체 `3`을 만들고, `b`라는 이름표를 붙입니다.\n\n`a`와 `b`는 서로 다른 정수 객체를 가리키는 별개의 이름표입니다. 메모리 시각화를 보면 `a`는 `10` 객체를, `b`는 `3` 객체를 각각 가리키고 있습니다.\n\n**왜 이 순서인가?** 아래(line 4~7)에서 `a`와 `b`를 사용한 연산을 수행하려면, 먼저 두 변수가 정의되어 있어야 합니다. 파이썬은 위에서 아래로 한 줄씩 실행하므로, 변수 정의가 사용보다 위에 있어야 합니다.\n\n**Python 내부 동작:** `3`도 Small Integer Cache 범위(-5~256) 안에 있으므로, 미리 생성된 객체가 재사용됩니다. 전역 네임스페이스 딕셔너리에 `{\"a\": <10 주소>, \"b\": <3 주소>}` 두 항목이 등록된 상태입니다.\n\n**주의:** 변수 이름은 영문자, 숫자, 밑줄(`_`)만 사용 가능하며, 숫자로 시작할 수 없습니다. `2b = 3`은 `SyntaxError`입니다.",
+        "explanation": "`b = 3`을 실행하면 정수 `3`이 만들어집니다.\n\n그리고 `b`가 그 값을 가리킵니다.\n\n이제 `a`와 `b`를 연산에 사용할 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "b = 3",
         "pythonMemoryState": {
@@ -62,7 +62,7 @@
       },
       {
         "title": "덧셈 연산",
-        "explanation": "**`print(a + b)`** -- `a`(10)와 `b`(3)를 더한 결과 `13`을 출력합니다.\n\n`+` 연산자가 실행되면, 파이썬은 `a`와 `b`가 가리키는 두 정수 객체의 값을 읽어 더한 뒤, **새로운 정수 객체 `13`**을 생성합니다. 이 새 객체가 `print()`에 전달되어 화면에 출력됩니다.",
+        "explanation": "`print(a + b)`는 `a`와 `b`를 더한 값을 출력합니다.\n\n여기서는 `10 + 3`이므로 `13`이 출력됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(a + b)",
         "pythonMemoryState": {
@@ -97,7 +97,7 @@
       },
       {
         "title": "나눗셈 연산 (/)",
-        "explanation": "**`print(a / b)`** -- `/` 연산자로 '진짜 나눗셈(true division)'을 수행합니다.\n\n`10 / 3`의 결과는 `3.3333333333333335`입니다. **핵심:** `/` 연산자는 피연산자가 모두 정수여도 **항상 float(실수) 결과**를 반환합니다. `10 / 2`조차도 `5`가 아니라 `5.0`이 됩니다!",
+        "explanation": "`print(a / b)`는 `/`로 나누기 결과를 출력합니다.\n\n`10 / 3`의 결과는 `3.3333333333333335`입니다.\n\n`/`는 항상 실수 결과를 만듭니다.",
         "visualizationType": "pythonMemory",
         "code": "print(a / b)",
         "pythonMemoryState": {
@@ -132,7 +132,7 @@
       },
       {
         "title": "정수 나눗셈 연산 (//)",
-        "explanation": "**`print(a // b)`** -- `//` 연산자로 '바닥 나눗셈(floor division)', 즉 **몫**을 구합니다.\n\n`10 // 3`의 결과는 `3`입니다. 나눗셈 결과에서 소수점 이하를 **버리고(내림)** 정수 부분만 반환합니다.",
+        "explanation": "`print(a // b)`는 `//`로 몫을 구합니다.\n\n`10 // 3`의 결과는 `3`입니다.\n\n소수점 아래는 버려집니다.",
         "visualizationType": "pythonMemory",
         "code": "print(a // b)",
         "pythonMemoryState": {
@@ -167,7 +167,7 @@
       },
       {
         "title": "나머지 연산 (%)",
-        "explanation": "**`print(a % b)`** -- `%` 연산자(모듈로)로 나눗셈 후의 **나머지**를 구합니다.\n\n`10 % 3`의 결과는 `1`입니다. 10을 3으로 나누면 몫이 3이고, 나머지가 1이니까요 (10 = 3 x 3 + **1**).",
+        "explanation": "`print(a % b)`는 `%`로 나머지를 구합니다.\n\n`10 % 3`의 결과는 `1`입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(a % b)",
         "pythonMemoryState": {
@@ -202,7 +202,7 @@
       },
       {
         "title": "실수 변수 'pi' 생성",
-        "explanation": "**`pi = 3.14`** -- 메모리에 실수(float) 객체 `3.14`를 만들고, `pi`라는 이름표를 붙입니다.\n\n소수점이 포함된 숫자 리터럴은 자동으로 `float` 타입 객체가 됩니다. `int`와 `float`는 서로 다른 타입의 객체입니다.",
+        "explanation": "`pi = 3.14`를 실행하면 실수 `3.14`가 만들어집니다.\n\n그리고 `pi`가 그 값을 가리킵니다.\n\n소수점이 있으면 `float`입니다.",
         "visualizationType": "pythonMemory",
         "code": "pi = 3.14",
         "pythonMemoryState": {
@@ -244,7 +244,7 @@
       },
       {
         "title": "실수 변수 'radius' 생성",
-        "explanation": "**`radius = 2.0`** -- 메모리에 실수 객체 `2.0`을 만들고, `radius`라는 이름표를 붙입니다.\n\n`2`가 아닌 `2.0`으로 작성하여 명시적으로 `float` 타입임을 나타냅니다. `2`는 `int`, `2.0`은 `float`입니다 -- 값은 같아 보이지만 타입이 다릅니다.",
+        "explanation": "`radius = 2.0`을 실행하면 실수 `2.0`이 만들어집니다.\n\n그리고 `radius`가 그 값을 가리킵니다.\n\n`2`와 `2.0`은 타입이 다릅니다.",
         "visualizationType": "pythonMemory",
         "code": "radius = 2.0",
         "pythonMemoryState": {
@@ -296,7 +296,7 @@
       },
       {
         "title": "원의 넓이 계산",
-        "explanation": "**`area = pi * (radius ** 2)`** -- 거듭제곱 연산자 `**`와 곱셈으로 원의 넓이를 계산합니다.\n\n파이썬은 수학의 연산 순서(우선순위)를 따릅니다:\n1. 먼저 `radius ** 2` = `2.0 ** 2` = `4.0` (거듭제곱이 곱셈보다 우선)\n2. 그 다음 `pi * 4.0` = `3.14 * 4.0` = `12.56`\n3. 결과 `12.56`이라는 새로운 `float` 객체가 생성되고, `area` 이름표가 붙습니다.",
+        "explanation": "`area = pi * (radius ** 2)`는 원의 넓이를 계산합니다.\n\n먼저 `radius ** 2`를 계산합니다.\n\n그다음 `pi`를 곱합니다.\n\n결과는 `12.56`입니다.",
         "visualizationType": "pythonMemory",
         "code": "area = pi * (radius ** 2)",
         "pythonMemoryState": {
@@ -358,7 +358,7 @@
       },
       {
         "title": "결과 출력",
-        "explanation": "**`print(area)`** -- `area`가 가리키는 객체의 값 `12.56`을 화면에 출력합니다.\n\n이것으로 원의 넓이 계산이 완료되었습니다. 반지름 2.0인 원의 넓이는 약 12.56입니다.\n\n**핵심 정리:**\n- `/` (진짜 나눗셈): 항상 `float` 반환 (`10/2` = `5.0`)\n- `//` (바닥 나눗셈): 몫만 반환 (소수점 버림)\n- `%` (나머지): 나머지 반환\n- `**` (거듭제곱): `^`가 아님에 주의!\n\n**Python 내부 동작:** `print()`는 `area` 객체의 `__repr__()`을 호출하여 문자열 `\"12.56\"`을 만들고 출력합니다. `float`의 `__repr__`은 값을 정확히 복원할 수 있는 최소한의 자릿수만 표시합니다.\n\n**실용 팁:** 더 정확한 pi 값이 필요하면 `import math; math.pi`를 사용하세요. `math.pi`는 `3.141592653589793`으로 15자리 정밀도를 제공합니다.",
+        "explanation": "`print(area)`는 `area`의 값을 출력합니다.\n\n여기서는 `12.56`이 출력됩니다.\n\n반지름 `2.0`인 원의 넓이는 약 `12.56`입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(area)",
         "pythonMemoryState": {

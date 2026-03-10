@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "with문으로 파일 열기 (쓰기 모드)",
-        "explanation": "**`with open(\"notes.txt\", \"w\") as file:`**는 파일 쓰기의 표준 시작 패턴입니다.\n\n핵심:\n- `with`가 블록 종료 시 파일을 자동으로 닫아줌\n- 예외가 나도 정리(close) 누락 위험을 줄임\n\n**비유**: 자동문처럼 들어가서 작업하고 나오면 자동 잠금되는 구조입니다.\n\n실무 권장:\n- 파일 I/O는 거의 항상 `with ... open ...` 형태 사용\n- 수동 `close()`에 의존하면 누락 버그가 생기기 쉽습니다",
+        "explanation": "`with open(..., \"w\")`로 파일을 엽니다.\n`with`를 쓰면 블록이 끝날 때 자동으로 닫힙니다.",
         "visualizationType": "pythonMemory",
         "code": "with open(\"output.txt\", \"w\") as f:",
         "pythonMemoryState": {
@@ -29,11 +29,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`with`는 파일을 안전하게 닫아 준다."
       },
       {
         "title": "파일에 내용 쓰기 (write)",
-        "explanation": "**`write()`**는 문자열을 파일에 기록합니다.\n\n이 단계에서 중요한 건 줄바꿈 관리입니다.\n`write(\"hello\")`는 줄바꿈을 자동으로 넣지 않으므로, 필요하면 `\\n`을 직접 붙여야 합니다.\n\n**비유**: 노트에 글을 적을 때 줄 내림을 손으로 직접 하는 것과 같습니다.\n\n포인트:\n- 여러 줄 기록 시 `write(... + \"\\n\")` 또는 `writelines()` 패턴 사용\n- 문자열이 아닌 값은 `str()` 변환 후 쓰는 습관이 안전합니다",
+        "explanation": "`write()`로 문자열을 파일에 씁니다.\n줄바꿈이 필요하면 `\\n`을 직접 넣어야 합니다.",
         "visualizationType": "pythonMemory",
         "code": "    f.write(\"Hello, File!\\n\")",
         "highlightOffset": [
@@ -59,11 +61,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "주의",
+        "keyInsight": "`write()`는 줄바꿈을 자동으로 넣지 않는다."
       },
       {
         "title": "파일 내용 다시 읽기",
-        "explanation": "**`with open(\"output.txt\", \"r\") as f:`**\n**`    content = f.read()`**\n**`    print(content)`** -- 이전 `with` 블록이 끝나면서 파일이 자동으로 닫혔습니다. 이제 같은 파일을 **읽기 모드(\"r\")**로 다시 열어 내용을 확인합니다.\n\n방금 쓴 내용이 정말로 파일에 저장되었는지 확인하는 패턴입니다. 새로운 `with` 블록으로 파일을 읽기 모드로 열고, `read()`로 전체 내용을 가져옵니다.\n\n**비유:** 편지를 쓴 후(write) 봉투를 봉인하고(close), 봉투를 다시 열어서(open \"r\") 내용이 제대로 적혔는지 확인하는(read) 것과 같습니다.\n\n**주의:** `\"r\"` 모드에서 파일이 존재하지 않으면 `FileNotFoundError`가 발생합니다. 하지만 직전에 `\"w\"` 모드로 생성했으므로 여기서는 안전합니다.",
+        "explanation": "같은 파일을 다시 읽기 모드로 열어 내용을 확인합니다.\n방금 쓴 내용이 제대로 저장됐는지 볼 수 있습니다.",
         "visualizationType": "pythonMemory",
         "code": "with open(\"output.txt\", \"r\") as f:",
         "highlightOffset": [
@@ -106,11 +110,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "쓰기 후 읽기로 확인할 수 있다."
       },
       {
         "title": "추가 모드로 파일 열기 (append)",
-        "explanation": "**append 모드(`\"a\"`)**는 기존 파일 끝에 내용을 \"덧붙여\" 씁니다.\n\n핵심 차이:\n- `\"w\"`: 기존 내용 지우고 새로 시작\n- `\"a\"`: 기존 내용 유지 + 뒤에 추가\n\n로그, 기록 누적, 이력 저장에는 `a`가 기본 선택입니다.\n\n**비유**: 새 공책으로 갈아타는 게 `w`, 기존 공책 마지막 페이지 다음 줄에 이어 쓰는 게 `a`입니다.\n\n주의:\n- 줄바꿈(`\\n`)을 빠뜨리면 새 내용이 기존 줄에 붙어 가독성이 깨질 수 있습니다",
+        "explanation": "`\"a\"` 모드는 기존 내용 뒤에 덧붙입니다.\n반대로 `\"w\"`는 기존 내용을 지우고 다시 씁니다.",
         "visualizationType": "pythonMemory",
         "code": "with open(\"output.txt\", \"a\") as f:",
         "highlightOffset": [
@@ -136,7 +142,9 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`w`는 덮어쓰기, `a`는 이어쓰기다."
       }
     ],
     "deltaFormat": true

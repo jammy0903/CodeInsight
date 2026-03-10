@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "outer_func 정의",
-        "explanation": "**`def outer_func(x):`**\n\n**바깥 함수(외부 함수)를 정의합니다.**\n이 함수는 안에 또 다른 함수(`inner_func`)를 품고 있는 '중첩 함수' 구조의 바깥쪽입니다.",
+        "explanation": "`outer_func`라는 바깥 함수를 정의합니다.\n이 함수 안에는 `inner_func`가 들어갑니다.",
         "visualizationType": "pythonMemory",
         "code": "def outer_func(x):",
         "highlightOffset": [
@@ -35,11 +35,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "클로저는 바깥 함수 안에서 시작된다."
       },
       {
         "title": "outer_func(2) 호출",
-        "explanation": "**`times_2 = outer_func(2)`**\n\n**`outer_func`을 호출하면서 매개변수 `x`에 값 `2`를 전달합니다.**",
+        "explanation": "`outer_func(2)`를 호출합니다.\n이때 `x`에는 `2`가 들어가고, 그 값이 안쪽 함수에 남을 준비를 합니다.",
         "visualizationType": "pythonMemory",
         "code": "times_2 = outer_func(2)",
         "pythonMemoryState": {
@@ -60,11 +62,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "`x`는 이번 호출에서만 2를 가진다."
       },
       {
         "title": "inner_func 정의 (x=2 환경)",
-        "explanation": "**`def inner_func(y):`**\n\n**`outer_func(2)` 실행 중에, 안쪽 함수 `inner_func`이 정의됩니다.**",
+        "explanation": "`outer_func(2)` 안에서 `inner_func`가 만들어집니다.\n이 함수는 바깥의 `x=2`를 기억합니다.",
         "visualizationType": "pythonMemory",
         "code": "def inner_func(y):",
         "highlightOffset": [
@@ -99,11 +103,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "안쪽 함수가 바깥 변수 `x`를 기억한다."
       },
       {
         "title": "클로저 반환 (1)",
-        "explanation": "**`return inner_func`**\n\n**`inner_func` 함수 객체 자체를 반환합니다.** 호출(`inner_func()`)이 아니라, 함수 그 자체를 돌려주는 것입니다.",
+        "explanation": "`inner_func`를 실행하지 않고 그대로 반환합니다.\n반환된 함수가 `times_2`에 저장됩니다.",
         "visualizationType": "pythonMemory",
         "code": "return inner_func",
         "pythonMemoryState": {
@@ -124,11 +130,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "주의",
+        "keyInsight": "`inner_func()`가 아니라 함수 자체를 돌려준다."
       },
       {
         "title": "outer_func(3) 호출",
-        "explanation": "**`times_3 = outer_func(3)`**\n\n**같은 `outer_func`을 이번에는 `x=3`으로 호출합니다.**",
+        "explanation": "같은 `outer_func`를 다시 호출합니다.\n이번에는 `x`에 `3`이 들어갑니다.",
         "visualizationType": "pythonMemory",
         "code": "times_3 = outer_func(3)",
         "pythonMemoryState": {
@@ -159,11 +167,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "호출이 다르면 기억하는 값도 달라진다."
       },
       {
         "title": "inner_func 정의 (x=3 환경)",
-        "explanation": "**`def inner_func(y):`**\n\n**이번에는 `x=3`인 환경을 기억하는 완전히 새로운 `inner_func`이 정의됩니다.**",
+        "explanation": "이번에도 `inner_func`가 만들어집니다.\n하지만 이 함수는 `x=3`을 기억하는 새 함수입니다.",
         "visualizationType": "pythonMemory",
         "code": "def inner_func(y):",
         "highlightOffset": [
@@ -198,11 +208,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`times_2`와 `times_3`는 다른 클로저다."
       },
       {
         "title": "클로저 반환 (2)",
-        "explanation": "**`return inner_func`**\n\n**두 번째 클로저(`x=3`을 기억하는 `inner_func`)를 반환합니다.**\n이 반환값이 `times_3`에 저장됩니다.",
+        "explanation": "`x=3`을 기억하는 `inner_func`를 반환합니다.\n이 함수가 `times_3`가 됩니다.",
         "visualizationType": "pythonMemory",
         "code": "return inner_func",
         "pythonMemoryState": {
@@ -233,11 +245,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "결론",
+        "keyInsight": "`times_3`는 3을 기억하는 함수다."
       },
       {
         "title": "times_2(5) 호출",
-        "explanation": "**`print(f\"times_2(5) = {times_2(5)}\")`**\n\n**클로저 `times_2`를 `y=5`로 호출합니다.**",
+        "explanation": "`times_2(5)`를 호출합니다.\n여기서는 `y`에 `5`가 들어가고, 예전에 기억한 `x`와 함께 계산됩니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"times_2(5) = {times_2(5)}\")",
         "pythonMemoryState": {
@@ -268,11 +282,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "`times_2`는 예전의 `x=2`를 꺼내 쓴다."
       },
       {
         "title": "times_2 실행 (2 * 5)",
-        "explanation": "**`return x * y`**\n\n**Cell에서 꺼낸 `x=2`와 매개변수 `y=5`를 곱하여 `10`을 반환합니다.**",
+        "explanation": "기억해 둔 `x=2`와 `y=5`를 곱합니다.\n그래서 결과로 `10`을 반환합니다.",
         "visualizationType": "pythonMemory",
         "code": "return x * y",
         "pythonMemoryState": {
@@ -304,11 +320,13 @@
               "pyId": "1006"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "결과",
+        "keyInsight": "기억한 값 `2`가 계산에 다시 쓰인다."
       },
       {
         "title": "times_3(5) 호출",
-        "explanation": "**`print(f\"times_3(5) = {times_3(5)}\")`**\n\n**이번에는 클로저 `times_3`를 `y=5`로 호출합니다.**",
+        "explanation": "이번에는 `times_3(5)`를 호출합니다.\n마찬가지로 `y`는 `5`입니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"times_3(5) = {times_3(5)}\")",
         "pythonMemoryState": {
@@ -339,11 +357,13 @@
               "highlight": true
             }
           ]
-        }
+        },
+        "keyInsightTitle": "포인트",
+        "keyInsight": "`times_3`는 `x=3`을 기억한다."
       },
       {
         "title": "times_3 실행 (3 * 5)",
-        "explanation": "**`return x * y`**\n\n**Cell에서 꺼낸 `x=3`과 매개변수 `y=5`를 곱하여 `15`를 반환합니다.**",
+        "explanation": "이번에는 기억한 `x=3`과 `y=5`를 곱합니다.\n그래서 `15`가 반환됩니다.",
         "visualizationType": "pythonMemory",
         "code": "return x * y",
         "pythonMemoryState": {
@@ -375,7 +395,9 @@
               "pyId": "1006"
             }
           ]
-        }
+        },
+        "keyInsightTitle": "결론",
+        "keyInsight": "클로저마다 기억한 값이 다르다."
       }
     ],
     "deltaFormat": true

@@ -1,5 +1,5 @@
 {
-  "lessonId": "py-2-5",
+  "lessonId": "py-1-7",
   "title": "String Interning",
   "concept": "Python reuses some string objects automatically for performance!",
   "content": {
@@ -7,7 +7,7 @@
     "steps": [
       {
         "title": "짧은 문자열 생성",
-        "explanation": "**`a = \"hello\"`** -- 짧고 공백 없는 문자열 객체 `\"hello\"`를 만들고, `a` 이름표를 붙입니다.\n\nPython은 위에서 아래로 순서대로 실행됩니다. 메모리에 문자열 객체 `\"hello\"`가 생성되고, `a`라는 이름표가 이 객체에 붙습니다.",
+        "explanation": "`a = \"hello\"`를 실행하면 문자열이 만들어집니다.\n\n그리고 `a`가 그 값을 가리킵니다.",
         "visualizationType": "pythonMemory",
         "code": "a = \"hello\"",
         "pythonMemoryState": {
@@ -30,7 +30,9 @@
       },
       {
         "title": "같은 문자열 재사용",
-        "explanation": "**`b = \"hello\"`** -- 새 객체를 만들지 않고, `a`와 **완전히 같은 객체(0x1000)**를 가리킵니다.\n\n**왜 새 객체를 만들지 않는가?** Python은 코드를 컴파일할 때, 같은 문자열 리터럴(`\"hello\"`)을 발견하면 **이미 intern table에 등록된 객체를 재사용**합니다. 따라서 `b`는 새로운 `\"hello\"` 객체를 만들지 않고, `a`가 가리키는 것과 **동일한 메모리 주소(0x1000)**를 가리킵니다.",
+        "explanation": "`b = \"hello\"`는 같은 문자열을 다시 씁니다.\n\n이 경우 `b`는 `a`와 같은 객체를 가리킬 수 있습니다.",
+        "keyInsightTitle": "포인트",
+        "keyInsight": "짧은 문자열은 같은 객체를 재사용할 수 있다.",
         "visualizationType": "pythonMemory",
         "code": "b = \"hello\"",
         "pythonMemoryState": {
@@ -59,7 +61,9 @@
       },
       {
         "title": "동일성 검사 (is)",
-        "explanation": "**`print(f\"a is b: {a is b}\")`** -- `a`와 `b`가 **같은 객체**인지 확인합니다. 결과는 `True`입니다.\n\n**`is` vs `==` -- 파이썬에서 가장 중요한 구분 중 하나:**\n- **`==`**: **값(내용)**이 같은가? → `\"hello\" == \"hello\"`는 항상 True\n- **`is`**: **같은 객체(메모리 주소)**인가? → `id(a) == id(b)`와 동일한 의미",
+        "explanation": "`a is b`는 두 변수가 같은 객체인지 확인합니다.\n\n여기서는 `True`가 나옵니다.",
+        "keyInsightTitle": "핵심",
+        "keyInsight": "`==`는 값 비교, `is`는 같은 객체 비교다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"a is b: {a is b}\")",
         "pythonMemoryState": {
@@ -89,7 +93,7 @@
       },
       {
         "title": "공백 있는 문자열 생성",
-        "explanation": "**`x = \"hello world\"`** -- 공백이 포함된 문자열 객체를 만듭니다. 이런 문자열은 interning이 **보장되지 않습니다**.\n\n이전 코드 실행이 끝나고, 순서대로 다음 줄로 넘어왔습니다. 이번에는 공백(` `)이 포함된 `\"hello world\"` 문자열을 생성합니다.",
+        "explanation": "`x = \"hello world\"`는 공백이 있는 문자열을 만듭니다.\n\n이런 문자열은 재사용이 항상 보장되지는 않습니다.",
         "visualizationType": "pythonMemory",
         "code": "x = \"hello world\"",
         "pythonMemoryState": {
@@ -125,7 +129,7 @@
       },
       {
         "title": "동일한 긴 문자열 다시 생성",
-        "explanation": "**`y = \"hello world\"`** -- `x`와 같은 내용의 문자열을 다시 만듭니다. 같은 객체를 가리킬지는 **예측할 수 없습니다**.\n\n`x`와 똑같은 내용(`\"hello world\"`)의 문자열을 다시 만듭니다. 이 경우 `y`가 `x`와 같은 객체를 공유할 수도 있고, 별도의 새 객체가 만들어질 수도 있습니다.",
+        "explanation": "`y = \"hello world\"`는 같은 내용의 문자열을 다시 만듭니다.\n\n하지만 `x`와 같은 객체일지는 확실하지 않습니다.",
         "visualizationType": "pythonMemory",
         "code": "y = \"hello world\"",
         "pythonMemoryState": {
@@ -174,7 +178,9 @@
       },
       {
         "title": "긴 문자열 동일성 검사",
-        "explanation": "**`print(f\"x is y: {x is y}\")`** -- `x`와 `y`가 같은 객체인지 확인합니다. 이 실행 예시에서는 **False**가 관찰되었습니다.\n\n`x`와 `y`는 내용이 같아도 객체 동일성(`is`) 결과는 인터프리터/최적화에 따라 달라질 수 있습니다. 이 스크립트에서는 `False`로 표현됩니다.",
+        "explanation": "`x is y`는 두 변수가 같은 객체인지 확인합니다.\n\n이 예시에서는 `False`가 나옵니다.",
+        "keyInsightTitle": "주의",
+        "keyInsight": "내용이 같아도 같은 객체라는 뜻은 아니다.",
         "visualizationType": "pythonMemory",
         "code": "print(f\"x is y: {x is y}\")",
         "pythonMemoryState": {
