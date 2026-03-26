@@ -9,6 +9,7 @@
 
 import { Flame, Trophy, AlertCircle } from 'lucide-react';
 import type { StreakStatus } from '@/services/gamification';
+import { useTranslation } from 'react-i18next';
 
 interface StreakCardProps {
   streak: StreakStatus | null;
@@ -17,6 +18,7 @@ interface StreakCardProps {
 }
 
 export function StreakCard({ streak, variant = 'full', loading = false }: StreakCardProps) {
+  const { t } = useTranslation();
   // 로딩 상태
   if (loading) {
     return variant === 'compact' ? (
@@ -38,8 +40,8 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
         <div className="flex items-center gap-3 text-[var(--theme-dashboard-text-muted)]">
           <Flame className="w-6 h-6" />
           <div>
-            <p className="font-medium">스트릭 시작하기</p>
-            <p className="text-sm text-[var(--theme-dashboard-text-muted)]">첫 레슨을 완료하면 스트릭이 시작됩니다</p>
+            <p className="font-medium">{t("gamification.txt_c09ebd")}</p>
+            <p className="text-sm text-[var(--theme-dashboard-text-muted)]">{t("gamification.txt_1ce32a")}</p>
           </div>
         </div>
       </div>
@@ -115,7 +117,7 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
             />
           </div>
           <div>
-            <h3 className="font-semibold text-[var(--theme-dashboard-title)]">연속 학습</h3>
+            <h3 className="font-semibold text-[var(--theme-dashboard-title)]">{t("dashboard.streak")}</h3>
             <p className="text-xs text-[var(--theme-dashboard-text-muted)]">
               {isActiveToday ? '오늘도 완료!' : streakAtRisk ? '오늘 학습하면 유지!' : '계속 이어가요!'}
             </p>
@@ -126,7 +128,7 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
         {streakAtRisk && (
           <div className="flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">
             <AlertCircle className="w-3 h-3" />
-            <span>위험!</span>
+            <span>{t("gamification.txt_105c76")}</span>
           </div>
         )}
       </div>
@@ -149,7 +151,7 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
           >
             {currentStreak}
           </div>
-          <div className="text-xs text-[var(--theme-dashboard-text-muted)]">현재 스트릭</div>
+          <div className="text-xs text-[var(--theme-dashboard-text-muted)]">{t("gamification.txt_48fa41")}</div>
         </div>
 
         {/* Divider */}
@@ -161,7 +163,7 @@ export function StreakCard({ streak, variant = 'full', loading = false }: Streak
             <Trophy className="w-5 h-5 text-yellow-500" />
             {longestStreak}
           </div>
-          <div className="text-xs text-[var(--theme-dashboard-text-muted)]">최장 기록</div>
+          <div className="text-xs text-[var(--theme-dashboard-text-muted)]">{t("gamification.txt_30e6fc")}</div>
         </div>
       </div>
 

@@ -13,6 +13,7 @@ import { TrackerView } from './components/TrackerView';
 import { ArrayView } from './components/ArrayView';
 import { TableView } from './components/TableView';
 import { GraphView } from './components/GraphView';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -129,10 +130,11 @@ export const AlgorithmView = memo(function AlgorithmView({
   algorithmState,
   prevAlgorithmState,
 }: AlgorithmViewProps) {
+  const { t } = useTranslation();
   if (!algorithmState || !algorithmState.subType) {
     return (
       <div className="p-4 text-center text-gray-400">
-        <p>알고리즘 시각화 데이터가 없습니다</p>
+        <p>{t("visualizer.txt_fa422e")}</p>
       </div>
     );
   }

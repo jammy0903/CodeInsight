@@ -4,6 +4,7 @@
  */
 
 import { REPORT_COLORS } from './colors';
+import { useTranslation } from 'react-i18next';
 
 interface CalendarDay {
   date: string;
@@ -26,6 +27,7 @@ function getGrassColor(count: number): string {
 }
 
 export function ReportCalendar({ data }: ReportCalendarProps) {
+  const { t } = useTranslation();
   // Build weeks array
   const weeks: CalendarDay[][] = [];
   let currentWeek: CalendarDay[] = [];
@@ -144,12 +146,12 @@ export function ReportCalendar({ data }: ReportCalendarProps) {
 
           {/* Legend */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '0.75rem', fontSize: '0.625rem', color: REPORT_COLORS.text.muted }}>
-            <span>적음</span>
+            <span>{t("dashboard.txt_08d289")}</span>
             <div style={{ ...cellStyle, backgroundColor: REPORT_COLORS.grass.empty }} />
             <div style={{ ...cellStyle, backgroundColor: REPORT_COLORS.grass.level1 }} />
             <div style={{ ...cellStyle, backgroundColor: REPORT_COLORS.grass.level2 }} />
             <div style={{ ...cellStyle, backgroundColor: REPORT_COLORS.grass.level3 }} />
-            <span>많음</span>
+            <span>{t("dashboard.txt_5e40d9")}</span>
           </div>
         </div>
       </div>

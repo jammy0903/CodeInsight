@@ -5,12 +5,14 @@
 
 import { Code2 } from 'lucide-react';
 import { REPORT_COLORS } from './colors';
+import { useTranslation } from 'react-i18next';
 
 interface ReportHeaderProps {
   period?: string;
 }
 
 export function ReportHeader({ period = '1y' }: ReportHeaderProps) {
+  const { t } = useTranslation();
   const periodLabel = {
     '7d': '7일',
     '30d': '30일',
@@ -61,11 +63,11 @@ export function ReportHeader({ period = '1y' }: ReportHeaderProps) {
       {/* Report Info */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', fontSize: '0.875rem', color: REPORT_COLORS.text.muted }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontWeight: 500 }}>생성일:</span>
+          <span style={{ fontWeight: 500 }}>{t("dashboard.txt_2f5bfd")}</span>
           <span>{today}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontWeight: 500 }}>분석 기간:</span>
+          <span style={{ fontWeight: 500 }}>{t("dashboard.txt_5c3d9b")}</span>
           <span>최근 {periodLabel}</span>
         </div>
       </div>

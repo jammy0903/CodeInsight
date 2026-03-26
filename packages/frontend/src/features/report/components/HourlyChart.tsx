@@ -3,12 +3,14 @@
  */
 
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface HourlyChartProps {
   hourlyActivity: number[]; // [0-23] 시간대별 초
 }
 
 export function HourlyChart({ hourlyActivity }: HourlyChartProps) {
+  const { t } = useTranslation();
   // 시간대를 4시간 단위로 그룹화 (6개 구간)
   const groupedActivity = [];
   for (let i = 0; i < 24; i += 4) {
@@ -24,7 +26,7 @@ export function HourlyChart({ hourlyActivity }: HourlyChartProps) {
 
   return (
     <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-4">
-      <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)] mb-3">시간대별 학습</h3>
+      <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)] mb-3">{t("dashboard.txt_e7312d")}</h3>
 
       <div className="space-y-2">
         {groupedActivity.map((group, index) => {

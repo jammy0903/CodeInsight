@@ -5,6 +5,7 @@
 
 import { XCircle } from 'lucide-react';
 import { REPORT_COLORS } from './colors';
+import { useTranslation } from 'react-i18next';
 
 interface WrongAnswer {
   quizId: string;
@@ -18,6 +19,7 @@ interface ReportWrongAnswersProps {
 }
 
 export function ReportWrongAnswers({ answers }: ReportWrongAnswersProps) {
+  const { t } = useTranslation();
   if (!answers || answers.length === 0) {
     return null;
   }
@@ -50,7 +52,7 @@ export function ReportWrongAnswers({ answers }: ReportWrongAnswersProps) {
     <div className="keep-together" style={{ marginBottom: '2rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
         <XCircle style={{ width: '1.25rem', height: '1.25rem', color: REPORT_COLORS.accent.red }} />
-        <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: REPORT_COLORS.text.secondary }}>최근 오답 기록</h2>
+        <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: REPORT_COLORS.text.secondary }}>{t("dashboard.txt_bae8e5")}</h2>
         <span style={{ fontSize: '0.875rem', color: REPORT_COLORS.text.muted }}>({recentAnswers.length}개)</span>
       </div>
 
@@ -58,9 +60,9 @@ export function ReportWrongAnswers({ answers }: ReportWrongAnswersProps) {
         <table style={{ width: '100%', fontSize: '0.875rem', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={headerCellStyle}>문제</th>
-              <th style={headerCellStyle}>내 답변</th>
-              <th style={headerCellStyle}>일시</th>
+              <th style={headerCellStyle}>{t("admin.col_problem")}</th>
+              <th style={headerCellStyle}>{t("dashboard.txt_d4e857")}</th>
+              <th style={headerCellStyle}>{t("dashboard.txt_334193")}</th>
             </tr>
           </thead>
           <tbody>

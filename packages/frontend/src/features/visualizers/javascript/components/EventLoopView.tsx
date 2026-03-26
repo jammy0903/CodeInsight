@@ -11,6 +11,7 @@
 
 import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -211,6 +212,7 @@ export const EventLoopView = memo(function EventLoopView({
   eventLoopState,
   prevEventLoopState,
 }: EventLoopViewProps) {
+  const { t } = useTranslation();
   const callStack = eventLoopState.callStack || [];
   const webApis = eventLoopState.webApis || [];
   const taskQueue = eventLoopState.taskQueue || [];
@@ -236,7 +238,7 @@ export const EventLoopView = memo(function EventLoopView({
           emoji="📚"
           colors={COLORS.callStack}
           isEmpty={callStack.length === 0}
-          emptyText="(비어있음 - 모든 코드 실행 완료)"
+          emptyText={t("visualizer.txt_859fe2")}
         >
           <div className="flex flex-col-reverse gap-1.5">
             <AnimatePresence mode="popLayout">
@@ -258,7 +260,7 @@ export const EventLoopView = memo(function EventLoopView({
           emoji="🌐"
           colors={COLORS.webApis}
           isEmpty={webApis.length === 0}
-          emptyText="(비어있음)"
+          emptyText={t("home.svg_panel4_heap_empty")}
         >
           <div className="flex flex-col gap-1.5">
             <AnimatePresence mode="popLayout">
@@ -287,7 +289,7 @@ export const EventLoopView = memo(function EventLoopView({
           emoji="📬"
           colors={COLORS.taskQueue}
           isEmpty={taskQueue.length === 0}
-          emptyText="(비어있음)"
+          emptyText={t("home.svg_panel4_heap_empty")}
           minHeight="60px"
         >
           <div className="flex flex-col gap-1.5">
@@ -310,7 +312,7 @@ export const EventLoopView = memo(function EventLoopView({
           emoji="⚡"
           colors={COLORS.microtaskQueue}
           isEmpty={microtaskQueue.length === 0}
-          emptyText="(비어있음)"
+          emptyText={t("home.svg_panel4_heap_empty")}
           minHeight="60px"
         >
           <div className="flex flex-col gap-1.5">
@@ -333,7 +335,7 @@ export const EventLoopView = memo(function EventLoopView({
         <div className="flex flex-wrap gap-3 text-[10px] text-gray-400">
           <div className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded" style={{ backgroundColor: COLORS.callStack.itemBg, border: `1px solid ${COLORS.callStack.itemBorder}` }} />
-            <span>콜 스택</span>
+            <span>{t("playground.call_stack")}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded" style={{ backgroundColor: COLORS.webApis.itemBg, border: `1px solid ${COLORS.webApis.itemBorder}` }} />
@@ -341,11 +343,11 @@ export const EventLoopView = memo(function EventLoopView({
           </div>
           <div className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded" style={{ backgroundColor: COLORS.taskQueue.itemBg, border: `1px solid ${COLORS.taskQueue.itemBorder}` }} />
-            <span>태스크 큐</span>
+            <span>{t("visualizer.txt_e6d9c6")}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded" style={{ backgroundColor: COLORS.microtaskQueue.itemBg, border: `1px solid ${COLORS.microtaskQueue.itemBorder}` }} />
-            <span>마이크로태스크</span>
+            <span>{t("visualizer.txt_a66f3a")}</span>
           </div>
         </div>
       </div>

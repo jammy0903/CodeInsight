@@ -5,12 +5,14 @@
 
 import { AlertTriangle } from 'lucide-react';
 import { REPORT_COLORS } from './colors';
+import { useTranslation } from 'react-i18next';
 
 interface ReportWeakConceptsProps {
   concepts: Record<string, number>;
 }
 
 export function ReportWeakConcepts({ concepts }: ReportWeakConceptsProps) {
+  const { t } = useTranslation();
   // Sort by wrong count descending, take top 5
   const sortedConcepts = Object.entries(concepts)
     .sort((a, b) => b[1] - a[1])
@@ -46,7 +48,7 @@ export function ReportWeakConcepts({ concepts }: ReportWeakConceptsProps) {
     <div className="keep-together" style={{ marginBottom: '2rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
         <AlertTriangle style={{ width: '1.25rem', height: '1.25rem', color: REPORT_COLORS.accent.amber }} />
-        <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: REPORT_COLORS.text.secondary }}>취약 개념 분석</h2>
+        <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: REPORT_COLORS.text.secondary }}>{t("dashboard.txt_a377c0")}</h2>
       </div>
 
       <div style={cardStyle}>

@@ -5,12 +5,14 @@
 import { motion } from 'framer-motion';
 import { AlertTriangle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface WeakConceptsProps {
   weakConcepts: Record<string, number>; // 개념 → 오답 수
 }
 
 export function WeakConcepts({ weakConcepts }: WeakConceptsProps) {
+  const { t } = useTranslation();
   // 오답 수 기준 정렬
   const sortedConcepts = Object.entries(weakConcepts)
     .sort((a, b) => b[1] - a[1])
@@ -25,8 +27,8 @@ export function WeakConcepts({ weakConcepts }: WeakConceptsProps) {
           <AlertTriangle className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)]">보완이 필요한 개념</h3>
-          <p className="text-sm text-[var(--theme-dashboard-text-muted)]">틀린 문제가 많은 주제예요</p>
+          <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)]">{t("report.txt_d9487f")}</h3>
+          <p className="text-sm text-[var(--theme-dashboard-text-muted)]">{t("report.txt_9210e2")}</p>
         </div>
       </div>
 

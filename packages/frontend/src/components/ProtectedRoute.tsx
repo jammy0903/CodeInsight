@@ -7,12 +7,14 @@
 
 import { Navigate } from 'react-router-dom';
 import { useStore } from '@/stores/store';
+import { useTranslation } from 'react-i18next';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const { t } = useTranslation();
   const firebaseUser = useStore((s) => s.firebaseUser);
   const appUser = useStore((s) => s.appUser);
   const authLoading = useStore((s) => s.authLoading);
@@ -21,7 +23,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[var(--theme-layout-page-bg)]">
-        <div className="text-lg text-[var(--theme-dashboard-text-muted)]">인증 확인 중...</div>
+        <div className="text-lg text-[var(--theme-dashboard-text-muted)]">{t("admin.checking_auth")}</div>
       </div>
     );
   }

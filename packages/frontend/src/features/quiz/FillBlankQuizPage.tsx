@@ -13,6 +13,7 @@ import { codeViewerColors } from '@/config/themes';
 import { Timer } from './components/Timer';
 import { useStore } from '@/stores/store'; // useStore import 추가
 import type { SupportedLanguage } from '@/types'; // SupportedLanguage import 추가
+import { useTranslation } from 'react-i18next';
 
 interface Quiz {
   id: string;
@@ -198,6 +199,7 @@ type ViewState = 'chapters' | 'quiz' | 'result';
 type QuizState = 'question' | 'correct' | 'incorrect';
 
 export function FillBlankQuizPage() {
+  const { t } = useTranslation();
   const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
   const currentTheme = useThemeStore((s) => s.theme);
@@ -358,7 +360,7 @@ export function FillBlankQuizPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-[var(--theme-quiz-title)]">{theme.name} 빈칸 코드</h1>
-              <p className="text-sm text-[var(--theme-quiz-text-muted)]">챕터를 선택하세요</p>
+              <p className="text-sm text-[var(--theme-quiz-text-muted)]">{t("quiz.txt_e6531a")}</p>
             </div>
           </div>
 
@@ -406,7 +408,7 @@ export function FillBlankQuizPage() {
             >
               <ArrowLeft className="w-5 h-5 text-[var(--theme-quiz-text-muted)]" />
             </button>
-            <h1 className="text-xl font-bold text-[var(--theme-quiz-title)]">퀴즈 결과</h1>
+            <h1 className="text-xl font-bold text-[var(--theme-quiz-title)]">{t("quiz.txt_a3f74a")}</h1>
           </div>
 
           <motion.div
@@ -431,7 +433,7 @@ export function FillBlankQuizPage() {
               {selectedChapter?.title}
             </p>
             <p className="text-lg text-[var(--theme-quiz-title)] mb-6">
-              <span className="text-green-600 font-bold">{score}문제</span> 정답 / <span className="text-red-500 font-bold">{wrongCount}문제</span> 오답
+              <span className="text-green-600 font-bold">{score}문제</span> {t("quiz.txt_3dea18")}<span className="text-red-500 font-bold">{wrongCount}문제</span> 오답
             </p>
 
             <div className="flex gap-3">
@@ -542,7 +544,7 @@ export function FillBlankQuizPage() {
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="빈칸에 들어갈 코드"
+                  placeholder={t("quiz.txt_e79899")}
                   className="flex-1 px-4 py-3 rounded-xl border-2 border-[var(--theme-quiz-card-border)] focus:border-purple-400 focus:outline-none font-mono text-lg"
                   autoFocus
                 />
@@ -565,7 +567,7 @@ export function FillBlankQuizPage() {
                     : 'border-red-400 bg-red-50'
                 }`}>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm text-[var(--theme-quiz-text-muted)]">내 답변:</span>
+                    <span className="text-sm text-[var(--theme-quiz-text-muted)]">{t("quiz.txt_eb3a7d")}</span>
                     <code className={`px-2 py-1 rounded font-mono text-sm ${
                       quizState === 'correct' ? 'bg-green-200 text-green-700' : 'bg-red-200 text-red-700'
                     }`}>
@@ -574,7 +576,7 @@ export function FillBlankQuizPage() {
                   </div>
                   {quizState === 'incorrect' && (
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-[var(--theme-quiz-text-muted)]">정답:</span>
+                      <span className="text-sm text-[var(--theme-quiz-text-muted)]">{t("quiz.txt_a74f3b")}</span>
                       <code className="px-2 py-1 rounded font-mono text-sm bg-green-200 text-green-700">
                         {currentQuiz?.answer}
                       </code>

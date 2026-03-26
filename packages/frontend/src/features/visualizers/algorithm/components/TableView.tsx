@@ -9,6 +9,7 @@
 
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -58,6 +59,7 @@ const HIGHLIGHT_COLORS: Record<string, { bg: string; border: string; text: strin
 export const TableView = memo(function TableView({
   data,
 }: TableViewProps) {
+  const { t } = useTranslation();
   const tableRows = data?.data ?? [];
   const highlights = data?.highlights;
 
@@ -72,7 +74,7 @@ export const TableView = memo(function TableView({
   if (!data || tableRows.length === 0) {
     return (
       <div className="p-4 text-center text-gray-400">
-        <p>테이블 데이터가 없습니다</p>
+        <p>{t("visualizer.txt_22a468")}</p>
       </div>
     );
   }

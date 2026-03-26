@@ -4,6 +4,7 @@
 
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface ActivityChartProps {
   dailyActivity: Record<string, number>;
@@ -11,6 +12,7 @@ interface ActivityChartProps {
 }
 
 export function ActivityChart({ dailyActivity, period }: ActivityChartProps) {
+  const { t } = useTranslation();
   // 기간에 따른 날짜 배열 생성
   const { dates } = useMemo(() => {
     const days = period === '7d' ? 7 : period === '30d' ? 30 : period === '90d' ? 90 : 365;
@@ -62,7 +64,7 @@ export function ActivityChart({ dailyActivity, period }: ActivityChartProps) {
 
   return (
     <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] p-4">
-      <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)] mb-4">일별 학습 활동</h3>
+      <h3 className="text-lg font-semibold text-[var(--theme-dashboard-title)] mb-4">{t("report.txt_220154")}</h3>
 
       <div className="relative h-48">
         {/* Y축 눈금 */}
