@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/dialog';
 import {
   PROFILE_QUESTIONS,
-  getProfileLabel,
+  getProfileLabelKey,
   getProfileEmoji,
   type ProfileQuestionKey,
 } from '@/constants/profileQuestions';
@@ -385,16 +385,16 @@ function getErrorMessage(error: unknown, fallback: string): string {
                       >
                         <div>
                           <p className="text-xs text-[var(--theme-dashboard-text-muted)] mb-1">
-                            {question.title.replace('?', '')}
+                            {t(question.titleKey).replace('?', '')}
                           </p>
                           {value ? (
                             <p className="text-sm font-medium text-[var(--theme-dashboard-title)] flex items-center gap-2">
                               <span>{getProfileEmoji(question.key, value)}</span>
-                              <span>{getProfileLabel(question.key, value)}</span>
+                              <span>{t(getProfileLabelKey(question.key, value))}</span>
                             </p>
                           ) : (
                             <p className="text-sm text-[var(--theme-dashboard-text-muted)]">
-                              아직 설정하지 않았어요
+                              {t('learning_profile.not_set')}
                             </p>
                           )}
                         </div>
@@ -414,13 +414,13 @@ function getErrorMessage(error: unknown, fallback: string): string {
                           <div className="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border-2 border-orange-200">
                             <div className="flex items-center justify-between mb-3">
                               <p className="text-sm font-semibold text-[var(--theme-dashboard-title)]">
-                                {question.title}
+                                {t(question.titleKey)}
                               </p>
                               <button
                                 onClick={() => setEditingKey(null)}
                                 className="text-xs text-[var(--theme-dashboard-text-muted)] hover:text-[var(--theme-dashboard-title)] transition-colors"
                               >
-                                취소
+                                {t('common.cancel')}
                               </button>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
@@ -442,7 +442,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
                                 >
                                   <span className="text-lg">{option.emoji}</span>
                                   <span className="text-sm font-medium text-[var(--theme-dashboard-title)]">
-                                    {option.label}
+                                    {t(option.labelKey)}
                                   </span>
                                   {value === option.value && (
                                     <Check className="w-4 h-4 text-orange-500 ml-auto" />

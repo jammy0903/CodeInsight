@@ -157,10 +157,10 @@ export function OnboardingModal() {
                 className="text-center"
               >
                 <h2 className="text-xl font-bold text-[var(--theme-dashboard-title)]">
-                  {currentQuestion.title}
+                  {t(currentQuestion.titleKey)}
                 </h2>
                 <p className="text-sm text-[var(--theme-dashboard-text-muted)] mt-1">
-                  {currentQuestion.subtitle}
+                  {t(currentQuestion.subtitleKey)}
                 </p>
               </motion.div>
             </AnimatePresence>
@@ -195,7 +195,7 @@ export function OnboardingModal() {
                     <span className={`text-sm font-medium ${
                       selectedValue === option.value ? 'text-orange-700' : 'text-[var(--theme-dashboard-title)]'
                     }`}>
-                      {option.label}
+                      {t(option.labelKey)}
                     </span>
                   </motion.button>
                 ))}
@@ -213,7 +213,7 @@ export function OnboardingModal() {
                 className="flex items-center gap-1 px-4 py-3 text-[var(--theme-dashboard-text-muted)] border-2 border-[var(--theme-dashboard-card-border)] rounded-xl font-medium hover:bg-[var(--theme-dashboard-section-header-bg)] transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
-                이전
+                {t('common.previous')}
               </motion.button>
             )}
 
@@ -237,16 +237,16 @@ export function OnboardingModal() {
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                     className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
                   />
-                  저장 중...
+                  {t('common.loading')}
                 </span>
               ) : isLastStep ? (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  시작하기
+                  {t('home.start_learning')}
                 </>
               ) : (
                 <>
-                  다음
+                  {t('common.next')}
                   <ChevronRight className="w-4 h-4" />
                 </>
               )}
@@ -259,7 +259,7 @@ export function OnboardingModal() {
               onClick={handleSkip}
               className="text-xs text-[var(--theme-dashboard-text-muted)] hover:text-[var(--theme-dashboard-title)] transition-colors"
             >
-              나중에 설정하기
+              {t('onboarding.skip_for_now')}
             </button>
           </div>
         </motion.div>
