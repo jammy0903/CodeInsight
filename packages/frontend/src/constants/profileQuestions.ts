@@ -5,19 +5,22 @@
  * USAGE:
  *   - OnboardingModal: 최초 설문
  *   - ProfilePage: 조회/수정
+ *
+ * NOTE: title/subtitle/label 은 i18n 키로 저장.
+ *       컴포넌트에서 t(question.titleKey) 형태로 사용.
  */
 
 // 설문 항목 타입
 export interface ProfileQuestion {
   key: ProfileQuestionKey;
-  title: string;
-  subtitle: string;
+  titleKey: string;
+  subtitleKey: string;
   options: ProfileOption[];
 }
 
 export interface ProfileOption {
   value: string;
-  label: string;
+  labelKey: string;
   emoji: string;
 }
 
@@ -32,61 +35,60 @@ export type ProfileQuestionKey =
 export const PROFILE_QUESTIONS: readonly ProfileQuestion[] = [
   {
     key: 'ageGroup',
-    title: '나이대가 어떻게 되세요?',
-    subtitle: '맞춤형 학습 콘텐츠를 위해 필요해요',
+    titleKey: 'onboarding.age_question',
+    subtitleKey: 'onboarding.age_subtitle',
     options: [
-      { value: '10s', label: '10대', emoji: '🎒' },
-      { value: '20s', label: '20대', emoji: '🎓' },
-      { value: '30s', label: '30대', emoji: '💼' },
-      { value: '40s+', label: '40대 이상', emoji: '🌟' },
+      { value: '10s',  labelKey: 'onboarding.age_10s',      emoji: '🎒' },
+      { value: '20s',  labelKey: 'onboarding.age_20s',      emoji: '🎓' },
+      { value: '30s',  labelKey: 'onboarding.age_30s',      emoji: '💼' },
+      { value: '40s+', labelKey: 'onboarding.age_40s_plus', emoji: '🌟' },
     ],
   },
   {
     key: 'occupation',
-    title: '현재 어떤 일을 하고 계세요?',
-    subtitle: '학습 목표에 맞는 추천을 드릴게요',
+    titleKey: 'onboarding.occupation_question',
+    subtitleKey: 'onboarding.occupation_subtitle',
     options: [
-      { value: 'student_middle', label: '중학생', emoji: '📚' },
-      { value: 'student_high', label: '고등학생', emoji: '📝' },
-      { value: 'student_univ', label: '대학생', emoji: '🎓' },
-      { value: 'job_seeker', label: '취업 준비생', emoji: '🔍' },
-      { value: 'worker', label: '직장인', emoji: '💻' },
-      { value: 'other', label: '기타', emoji: '✨' },
+      { value: 'student_middle', labelKey: 'onboarding.student_middle', emoji: '📚' },
+      { value: 'student_high',   labelKey: 'onboarding.student_high',   emoji: '📝' },
+      { value: 'student_univ',   labelKey: 'onboarding.student_univ',   emoji: '🎓' },
+      { value: 'job_seeker',     labelKey: 'onboarding.job_seeker',     emoji: '🔍' },
+      { value: 'worker',         labelKey: 'onboarding.worker',         emoji: '💻' },
+      { value: 'other',          labelKey: 'onboarding.other',          emoji: '✨' },
     ],
   },
   {
     key: 'programmingExp',
-    title: '프로그래밍 경험이 있으신가요?',
-    subtitle: '수준에 맞는 설명을 제공해 드릴게요',
+    titleKey: 'onboarding.exp_question',
+    subtitleKey: 'onboarding.exp_subtitle',
     options: [
-      { value: 'none', label: '처음이에요', emoji: '🌱' },
-      { value: 'less_1y', label: '1년 미만', emoji: '🌿' },
-      { value: '1_3y', label: '1~3년', emoji: '🌳' },
-      { value: '3y_plus', label: '3년 이상', emoji: '🏆' },
+      { value: 'none',     labelKey: 'onboarding.exp_none',     emoji: '🌱' },
+      { value: 'less_1y',  labelKey: 'onboarding.exp_less_1y',  emoji: '🌿' },
+      { value: '1_3y',     labelKey: 'onboarding.exp_1_3y',     emoji: '🌳' },
+      { value: '3y_plus',  labelKey: 'onboarding.exp_3y_plus',  emoji: '🏆' },
     ],
   },
   {
     key: 'learningGoal',
-    title: '어떤 목표로 학습하시나요?',
-    subtitle: '목표에 맞는 학습 경로를 추천해 드릴게요',
+    titleKey: 'onboarding.goal_question',
+    subtitleKey: 'onboarding.goal_subtitle',
     options: [
-      { value: 'basics', label: '기초부터 탄탄히', emoji: '📖' },
-      { value: 'job_prep', label: '취업/이직 준비', emoji: '🎯' },
-      { value: 'skill_up', label: '실력 향상', emoji: '📈' },
-      { value: 'curiosity', label: '호기심/재미', emoji: '🎮' },
+      { value: 'basics',    labelKey: 'onboarding.goal_basics',    emoji: '📖' },
+      { value: 'job_prep',  labelKey: 'onboarding.goal_job_prep',  emoji: '🎯' },
+      { value: 'skill_up',  labelKey: 'onboarding.goal_skill_up',  emoji: '📈' },
+      { value: 'curiosity', labelKey: 'onboarding.goal_curiosity', emoji: '🎮' },
     ],
   },
 ] as const;
 
 /**
- * value로 label 찾기 (프로필 표시용)
+ * value로 labelKey 찾기 (컴포넌트에서 t(key) 로 번역)
  */
-export function getProfileLabel(key: ProfileQuestionKey, value: string): string {
+export function getProfileLabelKey(key: ProfileQuestionKey, value: string): string {
   const question = PROFILE_QUESTIONS.find((q) => q.key === key);
   if (!question) return value;
-
   const option = question.options.find((o) => o.value === value);
-  return option?.label || value;
+  return option?.labelKey ?? value;
 }
 
 /**
@@ -95,9 +97,8 @@ export function getProfileLabel(key: ProfileQuestionKey, value: string): string 
 export function getProfileEmoji(key: ProfileQuestionKey, value: string): string {
   const question = PROFILE_QUESTIONS.find((q) => q.key === key);
   if (!question) return '';
-
   const option = question.options.find((o) => o.value === value);
-  return option?.emoji || '';
+  return option?.emoji ?? '';
 }
 
 /**
