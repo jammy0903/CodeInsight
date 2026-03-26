@@ -9,6 +9,7 @@
 
 import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -158,10 +159,11 @@ const PointerMarker = memo(function PointerMarker({
 export const ArrayView = memo(function ArrayView({
   data,
 }: ArrayViewProps) {
+  const { t } = useTranslation();
   if (!data || !data.values) {
     return (
       <div className="p-4 text-center text-gray-400">
-        <p>배열 데이터가 없습니다</p>
+        <p>{t("visualizer.txt_9c57a2")}</p>
       </div>
     );
   }

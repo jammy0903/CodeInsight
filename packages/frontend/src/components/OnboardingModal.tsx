@@ -14,8 +14,10 @@ import { useStore } from '@/stores/store';
 import { updateProfile, type UserProfile } from '@/services/analytics';
 import { ChevronLeft, ChevronRight, Sparkles, X } from 'lucide-react';
 import { PROFILE_QUESTIONS, type ProfileQuestionKey } from '@/constants/profileQuestions';
+import { useTranslation } from 'react-i18next';
 
 export function OnboardingModal() {
+  const { t } = useTranslation();
   const needsOnboarding = useStore((s) => s.needsOnboarding);
   const setNeedsOnboarding = useStore((s) => s.setNeedsOnboarding);
   const appUser = useStore((s) => s.appUser);
@@ -110,7 +112,7 @@ export function OnboardingModal() {
             <button
               onClick={handleSkip}
               className="absolute top-4 right-4 p-2 text-[var(--theme-dashboard-text-muted)] hover:text-[var(--theme-dashboard-title)] hover:bg-[var(--theme-dashboard-section-header-bg)] rounded-full transition-colors"
-              title="나중에 하기"
+              title={t("onboarding.txt_939764")}
             >
               <X className="w-5 h-5" />
             </button>

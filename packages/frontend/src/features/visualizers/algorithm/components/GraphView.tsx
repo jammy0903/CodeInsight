@@ -7,6 +7,7 @@
 
 import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -112,6 +113,7 @@ function computeLayout(nodes: GraphNode[]): Map<string, { x: number; y: number }
 export const GraphView = memo(function GraphView({
   data,
 }: GraphViewProps) {
+  const { t } = useTranslation();
   const nodes = data?.nodes;
   const edges = data?.edges ?? [];
 
@@ -134,7 +136,7 @@ export const GraphView = memo(function GraphView({
   if (!data || !nodes || nodes.length === 0) {
     return (
       <div className="p-4 text-center text-gray-400">
-        <p>그래프 데이터가 없습니다</p>
+        <p>{t("visualizer.txt_a13de7")}</p>
       </div>
     );
   }

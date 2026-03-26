@@ -3,6 +3,7 @@
  */
 
 import { useThemeStore } from '@/stores/themeStore';
+import { useTranslation } from 'react-i18next';
 
 export interface CalendarDay {
   date: string;
@@ -13,6 +14,7 @@ export interface CalendarDay {
 const MONTHS = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 
 export function ContributionCalendar({ data }: { data: CalendarDay[] }) {
+  const { t } = useTranslation();
   const currentTheme = useThemeStore((s) => s.theme);
 
   const grassColors = currentTheme === 'dark'
@@ -99,12 +101,12 @@ export function ContributionCalendar({ data }: { data: CalendarDay[] }) {
       </div>
 
       <div className="flex items-center gap-1 mt-2 text-[10px] sm:text-xs" style={{ color: 'var(--theme-dashboard-text-muted)' }}>
-        <span>적음</span>
+        <span>{t("dashboard.txt_08d289")}</span>
         <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm" style={{ backgroundColor: grassColors.empty }} />
         <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm" style={{ backgroundColor: grassColors.level1 }} />
         <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm" style={{ backgroundColor: grassColors.level2 }} />
         <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm" style={{ backgroundColor: grassColors.level3 }} />
-        <span>많음</span>
+        <span>{t("dashboard.txt_5e40d9")}</span>
       </div>
     </div>
   );

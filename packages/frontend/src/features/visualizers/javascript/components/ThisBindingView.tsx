@@ -9,6 +9,7 @@
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -118,6 +119,7 @@ const ObjectCard = memo(function ObjectCard({ obj, isThisTarget }: ObjectCardPro
 export const ThisBindingView = memo(function ThisBindingView({
   thisState,
 }: ThisBindingViewProps) {
+  const { t } = useTranslation();
   if (!thisState) {
     return (
       <div className="p-4 text-center text-gray-400">
@@ -164,7 +166,7 @@ export const ThisBindingView = memo(function ThisBindingView({
           {/* Call stack */}
           {thisState.callStack && thisState.callStack.length > 0 && (
             <div className="mb-4">
-              <div className="text-xs text-gray-500 mb-2 font-medium">콜 스택</div>
+              <div className="text-xs text-gray-500 mb-2 font-medium">{t("playground.call_stack")}</div>
               <div className="flex items-center gap-1 flex-wrap">
                 {thisState.callStack.map((call, i) => (
                   <div key={i} className="flex items-center gap-1">
@@ -204,10 +206,10 @@ export const ThisBindingView = memo(function ThisBindingView({
             <div className="mt-3 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
               <div className="text-xs space-y-1">
                 {thisState.binding.method && (
-                  <div><span className="text-gray-500">메서드:</span> <span className="font-mono text-gray-800">{thisState.binding.method}</span></div>
+                  <div><span className="text-gray-500">{t("visualizer.txt_8b52dc")}</span> <span className="font-mono text-gray-800">{thisState.binding.method}</span></div>
                 )}
                 {thisState.binding.object && (
-                  <div><span className="text-gray-500">객체:</span> <span className="font-mono text-gray-800">{thisState.binding.object}</span></div>
+                  <div><span className="text-gray-500">{t("visualizer.txt_cdd750")}</span> <span className="font-mono text-gray-800">{thisState.binding.object}</span></div>
                 )}
                 {thisState.binding.thisIs && (
                   <div><span className="text-gray-500">this =</span> <span className="font-mono font-bold text-amber-700">{thisState.binding.thisIs}</span></div>
@@ -228,7 +230,7 @@ export const ThisBindingView = memo(function ThisBindingView({
       {/* Objects */}
       {thisState.objects && thisState.objects.length > 0 && (
         <div className="space-y-3">
-          <div className="text-xs text-gray-500 font-medium">객체들</div>
+          <div className="text-xs text-gray-500 font-medium">{t("visualizer.txt_e8af29")}</div>
           {thisState.objects.map((obj) => (
             <ObjectCard
               key={obj.name}

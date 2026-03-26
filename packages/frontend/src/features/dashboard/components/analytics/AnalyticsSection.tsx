@@ -20,12 +20,14 @@ import { getAnalyticsColors, type ThemeKey } from './utils/analyticsColors';
 import { generateAnalysis } from './utils/generateAnalysis';
 import { ContributionCalendar } from './ContributionCalendar';
 import { AnalysisResultModal } from './AnalysisResultModal';
+import { useTranslation } from 'react-i18next';
 
 interface AnalyticsSectionProps {
   progress: UserProgress[];
 }
 
 export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
+  const { t } = useTranslation();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [showDetailedReport, setShowDetailedReport] = useState(false);
@@ -70,23 +72,23 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
         style={{ backgroundColor: colors.headerBg, color: colors.headerText, borderBottom: `1px solid ${colors.headerBorder}` }}
       >
         <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
-        <h2 className="text-sm sm:text-base font-semibold">분석 리포트</h2>
+        <h2 className="text-sm sm:text-base font-semibold">{t("dashboard.txt_f84855")}</h2>
       </div>
 
       <div className="p-3 sm:p-4 space-y-4 sm:space-y-6">
         {/* 요약 카드 (API 데이터가 있을 때만) */}
         {analyticsData && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
-            <StatCard icon={Clock} label="총 학습 시간" color={colors.headerText}>
+            <StatCard icon={Clock} label={t("dashboard.txt_33d19b")} color={colors.headerText}>
               {Math.floor(analyticsData.totalStudyTime / 3600)}시간 {Math.floor((analyticsData.totalStudyTime % 3600) / 60)}분
             </StatCard>
-            <StatCard icon={Target} label="퀴즈 정답률" color={colors.headerText}>
+            <StatCard icon={Target} label={t("dashboard.txt_0e22eb")} color={colors.headerText}>
               {analyticsData.quizStats.accuracy}%
             </StatCard>
-            <StatCard icon={Brain} label="AI 질문" color={colors.headerText}>
+            <StatCard icon={Brain} label={t("dashboard.txt_c9dbb8")} color={colors.headerText}>
               {analyticsData.aiQuestions}회
             </StatCard>
-            <StatCard icon={Calendar} label="학습 세션" color={colors.headerText}>
+            <StatCard icon={Calendar} label={t("dashboard.txt_c7a7f8")} color={colors.headerText}>
               {analyticsData.totalSessions}회
             </StatCard>
           </div>
@@ -96,7 +98,7 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
         {isLoadingAnalytics && (
           <div className="flex items-center justify-center py-3 sm:py-4 gap-1.5 sm:gap-2" style={{ color: 'var(--theme-dashboard-text-muted)' }}>
             <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
-            <span className="text-xs sm:text-sm">분석 데이터 로딩 중...</span>
+            <span className="text-xs sm:text-sm">{t("dashboard.txt_891ddf")}</span>
           </div>
         )}
 
@@ -104,7 +106,7 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
         <div>
           <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
             <Calendar className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: 'var(--theme-dashboard-text-muted)' }} />
-            <h3 className="text-xs sm:text-sm font-medium" style={{ color: 'var(--theme-dashboard-text)' }}>학습 기록 (최근 1년)</h3>
+            <h3 className="text-xs sm:text-sm font-medium" style={{ color: 'var(--theme-dashboard-text)' }}>{t("dashboard.txt_328c88")}</h3>
           </div>
           <div className="overflow-x-auto">
             <ContributionCalendar data={calendarData} />
@@ -117,7 +119,7 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
           <div>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
               <Calendar className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: 'var(--theme-dashboard-text-muted)' }} />
-              <h3 className="text-xs sm:text-sm font-medium" style={{ color: 'var(--theme-dashboard-text)' }}>요일별 학습</h3>
+              <h3 className="text-xs sm:text-sm font-medium" style={{ color: 'var(--theme-dashboard-text)' }}>{t("dashboard.txt_e58122")}</h3>
               <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded" style={{ backgroundColor: colors.badgeBg, color: colors.badgeText }}>
                 {mostActiveDay}요일 가장 활발
               </span>
@@ -150,7 +152,7 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
           <div>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
               <Clock className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: 'var(--theme-dashboard-text-muted)' }} />
-              <h3 className="text-xs sm:text-sm font-medium" style={{ color: 'var(--theme-dashboard-text)' }}>시간대별 학습</h3>
+              <h3 className="text-xs sm:text-sm font-medium" style={{ color: 'var(--theme-dashboard-text)' }}>{t("dashboard.txt_e7312d")}</h3>
               <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded" style={{ backgroundColor: colors.badgeBg, color: colors.badgeText }}>
                 {mostActiveTimeSlot} 선호
               </span>
@@ -191,7 +193,7 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--theme-dashboard-accent)'}
           >
             {isAnalyzing ? (
-              <><Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" /><span className="hidden sm:inline">AI 분석 중...</span><span className="sm:hidden">분석중</span></>
+              <><Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" /><span className="hidden sm:inline">AI 분석 중...</span><span className="sm:hidden">{t("dashboard.txt_2d2670")}</span></>
             ) : (
               <><Sparkles className="w-3 h-3 sm:w-4 sm:h-4" /><span className="hidden sm:inline">AI 분석하기</span><span className="sm:hidden">AI 분석</span></>
             )}
@@ -203,7 +205,7 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
             style={{ border: `1px solid ${colors.headerBorder}`, color: colors.headerText }}
           >
             <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">상세 보기</span><span className="sm:hidden">상세</span>
+            <span className="hidden sm:inline">{t("dashboard.txt_51d43f")}</span><span className="sm:hidden">{t("dashboard.txt_b70e98")}</span>
           </button>
 
           {analysisResult && (
@@ -213,7 +215,7 @@ export function AnalyticsSection({ progress }: AnalyticsSectionProps) {
               style={{ border: `1px solid ${colors.headerBorder}`, color: colors.headerText }}
             >
               <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">분석 결과 보기</span><span className="sm:hidden">결과</span>
+              <span className="hidden sm:inline">{t("dashboard.txt_fd8c1e")}</span><span className="sm:hidden">{t("admin.col_result")}</span>
             </button>
           )}
         </div>

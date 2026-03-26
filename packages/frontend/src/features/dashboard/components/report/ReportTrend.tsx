@@ -5,6 +5,7 @@
 
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { REPORT_COLORS } from './colors';
+import { useTranslation } from 'react-i18next';
 
 interface ReportTrendProps {
   dailyActivity: Record<string, number>;
@@ -29,6 +30,7 @@ function getTrendLabel(percent: number): string {
 }
 
 export function ReportTrend({ dailyActivity }: ReportTrendProps) {
+  const { t } = useTranslation();
   // Get dates for this week and last week
   const today = new Date();
   const thisWeekStart = new Date(today);
@@ -83,7 +85,7 @@ export function ReportTrend({ dailyActivity }: ReportTrendProps) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
           {/* Last week */}
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted, marginBottom: '0.25rem' }}>지난주</p>
+            <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted, marginBottom: '0.25rem' }}>{t("dashboard.txt_317a89")}</p>
             <p style={{ fontSize: '1.5rem', fontWeight: 700, color: REPORT_COLORS.text.muted }}>{lastWeekMinutes}</p>
             <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted }}>분</p>
             <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.light, marginTop: '0.25rem' }}>{lastWeekDays}일 학습</p>
@@ -100,7 +102,7 @@ export function ReportTrend({ dailyActivity }: ReportTrendProps) {
 
           {/* This week */}
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted, marginBottom: '0.25rem' }}>이번주</p>
+            <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted, marginBottom: '0.25rem' }}>{t("dashboard.txt_f780b4")}</p>
             <p style={{ fontSize: '1.5rem', fontWeight: 700, color: REPORT_COLORS.text.primary }}>{thisWeekMinutes}</p>
             <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.muted }}>분</p>
             <p style={{ fontSize: '0.75rem', color: REPORT_COLORS.text.light, marginTop: '0.25rem' }}>{thisWeekDays}일 학습</p>

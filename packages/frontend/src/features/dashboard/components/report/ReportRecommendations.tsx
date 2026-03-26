@@ -6,6 +6,7 @@
 import { Lightbulb, Target, Clock, BookOpen } from 'lucide-react';
 import type { AnalyticsSummary } from '@/services/analytics';
 import { REPORT_COLORS } from './colors';
+import { useTranslation } from 'react-i18next';
 
 interface ReportRecommendationsProps {
   data: AnalyticsSummary;
@@ -18,6 +19,7 @@ export function ReportRecommendations({
   mostActiveDay,
   mostActiveTimeSlot,
 }: ReportRecommendationsProps) {
+  const { t } = useTranslation();
   const { quizStats, weakConcepts } = data;
 
   // Generate recommendations based on data
@@ -114,7 +116,7 @@ export function ReportRecommendations({
     <div className="keep-together" style={{ marginBottom: '2rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
         <Lightbulb style={{ width: '1.25rem', height: '1.25rem', color: REPORT_COLORS.accent.amber }} />
-        <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: REPORT_COLORS.text.secondary }}>맞춤 학습 추천</h2>
+        <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: REPORT_COLORS.text.secondary }}>{t("dashboard.txt_96cf93")}</h2>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>

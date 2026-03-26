@@ -23,6 +23,7 @@ import {
   type StandaloneQuiz,
 } from '@/services/standalone-quiz';
 import { logger } from '@/utils/logger';
+import { useTranslation } from 'react-i18next';
 
 // 언어별 정보
 const LANGUAGE_INFO: Record<string, { name: string; icon: string; color: string }> = {
@@ -36,6 +37,7 @@ const LANGUAGE_INFO: Record<string, { name: string; icon: string; color: string 
 type ViewState = 'chapters' | 'quiz' | 'result';
 
 export function OXQuizPage() {
+  const { t } = useTranslation();
   const { lang } = useParams<{ lang: string }>();
   const langInfo = LANGUAGE_INFO[lang || 'c'] || LANGUAGE_INFO.c;
 
@@ -206,7 +208,7 @@ export function OXQuizPage() {
             </div>
           ) : chapters.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-[var(--theme-quiz-text-muted)]">아직 퀴즈가 없습니다.</p>
+              <p className="text-[var(--theme-quiz-text-muted)]">{t("quiz.txt_2d76c3")}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -270,7 +272,7 @@ export function OXQuizPage() {
             >
               <ArrowLeft className="w-5 h-5 text-[var(--theme-quiz-text-muted)]" />
             </button>
-            <h1 className="text-xl font-bold text-[var(--theme-quiz-title)]">퀴즈 결과</h1>
+            <h1 className="text-xl font-bold text-[var(--theme-quiz-title)]">{t("quiz.txt_a3f74a")}</h1>
           </div>
 
           <motion.div

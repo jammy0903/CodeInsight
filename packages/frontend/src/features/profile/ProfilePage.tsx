@@ -243,7 +243,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <User className="w-8 h-8 text-[var(--theme-dashboard-accent)]" />
-          <h1 className="text-2xl font-bold text-[var(--theme-dashboard-title)]">프로필</h1>
+          <h1 className="text-2xl font-bold text-[var(--theme-dashboard-title)]">{t("profile.title")}</h1>
         </div>
 
         {/* 기본 정보 카드 */}
@@ -261,7 +261,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
                     <button
                       onClick={handleStartEditNickname}
                       className="p-1.5 rounded-lg hover:bg-[var(--theme-layout-top-bar-button-hover)] transition-colors text-[var(--theme-dashboard-accent)]"
-                      title="닉네임 변경"
+                      title={t("profile.nickname_change")}
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -273,7 +273,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
                         type="text"
                         value={newNickname}
                         onChange={(e) => handleNicknameChange(e.target.value)}
-                        placeholder="새 닉네임"
+                        placeholder={t("profile.nickname_placeholder")}
                         className="flex-1 px-3 py-2 border-2 border-orange-200 rounded-lg focus:border-orange-400 focus:outline-none text-sm"
                         disabled={isSavingNickname}
                         autoFocus
@@ -516,19 +516,19 @@ function getErrorMessage(error: unknown, fallback: string): string {
             <div className="space-y-2 text-sm text-[var(--theme-dashboard-text-muted)]">
               <p className="flex items-start gap-2">
                 <span className="text-red-600 font-bold mt-0.5">•</span>
-                <span>모든 제출 기록과 드래프트가 삭제됩니다</span>
+                <span>{t("account.delete_submissions")}</span>
               </p>
               <p className="flex items-start gap-2">
                 <span className="text-red-600 font-bold mt-0.5">•</span>
-                <span>학습 진도 데이터가 모두 제거됩니다</span>
+                <span>{t("account.delete_progress")}</span>
               </p>
               <p className="flex items-start gap-2">
                 <span className="text-red-600 font-bold mt-0.5">•</span>
-                <span>같은 이메일로 다시 가입할 수 없습니다</span>
+                <span>{t("account.delete_email")}</span>
               </p>
               <p className="flex items-start gap-2">
                 <span className="text-red-600 font-bold mt-0.5">•</span>
-                <span>계정 정보가 즉시 삭제됩니다</span>
+                <span>{t("account.delete_immediate")}</span>
               </p>
             </div>
 

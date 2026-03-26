@@ -13,6 +13,7 @@ import { AlertTriangle, ArrowRight, TrendingDown, Loader2, BookOpen } from 'luci
 import { Link } from 'react-router-dom';
 import { getWeakConcepts, type WeakConcept } from '@/services/standalone-quiz';
 import { logger } from '@/utils/logger';
+import { useTranslation } from 'react-i18next';
 
 const LANGUAGE_INFO: Record<string, { name: string; icon: string; color: string }> = {
   c: { name: 'C', icon: '🧊', color: '#3B82F6' },
@@ -23,6 +24,7 @@ const LANGUAGE_INFO: Record<string, { name: string; icon: string; color: string 
 };
 
 export function StandaloneQuizSection() {
+  const { t } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState<string>('c');
   const [weakConcepts, setWeakConcepts] = useState<WeakConcept[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,8 +56,8 @@ export function StandaloneQuizSection() {
             <TrendingDown className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-[var(--theme-dashboard-title)]">퀴즈 취약 개념</h3>
-            <p className="text-sm text-[var(--theme-dashboard-text-muted)]">오답률이 높은 개념을 다시 학습하세요</p>
+            <h3 className="text-xl font-bold text-[var(--theme-dashboard-title)]">{t("report.txt_4af8e4")}</h3>
+            <p className="text-sm text-[var(--theme-dashboard-text-muted)]">{t("report.txt_7f4aa2")}</p>
           </div>
         </div>
       </div>
