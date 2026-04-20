@@ -16,7 +16,6 @@ import { z } from 'zod';
 import * as courseService from './service';
 import { lessonContentLoader } from '../../services/lessonContentLoader';
 import { logger } from '../../utils/logger';
-import { env } from '../../config/env';
 
 // =============================================
 // 스키마 정의
@@ -180,7 +179,7 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
         const userId = request.user!.dbUser!.id;
-        const isAdmin = request.user?.uid === env.ADMIN_FIREBASE_UID;
+        const isAdmin = request.user?.dbUser?.role === 'admin';
 
         const chapterId = Array.isArray(id) ? id[0] : id;
         if (!chapterId) {
@@ -286,7 +285,7 @@ const courseRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       const userId = request.user?.dbUser?.id;
-      const isAdmin = request.user?.uid === env.ADMIN_FIREBASE_UID;
+      const isAdmin = request.user?.dbUser?.role === 'admin';
       const language = await courseService.getLanguageWithChapters(id, userId, !!isAdmin, locale);
 
       if (!language) {

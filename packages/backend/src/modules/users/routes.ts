@@ -11,12 +11,10 @@
  * DELETE /api/users/me                - 계정 탈퇴
  */
 
-import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '../../config/database';
-import { getFirebaseAuth } from '../../config/firebase';
 import { logger } from '../../config/logger';
-import { env } from '../../config/env';
 
 // =============================================
 // Zod 스키마 정의
@@ -47,103 +45,10 @@ const registerSchema = z.object({
 });
 
 // =============================================
-// Admin 인증 preHandler
-// =============================================
-
-async function requireAdmin(request: FastifyRequest, reply: FastifyReply) {
-  const authHeader = request.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) {
-    return reply.status(401).send({ error: 'Unauthorized: No token provided' });
-  }
-
-  const token = authHeader.slice(7);
-
-  try {
-    const decodedToken = await getFirebaseAuth().verifyIdToken(token);
-
-    // UID 확인 (환경변수에서 Admin UID 가져옴)
-    if (!env.ADMIN_FIREBASE_UID || decodedToken.uid !== env.ADMIN_FIREBASE_UID) {
-      return reply.status(403).send({
-        error: 'Forbidden: Admin access only',
-        message: '관리자 권한이 필요합니다.'
-      });
-    }
-
-    // Admin 정보 저장 (request에 확장)
-    (request as any).adminUser = {
-      uid: decodedToken.uid,
-      displayName: decodedToken.name,
-    };
-  } catch (error) {
-    logger.error('Admin auth error:', error);
-    return reply.status(401).send({ error: 'Unauthorized: Invalid token' });
-  }
-}
-
-// =============================================
 // Fastify Plugin
 // =============================================
 
 const userRoutes: FastifyPluginAsync = async (fastify) => {
-  /**
-   * @swagger
-   * /api/users:
-   *   get:
-   *     tags: [Users]
-   *     summary: 전체 사용자 목록 (Admin용)
-   *     security:
-   *       - bearerAuth: []
-   *     responses:
-   *       200:
-   *         description: 사용자 목록
-   *       403:
-   *         description: Admin 권한 필요
-   */
-  fastify.get(
-    '/',
-    { preHandler: [requireAdmin] },
-    async (request, reply) => {
-      try {
-        const users = await prisma.user.findMany({
-          include: {
-            oauthAccounts: {
-              select: {
-                provider: true,
-              },
-            },
-            _count: {
-              select: {
-                submissions: true,
-                drafts: true,
-              },
-            },
-            submissions: {
-              where: { verdict: 'accepted' },
-              select: { problemId: true },
-              distinct: ['problemId'],
-            },
-          },
-          orderBy: { createdAt: 'desc' },
-        });
-
-        const result = users.map((user: any) => ({
-          nickname: user.nickname,
-          role: user.role,
-          createdAt: user.createdAt,
-          oauthAccounts: user.oauthAccounts,
-          totalSubmissions: user._count.submissions,
-          solvedCount: user.submissions.length,
-          draftsCount: user._count.drafts,
-        }));
-
-        return result;
-      } catch (error) {
-        logger.error('Failed to fetch users:', error);
-        return reply.status(500).send({ error: 'Failed to fetch users' });
-      }
-    }
-  );
-
   /**
    * @swagger
    * /api/users/check-nickname/{nickname}:

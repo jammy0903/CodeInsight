@@ -35,7 +35,7 @@ export interface UserInfo {
 
 export interface SubmissionInfo {
   id: string;
-  userId: string;
+  userNickname: string;
   problemId: string;
   verdict: string;
   createdAt: string;
@@ -244,11 +244,12 @@ export class AdminService {
     const submissions = await prisma.submission.findMany({
       take: limit,
       orderBy: { createdAt: 'desc' },
+      include: { user: { select: { nickname: true } } },
     });
 
     return submissions.map(s => ({
       id: s.id,
-      userId: s.userId,
+      userNickname: s.user.nickname,
       problemId: s.problemId,
       verdict: s.verdict,
       createdAt: s.createdAt.toISOString(),
