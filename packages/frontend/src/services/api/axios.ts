@@ -10,10 +10,17 @@
  */
 
 import axios from 'axios';
+
+declare module 'axios' {
+  interface InternalAxiosRequestConfig {
+    _retried?: boolean;
+  }
+}
 import { config } from '../../config';
 import { logger } from '@/utils/logger';
-import { getAuthToken } from './tokenManager';
+import { getAuthToken, setAuthToken } from './tokenManager';
 import { handleAPIError } from '@/components/common/Toast/notifications';
+import { auth } from '../firebase';
 
 // API 기본 URL (버전 포함)
 const BASE_URL = config.api.baseUrl;
@@ -43,12 +50,25 @@ api.interceptors.request.use(
   }
 );
 
-// Response Interceptor: 에러 시 toast 표시 + errors.ts로 위임
+// Response Interceptor: 401 시 토큰 갱신 후 1회 재시도, 그 외 에러는 toast
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status ?? 0;
+
+      if (status === 401 && !error.config?._retried && auth.currentUser) {
+        error.config._retried = true;
+        try {
+          const freshToken = await auth.currentUser.getIdToken(true);
+          setAuthToken(freshToken);
+          error.config.headers.Authorization = `Bearer ${freshToken}`;
+          return api(error.config);
+        } catch (refreshError) {
+          logger.error('Token refresh failed:', refreshError);
+        }
+      }
+
       const message = error.response?.data?.message;
       handleAPIError(status, message);
     }

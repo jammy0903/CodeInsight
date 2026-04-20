@@ -13,7 +13,6 @@ import fp from 'fastify-plugin';
 import { getFirebaseAuth } from '../config/firebase';
 import { prisma } from '../config/database';
 import { logger } from '../config/logger';
-import { env } from '../config/env';
 
 // OAuth Provider 타입
 type OAuthProvider = 'google' | 'github' | 'kakao';
@@ -336,34 +335,36 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
 
   /**
    * Admin 권한 확인 (필수)
-   * - Firebase 토큰 검증 + Admin UID 확인
-   * - ADMIN_FIREBASE_UID 환경변수와 일치해야 함
+   * - Firebase 토큰 디코드 + DB role === 'admin' 확인
    */
   fastify.decorate('requireAdmin', async function (request: FastifyRequest, reply: FastifyReply) {
-    const authHeader = request.headers.authorization;
+    const token = extractToken(request);
 
-    if (!authHeader?.startsWith('Bearer ')) {
+    if (!token) {
       return reply.status(401).send({ error: 'Unauthorized: No token provided' });
     }
 
-    const token = authHeader.slice(7);
+    const decoded = decodeFirebaseJwt(token);
+    if (!decoded) {
+      return reply.status(401).send({ error: 'Unauthorized: Invalid token' });
+    }
 
     try {
-      const decodedToken = await getFirebaseAuth().verifyIdToken(token);
+      // 캐시 미사용: role 변경이 즉시 반영되어야 함
+      const dbUser = await prisma.user.findUnique({
+        where: { firebaseUid: decoded.sub },
+        select: { role: true },
+      });
 
-      // Admin UID 확인
-      if (!env.ADMIN_FIREBASE_UID || decodedToken.uid !== env.ADMIN_FIREBASE_UID) {
+      if (!dbUser || dbUser.role !== 'admin') {
         return reply.status(403).send({
           error: 'Forbidden: Admin access only',
           message: '관리자 권한이 필요합니다.',
         });
       }
 
-      // Admin 정보 저장
-      request.adminUser = {
-        uid: decodedToken.uid,
-        displayName: decodedToken.name,
-      };
+      request.adminUser = { uid: decoded.sub };
+
     } catch (error) {
       logger.error('Admin auth error:', error);
       return reply.status(401).send({ error: 'Unauthorized: Invalid token' });
