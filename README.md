@@ -19,7 +19,9 @@
 
 <br />
 
-**[🚀 Live Demo](https://codeinsight.online)** · **[📖 Docs](#getting-started)** · **[🐛 Issues](https://github.com/jammy0903/C-OSINE/issues)**
+**[📖 Docs](#getting-started)** · **[🐛 Issues](https://github.com/jammy0903/CodeInsight/issues)**
+
+*웹사이트로 배포해 운영했으며, 현재는 운영을 종료했습니다. 소스는 MIT 라이선스로 공개되어 있습니다.*
 
 <br />
 
@@ -36,7 +38,7 @@
 CodeInsight는 코드 한 줄 한 줄이 실행될 때 메모리, 변수, 콜 스택이 어떻게 변하는지를 **시각적으로** 보여주는 학습 플랫폼입니다. C, Python, JavaScript, Java 모두 지원합니다.
 
 ```
-코드 작성  →  단계별 실행  →  메모리 변화 시각화  →  AI 해설  →  퀴즈로 확인
+코드 작성  →  단계별 실행  →  메모리 변화 시각화  →  단계별 설명  →  퀴즈로 확인
 ```
 
 ---
@@ -58,7 +60,7 @@ CodeInsight는 코드 한 줄 한 줄이 실행될 때 메모리, 변수, 콜 �
 - **Playground 모드** — 직접 코드를 작성하고 실시간으로 시각화
 - **알고리즘 시각화** — 배열, 그래프, 정렬 알고리즘 시각화
 - **퀴즈** — 레슨 후 이해도 확인 퀴즈 (O/X, 객관식)
-- **AI 해설** — 각 실행 단계마다 AI가 자동으로 설명
+- **단계별 설명** — 각 실행 단계마다 템플릿 기반 설명 제공
 
 ### 플랫폼
 
@@ -66,7 +68,7 @@ CodeInsight는 코드 한 줄 한 줄이 실행될 때 메모리, 변수, 콜 �
 - **다크/라이트 테마** — 시스템 설정 연동
 - **다국어** — 한국어 / English
 - **소셜 로그인** — Google, GitHub, Kakao
-- **모바일 지원** — iOS/Android (Capacitor)
+- **모바일 브라우저 지원** — 반응형 레이아웃
 
 ---
 
@@ -76,19 +78,19 @@ CodeInsight는 코드 한 줄 한 줄이 실행될 때 메모리, 변수, 콜 �
 packages/
 ├── frontend/     React 19 + Vite + TailwindCSS + Zustand + React Query
 ├── backend/      Node.js + Fastify + Prisma ORM
-├── shared/       TypeScript 공유 타입 & 스키마
-└── simulators/   언어별 코드 실행 엔진 (Docker 격리)
+└── shared/       TypeScript 공유 타입 & 스키마
+
+packages/backend/src/modules/simulators/   언어별 코드 실행 엔진 (C·C++ GDB, Python sys.settrace, JavaScript AST·V8 Inspector, Java JDI)
 ```
 
 | Layer | Technology |
 |-------|------------|
 | Frontend | React 19, Vite, TailwindCSS, Zustand, TanStack Query, Framer Motion |
 | Backend | Node.js, Fastify, Prisma ORM, Zod |
-| Database | PostgreSQL |
+| Database | PostgreSQL (Neon) |
 | Auth | Firebase Authentication (Google, GitHub, Kakao) |
-| AI | DeepSeek API |
-| Simulators | Docker-based execution sandbox |
-| Infra | Render (Frontend + Backend + DB) |
+| Simulators | API 서버 컨테이너 안의 자식 프로세스로 실행 (실행 시간 제한 · 스텝 상한 · 위험 패턴 검사 · 최소 환경변수 · 요청 속도 제한). 실행 단위 컨테이너 격리는 적용하지 않음 |
+| Infra | Render (Frontend, Backend Docker 이미지) · Neon (DB) |
 | Monorepo | pnpm workspaces + TypeScript |
 
 ---
@@ -123,15 +125,15 @@ flowchart TD
 - Node.js >= 18
 - pnpm >= 8
 - PostgreSQL
-- Docker (시뮬레이터 실행용)
+- GCC · GDB, Python 3, JDK 17 (시뮬레이터 실행용. 또는 Docker 이미지로 한 번에 실행)
 - Firebase 프로젝트
 
 ### Setup
 
 ```bash
 # 클론
-git clone https://github.com/jammy0903/C-OSINE.git
-cd C-OSINE
+git clone https://github.com/jammy0903/CodeInsight.git
+cd CodeInsight
 
 # 의존성 설치
 pnpm install
@@ -162,7 +164,6 @@ pnpm dev
 | `FIREBASE_PROJECT_ID` | Firebase 프로젝트 ID |
 | `FIREBASE_CLIENT_EMAIL` | Firebase 서비스 계정 이메일 |
 | `FIREBASE_PRIVATE_KEY` | Firebase 서비스 계정 키 |
-| `DEEPSEEK_API_KEY` | DeepSeek AI API 키 |
 | `VITE_API_URL` | 프론트엔드에서 사용할 백엔드 URL |
 
 전체 목록은 [`.env.example`](.env.example) 참고.
