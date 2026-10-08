@@ -3,11 +3,14 @@
 ## 📌 Project
 **Visualization platform for code execution** (C, Python, JS, Java)
 
+**Portfolio project** (운영 종료 후 포트폴리오로 전환, 2026-10). 계정·로그인 없음, 진도는 localStorage.
+
 **Dual execution modes:**
-- **Lesson**: Pre-scripted JSON (no simulator needed)
+- **Lesson**: Pre-scripted JSON (no simulator needed). 한 스텝 = 설명(위) + 시각화(아래), 일부 스텝에 "실행 전 예측" 질문(`predict`)
 - **Playground**: User code → Simulator → Dynamic visualization
 
-**Tech**: React/Vite, Node.js/Fastify, PostgreSQL, Language-specific simulators
+**Tech**: React/Vite, Node.js/Fastify, PostgreSQL (lesson content only), Language-specific simulators
+**Deploy**: Frontend Vercel (push to `main` → auto), Backend Fly.io (manual `flyctl deploy`). See `.claude/deployment_info.md`
 
 ## ⚡ Key Rules
 1. **Explain Why**: Context + Reasoning, not just code
@@ -22,9 +25,8 @@
 ```
 packages/
 ├── frontend/     (React Vite)
-├── backend/      (Node.js API)
-├── shared/       (Types)
-└── simulators/   (Language implementations)
+├── backend/      (Fastify API, simulators in src/modules/simulators/{c,python,javascript,java})
+└── shared/       (Zod schemas & types)
 ```
 
 ## 🔧 Commands

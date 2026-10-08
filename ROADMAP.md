@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-10 — 포트폴리오 전환 ✅
+
+서비스 운영을 끝내고 포트폴리오로 정리했다. 상세 기록: [`plan.md`](plan.md)
+
+- [x] 운영용 기능 제거: 로그인(Firebase), 대시보드·리포트·관리자·게이미피케이션·노트·문제/제출, C++ · 업무 자동화 · AI 리터러시 강의, Android 앱
+- [x] 차별화 기능: **실행 전 예측하기** (C 역참조, Python 리스트, Java 참조 전달, JS 이벤트 루프)
+- [x] 레슨을 설명+시각화 한 화면으로 통합
+- [x] 홈 첫 화면에 실행 시각화 데모 (녹화 재생)
+- [x] 보안 정리: 공개 저장소의 DB 비밀번호·서명 키 제거 및 교체, 실제로 걸려 있지 않던 rate limit 수정
+- [x] 배포 이전: Render → Vercel(프론트) + Fly.io(백엔드)
+- 데모: https://codeinsight-jammy0903s-projects.vercel.app
+
+---
+
 ## Phase 1 — 공개 준비 (2주)
 
 ### GitHub 정리
@@ -56,9 +70,9 @@
   ```
   CodeInsight | 1인 풀스택 개발 (2024~)
   - C/Python/JS/Java 코드 실행 시각화 플랫폼 설계 및 구현
-  - React 19, Node.js, PostgreSQL, Docker 기반 모노레포 구성
-  - Firebase Auth, DeepSeek AI 연동
-  - GitHub Stars XXX / 월 활성 사용자 XXX명
+    (GDB/MI · sys.settrace · V8 Inspector · JDI로 실제 실행을 추적)
+  - "실행 전 예측" 학습 흐름과 개념별 시각화(이벤트 루프, 포인터, 참조 그래프)
+  - React 19, Fastify, PostgreSQL, Docker 기반 모노레포 / Vercel + Fly.io 배포
   ```
 - [ ] 포트폴리오 사이트에 프로젝트 섹션 추가
 
@@ -114,6 +128,7 @@
 | 날짜 | GitHub Stars | MAU | 이벤트 |
 |------|-------------|-----|--------|
 | 2026-02-27 | - | - | 로드맵 시작, README 개편, 데모 GIF 추가, 죽은 코드 삭제 |
+| 2026-10-08 | - | - | 포트폴리오 전환, 예측 기능, 한 화면 레슨, Vercel + Fly.io 배포 |
 
 ---
 

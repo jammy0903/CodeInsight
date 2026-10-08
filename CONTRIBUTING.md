@@ -5,10 +5,12 @@ Thanks for your interest in contributing! This guide will help you get started.
 ## Development Setup
 
 1. Fork and clone the repo
-2. Install dependencies: `pnpm install`
-3. Copy `.env.example` to `.env` and fill in your values
-4. Set up the database: `cd packages/backend && npx prisma migrate dev`
+2. Install dependencies: `pnpm install` (Node.js 22+)
+3. Start PostgreSQL (see README for a Docker one-liner). `.env` is optional — every variable has a default
+4. Set up the database: `cd packages/backend && npx prisma migrate deploy && npx prisma db seed`
 5. Start dev servers: `pnpm dev`
+
+Running all simulators locally needs GCC + GDB, Python 3 and JDK 17.
 
 ## Code Standards
 
@@ -22,7 +24,7 @@ Thanks for your interest in contributing! This guide will help you get started.
 
 ### Reporting Bugs
 
-Open an [issue](https://github.com/jammy0903/C-OSINE/issues/new?template=bug_report.md) with:
+Open an [issue](https://github.com/jammy0903/CodeInsight/issues/new?template=bug_report.md) with:
 - Steps to reproduce
 - Expected vs actual behavior
 - Browser/OS info
@@ -30,7 +32,7 @@ Open an [issue](https://github.com/jammy0903/C-OSINE/issues/new?template=bug_rep
 
 ### Suggesting Features
 
-Open an [issue](https://github.com/jammy0903/C-OSINE/issues/new?template=feature_request.md) describing:
+Open an [issue](https://github.com/jammy0903/CodeInsight/issues/new?template=feature_request.md) describing:
 - The problem you're trying to solve
 - Your proposed solution
 - Any alternatives you've considered
@@ -68,13 +70,15 @@ packages/
 
 ### Key Concepts
 
-- **Lessons** use pre-scripted JSON to drive visualizations (no simulator needed)
+- **Lessons** use pre-scripted JSON (`packages/backend/prisma/content`) to drive visualizations (no simulator needed). Each step shows its explanation above the visualization
+- **Predictions**: a lesson step can carry `predict { question, options, answer }`; the learner answers before the step runs (`usePredictGate`)
 - **Playground** sends user code to language-specific simulators that return execution traces
-- **Visualizers** render execution state (memory, variables, call stack) as interactive diagrams
+- **Visualizers** render execution state (memory, variables, call stack, event loop) as interactive diagrams
+- **No accounts**: progress and prediction results live in localStorage
 
 ## Getting Help
 
-- Open a [Discussion](https://github.com/jammy0903/C-OSINE/discussions) for questions
+- Open a [Discussion](https://github.com/jammy0903/CodeInsight/discussions) for questions
 - Check existing issues before creating new ones
 
 ## License

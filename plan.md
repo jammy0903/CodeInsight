@@ -96,7 +96,7 @@
 - [x] E2E 수동 확인 (임시 DB + 로컬 백엔드 + 헤드리스 브라우저): C·JS 레슨 질문 → 오답 → 피드백 → 기록
 - 참고: shared 스키마를 바꾼 뒤 dev 서버는 `vite --force`로 재시작해야 함 (optimizeDeps 캐시)
 
-### 7. 마무리
+### 7. 마무리 ✅
 - [x] README를 포트폴리오 관점으로 재작성 (차별점, 아키텍처, 설계 결정, Firebase 없는 실행 방법, 현재 UI 스크린샷)
 - [x] `render.yaml`, `.env.example` 2개, docker-compose: 코드가 실제로 읽는 변수만 남김, 불필요한 `docker.sock` 마운트 제거
 - [x] 번역: 하드코딩 문구 ~45곳 i18n, 미사용 네임스페이스 13개·C++ 언급 삭제
@@ -104,8 +104,26 @@
 - [x] 영업 메일 자동화 스크립트 7개 삭제
 - [x] **보안**: 요청 속도 제한이 실제로는 어느 라우트에도 적용되지 않던 문제 수정 (전역 IP당 분당 100회, 429 응답)
 - [x] 전체 화면 확인 (ko/en, 홈·코스·챕터·레슨·Playground 실행·삭제된 경로): 콘솔 에러·실패 요청 없음
-- [ ] ⚠️ 사용자 조치: Neon DB 비밀번호 교체 → Render `DATABASE_URL` 갱신 (머지 전)
-- [ ] main 머지 (머지 시 Render 배포에서 마이그레이션이 운영 DB에 적용됨)
+- [x] Neon DB 비밀번호 교체 (새 비밀번호 접속 OK, 옛 비밀번호 거부 확인)
+- [x] main 머지
+
+### 8. 배포 이전 (Render 계정 삭제 → Vercel + Fly.io) ✅
+- [x] Fly: 1월에 만든 `codeinsight-backend` 재사용, 미사용 시크릿 7개·예전 머신·볼륨 삭제, 새 `DATABASE_URL`
+- [x] `fly.toml`: nrt, 1GB, 자동 정지, `release_command`로 migrate + seed
+- [x] 배포하며 고친 것: 런타임 이미지에 `prisma.config.ts`·`src/utils` 누락, Node 20 → 22 (JS 시뮬레이터 WebSocket)
+- [x] 운영 DB에 `portfolio_slim` 마이그레이션 적용 (테이블 23 → 6)
+- [x] Vercel 프로젝트 `codeinsight` (root `packages/frontend`), Vercel Authentication 해제(공개)
+- [x] 운영 확인: 홈 데모, 레슨·예측, Playground C·JS 실행, 4개 시뮬레이터 API, CORS
+
+### 9. 레슨 한 화면 통합 ✅
+- [x] 설명 라운드 → 시각화 라운드 2단 구조 제거 → 한 스텝 = 설명(위, 접기) + 시각화(아래)
+- [x] `useRoundNavigation` → `useStepNavigation`, 시각화 없는 스텝은 직전 시각화 유지
+- [x] 예측이 다음 스텝 설명보다 먼저 → 실제 예측이 됨
+- [x] 테스트 11개 (예측 8, 스텝 이동 3)
+
+### 10. 문서 갱신 ✅
+- [x] README, 패키지 README 2개, CONTRIBUTING, ROADMAP, `.claude/CLAUDE.md`·rules·context·deployment_info
+- [x] 백엔드 기본 포트 3000 → 3002 (프론트 기본값과 불일치하던 문제)
 
 ## 남은 이슈 (이번 범위 밖)
 - 일부 레슨 콘텐츠의 영어/중국어 번역 누락 (예: `py-3-1` 설명)
@@ -113,3 +131,5 @@
 - C 시뮬레이터 테스트 12개는 gdb가 있는 환경에서만 통과
 - 개발용 스크립트 3개의 기존 타입 에러 (backup-courses, restore-courses, validate-simulators)
 - `docs/demo.gif`(2월 녹화)는 현재 UI와 다름 — README에서는 참조하지 않음
+- DeepSeek·FAL·Firebase API 키는 각 서비스 콘솔에서 직접 폐기 필요
+- 과거 기록 문서(`.claude/plans`, `.claude/audit`, `packages/frontend/E2E_*.md` 등)는 당시 기준으로 남아 있음

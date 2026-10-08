@@ -18,7 +18,7 @@ dotenv.config();
 
 const envSchema = z.object({
   // === Server ===
-  PORT: z.coerce.number().default(3000),
+  PORT: z.coerce.number().default(3002),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 
   // === CORS ===

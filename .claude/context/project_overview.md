@@ -7,7 +7,7 @@
 
 | 모드 | 방식 | 사용처 |
 |------|------|--------|
-| **Lesson** | JSON 사전 스크립팅 (시뮬레이터 불필요) | 교육 콘텐츠 |
+| **Lesson** | JSON 사전 스크립팅 (시뮬레이터 불필요) | 교육 콘텐츠: 스텝마다 설명(위) + 시각화(아래), 일부 스텝은 실행 전 예측 질문 |
 | **Playground** | 동적 실행 (시뮬레이터 사용) | 사용자 실습 |
 
 **JSON 경로**: `packages/backend/prisma/content/{language}/lessons/`
@@ -16,10 +16,15 @@
 
 **C 모델**: 메모리 스택/힙 시각화
 
+**예측 질문**: 레슨 JSON 스텝의 `predict { question, options, answer }` → `usePredictGate`가 다음 스텝 이동 전에 질문. 결과는 localStorage(`codeinsight-progress`)
+
+**계정 없음**: 로그인·사용자 DB 없음. 진도/예측 결과는 브라우저 localStorage
+
 ## 🏢 구조
-- **Frontend**: React/Vite (`packages/frontend/src/`)
-- **Backend**: Node.js/Fastify (`packages/backend/src/`)
-- **Database**: Neon PostgreSQL
+- **Frontend**: React/Vite (`packages/frontend/src/`) → Vercel
+- **Backend**: Node.js/Fastify (`packages/backend/src/`) → Fly.io
+- **Database**: Neon PostgreSQL (레슨 콘텐츠만)
+- **홈 데모**: `features/home/demo/recordings.json` (녹화된 엔진 결과, `scripts/record-home-demo.mjs`로 갱신)
 
 ## 📚 참고
 - 상세 아키텍처: See `architecture.md`, `frontend_arch.md`, `backend_arch.md`
