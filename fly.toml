@@ -1,0 +1,41 @@
+# ==================================================
+# Fly.io Backend Configuration
+# ==================================================
+# 배포: flyctl deploy (저장소 루트에서)
+# 비밀값: flyctl secrets set DATABASE_URL=... CORS_ORIGINS=...
+
+app = "codeinsight-backend"
+primary_region = "nrt" # Tokyo
+
+[build]
+  dockerfile = "packages/backend/Dockerfile"
+
+# 배포할 때 한 번만 실행: 스키마 마이그레이션 + 레슨 콘텐츠 upsert
+[deploy]
+  release_command = "sh -c 'npx prisma migrate deploy && npx prisma db seed'"
+
+[env]
+  PORT = "3002"
+  NODE_ENV = "production"
+  # 마이그레이션은 release_command가 담당 → 콜드 스타트 시 건너뜀
+  SKIP_MIGRATE = "true"
+
+[http_service]
+  internal_port = 3002
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    grace_period = "30s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+# JVM(Java 시뮬레이터) + Node가 함께 돌기 때문에 1GB
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1

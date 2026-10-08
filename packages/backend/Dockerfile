@@ -101,10 +101,13 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3002/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # 시작 스크립트 생성 (migrate → 조건부 seed → app)
+# SKIP_MIGRATE=true 이면 migrate 생략 (Fly.io는 release_command에서 실행)
 # SEED_ON_DEPLOY=true 일 때만 seed 실행 (기본: 실행 안 함)
 RUN echo '#!/bin/sh\n\
-echo "🔄 Running Prisma migrate..."\n\
-npx prisma migrate deploy\n\
+if [ "$SKIP_MIGRATE" != "true" ]; then\n\
+  echo "🔄 Running Prisma migrate..."\n\
+  npx prisma migrate deploy\n\
+fi\n\
 if [ "$SEED_ON_DEPLOY" = "true" ]; then\n\
   echo "🌱 SEED_ON_DEPLOY=true → Running seed..."\n\
   npx prisma db seed || echo "⚠️ Seed failed"\n\
