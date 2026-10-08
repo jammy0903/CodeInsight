@@ -51,13 +51,17 @@
 - [x] 타입 체크·빌드 확인 → 커밋
 - 남김: Capacitor(Android 앱 래퍼), 번역 JSON의 미사용 키 → 7단계에서 정리
 
-### 3. 백엔드 정리
-- [ ] `modules/{gamification,analytics,notes,admin,reports,problems,submissions,standalone-quizzes,users}` 삭제
-- [ ] `modules/simulators/cpp` 삭제
-- [ ] 인증 제거: `plugins/auth.ts`, `config/firebase.ts`, `firebase-admin` 의존성, rateLimit의 사용자 기반 키
-- [ ] `courses`: 진도 API(`/progress` 등)와 `streakService` 결합 제거, 콘텐츠 조회만 남김
-- [ ] `app.ts` 라우트 등록, `swagger.ts` 정리
-- [ ] 빌드·테스트 확인 → 커밋
+### 3. 백엔드 정리 ✅
+- [x] `modules/{gamification,analytics,notes,admin,reports,problems,submissions,standalone-quizzes,users}` 삭제
+- [x] `modules/simulators/cpp` 삭제
+- [x] 인증 제거: `plugins/auth.ts`, `config/firebase.ts`, rateLimit 키를 IP 기준으로, CORS Authorization 헤더·credentials 제거
+- [x] `courses`: 진도 API 3개와 `streakService` 결합 제거, 콘텐츠 조회만 남김
+- [x] C 시뮬레이터의 `/judge`(문제 채점, 프론트 미사용) 엔드포인트·executor 메서드·타입 제거
+- [x] 미사용 환경변수 제거: Firebase, xAI, DeepSeek, Brevo, C_JUDGE_TIMEOUT
+- [x] 미사용 의존성 제거: firebase-admin, @google/generative-ai, @notionhq/client, @babel/*
+- [x] `app.ts` 라우트 등록, `swagger.ts` 태그·스키마 정리
+- [x] 타입 체크 0 에러, 테스트 107 통과 / 12 실패 (기준선과 동일: 로컬에 gdb 없음)
+- 남김: libsql/better-sqlite3/Prisma adapter 의존성 (코드에서 미사용, 4단계에서 DB 정리하며 확인)
 
 ### 4. Prisma 스키마 정리
 - [ ] 남길 모델: Language, Chapter, Lesson, LessonContent, Quiz (그 외 전부 제거)

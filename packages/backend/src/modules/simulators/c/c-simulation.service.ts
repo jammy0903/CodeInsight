@@ -10,7 +10,7 @@
  *   6. Cleanup   → rm -rf tmp dir
  *
  * Replaces the regex-based simulator for /trace endpoint.
- * /simulate and /judge endpoints remain unchanged (use cExecutor).
+ * /simulate endpoint remains unchanged (uses cExecutor).
  */
 
 import * as fs from 'fs/promises';

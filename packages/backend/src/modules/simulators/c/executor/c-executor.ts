@@ -18,7 +18,7 @@ import * as path from 'path';
 import * as os from 'os';
 import * as crypto from 'crypto';
 import { config } from '../../../../config';
-import type { ExecutionResult, IExecutor, JudgeResult } from '../../../executors/types';
+import type { ExecutionResult, IExecutor } from '../../../executors/types';
 import { checkCodeSecurity } from './security';
 import { cSafeEnv } from '../../safe-env';
 
@@ -166,105 +166,6 @@ export class CExecutor implements IExecutor {
         // 무시
       }
     }
-  }
-
-  async judge(
-    code: string,
-    testCases: Array<{ input: string; output: string }>,
-    timeout: number = config.execution.judgeTimeout
-  ): Promise<JudgeResult> {
-    const startTime = Date.now();
-    const details: JudgeResult['details'] = [];
-    let passed = 0;
-
-    // 보안 검사
-    const security = this.checkSecurity(code);
-    if (!security.safe) {
-      return {
-        success: false,
-        verdict: 'compile_error',
-        passed: 0,
-        total: testCases.length,
-        executionTimeMs: 0,
-        details: [{ testCase: 0, passed: false, error: security.reason }]
-      };
-    }
-
-    for (let i = 0; i < testCases.length; i++) {
-      const tc = testCases[i];
-      const result = await this.run(code, tc.input, timeout);
-
-      if (!result.compiled) {
-        return {
-          success: false,
-          verdict: 'compile_error',
-          passed: 0,
-          total: testCases.length,
-          executionTimeMs: Date.now() - startTime,
-          details: [{ testCase: i + 1, passed: false, error: result.stderr }]
-        };
-      }
-
-      if (result.error === 'timeout') {
-        details.push({
-          testCase: i + 1,
-          passed: false,
-          expected: tc.output.trim(),
-          actual: '(시간 초과)',
-          error: 'Time Limit Exceeded'
-        });
-        continue;
-      }
-
-      if (!result.executed || result.error) {
-        details.push({
-          testCase: i + 1,
-          passed: false,
-          expected: tc.output.trim(),
-          actual: result.stdout,
-          error: result.stderr || result.error
-        });
-        continue;
-      }
-
-      // 출력 비교 (줄바꿈, 공백 정규화)
-      const expected = tc.output.trim().replace(/\r\n/g, '\n');
-      const actual = result.stdout.trim().replace(/\r\n/g, '\n');
-      const isCorrect = expected === actual;
-
-      if (isCorrect) {
-        passed++;
-      }
-
-      details.push({
-        testCase: i + 1,
-        passed: isCorrect,
-        expected: expected,
-        actual: actual
-      });
-    }
-
-    const executionTime = Date.now() - startTime;
-    let verdict: JudgeResult['verdict'];
-
-    if (passed === testCases.length) {
-      verdict = 'accepted';
-    } else if (details.some(d => d.error?.includes('Time Limit'))) {
-      verdict = 'time_limit';
-    } else if (details.some(d => d.error && !d.error.includes('Time Limit'))) {
-      verdict = 'runtime_error';
-    } else {
-      verdict = 'wrong_answer';
-    }
-
-    return {
-      success: verdict === 'accepted',
-      verdict,
-      passed,
-      total: testCases.length,
-      executionTimeMs: executionTime,
-      details
-    };
   }
 }
 

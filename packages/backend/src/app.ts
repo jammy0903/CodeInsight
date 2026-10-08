@@ -8,35 +8,15 @@ import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import { config } from './config';
 import { logger } from './config/logger';
-import { initializeFirebase } from './config/firebase';
-import { authPlugin, rateLimitPlugin, swaggerPlugin } from './plugins';
+import { rateLimitPlugin, swaggerPlugin } from './plugins';
 import { lessonContentLoader } from './services/lessonContentLoader';
 
 // Route imports
-import { problemRoutes } from './modules/problems/routes';
 import { cSimulatorRoutes } from './modules/simulators/c/routes';
 import { courseRoutes } from './modules/courses/routes';
-import { analyticsRoutes } from './modules/analytics/routes';
-import { notesRoutes } from './modules/notes/routes';
-import { gamificationRoutes } from './modules/gamification';
-import { adminRoutes } from './modules/admin/admin.routes';
-import { userRoutes } from './modules/users/routes';
 import pythonSimulatorRoutes from './modules/simulators/python/routes';
 import { javaSimulatorRoutes } from './modules/simulators/java/routes';
-import { cppSimulatorRoutes } from './modules/simulators/cpp/routes';
 import javascriptSimulatorRoutes from './modules/simulators/javascript/routes';
-import { standaloneQuizzesRoutes } from './modules/standalone-quizzes/routes';
-import { submissionRoutes } from './modules/submissions/routes';
-import { reportRoutes } from './modules/reports/routes';
-
-// Firebase Admin 초기화
-try {
-  initializeFirebase();
-  logger.info('Firebase initialized successfully');
-} catch (error) {
-  logger.error('Firebase initialization failed:', error);
-  logger.warn('App will continue without Firebase authentication');
-}
 
 // Lesson Content 초기화 (서버 시작 시 파일 경로 스캔 + 메모리 프리로드)
 lessonContentLoader.scanFilePaths()
@@ -59,7 +39,7 @@ const allowedOrigins = [...config.server.corsOrigins, ...capacitorOrigins];
 
 app.register(cors, {
   methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type'],
   origin: config.server.isDev ? true : (origin, callback) => {
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
@@ -67,11 +47,9 @@ app.register(cors, {
     }
     callback(new Error('Not allowed by CORS'), false);
   },
-  credentials: true,
 });
 
 // 플러그인 등록
-app.register(authPlugin);
 app.register(rateLimitPlugin);
 app.register(swaggerPlugin);
 
@@ -101,21 +79,11 @@ app.get('/health', async () => {
 // =============================================
 // API v1 Routes
 // =============================================
-app.register(problemRoutes, { prefix: '/api/v1/problems' });
 app.register(cSimulatorRoutes, { prefix: '/api/v1/simulators/c' });
 app.register(pythonSimulatorRoutes, { prefix: '/api/v1/simulators/python' });
 app.register(javaSimulatorRoutes, { prefix: '/api/v1/simulators/java' });
 app.register(javascriptSimulatorRoutes, { prefix: '/api/v1/simulators/javascript' });
-app.register(cppSimulatorRoutes, { prefix: '/api/v1/simulators/cpp' });
 app.register(courseRoutes, { prefix: '/api/v1/courses' });
-app.register(analyticsRoutes, { prefix: '/api/v1/analytics' });
-app.register(notesRoutes, { prefix: '/api/v1/notes' });
-app.register(gamificationRoutes, { prefix: '/api/v1/gamification' });
-app.register(adminRoutes, { prefix: '/api/v1/admin' });
-app.register(userRoutes, { prefix: '/api/v1/users' });
-app.register(standaloneQuizzesRoutes, { prefix: '/api/v1/standalone-quizzes' });
-app.register(submissionRoutes, { prefix: '/api/v1/submissions' });
-app.register(reportRoutes, { prefix: '/api/v1/reports' });
 
 // =============================================
 // Error Handlers

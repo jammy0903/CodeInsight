@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { simulateCode } from './simulator';
 import { cExecutor } from './executor';
 import { EmscriptenValidatorService } from './services/emscripten-validator.service';
-import { prisma } from '../../../config/database';
 import { config } from '../../../config';
 import { logger } from '../../../utils/logger';
 
@@ -24,25 +23,6 @@ const runCodeSchema = z.object({
     .max(config.execution.maxCodeLength, `코드가 너무 깁니다 (최대 ${config.execution.maxCodeLength}자)`),
   stdin: z.string().optional().default(''),
   timeout: z.number().int().min(1).max(config.execution.maxTimeout).optional(),
-});
-
-/**
- * /judge 엔드포인트 스키마
- */
-const judgeCodeSchema = z.object({
-  code: z
-    .string()
-    .min(1, 'code 필드가 필요합니다')
-    .max(config.execution.maxCodeLength, `코드가 너무 깁니다 (최대 ${config.execution.maxCodeLength}자)`),
-  problemId: z.string().uuid().optional(),
-  testCases: z
-    .array(
-      z.object({
-        input: z.string(),
-        output: z.string(),
-      })
-    )
-    .optional(),
 });
 
 // =============================================
@@ -209,147 +189,6 @@ export const cSimulatorRoutes: FastifyPluginAsync = async (fastify) => {
         success: false,
         error: 'internal_error',
         message: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  });
-
-  /**
-   * @swagger
-   * /api/c/judge:
-   *   post:
-   *     tags: [C Simulator]
-   *     summary: 문제 채점 (테스트케이스 기반)
-   *     description: 코드를 테스트케이스에 대해 채점하고 결과 반환. 로그인 시 제출 기록 저장
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/JudgeRequest'
-   *     responses:
-   *       200:
-   *         description: 채점 결과
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                 steps:
-   *                   type: array
-   *                   items:
-   *                     type: object
-   *                     properties:
-   *                       step:
-   *                         type: integer
-   *                       action:
-   *                         type: string
-   *                       stack:
-   *                         type: array
-   *                       heap:
-   *                         type: array
-   *       400:
-   *         description: 테스트케이스 없음
-   *       404:
-   *         description: 문제를 찾을 수 없음
-   *       500:
-   *         description: 내부 서버 에러
-   */
-  fastify.post('/judge', { preHandler: [fastify.optionalAuth] }, async (request, reply) => {
-    // Inline Zod validation
-    const parseResult = judgeCodeSchema.safeParse(request.body);
-
-    if (!parseResult.success) {
-      return reply.status(400).send({
-        success: false,
-        error: 'validation_error',
-        message: parseResult.error.issues[0]?.message || '유효하지 않은 요청입니다',
-        details: parseResult.error.issues,
-      });
-    }
-
-    try {
-      const { code, problemId, testCases } = parseResult.data;
-
-      let cases = testCases;
-
-      if (!cases && problemId) {
-        const problem = await prisma.problem.findUnique({
-          where: { id: problemId },
-          select: { testCases: true },
-        });
-
-        if (!problem) {
-          return reply.status(404).send({
-            success: false,
-            error: 'not_found',
-            message: '문제를 찾을 수 없습니다',
-          });
-        }
-
-        try {
-          cases = JSON.parse(problem.testCases as string) as Array<{ input: string; output: string }>;
-        } catch {
-          cases = [];
-        }
-      }
-
-      if (!cases || !Array.isArray(cases) || cases.length === 0) {
-        return reply.status(400).send({
-          success: false,
-          error: 'validation_error',
-          message: '테스트케이스가 필요합니다',
-        });
-      }
-
-      const result = await cExecutor.judge(code, cases, config.execution.judgeTimeout);
-
-      // 로그인한 사용자면 제출 기록 저장 (OAuthAccount로 조회)
-      if (request.user && problemId) {
-        try {
-          const oauthAccount = await prisma.oAuthAccount.findUnique({
-            where: {
-              provider_providerId: {
-                provider: request.user.provider,
-                providerId: request.user.uid,
-              },
-            },
-            select: { userId: true },
-          });
-
-          if (oauthAccount) {
-            await prisma.submission.create({
-              data: {
-                userId: oauthAccount.userId,
-                problemId,
-                code,
-                verdict: result.verdict,
-                executionTime: result.executionTimeMs,
-              },
-            });
-          }
-        } catch (dbError) {
-          logger.error('Failed to save submission:', dbError);
-        }
-      }
-
-      return {
-        success: result.success,
-        data: {
-          verdict: result.verdict,
-          passed: result.passed,
-          total: result.total,
-          execution_time_ms: result.executionTimeMs,
-          details: result.details,
-        },
-      };
-    } catch (error: unknown) {
-      logger.error('Judge error:', error);
-      return reply.status(500).send({
-        success: false,
-        error: 'internal_error',
-        message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   });

@@ -7,8 +7,6 @@
  */
 
 import { prisma } from '../../config/database';
-import { randomUUID } from 'crypto';
-import * as streakService from '../gamification/streak.service';
 import { getCourseLocalizationCatalog } from './localization';
 
 // =============================================
@@ -28,20 +26,10 @@ export async function getLanguages() {
 /**
  * 언어 상세 (챕터 포함)
  *
- * WHY: DRY 원칙 - 진행률 계산은 백엔드에서만
- * - userId 제공 시: 챕터별 진행률 계산하여 포함
- * - userId 미제공 시: 코스 구조만 반환
- *
- * OPTIMIZATION (2025-01-25): Payload ~50KB → ~3KB
- * - lesson.id만 조회 (description, difficulty 등 제외)
- * - 진행률은 별도 쿼리로 completed만 집계
- *
- * FIX (2026-02-15): Accurate progress per chapter
- * - 각 chapter마다 정확한 progress 계산
- * - chapter 범위로 completed lessons 필터링 (language 범위 X)
+ * 진도는 클라이언트(localStorage)에서 관리하므로 코스 구조만 반환한다.
+ * - lesson은 목록 표시에 필요한 필드만 조회 (Payload 최소화)
  */
-// ... (previous code)
-export async function getLanguageWithChapters(languageId: string, userId?: string, isAdmin: boolean = false, locale?: string) {
+export async function getLanguageWithChapters(languageId: string, locale?: string) {
   // 1. Structure (Lightweight - Lessons ID only)
   const language = await prisma.language.findUnique({
     where: { id: languageId },
@@ -79,98 +67,25 @@ export async function getLanguageWithChapters(languageId: string, userId?: strin
     })),
   });
 
-  // 2. userId 미제공 시: 코스 구조만 반환
-  if (!userId) {
-    return {
-      ...language,
-      chapters: language.chapters.map((chapter: any) => {
-        const localizedChapter = localizeChapter(chapter);
-        return {
-          ...localizedChapter,
-          lessons: localizedChapter.lessons.map((lesson: any) => ({
-            ...lesson,
-            progress: null,
-          })),
-          progress: {
-            total: chapter.lessons.length,
-            completed: 0,
-            percentage: 0,
-          },
-        };
-      }),
-    };
-  }
-
-  // 3. Progress (Single Source of Truth)
-  // 백엔드에서만 lesson/chapter 진행률 계산 후 반환
-  const allLessonIds = language.chapters.flatMap((chapter: any) =>
-    chapter.lessons.map((lesson: any) => lesson.id)
-  ) as string[];
-
-  const progressRows = isAdmin
-    ? []
-    : await prisma.userProgress.findMany({
-        where: {
-          userId,
-          lessonId: {
-            in: allLessonIds,
-          },
-        },
-        select: {
-          id: true,
-          userId: true,
-          lessonId: true,
-          status: true,
-          currentStep: true,
-          quizScore: true,
-          quizTotal: true,
-          startedAt: true,
-          completedAt: true,
-          updatedAt: true,
-        },
-      });
-
-  const progressMap = new Map(progressRows.map((row) => [row.lessonId, row]));
-
   return {
     ...language,
     chapters: language.chapters.map((chapter: any) => {
       const localizedChapter = localizeChapter(chapter);
-      const lessons = localizedChapter.lessons.map((lesson: any) => {
-        if (isAdmin) {
-          return {
-            ...lesson,
-            progress: {
-              status: 'completed',
-            },
-          };
-        }
-
-        return {
-          ...lesson,
-          progress: progressMap.get(lesson.id) || null,
-        };
-      });
-
-      const total = lessons.length;
-      const completed = lessons.filter((lesson: any) => lesson.progress?.status === 'completed').length;
-
       return {
         ...localizedChapter,
-        lessons,
+        lessons: localizedChapter.lessons.map((lesson: any) => ({
+          ...lesson,
+          progress: null,
+        })),
         progress: {
-          total,
-          completed,
-          percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
+          total: chapter.lessons.length,
+          completed: 0,
+          percentage: 0,
         },
       };
     }),
   };
 }
-
-// =============================================
-// Chapter
-// =============================================
 
 /**
  * 언어별 챕터 목록
@@ -300,117 +215,3 @@ export async function getLessonFull(lessonId: string, locale?: string) {
   return localizedLesson;
 }
 
-// =============================================
-// Progress
-// =============================================
-
-/**
- * 사용자 진행 상태 조회
- */
-export async function getUserProgress(userId: string, lessonId?: string) {
-  if (lessonId) {
-    return prisma.userProgress.findUnique({
-      where: {
-        userId_lessonId: { userId, lessonId },
-      },
-    });
-  }
-
-  return prisma.userProgress.findMany({
-    where: { userId },
-    orderBy: { updatedAt: 'desc' },
-  });
-}
-
-/**
- * 챕터별 진행 상태 (레슨 포함)
- */
-export async function getChapterProgress(userId: string, chapterId: string, isAdmin: boolean = false) {
-  const chapter = await prisma.chapter.findUnique({
-    where: { id: chapterId },
-    include: {
-      lessons: {
-        where: { isActive: true },
-        orderBy: { order: 'asc' },
-        include: {
-          progress: {
-            where: { userId },
-          },
-        },
-      },
-    },
-  });
-
-  if (!chapter) return null;
-
-  // Admin은 모든 레슨을 완료한 것으로 처리
-  const completedCount = isAdmin ? chapter.lessons.length : chapter.lessons.filter(
-    (l: any) => l.progress[0]?.status === 'completed'
-  ).length;
-
-  return {
-    ...chapter,
-    completedCount,
-    totalCount: chapter.lessons.length,
-    lessons: chapter.lessons.map((l: any) => ({
-      ...l,
-      // Admin은 모든 레슨에 대해 가짜 완료 상태 반환 (접근 허용)
-      progress: isAdmin ? (l.progress[0] || { status: 'completed' }) : (l.progress[0] || null),
-    })),
-  };
-}
-
-/**
- * 진행 상태 업데이트 (upsert)
- */
-export async function updateProgress(
-  userId: string,
-  lessonId: string,
-  data: {
-    status?: 'not_started' | 'in_progress' | 'completed';
-    currentStep?: number;
-    quizScore?: number;
-    quizTotal?: number;
-  }
-) {
-  const now = new Date();
-
-  const progress = await prisma.userProgress.upsert({
-    where: {
-      userId_lessonId: { userId, lessonId },
-    },
-    create: {
-      userId,
-      lessonId,
-      status: data.status || 'in_progress',
-      currentStep: data.currentStep || 0,
-      quizScore: data.quizScore,
-      quizTotal: data.quizTotal,
-      startedAt: now,
-      completedAt: data.status === 'completed' ? now : null,
-    },
-    update: {
-      status: data.status,
-      currentStep: data.currentStep,
-      quizScore: data.quizScore,
-      quizTotal: data.quizTotal,
-      completedAt: data.status === 'completed' ? now : undefined,
-    },
-  });
-
-  // 레슨 완료 시 스트릭 업데이트
-  if (data.status === 'completed') {
-    try {
-      await streakService.updateStreak(userId);
-    } catch (error) {
-      // 스트릭 업데이트 실패해도 진행 상태는 저장됨 (비크리티컬)
-      console.error('Failed to update streak:', error);
-    }
-  }
-
-  return progress;
-}
-
-// =============================================
-// Admin (시드 데이터용)
-// =============================================

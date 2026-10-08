@@ -12,7 +12,7 @@
  */
 
 // Types
-export type { ExecutionResult, IExecutor, JudgeResult } from './types';
+export type { ExecutionResult, IExecutor } from './types';
 export { Language } from './types';
 
 // TODO: Python Executor (Phase 2)

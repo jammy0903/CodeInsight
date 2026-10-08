@@ -27,29 +27,11 @@ const envSchema = z.object({
   // === C Execution Timeouts (seconds) ===
   C_RUN_DEFAULT_TIMEOUT: z.coerce.number().default(10),
   C_RUN_MAX_TIMEOUT: z.coerce.number().default(30),
-  C_JUDGE_TIMEOUT: z.coerce.number().default(5),
   C_EXECUTOR_BUFFER_SIZE: z.coerce.number().default(10 * 1024 * 1024),
 
   // === Code Limits ===
   CODE_MAX_LENGTH: z.coerce.number().default(50000),
   JSON_BODY_LIMIT: z.string().default('1mb'),
-
-  // === External APIs (optional) ===
-  XAI_API_KEY: z.string().optional(),
-  XAI_API_URL: z.string().default('https://api.x.ai/v1/chat/completions'),
-
-  // === DeepSeek AI ===
-  DEEPSEEK_API_KEY: z.string().optional(),
-  DEEPSEEK_BASE_URL: z.string().default('https://api.deepseek.com'),
-
-
-  // === Firebase Admin ===
-  FIREBASE_PROJECT_ID: z.string().optional(),
-  FIREBASE_CLIENT_EMAIL: z.string().optional(),
-  FIREBASE_PRIVATE_KEY: z.string().optional(),
-
-  // === Brevo Email ===
-  BREVO_API_KEY: z.string().optional(),
 });
 
 // 환경변수 파싱 및 검증

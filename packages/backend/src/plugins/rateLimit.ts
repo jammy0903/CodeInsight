@@ -5,7 +5,6 @@
  *
  * WHY: 엔드포인트별로 다른 제한이 필요
  *      - 일반 API: 관대하게 (UX)
- *      - 인증: 엄격하게 (brute-force 방지)
  *      - AI: 비용 고려
  *      - 실행: 서버 리소스 보호 (Docker 컨테이너)
  */
@@ -15,7 +14,7 @@ import fp from 'fastify-plugin';
 import rateLimit, { RateLimitPluginOptions } from '@fastify/rate-limit';
 
 // Rate limit 프리셋 타입
-export type RateLimitPreset = 'standard' | 'auth' | 'ai' | 'execute';
+export type RateLimitPreset = 'standard' | 'ai' | 'execute';
 
 // 프리셋 설정
 const presets: Record<RateLimitPreset, { max: number; timeWindow: string; message: string }> = {
@@ -23,11 +22,6 @@ const presets: Record<RateLimitPreset, { max: number; timeWindow: string; messag
     max: 100,
     timeWindow: '1 minute',
     message: 'Too many requests, please try again later.',
-  },
-  auth: {
-    max: 10,
-    timeWindow: '1 minute',
-    message: 'Too many authentication attempts. Please wait.',
   },
   ai: {
     max: 50,
@@ -54,10 +48,7 @@ const rateLimitPlugin: FastifyPluginAsync = async (fastify) => {
     global: false, // 전역 적용 비활성화 (라우트별로 적용)
     max: 100,
     timeWindow: '1 minute',
-    keyGenerator: (request: FastifyRequest) => {
-      // 인증된 사용자는 user id로, 아니면 IP로 구분
-      return request.user?.uid || request.ip;
-    },
+    keyGenerator: (request: FastifyRequest) => request.ip,
     errorResponseBuilder: (request, context) => {
       const retryAfter = Math.ceil(context.ttl / 1000);
       return {

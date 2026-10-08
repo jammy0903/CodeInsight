@@ -36,58 +36,11 @@ const swaggerPlugin: FastifyPluginAsync = async (fastify) => {
         },
       ],
       tags: [
-        { name: 'Problems', description: '문제 관련 API' },
-        { name: 'Submissions', description: '제출 기록 API' },
-        { name: 'Users', description: '사용자 관리 API' },
         { name: 'Courses', description: '강좌 및 레슨 API' },
-        { name: 'AI', description: 'AI 채팅 API' },
         { name: 'Simulators', description: '코드 실행/시각화 API' },
-        { name: 'Gamification', description: '게이미피케이션 API' },
-        { name: 'Notes', description: '노트 관리 API' },
-        { name: 'Analytics', description: '분석 API' },
-        { name: 'Admin', description: '관리자 API' },
       ],
       components: {
-        securitySchemes: {
-          bearerAuth: {
-            type: 'http',
-            scheme: 'bearer',
-            bearerFormat: 'Firebase ID Token',
-            description: 'Firebase ID Token을 Bearer 토큰으로 전달',
-          },
-        },
         schemas: {
-          Problem: {
-            type: 'object',
-            properties: {
-              id: { type: 'string', example: 'clxyz123' },
-              number: { type: 'integer', example: 1000 },
-              title: { type: 'string', example: 'A+B' },
-              description: { type: 'string' },
-              difficulty: { type: 'string', example: 'bronze' },
-              tags: { type: 'array', items: { type: 'string' } },
-              testCases: { type: 'string', description: 'JSON stringified array' },
-            },
-          },
-          User: {
-            type: 'object',
-            properties: {
-              id: { type: 'string', description: 'User UUID (PK)' },
-              nickname: { type: 'string', description: '사용자 닉네임' },
-              role: { type: 'string', enum: ['user', 'admin'] },
-              createdAt: { type: 'string', format: 'date-time' },
-              oauthAccounts: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    provider: { type: 'string', enum: ['google', 'github', 'kakao'] },
-                    email: { type: 'string', format: 'email', nullable: true },
-                  },
-                },
-              },
-            },
-          },
           Error: {
             type: 'object',
             properties: {

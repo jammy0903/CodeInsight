@@ -29,24 +29,6 @@ export interface ExecutionResult {
 }
 
 /**
- * 테스트케이스 채점 결과
- */
-export interface JudgeResult {
-  success: boolean;
-  verdict: 'accepted' | 'wrong_answer' | 'compile_error' | 'runtime_error' | 'time_limit' | 'memory_limit';
-  passed: number;
-  total: number;
-  executionTimeMs: number;
-  details: Array<{
-    testCase: number;
-    passed: boolean;
-    expected?: string;
-    actual?: string;
-    error?: string;
-  }>;
-}
-
-/**
  * 언어별 Executor 인터페이스
  *
  * WHY: 모든 언어가 같은 인터페이스 구현 → 코스 API 통일
@@ -65,9 +47,4 @@ export interface IExecutor {
    * 코드 실행
    */
   run(code: string, stdin?: string, timeout?: number): Promise<ExecutionResult>;
-
-  /**
-   * 테스트케이스 채점
-   */
-  judge(code: string, testCases: Array<{ input: string; output: string }>, timeout?: number): Promise<JudgeResult>;
 }

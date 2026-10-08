@@ -18,16 +18,8 @@ export const config = {
   execution: {
     defaultTimeout: env.C_RUN_DEFAULT_TIMEOUT,
     maxTimeout: env.C_RUN_MAX_TIMEOUT,
-    judgeTimeout: env.C_JUDGE_TIMEOUT,
     bufferSize: env.C_EXECUTOR_BUFFER_SIZE,
     maxCodeLength: env.CODE_MAX_LENGTH,
-  },
-
-  external: {
-    xai: {
-      apiKey: env.XAI_API_KEY,
-      apiUrl: env.XAI_API_URL,
-    },
   },
 } as const;
 
