@@ -4,15 +4,15 @@
  * Desktop (horizontal): code left | content right
  * Mobile (vertical):    code top  | content bottom
  *
- * Two rounds: R1 (explanation) → R2 (visualization) → quiz
+ * 한 스텝 = 설명(위) + 시각화(아래). 마지막 스텝 다음은 퀴즈.
+ * 시각화 데이터가 없는 스텝은 가장 최근 시각화 상태를 그대로 보여준다.
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Layers, Lightbulb } from 'lucide-react';
 
-import { useRoundNavigation } from '../hooks/useRoundNavigation';
+import { useStepNavigation } from '../hooks/useStepNavigation';
 import { usePredictGate } from '../hooks/usePredictGate';
 import { PredictQuestion, PredictResult } from './PredictPanel';
 import { useLessonVisualization } from '../hooks/useLessonVisualization';
@@ -20,6 +20,7 @@ import { useLessonTerminal } from '@/features/visualizers/shared/hooks/useLesson
 import { useStepGestures } from '@/features/visualizers/shared/hooks/useStepGestures';
 import { LessonCodePanel } from './LessonCodePanel';
 import { StepExplanation } from './day/StepExplanation';
+import { CollapsibleExplanation } from './CollapsibleExplanation';
 import { LessonBottomNav } from './LessonBottomNav';
 
 import { LessonFlowVisualizer, LessonMemoryVisualizer } from '@/features/visualizers';
@@ -27,7 +28,7 @@ import { ConceptPopup } from '@/features/visualizers/shared/components/ConceptPo
 import { useIsMobile } from '@/hooks';
 import type { LessonStep } from '@/types';
 import type { CodeSelection } from '@/features/visualizers/shared/components/CodeMirrorEditor';
-import { hasMeaningfulValue, hasClassicMemoryData, hasJsMemoryData, hasJavaMemoryData } from '../utils/visualizationData';
+import { hasMeaningfulValue, hasClassicMemoryData, hasJsMemoryData, hasJavaMemoryData, hasVisualizationData } from '../utils/visualizationData';
 
 interface LessonUnifiedViewProps {
   code: string;
@@ -37,12 +38,6 @@ interface LessonUnifiedViewProps {
   onQuiz?: () => void;
   onSelectionChange?: (selection: CodeSelection) => void;
 }
-
-const contentVariants = {
-  enter: { opacity: 0, y: 12 },
-  center: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
-  exit: { opacity: 0, y: -12, transition: { duration: 0.15 } },
-} as const;
 
 const CONCEPT_TYPES = new Set(['preprocessor', 'streams', 'buffering', 'fileio']);
 
@@ -67,26 +62,35 @@ export function LessonUnifiedView({
   const [activeVizTab, setActiveVizTab] = useState<'flow' | 'memory' | 'jsMemory'>('flow');
   const [isConceptOpen, setIsConceptOpen] = useState(false);
 
-  // Round navigation (shared for both layouts)
-  const nav = useRoundNavigation({
-    steps,
-    lessonId,
-    onQuiz,
-  });
+  const nav = useStepNavigation({ stepCount: steps.length, onQuiz });
 
-  // 실행 중 예측하기 (시각화 라운드): 모든 이동은 gate를 거친다
+  // 실행 중 예측하기: 모든 이동(버튼·키보드·스와이프)은 gate를 거친다
   const gate = usePredictGate({ steps, nav, lessonId });
 
-  const currentStep = steps[nav.actualStepIndex];
+  const currentStep = steps[nav.stepIndex];
+
+  // 시각화가 있는 스텝들. 현재 스텝에 시각화가 없으면 가장 최근 시각화 상태를 유지한다.
+  const vizStepIndices = useMemo(
+    () => steps.reduce<number[]>((acc, step, i) => (hasVisualizationData(step) ? [...acc, i] : acc), []),
+    [steps]
+  );
+  const { vizIndex, prevVizIndex } = useMemo(() => {
+    const upTo = vizStepIndices.filter((i) => i <= nav.stepIndex);
+    return {
+      vizIndex: upTo.length > 0 ? upTo[upTo.length - 1] : null,
+      prevVizIndex: upTo.length > 1 ? upTo[upTo.length - 2] : null,
+    };
+  }, [vizStepIndices, nav.stepIndex]);
+  const vizStep = vizIndex !== null ? steps[vizIndex] : undefined;
+  const prevVizStep = prevVizIndex !== null ? steps[prevVizIndex] : null;
   // 예측 중에는 곧 실행될 줄을 가리킨다 (디버거의 다음 줄 표시처럼)
   const highlightLine = (gate.pendingIndex !== null ? steps[gate.pendingIndex]?.line : currentStep?.line) || 1;
   const currentStepRecord = currentStep as Record<string, unknown> | undefined;
   const currentStepIllustrations = Array.isArray(currentStepRecord?.illustrations)
     ? (currentStepRecord.illustrations as Array<{ src: string; alt?: string; caption?: string }>)
     : undefined;
-  const isExplanationRound = nav.round === 'explanation';
   const { showMemoryTab, showJsMemoryTab } = useMemo(() => {
-    const vizSteps = nav.vizStepIndices.map(i => steps[i]);
+    const vizSteps = vizStepIndices.map(i => steps[i]);
     return {
       showMemoryTab: (
         (languageId === 'c' && hasClassicMemoryData(vizSteps)) ||
@@ -94,7 +98,7 @@ export function LessonUnifiedView({
       ),
       showJsMemoryTab: languageId === 'javascript' && hasJsMemoryData(vizSteps),
     };
-  }, [languageId, nav.vizStepIndices, steps]);
+  }, [languageId, vizStepIndices, steps]);
   const hasVizTabs = showMemoryTab || showJsMemoryTab;
   const flowLanguage = languageId || 'c';
   const rawConceptType = asString(currentStepRecord?.conceptVisualizationType) || asString(currentStepRecord?.visualizationType);
@@ -103,7 +107,7 @@ export function LessonUnifiedView({
   const hasConceptPopup = !!conceptType || hasMeaningfulValue(conceptState);
 
   // Visualization data
-  const { memoryState, changedBlocks } = useLessonVisualization(steps, nav.actualStepIndex);
+  const { memoryState, changedBlocks } = useLessonVisualization(steps, vizIndex ?? 0);
 
   const toJsMemoryStep = useCallback((step: LessonStep | undefined): LessonStep => {
     const base = (step || {}) as LessonStep;
@@ -121,7 +125,7 @@ export function LessonUnifiedView({
   // Terminal output
   const terminalLines = useLessonTerminal({
     steps,
-    currentStepIndex: nav.actualStepIndex,
+    currentStepIndex: nav.stepIndex,
     languageId,
     diffMode: false,
   });
@@ -138,7 +142,7 @@ export function LessonUnifiedView({
 
   useEffect(() => {
     setIsConceptOpen(false);
-  }, [nav.round, nav.actualStepIndex]);
+  }, [nav.stepIndex]);
 
   useEffect(() => {
     setActiveVizTab('flow');
@@ -155,22 +159,12 @@ export function LessonUnifiedView({
   }, [activeVizTab, showMemoryTab, showJsMemoryTab]);
 
   // Next button label
-  const nextLabel = (() => {
-    if (gate.pendingIndex !== null) return t('lesson.predict.choose');
-    if (isExplanationRound) {
-      if (nav.stepIndex >= steps.length - 1) {
-        return nav.hasVizRound ? t('lesson.visualization') : t('lesson.quiz');
-      }
-      return t('common.next');
-    }
-    if (nav.stepIndex >= nav.vizStepIndices.length - 1) {
-      return t('lesson.quiz');
-    }
-    return t('common.next');
-  })();
+  const nextLabel = gate.pendingIndex !== null
+    ? t('lesson.predict.choose')
+    : nav.isLast ? t('lesson.quiz') : t('common.next');
 
-  // Round indicator bar
-  const roundIndicator = (
+  // Step header: 진행 + 스텝 제목
+  const stepHeader = (
     <div
       className="flex items-center gap-2 px-3 py-1.5 shrink-0 border-b"
       style={{
@@ -178,156 +172,118 @@ export function LessonUnifiedView({
         borderColor: 'var(--theme-lesson-panel-border)',
       }}
     >
-      <div className="flex gap-1">
-        <button
-          type="button"
-          onClick={nav.goToExplanationStart}
-          className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full transition-all ${
-            isExplanationRound
-              ? 'round-tab-active opacity-100'
-              : 'round-tab-inactive opacity-45 saturate-0 hover:opacity-70'
-          }`}
-        >
-          {t('lesson.explanation')}
-        </button>
-        {nav.hasVizRound && (
-          <button
-            type="button"
-            onClick={nav.goToVisualizationStart}
-            className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full transition-all ${
-              !isExplanationRound
-                ? 'round-tab-active opacity-100'
-                : 'round-tab-inactive opacity-45 saturate-0 hover:opacity-70'
-            }`}
-          >
-            {t('lesson.visualization')}
-          </button>
-        )}
-      </div>
-      <span className="ml-auto text-xs md:text-sm font-semibold opacity-60">
-        {nav.stepIndex + 1}/{nav.totalInRound} · L{currentStep?.line || 1}
+      <span className="text-xs md:text-sm font-semibold opacity-60 shrink-0">
+        {nav.stepIndex + 1}/{nav.total} · L{currentStep?.line || 1}
       </span>
+      {currentStep?.title && (
+        <span className="text-xs md:text-sm font-bold truncate">{currentStep.title}</span>
+      )}
     </div>
   );
 
-  // Content area (R1: explanation, R2: visualization)
+  const vizTabs = (hasVizTabs || hasConceptPopup) && (
+    <div className="flex items-center shrink-0 border-y border-[var(--theme-lesson-panel-border)]">
+      {hasVizTabs && (
+        <div className="flex flex-1">
+          <button
+            onClick={() => setActiveVizTab('flow')}
+            className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all ${activeVizTab === 'flow' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
+          >
+            <Play className="w-4 h-4" />
+            {t('lesson.flow')}
+          </button>
+          {showMemoryTab && (
+            <button
+              onClick={() => setActiveVizTab('memory')}
+              className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'memory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
+            >
+              <Layers className="w-4 h-4" />
+              {t('lesson.memory')}
+            </button>
+          )}
+          {showJsMemoryTab && (
+            <button
+              onClick={() => setActiveVizTab('jsMemory')}
+              className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'jsMemory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
+            >
+              <Layers className="w-4 h-4" />
+              JS Memory
+            </button>
+          )}
+        </div>
+      )}
+
+      {hasConceptPopup && (
+        <button
+          onClick={() => setIsConceptOpen(true)}
+          className={`flex items-center gap-1.5 px-3 py-2 text-sm md:text-base font-semibold transition-all ${hasVizTabs ? 'border-l border-[var(--theme-lesson-panel-border)]' : ''} viz-tab-inactive hover:viz-tab-active`}
+        >
+          <Lightbulb className="w-4 h-4" />
+          {t('lesson.concept')}
+        </button>
+      )}
+    </div>
+  );
+
+  const memoryForFlow = memoryState ? {
+    stack: memoryState.stack.map((s) => ({ ...s, name: s.name || '?' })),
+    heap: memoryState.heap.map((h) => ({ ...h, name: h.name || '?' })),
+  } : undefined;
+
+  // Content: 설명(위) → 예측 카드/결과 → 시각화(아래)
   const contentArea = (
     <div className="flex-1 min-h-0 overflow-y-auto">
-      <AnimatePresence mode="wait">
-        {isExplanationRound ? (
-          <motion.div
-            key={`explanation-${nav.stepIndex}`}
-            variants={contentVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            className="p-4 explanation-container"
-          >
-            <StepExplanation
-              explanation={currentStep?.explanation || ''}
-              stepIndex={nav.stepIndex}
-              keyInsight={currentStep?.keyInsight}
-              keyInsightTitle={currentStep?.keyInsightTitle}
-              illustrations={currentStepIllustrations}
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            key={`viz-${nav.stepIndex}`}
-            variants={contentVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            className="w-full"
-          >
-            {(hasVizTabs || hasConceptPopup) && (
-              <div className="flex items-center shrink-0 border-b border-[var(--theme-lesson-panel-border)]">
-                {hasVizTabs && (
-                  <div className="flex flex-1">
-                    <button
-                      onClick={() => setActiveVizTab('flow')}
-                      className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all ${activeVizTab === 'flow' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
-                    >
-                      <Play className="w-4 h-4" />
-                      {t('lesson.flow')}
-                    </button>
-                    {showMemoryTab && (
-                      <button
-                        onClick={() => setActiveVizTab('memory')}
-                        className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'memory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
-                      >
-                        <Layers className="w-4 h-4" />
-                        {t('lesson.memory')}
-                      </button>
-                    )}
-                    {showJsMemoryTab && (
-                      <button
-                        onClick={() => setActiveVizTab('jsMemory')}
-                        className={`flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 text-sm md:text-base font-semibold transition-all border-l border-[var(--theme-lesson-panel-border)] ${activeVizTab === 'jsMemory' ? 'viz-tab-active' : 'viz-tab-inactive'}`}
-                      >
-                        <Layers className="w-4 h-4" />
-                        JS Memory
-                      </button>
-                    )}
-                  </div>
-                )}
+      <div className="p-4 explanation-container">
+        <CollapsibleExplanation key={nav.stepIndex}>
+          <StepExplanation
+            explanation={currentStep?.explanation || ''}
+            stepIndex={nav.stepIndex}
+            keyInsight={currentStep?.keyInsight}
+            keyInsightTitle={currentStep?.keyInsightTitle}
+            illustrations={currentStepIllustrations}
+          />
+        </CollapsibleExplanation>
+      </div>
 
-                {hasConceptPopup && (
-                  <button
-                    onClick={() => setIsConceptOpen(true)}
-                    className={`flex items-center gap-1.5 px-3 py-2 text-sm md:text-base font-semibold transition-all ${hasVizTabs ? 'border-l border-[var(--theme-lesson-panel-border)]' : ''} viz-tab-inactive hover:viz-tab-active`}
-                  >
-                    <Lightbulb className="w-4 h-4" />
-                    {t('lesson.concept')}
-                  </button>
-                )}
-              </div>
+      {gate.pendingPredict ? (
+        <PredictQuestion predict={gate.pendingPredict} onAnswer={gate.answer} />
+      ) : gate.feedback ? (
+        <PredictResult feedback={gate.feedback} />
+      ) : null}
+
+      {vizStep && (
+        <div className="w-full">
+          {vizTabs}
+          <div className={`w-full min-h-[67px] px-0 py-2 ${isMobile ? 'viz-zoom-container' : ''}`}>
+            {activeVizTab === 'flow' || !hasVizTabs ? (
+              <LessonFlowVisualizer
+                step={vizStep}
+                prevStep={prevVizStep}
+                language={flowLanguage}
+                fullCode={code}
+                memoryState={memoryForFlow}
+                stdout={vizStep.stdout}
+              />
+            ) : activeVizTab === 'jsMemory' ? (
+              <LessonFlowVisualizer
+                step={toJsMemoryStep(vizStep)}
+                prevStep={prevVizStep ? toJsMemoryStep(prevVizStep) : null}
+                language={flowLanguage}
+                fullCode={code}
+                memoryState={memoryForFlow}
+                stdout={vizStep.stdout}
+              />
+            ) : (
+              <LessonMemoryVisualizer
+                step={vizStep}
+                language={languageId}
+                memoryState={memoryState}
+                changedBlocks={changedBlocks}
+              />
             )}
-
-            {gate.pendingPredict ? (
-              <PredictQuestion predict={gate.pendingPredict} onAnswer={gate.answer} />
-            ) : gate.feedback ? (
-              <PredictResult feedback={gate.feedback} />
-            ) : null}
-
-            {/* Visualization content */}
-            <div className={`w-full min-h-[67px] px-0 py-2 ${isMobile ? 'viz-zoom-container' : ''}`}>
-              {activeVizTab === 'flow' || !hasVizTabs ? (
-                <LessonFlowVisualizer
-                  step={currentStep}
-                  prevStep={nav.actualStepIndex > 0 ? steps[nav.actualStepIndex - 1] : null}
-                  language={flowLanguage}
-                  fullCode={code}
-                  memoryState={memoryState ? {
-                    stack: memoryState.stack.map((s) => ({ ...s, name: s.name || '?' })),
-                    heap: memoryState.heap.map((h) => ({ ...h, name: h.name || '?' })),
-                  } : undefined}
-                  stdout={currentStep?.stdout}
-                />
-              ) : activeVizTab === 'jsMemory' ? (
-                <LessonFlowVisualizer
-                  step={toJsMemoryStep(currentStep)}
-                  prevStep={nav.actualStepIndex > 0 ? toJsMemoryStep(steps[nav.actualStepIndex - 1]) : null}
-                  language={flowLanguage}
-                  fullCode={code}
-                  memoryState={memoryState ? {
-                    stack: memoryState.stack.map((s) => ({ ...s, name: s.name || '?' })),
-                    heap: memoryState.heap.map((h) => ({ ...h, name: h.name || '?' })),
-                  } : undefined}
-                  stdout={currentStep?.stdout}
-                />
-              ) : (
-                <LessonMemoryVisualizer
-                  step={currentStep}
-                  language={languageId}
-                  memoryState={memoryState}
-                  changedBlocks={changedBlocks}
-                />
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -348,7 +304,7 @@ export function LessonUnifiedView({
             : { height: 'calc(100vh - 80px)', position: 'sticky' as const, top: 0, border: '1px solid var(--theme-lesson-panel-border)', marginTop: '1rem' }),
         }}
       >
-        {roundIndicator}
+        {stepHeader}
         {contentArea}
       </LessonCodePanel>
 

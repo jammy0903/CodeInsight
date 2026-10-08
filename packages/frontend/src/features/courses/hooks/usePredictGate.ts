@@ -1,12 +1,12 @@
 /**
- * usePredictGate - 시각화 라운드의 "실행 중 예측하기"
+ * usePredictGate - "실행 중 예측하기"
  *
  * WHY: 결과를 보기 전에 먼저 예측하게 해서, 틀린 예측(오개념)을 시각화로 바로 교정한다.
  *
  * 흐름:
- *   1. 시각화 라운드에서 다음 스텝에 predict가 있고 아직 답하지 않았으면 이동을 막고 질문을 띄운다
- *      (시각화는 현재 상태 그대로, 코드 하이라이트는 곧 실행될 줄)
- *   2. 답하면 결과를 기록하고 그 스텝으로 이동 → 시각화가 실제 변화를 보여준다
+ *   1. 다음 스텝에 predict가 있고 아직 답하지 않았으면 이동을 막고 질문을 띄운다
+ *      (설명·시각화는 현재 스텝 그대로, 코드 하이라이트는 곧 실행될 줄)
+ *   2. 답하면 결과를 기록하고 그 스텝으로 이동 → 그 스텝의 설명과 시각화가 실제 변화를 보여준다
  *   3. 이동 후에는 정답/오답 피드백을 표시한다
  *
  * 버튼, 키보드, 스와이프 모두 이 훅의 goNext/goPrev를 거친다.
@@ -14,22 +14,17 @@
 
 import { useCallback, useState } from 'react';
 import type { LessonStep, StepPredict } from '@/types';
-import type { LessonRound } from './useRoundNavigation';
 import { useProgressStore } from '@/stores/progressStore';
 
-interface RoundNav {
-  round: LessonRound;
+interface StepNav {
   stepIndex: number;
-  totalInRound: number;
-  actualStepIndex: number;
-  vizStepIndices: number[];
   goNext: () => void;
   goPrev: () => void;
 }
 
 interface UsePredictGateOptions {
   steps: LessonStep[];
-  nav: RoundNav;
+  nav: StepNav;
   lessonId: string;
 }
 
@@ -52,18 +47,15 @@ interface UsePredictGateReturn {
 
 /**
  * 다음으로 넘어갈 때 예측 질문을 띄워야 하는 스텝 인덱스를 구한다.
- * 시각화 라운드 안에서의 이동만 대상으로 한다 (라운드 전환/퀴즈 이동은 제외).
+ * 마지막 스텝 다음(퀴즈 이동)은 대상이 아니다.
  */
 export function findPredictGate(
   steps: LessonStep[],
-  nav: Pick<RoundNav, 'round' | 'stepIndex' | 'totalInRound' | 'vizStepIndices'>,
+  stepIndex: number,
   answered: Record<number, number>,
 ): number | null {
-  if (nav.round !== 'visualization') return null;
-  if (nav.stepIndex + 1 >= nav.totalInRound) return null;
-
-  const nextIndex = nav.vizStepIndices[nav.stepIndex + 1];
-  if (nextIndex === undefined) return null;
+  const nextIndex = stepIndex + 1;
+  if (nextIndex >= steps.length) return null;
   if (!steps[nextIndex]?.predict) return null;
   if (nextIndex in answered) return null;
   return nextIndex;
@@ -77,7 +69,7 @@ export function usePredictGate({ steps, nav, lessonId }: UsePredictGateOptions):
 
   const goNext = useCallback(() => {
     if (pendingIndex !== null) return; // 답하기 전에는 넘어가지 않는다
-    const gate = findPredictGate(steps, nav, answered);
+    const gate = findPredictGate(steps, nav.stepIndex, answered);
     if (gate !== null) {
       setPendingIndex(gate);
       return;
@@ -104,10 +96,10 @@ export function usePredictGate({ steps, nav, lessonId }: UsePredictGateOptions):
     nav.goNext();
   }, [pendingIndex, steps, lessonId, recordPrediction, nav]);
 
-  const currentPredict = steps[nav.actualStepIndex]?.predict;
-  const chosen = answered[nav.actualStepIndex];
+  const currentPredict = steps[nav.stepIndex]?.predict;
+  const chosen = answered[nav.stepIndex];
   const feedback: PredictFeedback | null =
-    nav.round === 'visualization' && currentPredict && chosen !== undefined && pendingIndex === null
+    currentPredict && chosen !== undefined && pendingIndex === null
       ? { predict: currentPredict, chosen, correct: chosen === currentPredict.answer }
       : null;
 

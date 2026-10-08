@@ -6,7 +6,7 @@ import type { LessonStep } from '@/types';
 
 const predict = { question: 'energy 값은?', options: ['50', '100'], answer: 1 };
 
-// 0: 설명만, 1~3: 시각화 스텝, 2번에 예측 질문
+// 2번 스텝에 예측 질문
 const steps = [
   { line: 1, explanation: '' },
   { line: 2, explanation: '', visualizationType: 'cMemory' },
@@ -14,36 +14,23 @@ const steps = [
   { line: 4, explanation: '', visualizationType: 'cMemory' },
 ] as LessonStep[];
 
-const vizStepIndices = [1, 2, 3];
-
-function makeNav(stepIndex: number, round: 'explanation' | 'visualization' = 'visualization') {
-  return {
-    round,
-    stepIndex,
-    totalInRound: round === 'visualization' ? vizStepIndices.length : steps.length,
-    actualStepIndex: round === 'visualization' ? vizStepIndices[stepIndex] : stepIndex,
-    vizStepIndices,
-    goNext: vi.fn(),
-    goPrev: vi.fn(),
-  };
+function makeNav(stepIndex: number) {
+  return { stepIndex, goNext: vi.fn(), goPrev: vi.fn() };
 }
 
 describe('findPredictGate', () => {
-  it('다음 시각화 스텝에 predict가 있으면 그 인덱스를 반환한다', () => {
-    expect(findPredictGate(steps, makeNav(0), {})).toBe(2);
+  it('다음 스텝에 predict가 있으면 그 인덱스를 반환한다', () => {
+    expect(findPredictGate(steps, 1, {})).toBe(2);
   });
 
   it('이미 답한 예측은 다시 막지 않는다', () => {
-    expect(findPredictGate(steps, makeNav(0), { 2: 0 })).toBeNull();
-  });
-
-  it('설명 라운드에서는 막지 않는다', () => {
-    expect(findPredictGate(steps, makeNav(1, 'explanation'), {})).toBeNull();
+    expect(findPredictGate(steps, 1, { 2: 0 })).toBeNull();
   });
 
   it('다음 스텝에 predict가 없거나 마지막 스텝이면 막지 않는다', () => {
-    expect(findPredictGate(steps, makeNav(1), {})).toBeNull();
-    expect(findPredictGate(steps, makeNav(2), {})).toBeNull();
+    expect(findPredictGate(steps, 0, {})).toBeNull();
+    expect(findPredictGate(steps, 2, {})).toBeNull();
+    expect(findPredictGate(steps, 3, {})).toBeNull();
   });
 });
 
@@ -53,7 +40,7 @@ describe('usePredictGate', () => {
   });
 
   it('예측 스텝 앞에서 goNext는 이동하지 않고 질문을 띄운다', () => {
-    const nav = makeNav(0);
+    const nav = makeNav(1);
     const { result } = renderHook(() => usePredictGate({ steps, nav, lessonId: 'c-2-4' }));
 
     act(() => result.current.goNext());
@@ -64,7 +51,7 @@ describe('usePredictGate', () => {
   });
 
   it('질문 중에는 goNext가 무시되고, goPrev는 질문만 닫는다', () => {
-    const nav = makeNav(0);
+    const nav = makeNav(1);
     const { result } = renderHook(() => usePredictGate({ steps, nav, lessonId: 'c-2-4' }));
 
     act(() => result.current.goNext());
@@ -77,7 +64,7 @@ describe('usePredictGate', () => {
   });
 
   it('답하면 결과를 기록하고 다음 스텝으로 이동한다', () => {
-    const nav = makeNav(0);
+    const nav = makeNav(1);
     const { result } = renderHook(() => usePredictGate({ steps, nav, lessonId: 'c-2-4' }));
 
     act(() => result.current.goNext());
@@ -89,12 +76,12 @@ describe('usePredictGate', () => {
   });
 
   it('예측 스텝에 도착하면 내 답과 정답 여부를 피드백으로 준다', () => {
-    let nav = makeNav(0);
+    let nav = makeNav(1);
     const { result, rerender } = renderHook(() => usePredictGate({ steps, nav, lessonId: 'c-2-4' }));
 
     act(() => result.current.goNext());
     act(() => result.current.answer(1)); // 정답
-    nav = makeNav(1); // 부모가 스텝을 옮긴 상태
+    nav = makeNav(2); // 부모가 스텝을 옮긴 상태
     rerender();
 
     expect(result.current.feedback).toEqual({ predict, chosen: 1, correct: true });
