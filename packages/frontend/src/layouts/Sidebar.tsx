@@ -5,19 +5,16 @@
  * FEATURES: 열림/닫힘 애니메이션, 반응형 콘텐츠
  *
  * CHANGE: user → firebaseUser + appUser
- * - admin 체크: email → role 기반
  * - 프로필 표시: nickname 기반
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
-import { X, Home, BookOpen, Play, Shield, LogOut, UserPlus, FileQuestion, BarChart3, Flag } from 'lucide-react';
+import { X, Home, BookOpen, Play, LogOut, UserPlus } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '@/stores/store';
 import { logout, loginWithGoogle } from '@/services/firebase';
 import { PixelAvatar } from '@/components/PixelAvatar';
-import { ReportModal } from '@/components/ReportModal';
 import { logger } from '@/utils/logger';
 import { LanguageToggle } from '@/components/LanguageToggle';
 
@@ -35,24 +32,14 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/playground', labelKey: 'nav.playground', icon: Play },
 ];
 
-// 로그인 필수 탭들 (프로필은 프로필 카드 클릭으로 이동)
-const AUTH_NAV_ITEMS: NavItem[] = [
-  { path: '/quiz', labelKey: 'nav.quiz', icon: FileQuestion },
-  { path: '/report', labelKey: 'nav.report', icon: BarChart3 },
-];
-
 export function Sidebar() {
   const location = useLocation();
   const { t } = useTranslation();
-  const [reportOpen, setReportOpen] = useState(false);
   const sidebarOpen = useStore((s) => s.sidebarOpen);
   const toggleSidebar = useStore((s) => s.toggleSidebar);
   const firebaseUser = useStore((s) => s.firebaseUser);
   const appUser = useStore((s) => s.appUser);
   const needsRegistration = useStore((s) => s.needsRegistration);
-  const isAdmin = appUser?.role === 'admin';
-  const lessonRouteMatch = location.pathname.match(/^\/courses\/([^/]+-\d+-\d+.*)$/);
-  const lessonId = lessonRouteMatch?.[1];
 
   const handleSignOut = async () => {
     await logout();
@@ -177,98 +164,6 @@ export function Sidebar() {
               })}
 
               {/* 로그인 필수 메뉴 */}
-              {appUser && AUTH_NAV_ITEMS.map((item) => {
-                const isActive = location.pathname === item.path ||
-                  (item.path !== '/' && location.pathname.startsWith(item.path));
-                const Icon = item.icon;
-
-                return (
-                  <motion.div
-                    key={item.path}
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                  >
-                    <Link
-                      to={item.path}
-                      onClick={toggleSidebar}
-                      className={`
-                        flex items-center gap-3 px-4 h-12 rounded-lg
-                        border transition-all duration-150
-                        ${isActive ? 'font-semibold' : ''}
-                      `}
-                      style={isActive ? {
-                        backgroundColor: 'var(--theme-sidebar-nav-active-bg)',
-                        borderColor: 'var(--theme-sidebar-nav-active-border)',
-                        color: 'var(--theme-sidebar-nav-active-text)'
-                      } : {
-                        backgroundColor: 'var(--theme-sidebar-nav-inactive-bg)',
-                        borderColor: 'var(--theme-sidebar-nav-inactive-border)',
-                        color: 'var(--theme-sidebar-nav-inactive-text)'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-hover-bg)';
-                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-hover-border)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-bg)';
-                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-border)';
-                        }
-                      }}
-                    >
-                      <Icon className="w-5 h-5 shrink-0" />
-                      <span className="text-sm">{t(item.labelKey)}</span>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-
-              {/* Admin 메뉴 (관리자만 표시) */}
-              {isAdmin && (
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                >
-                  <Link
-                    to="/admin"
-                    onClick={toggleSidebar}
-                    className={`
-                      flex items-center gap-3 px-4 h-12 rounded-lg
-                      border transition-all duration-150
-                      ${location.pathname.startsWith('/admin') ? 'font-semibold' : ''}
-                    `}
-                    style={location.pathname.startsWith('/admin') ? {
-                      backgroundColor: 'var(--theme-sidebar-admin-active-bg)',
-                      borderColor: 'var(--theme-sidebar-admin-active-border)',
-                      color: 'var(--theme-sidebar-nav-active-text)'
-                    } : {
-                      backgroundColor: 'var(--theme-sidebar-nav-inactive-bg)',
-                      borderColor: 'var(--theme-sidebar-nav-inactive-border)',
-                      color: 'var(--theme-sidebar-nav-inactive-text)'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!location.pathname.startsWith('/admin')) {
-                        e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-admin-inactive-hover-bg)';
-                        e.currentTarget.style.borderColor = 'var(--theme-sidebar-admin-inactive-hover-border)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!location.pathname.startsWith('/admin')) {
-                        e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-bg)';
-                        e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-border)';
-                      }
-                    }}
-                  >
-                    <Shield className="w-5 h-5 shrink-0" />
-                    <span className="text-sm">Admin</span>
-                  </Link>
-                </motion.div>
-              )}
-
               {/* 프로필 영역 (스크롤 가능) */}
               <div className="mt-4 pt-4 border-t border-t-[var(--theme-sidebar-profile-border)]">
               {firebaseUser ? (
@@ -299,22 +194,12 @@ export function Sidebar() {
                     </motion.button>
                   ) : (
                     <>
-                      {/* 등록 완료 상태 - 닉네임 기반 프로필 (클릭 시 프로필 페이지 이동) */}
-                      <Link
-                        to="/profile"
-                        onClick={toggleSidebar}
-                        className="flex items-center gap-3 p-3 rounded-lg border transition-colors"
+                      {/* 등록 완료 상태 - 닉네임 기반 프로필 */}
+                      <div
+                        className="flex items-center gap-3 p-3 rounded-lg border"
                         style={{
                           backgroundColor: 'var(--theme-sidebar-profile-card-bg)',
                           borderColor: 'var(--theme-sidebar-profile-card-border)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-hover-bg)';
-                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-hover-border)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-profile-card-bg)';
-                          e.currentTarget.style.borderColor = 'var(--theme-sidebar-profile-card-border)';
                         }}
                       >
                         <PixelAvatar seed={appUser.nickname} size={40} />
@@ -326,7 +211,7 @@ export function Sidebar() {
                             {firebaseUser.email}
                           </p>
                         </div>
-                      </Link>
+                      </div>
                     </>
                   )}
 
@@ -402,54 +287,14 @@ export function Sidebar() {
                 </div>
               )}
               </div>
-              {/* Design decision:
-                  신고 진입은 디바이스(모바일/데스크톱)와 페이지(레슨/일반) 관계없이
-                  항상 사이드바 한 곳에서만 노출한다.
-                  이유: 하단 고정 Next/Previous 네비와의 충돌/겹침을 방지하고
-                  신고 액션 위치를 일관되게 유지하기 위함. */}
               {/* 한/영 전환 */}
               <div className="mt-3 flex justify-center">
                 <LanguageToggle />
               </div>
-
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                onClick={() => {
-                  setReportOpen(true);
-                  toggleSidebar();
-                }}
-                className="w-full mt-3 flex items-center gap-3 px-4 h-12 rounded-lg border transition-all duration-150"
-                style={{
-                  backgroundColor: 'var(--theme-sidebar-nav-inactive-bg)',
-                  borderColor: 'var(--theme-sidebar-nav-inactive-border)',
-                  color: 'var(--theme-sidebar-nav-inactive-text)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-hover-bg)';
-                  e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-hover-border)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--theme-sidebar-nav-inactive-bg)';
-                  e.currentTarget.style.borderColor = 'var(--theme-sidebar-nav-inactive-border)';
-                }}
-              >
-                <Flag className="w-5 h-5 shrink-0" />
-                <span className="text-sm">{t('report.lesson_title')}</span>
-              </motion.button>
             </nav>
           </motion.aside>
         </>
       )}
-      <ReportModal
-        open={reportOpen}
-        onOpenChange={setReportOpen}
-        // 레슨 상세 경로에서는 lesson 신고, 그 외 경로에서는 general 문의로 라우팅
-        type={lessonId ? 'lesson' : 'general'}
-        lessonId={lessonId}
-      />
     </AnimatePresence>
   );
 }

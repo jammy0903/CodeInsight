@@ -8,11 +8,9 @@ import { Code2, Sparkles, Menu, UserRound } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { StreakCard } from '@/features/gamification';
 import { LanguageBadge } from '@/components/ui/LanguageBadge';
 import { useIsMobile } from '@/hooks';
 import type { SupportedLanguage } from '@/types/simulator';
-import { useEffect } from 'react';
 import { CBrandIcon } from '@/components/ui/CBrandIcon';
 import { LanguageToggle } from '@/components/LanguageToggle';
 
@@ -36,17 +34,9 @@ export function TopBar() {
   const pageSubtitle = useStore((s) => s.pageSubtitle);
   const pageLanguage = useStore((s) => s.pageLanguage);
   const appUser = useStore((s) => s.appUser);
-  const streak = useStore((s) => s.streak);
-  const streakLoading = useStore((s) => s.streakLoading);
-  const refreshStreak = useStore((s) => s.refreshStreak);
   const isMobile = useIsMobile();
 
   const langInfo = pageLanguage ? getLanguageInfo(pageLanguage, t) : null;
-
-  // 초기 로드 및 appUser 변경 시 스트릭 로드
-  useEffect(() => {
-    refreshStreak();
-  }, [appUser, refreshStreak]);
 
   return (
     <header
@@ -145,16 +135,11 @@ export function TopBar() {
           </div>
         )}
 
-        {/* Right: Actions Area - 언어 토글 + 스트릭 또는 로그인 버튼 */}
+        {/* Right: Actions Area - 언어 토글 + 로그인 버튼 */}
         <div className="flex items-center gap-3 shrink-0">
           <LanguageToggle />
-          {/* 로그인 상태일 때 스트릭 표시 */}
-          {appUser ? (
-            <Link to="/dashboard" title={t('nav.view_status')}>
-              <StreakCard streak={streak} variant="compact" loading={streakLoading} />
-            </Link>
-          ) : (
-            /* 미로그인 상태일 때 로그인 버튼 */
+          {/* 미로그인 상태일 때 로그인 버튼 */}
+          {!appUser && (
             <Link
               to="/login"
               className="p-2 rounded-md transition-colors border hover:bg-[var(--theme-layout-top-bar-button-hover)]"

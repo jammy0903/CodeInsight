@@ -87,8 +87,6 @@ const STATIC_LANGUAGES: Array<{ id: string; icon: string }> = [
   { id: 'python', icon: '🐍' },
   { id: 'java', icon: '☕' },
   { id: 'javascript', icon: '⚡' },
-  { id: 'python-practical', icon: '🤖' },
-  { id: 'ai-literacy', icon: '🛡️' },
 ];
 
 // 언어별 색상 매핑

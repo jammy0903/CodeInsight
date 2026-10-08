@@ -9,12 +9,6 @@ import { HomePage } from './features/home';
 import { AuthPage } from './features/auth';
 
 import { PlaygroundPage } from './features/playground';
-import { AdminPage, AdminRoute } from './features/admin';
-import { QuizPage, OXQuizPage, MultipleChoiceQuizPage, FillBlankQuizPage, AlgorithmQuizPage } from './features/quiz';
-import { ProfilePage } from './features/profile';
-import { DashboardPage } from './features/dashboard';
-import { ReportPage } from './features/report';
-import { ProtectedRoute } from './components/ProtectedRoute';
 import { CoursesPage } from './features/courses/CoursesPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
@@ -88,22 +82,6 @@ export const router = createBrowserRouter([
         }
       },
       {
-        path: 'courses/python-practical',
-        lazy: async () => {
-          const { LanguageCoursePage } = await import('./features/courses/LanguageCoursePage');
-          const Component = () => <LanguageCoursePage langOverride="python-practical" />;
-          return { Component };
-        }
-      },
-      {
-        path: 'courses/ai-literacy',
-        lazy: async () => {
-          const { LanguageCoursePage } = await import('./features/courses/LanguageCoursePage');
-          const Component = () => <LanguageCoursePage langOverride="ai-literacy" />;
-          return { Component };
-        }
-      },
-      {
         path: 'courses/:lessonId',
         lazy: async () => {
           const { LessonPage } = await import('./features/courses/LessonPage');
@@ -118,15 +96,6 @@ export const router = createBrowserRouter([
         }
       },
       { path: 'playground', element: <PlaygroundPage /> },
-      { path: 'quiz', element: <ProtectedRoute><QuizPage /></ProtectedRoute> },
-      { path: 'quiz/ox/:lang', element: <ProtectedRoute><OXQuizPage /></ProtectedRoute> },
-      { path: 'quiz/multiple-choice/:lang', element: <ProtectedRoute><MultipleChoiceQuizPage /></ProtectedRoute> },
-      { path: 'quiz/fill-blank/:lang', element: <ProtectedRoute><FillBlankQuizPage /></ProtectedRoute> },
-      { path: 'quiz/algorithm/:lang', element: <ProtectedRoute><AlgorithmQuizPage /></ProtectedRoute> },
-      { path: 'profile', element: <ProtectedRoute><ProfilePage /></ProtectedRoute> },
-      { path: 'dashboard', element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
-      { path: 'report', element: <ProtectedRoute><ReportPage /></ProtectedRoute> },
-      { path: 'admin', element: <AdminRoute><AdminPage /></AdminRoute> },
       {
         path: 'privacy',
         lazy: async () => {
