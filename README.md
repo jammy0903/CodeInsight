@@ -104,7 +104,7 @@ packages/
 
 ## 실행하기
 
-**필요한 것**: Node.js 18 이상, pnpm, PostgreSQL. 시뮬레이터를 로컬에서 돌리려면 GCC · GDB, Python 3, JDK 17이 필요합니다.
+**필요한 것**: Node.js 22 이상, pnpm, PostgreSQL. 시뮬레이터를 로컬에서 돌리려면 GCC · GDB, Python 3, JDK 17이 필요합니다.
 
 ```bash
 git clone https://github.com/jammy0903/CodeInsight.git

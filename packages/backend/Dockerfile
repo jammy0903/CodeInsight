@@ -14,7 +14,7 @@ RUN mkdir -p build/classes && \
 # ==========================================
 # Stage 2: Build TypeScript Backend
 # ==========================================
-FROM node:20-slim AS builder
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
@@ -57,7 +57,7 @@ RUN cp -r src/modules/simulators/javascript/agent dist/modules/simulators/javasc
 # ==========================================
 # Stage 3: Production Runtime
 # ==========================================
-FROM node:20-slim
+FROM node:22-slim
 
 WORKDIR /app
 

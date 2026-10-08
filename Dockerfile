@@ -1,7 +1,7 @@
 # ==================================================
 # Stage 1: Base Image with All Runtimes
 # ==================================================
-FROM node:20-bullseye AS base
+FROM node:22-bookworm AS base
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
