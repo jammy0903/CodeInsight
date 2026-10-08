@@ -82,6 +82,7 @@ COPY --from=builder /app/packages/backend/package.json ./packages/backend/
 COPY --from=builder /app/packages/shared ./packages/shared
 COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
 COPY --from=builder /app/packages/backend/prisma ./packages/backend/prisma
+COPY --from=builder /app/packages/backend/prisma.config.ts ./packages/backend/prisma.config.ts
 COPY --from=builder /app/packages/backend/src/modules/simulators ./packages/backend/src/modules/simulators
 
 # 의존성 설치 (devDependencies 포함 - prisma CLI 필요)
