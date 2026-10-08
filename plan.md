@@ -63,12 +63,16 @@
 - [x] 타입 체크 0 에러, 테스트 107 통과 / 12 실패 (기준선과 동일: 로컬에 gdb 없음)
 - 남김: libsql/better-sqlite3/Prisma adapter 의존성 (코드에서 미사용, 4단계에서 DB 정리하며 확인)
 
-### 4. Prisma 스키마 정리
-- [ ] 남길 모델: Language, Chapter, Lesson, LessonContent, Quiz (그 외 전부 제거)
-- [ ] cpp / python-practical / ai-literacy 강의 콘텐츠 seed 제거
-- [ ] 마이그레이션 생성 (`prisma migrate dev --name portfolio_slim`)
-- [ ] seed·스크립트(`backup-user-data.ts`, `crawl-solvedac.ts` 등)에서 제거된 모델 참조 정리
-- [ ] 빌드 확인 → 커밋
+### 4. Prisma 스키마 정리 ✅
+- [x] 남긴 모델: Language, Chapter, Lesson, LessonContent, Quiz (17개 모델 제거)
+- [x] 마이그레이션 `20261008000000_portfolio_slim`: FK·테이블 DROP(`IF EXISTS`), cpp/python-practical/ai-literacy 강의 행 삭제
+- [x] seed: 제외 강의 블록 제거, `prisma/content/{cpp,python-practical,ai-literacy,quizzes}` 삭제
+- [x] 사용자·문제 관련 스크립트 16개, 커밋돼 있던 사용자 백업 JSON, 죽은 npm 스크립트 5개 삭제
+- [x] 미사용 의존성 제거: libsql, better-sqlite3, Prisma sqlite/libsql adapter, zod-to-json-schema
+- [x] **보안**: `prisma.config.ts`, `scripts/check-seed.ts`에 하드코딩된 Neon 접속 URL(비밀번호 포함) 제거
+- [x] 검증 (임시 Docker Postgres): 기존 마이그레이션 + 운영 유사 데이터 → 새 마이그레이션 적용 → 테이블 23→6, cpp 데이터만 삭제, 스키마 drift 없음, seed 202 레슨, API·Python/JS 시뮬레이터 정상
+- 남김: 개발용 스크립트 3개의 기존 타입 에러(backup-courses, restore-courses, validate-simulators)
+- ⚠️ 사용자 조치 필요: Neon DB 비밀번호 교체 (공개 히스토리에 노출됨) → Render `DATABASE_URL` 갱신
 
 ### 5. 데모 동선
 - [ ] 홈 첫 화면에서 예제 코드가 바로 실행·시각화되도록 변경
