@@ -24,7 +24,7 @@ interface JSStepResponse {
   visualizationState?: unknown;
 }
 
-interface JSSimulateResponse {
+export interface JSSimulateResponse {
   success: boolean;
   engine?: 'legacy' | 'inspector';
   steps?: JSStepResponse[];
@@ -59,6 +59,28 @@ function parseErrorPayload(error: JSSimulateResponse['error']): {
   };
 }
 
+/** 백엔드 JS 시뮬레이터 응답 → LessonStep (녹화된 데모 데이터에도 사용) */
+export function toJsLessonSteps(steps: JSSimulateResponse['steps']): LessonStep[] {
+  return (steps ?? []).map((step) => ({
+    line: step.line ?? 0,
+    code: step.code ?? '',
+    explanation: step.explanation ?? '',
+    // Keep simulator's original JS snapshot shape.
+    // JSTransformer/useLessonVisualization expect frame objects (methodName + variables),
+    // and flattening to MemoryBlock loses variable information.
+    stack: (Array.isArray(step.stack) ? step.stack : []) as LessonStep['stack'],
+    heap: (Array.isArray(step.heap) ? step.heap : []) as LessonStep['heap'],
+    stdout: step.stdout,
+    visualizationType: step.visualizationType ?? 'javascript',
+    visualizationState: step.visualizationState,
+    eventLoopState: step.eventLoopState,
+    scopeState: step.scopeState,
+    thisState: step.thisState,
+    prototypeState: step.prototypeState,
+    promiseState: step.promiseState,
+  }));
+}
+
 export async function simulateJavaScript(request: SimulateRequest): Promise<SimulateResult> {
   try {
     const response = await api.post<JSSimulateResponse>(
@@ -74,24 +96,7 @@ export async function simulateJavaScript(request: SimulateRequest): Promise<Simu
     }
 
     if (data.success && Array.isArray(data.steps)) {
-      const lessonSteps: LessonStep[] = data.steps.map((step) => ({
-        line: step.line ?? 0,
-        code: step.code ?? '',
-        explanation: step.explanation ?? '',
-        // Keep simulator's original JS snapshot shape.
-        // JSTransformer/useLessonVisualization expect frame objects (methodName + variables),
-        // and flattening to MemoryBlock loses variable information.
-        stack: (Array.isArray(step.stack) ? step.stack : []) as LessonStep['stack'],
-        heap: (Array.isArray(step.heap) ? step.heap : []) as LessonStep['heap'],
-        stdout: step.stdout,
-        visualizationType: step.visualizationType ?? 'javascript',
-        visualizationState: step.visualizationState,
-        eventLoopState: step.eventLoopState,
-        scopeState: step.scopeState,
-        thisState: step.thisState,
-        prototypeState: step.prototypeState,
-        promiseState: step.promiseState,
-      }));
+      const lessonSteps = toJsLessonSteps(data.steps);
 
       return { success: true, steps: lessonSteps };
     }

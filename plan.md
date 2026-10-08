@@ -74,10 +74,16 @@
 - 남김: 개발용 스크립트 3개의 기존 타입 에러(backup-courses, restore-courses, validate-simulators)
 - ⚠️ 사용자 조치 필요: Neon DB 비밀번호 교체 (공개 히스토리에 노출됨) → Render `DATABASE_URL` 갱신
 
-### 5. 데모 동선
-- [ ] 홈 첫 화면에서 예제 코드가 바로 실행·시각화되도록 변경
-- [ ] (선택) 레슨 완료 표시를 localStorage로
-- [ ] 커밋
+### 5. 데모 동선 ✅
+- [x] 홈 슬라이드 패널(지운 기능을 그린 SVG 8개) → 실행 시각화 데모(`features/home/HomeDemo.tsx`)로 교체
+  - Python 참조/별칭: 녹화된 시뮬레이터 응답 → Playground와 같은 변환(`toPythonLessonSteps`)
+  - JS 이벤트 루프: 녹화된 레슨 `js-1-4` → 레슨과 같은 변환(`resolveStepLines`)
+  - 자동 재생(2.6초, 반복), 직접 넘기면 정지, `prefers-reduced-motion`이면 정지 상태로 시작
+  - 캡션·출력 줄, 한/영/중 i18n
+- [x] 녹화 스크립트 `packages/frontend/scripts/record-home-demo.mjs` (백엔드 콜드 스타트 없이 즉시 재생)
+- [x] 홈 로그인 버튼 → Playground 버튼 (2단계에서 처리)
+- [x] 진도 localStorage (2단계에서 처리)
+- [x] 헤드리스 Chromium으로 데스크톱/모바일 확인, 콘솔 에러 없음
 
 ### 6. 차별화 기능: 실행 중 예측하기
 - [ ] 설계: 어느 스텝에서 멈출지 정의 방식 (레슨 JSON에 `predict` 필드)
@@ -89,7 +95,8 @@
 ### 7. 마무리
 - [ ] README를 포트폴리오 관점으로 재작성 (차별점, 아키텍처, 데모 GIF)
 - [ ] `render.yaml`, `.env.example`, docker-compose에서 Firebase 등 불필요 환경변수 제거
-- [ ] 번역 JSON(ko/en/zh)의 미사용 키 정리
+- [ ] 번역 JSON(ko/en/zh)의 미사용 키 정리, `feature_languages_desc`의 C++ 언급
+- [ ] `EventLoopView` 헤더 등 하드코딩된 한국어 문자열 i18n
 - [ ] Capacitor/Android 유지 여부 결정
 - [ ] 브라우저에서 전체 동선 확인 (Network 404 없음)
 - [ ] main 머지

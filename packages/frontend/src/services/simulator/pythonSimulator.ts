@@ -40,13 +40,14 @@ interface PyStep {
   callStack?: PyCallFrameSnapshot[];
 }
 
-interface PySimulateResult {
+export interface PySimulateResult {
   success: boolean;
   steps: PyStep[];
   error?: string;
 }
 
-function toSteps(pySteps: PyStep[]): LessonStep[] {
+/** 백엔드 Python 시뮬레이터 응답 → LessonStep (녹화된 데모 데이터에도 사용) */
+export function toPythonLessonSteps(pySteps: PyStep[]): LessonStep[] {
   return pySteps.map((step) => ({
     line: step.line,
     code: step.code,
@@ -70,7 +71,7 @@ export async function simulatePython(request: SimulateRequest): Promise<Simulate
     const data = response.data;
 
     if (data.success && data.steps) {
-      return { success: true, steps: toSteps(data.steps) };
+      return { success: true, steps: toPythonLessonSteps(data.steps) };
     }
 
     const errorMessage = data.error || 'Python simulation failed';
