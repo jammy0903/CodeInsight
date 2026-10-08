@@ -84,6 +84,8 @@ COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
 COPY --from=builder /app/packages/backend/prisma ./packages/backend/prisma
 COPY --from=builder /app/packages/backend/prisma.config.ts ./packages/backend/prisma.config.ts
 COPY --from=builder /app/packages/backend/src/modules/simulators ./packages/backend/src/modules/simulators
+# seed(prisma/utils)가 src/utils/expandDeltaSteps를 재사용
+COPY --from=builder /app/packages/backend/src/utils ./packages/backend/src/utils
 
 # 의존성 설치 (devDependencies 포함 - prisma CLI 필요)
 RUN pnpm install --frozen-lockfile
