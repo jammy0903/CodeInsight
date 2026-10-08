@@ -8,7 +8,6 @@
 import { motion } from 'framer-motion';
 import type { MemoryBlock } from '@/types';
 
-import { COLORS } from './utils/frameColors';
 import type { FrameColor } from './utils/frameColors';
 import { getDisplayName } from './utils/memoryHelpers';
 import { MemoryBlockCard } from './MemoryBlockCard';

@@ -2,6 +2,7 @@
  * C 시뮬레이터 — 메모리 트레이스 API 클라이언트
  */
 
+import i18n from 'i18next';
 import { AxiosError } from 'axios';
 import { api } from '../api/axios';
 import type { LessonStep, MemoryBlock } from '@/types';
@@ -94,7 +95,7 @@ export async function simulateC(request: SimulateRequest): Promise<SimulateResul
     // 컴파일 에러 (Emscripten 검증 실패)
     if (data.error === 'compilation_error' && data.details && data.details.length > 0) {
       notifySimulator.compilationErrors('C', data.details);
-      return { success: false, steps: [], error: data.message || '컴파일 에러' };
+      return { success: false, steps: [], error: data.message || i18n.t('playground.err_compile') };
     }
 
     const errorMessage = data.error || data.message || 'Simulation failed';
@@ -106,7 +107,7 @@ export async function simulateC(request: SimulateRequest): Promise<SimulateResul
 
       if (errorData.error === 'compilation_error' && errorData.details && errorData.details.length > 0) {
         notifySimulator.compilationErrors('C', errorData.details);
-        return { success: false, steps: [], error: errorData.message || '컴파일 에러' };
+        return { success: false, steps: [], error: errorData.message || i18n.t('playground.err_compile') };
       }
 
       const errorMessage = errorData.error || errorData.message || error.message;

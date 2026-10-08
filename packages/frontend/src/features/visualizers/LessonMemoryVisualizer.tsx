@@ -20,6 +20,7 @@ import { MemoryPanel } from '@/features/courses/components/memory/MemoryPanel';
 import type { MemoryState, ChangedBlocksType, MemoryAdapter } from './shared/adapters/types';
 import { CMemoryAdapter } from './c/adapters/CMemoryAdapter';
 import { JavaMemoryAdapter } from './java/adapters/JavaMemoryAdapter';
+import { useTranslation } from 'react-i18next';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -75,6 +76,7 @@ export const LessonMemoryVisualizer = memo(function LessonMemoryVisualizer({
   changedBlocks,
   className = '',
 }: LessonMemoryVisualizerProps) {
+  const { t } = useTranslation();
   // 어댑터로 변환
   const adapter = useMemo(() => createMemoryAdapter(language), [language]);
   const props = useMemo(
@@ -100,7 +102,7 @@ export const LessonMemoryVisualizer = memo(function LessonMemoryVisualizer({
     hasText(stepRecord.stdout)
   );
   const emptyMessage = isComparisonOrOutputStep
-    ? '이 단계는 비교/출력 중심이라 메모리 스냅샷을 생략했어요.'
+    ? t('visualizer.memory_snapshot_skipped')
     : undefined;
 
   // Java

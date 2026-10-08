@@ -8,6 +8,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, Square, RotateCcw, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { usePlaygroundStore, useStepControls, useCurrentCode } from '../stores/playgroundStore';
 import { simulatorService, isLanguageSupported } from '@/services/simulator';
+import { useTranslation } from 'react-i18next';
 
 interface StepControlsProps {
   isMobile?: boolean;
@@ -22,6 +23,7 @@ export function StepControls({
   showReset = true,
   showNavigation = true,
 }: StepControlsProps) {
+  const { t } = useTranslation();
   const {
     language, steps, currentStepIndex, isSimulating,
     setIsSimulating, setSteps, setError, stdins,
@@ -68,19 +70,18 @@ export function StepControls({
 
   const handleRun = async () => {
     if (!code.trim()) {
-      setError('코드를 입력해주세요');
+      setError(t('playground.err_empty_code'));
       return;
     }
 
     if (!isSupported) {
-      setError(`${language.toUpperCase()} 시뮬레이션은 아직 지원되지 않습니다`);
+      setError(t('playground.err_unsupported', { language: language.toUpperCase() }));
       return;
     }
 
     if (language === 'javascript' && DOM_API_PATTERN.test(code)) {
       setError(
-        'Playground는 Node.js 환경에서 실행되므로 document, window 등 브라우저 DOM API를 지원하지 않습니다.\n' +
-        '이벤트 핸들러 없이 실행되는 순수 JavaScript 로직으로 작성해주세요.'
+        t('playground.err_dom_api')
       );
       return;
     }
@@ -113,8 +114,7 @@ export function StepControls({
         const errMsg = result.error || 'Simulation failed';
         if (language === 'javascript' && /document|window|navigator|localStorage/.test(errMsg) && errMsg.includes('is not defined')) {
           setError(
-            'Playground는 Node.js 환경에서 실행되므로 document, window 등 브라우저 DOM API를 지원하지 않습니다.\n' +
-            '이벤트 핸들러 없이 실행되는 순수 JavaScript 로직으로 작성해주세요.'
+            t('playground.err_dom_api')
           );
         } else {
           setError(errMsg);
@@ -123,7 +123,7 @@ export function StepControls({
       }
 
       if (result.steps.length === 0) {
-        setError('시뮬레이션할 코드가 없습니다');
+        setError(t('playground.err_no_code'));
         return;
       }
 
@@ -134,11 +134,10 @@ export function StepControls({
       }
       const msg = err instanceof Error ? err.message : 'Simulation failed';
       if (msg.includes('timeout') || msg.includes('ECONNABORTED')) {
-        setError('코드 실행 시간이 초과되었습니다. 무한 루프가 없는지 확인해주세요.');
+        setError(t('playground.err_timeout'));
       } else if (language === 'javascript' && (msg.includes('is not defined') && /document|window|navigator|localStorage/.test(msg))) {
         setError(
-          'Playground는 Node.js 환경에서 실행되므로 document, window 등 브라우저 DOM API를 지원하지 않습니다.\n' +
-          '이벤트 핸들러 없이 실행되는 순수 JavaScript 로직으로 작성해주세요.'
+          t('playground.err_dom_api')
         );
       } else {
         setError(msg);

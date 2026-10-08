@@ -124,7 +124,7 @@ export const ThisBindingView = memo(function ThisBindingView({
     return (
       <div className="p-4 text-center text-gray-400">
         <span className="text-4xl mb-2 block">📍</span>
-        <p>this 바인딩 데이터가 없습니다</p>
+        <p>{t('visualizer.this_no_data')}</p>
       </div>
     );
   }
@@ -136,7 +136,7 @@ export const ThisBindingView = memo(function ThisBindingView({
       {/* Header */}
       <div className="mb-4 text-sm text-gray-500 flex items-center gap-2">
         <span>📍</span>
-        <span>JavaScript this: 호출 방식에 따라 this가 결정됩니다</span>
+        <span>{t('visualizer.this_desc')}</span>
       </div>
 
       {/* Context card */}
@@ -246,11 +246,11 @@ export const ThisBindingView = memo(function ThisBindingView({
         <div className="flex flex-wrap gap-3 text-xs text-gray-500">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded bg-blue-100 border border-blue-400" />
-            <span>this 키워드</span>
+            <span>{t('visualizer.this_keyword')}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded bg-amber-50 border border-amber-400" />
-            <span>this가 가리키는 값</span>
+            <span>{t('visualizer.this_value')}</span>
           </div>
         </div>
       </div>

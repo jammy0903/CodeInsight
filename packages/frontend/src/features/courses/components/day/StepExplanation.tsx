@@ -6,6 +6,7 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface StepExplanationProps {
   explanation: string;
@@ -159,6 +160,7 @@ export function StepExplanation({
   keyInsightTitle,
   illustrations,
 }: StepExplanationProps) {
+  const { t } = useTranslation();
   const blocks = parseExplanationBlocks(explanation || '');
 
   return (
@@ -199,7 +201,7 @@ export function StepExplanation({
               color: '#5a3f2a',
             }}
           >
-            <p className="font-bold text-amber-800">{keyInsightTitle || '핵심'}</p>
+            <p className="font-bold text-amber-800">{keyInsightTitle || t('lesson.key_insight')}</p>
             <div className="mt-1">{formatExplanation(keyInsight)}</div>
           </div>
         )}

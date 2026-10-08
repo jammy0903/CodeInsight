@@ -11,6 +11,7 @@ import { memo } from 'react';
 import { motion } from 'framer-motion';
 import type { ControlFlow } from '@codeinsight/shared';
 import { FLOW_THEMES, FLOW_ANIMATION, type FlowTheme } from '../../shared/styles';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -38,6 +39,7 @@ const BranchIndicator = memo(function BranchIndicator({
   result,
   theme,
 }: BranchIndicatorProps) {
+  const { t } = useTranslation();
   const colors = FLOW_THEMES[theme].control;
   const resultColor = result ? colors.truePath : colors.falsePath;
 
@@ -84,7 +86,7 @@ const BranchIndicator = memo(function BranchIndicator({
           animate={{ opacity: 0.7 }}
           transition={{ delay: 0.3 }}
         >
-          → {result ? 'true (진입)' : 'false (스킵)'}
+          → {result ? t('visualizer.branch_enter') : t('visualizer.branch_skip')}
         </motion.span>
       </div>
 
@@ -156,6 +158,7 @@ const FunctionCallIndicator = memo(function FunctionCallIndicator({
   isReturn,
   theme,
 }: FunctionCallIndicatorProps) {
+  const { t } = useTranslation();
   const colors = FLOW_THEMES[theme].control;
 
   return (
@@ -204,7 +207,7 @@ const FunctionCallIndicator = memo(function FunctionCallIndicator({
         animate={{ opacity: 0.7 }}
         transition={{ delay: 0.2 }}
       >
-        {isReturn ? '함수 종료' : '함수 호출'}
+        {isReturn ? t('visualizer.function_return') : t('visualizer.function_call')}
       </motion.span>
     </motion.div>
   );

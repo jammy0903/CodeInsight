@@ -11,6 +11,7 @@ import type { ChangedBlocksType, MemoryPanelProps } from './types';
 import { StackSection } from './StackSection';
 import { HeapSection } from './HeapSection';
 import { LowerMemorySections } from './LowerMemorySections';
+import { useTranslation } from 'react-i18next';
 
 const INITIAL_CHANGED_BLOCKS: ChangedBlocksType = { stack: [], heap: [] };
 
@@ -23,6 +24,7 @@ export function MemoryPanel({
   dataSection = [],
   textSection = [],
 }: MemoryPanelProps) {
+  const { t } = useTranslation();
   const isEmpty = stack.length === 0 && heap.length === 0;
 
   return (
@@ -32,7 +34,7 @@ export function MemoryPanel({
           className="text-center py-8 text-sm italic"
           style={{ color: 'var(--theme-memory-card-muted)' }}
         >
-          {emptyMessage || '메모리 할당 없음'}
+          {emptyMessage || t('visualizer.memory_empty')}
         </div>
       ) : (
         <>

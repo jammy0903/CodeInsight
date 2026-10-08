@@ -4,6 +4,7 @@
  * - handleError: axios 에러를 APIError로 변환
  */
 
+import i18n from 'i18next';
 import { AxiosError } from 'axios';
 
 /**
@@ -46,64 +47,50 @@ export function handleError(error: unknown): APIError {
           return new APIError(
             400,
             data.code || 'BAD_REQUEST',
-            data.message || '잘못된 요청입니다',
+            data.message || i18n.t('errors.bad_request'),
             data.details
-          );
-
-        case 401:
-          return new APIError(
-            401,
-            'UNAUTHORIZED',
-            '로그인이 필요합니다'
-          );
-
-        case 402:
-          return new APIError(
-            402,
-            'INSUFFICIENT_BALANCE',
-            'API 크레딧이 부족합니다'
           );
 
         case 403:
           return new APIError(
             403,
             'FORBIDDEN',
-            '권한이 없습니다'
+            i18n.t('errors.forbidden')
           );
 
         case 404:
           return new APIError(
             404,
             'NOT_FOUND',
-            '요청한 리소스를 찾을 수 없습니다'
+            i18n.t('errors.not_found')
           );
 
         case 429:
           return new APIError(
             429,
             'RATE_LIMIT',
-            '요청이 너무 많습니다. 잠시 후 다시 시도해주세요'
+            i18n.t('errors.rate_limit')
           );
 
         case 500:
           return new APIError(
             500,
             'INTERNAL_SERVER_ERROR',
-            data.message || '서버 오류가 발생했습니다'
+            data.message || i18n.t('errors.server')
           );
 
         case 503:
           return new APIError(
             503,
             'SERVICE_UNAVAILABLE',
-            'AI 서비스를 사용할 수 없습니다'
+            i18n.t('errors.service_unavailable')
           );
 
         default:
           return new APIError(
             status,
             'UNKNOWN_ERROR',
-            data.message || '알 수 없는 오류가 발생했습니다',
+            data.message || i18n.t('errors.unknown'),
             data
           );
       }
@@ -114,7 +101,7 @@ export function handleError(error: unknown): APIError {
       return new APIError(
         0,
         'NETWORK_ERROR',
-        '서버에 연결할 수 없습니다. 네트워크를 확인해주세요'
+        i18n.t('errors.network')
       );
     }
   }
@@ -123,6 +110,6 @@ export function handleError(error: unknown): APIError {
   return new APIError(
     0,
     'UNKNOWN_ERROR',
-    error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다'
+    error instanceof Error ? error.message : i18n.t('errors.unknown')
   );
 }

@@ -5,6 +5,7 @@
  *   cSimulator.ts, pythonSimulator.ts, javaSimulator.ts, jsSimulator.ts
  */
 
+import i18n from 'i18next';
 import { simulateC, runC } from './cSimulator';
 import { simulatePython } from './pythonSimulator';
 import { simulateJava } from './javaSimulator';
@@ -31,7 +32,7 @@ export const simulatorService = {
     const lang = language.toLowerCase();
 
     if (!isLanguageSupported(lang)) {
-      return errorResult(`${language.toUpperCase()} 시뮬레이션은 아직 지원되지 않습니다`);
+      return errorResult(i18n.t('playground.err_unsupported', { language: language.toUpperCase() }));
     }
 
     // stdin은 현재 C만 지원 — 다른 언어는 무시됨
@@ -49,7 +50,7 @@ export const simulatorService = {
   ): Promise<{ success: boolean; output?: string; error?: string }> {
     const lang = language.toLowerCase();
     if (lang !== 'c') {
-      return { success: false, error: `${language.toUpperCase()} 실행은 아직 지원되지 않습니다` };
+      return { success: false, error: i18n.t('playground.err_run_unsupported', { language: language.toUpperCase() }) };
     }
     return runC(request);
   },

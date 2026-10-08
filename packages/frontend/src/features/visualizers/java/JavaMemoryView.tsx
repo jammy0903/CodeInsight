@@ -28,6 +28,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // ============================================================
 // 타입 정의
@@ -354,6 +355,7 @@ export function JavaMemoryView({
   changedTargets = [],
   emptyMessage,
 }: JavaMemoryViewProps) {
+  const { t } = useTranslation();
   const [hoveredRef, setHoveredRef] = useState<string | null>(null);
   const changedSet = new Set(changedTargets);
 
@@ -414,7 +416,7 @@ export function JavaMemoryView({
             Stack
           </span>
           <span style={{ fontSize: '11px', color: COLORS.variable.muted }}>
-            함수 호출 스택
+            {t('visualizer.java_call_stack')}
           </span>
           <span
             style={{
@@ -487,7 +489,7 @@ export function JavaMemoryView({
               Heap
             </span>
             <span style={{ fontSize: '11px', color: COLORS.variable.muted }}>
-              객체 저장소
+              {t('visualizer.java_heap')}
             </span>
             <span
               style={{
@@ -516,7 +518,7 @@ export function JavaMemoryView({
       {/* 호버 안내 (참조가 있을 때만) */}
       {heap.length > 0 && (
         <div style={{ textAlign: 'center', fontSize: '11px', color: COLORS.variable.muted, padding: '4px' }}>
-          💡 참조 변수 호버 → 힙 객체 하이라이트
+          💡 {t('visualizer.java_hover_hint')}
         </div>
       )}
     </div>

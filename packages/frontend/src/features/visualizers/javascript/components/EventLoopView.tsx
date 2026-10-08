@@ -227,7 +227,7 @@ export const EventLoopView = memo(function EventLoopView({
       {/* 헤더 */}
       <div className="text-sm text-gray-500 flex items-center gap-2 mb-2">
         <span className="text-base">🔄</span>
-        <span>Event Loop: 비동기 코드의 실행 흐름</span>
+        <span>{t('visualizer.event_loop_desc')}</span>
       </div>
 
       {/* 상단: Call Stack + Web APIs (2열) */}

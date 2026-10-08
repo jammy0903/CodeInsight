@@ -428,12 +428,6 @@ export const themes: Record<ThemeType, ThemeColors> = {
   },
 };
 
-export const themeLabels: Record<ThemeType, string> = {
-  soft: '소프트',
-  dark: '다크',
-  minimal: '미니멀',
-};
-
 /**
  * CodeViewer (읽기 전용) 구문 강조 색상
  * 레거시 CodeViewer 컴포넌트용 (deprecated)

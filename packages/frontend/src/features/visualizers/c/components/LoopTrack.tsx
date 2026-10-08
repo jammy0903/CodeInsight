@@ -11,6 +11,7 @@ import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { ControlFlow } from '@codeinsight/shared';
 import { FLOW_THEMES, FLOW_ANIMATION, type FlowTheme } from '../../shared/styles';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // 타입 정의
@@ -135,6 +136,7 @@ export const LoopTrack = memo(function LoopTrack({
   theme,
   maxIterations = 10,
 }: LoopTrackProps) {
+  const { t } = useTranslation();
   const { type, condition, loopIndex = 0 } = controlFlow;
   const colors = FLOW_THEMES[theme].control;
 
@@ -249,10 +251,10 @@ export const LoopTrack = memo(function LoopTrack({
           transition={{ delay: 0.2 }}
         >
           {loopIndex === 0
-            ? '반복 시작 전'
+            ? t('visualizer.loop_before')
             : loopIndex === 1
-            ? '첫 번째 반복'
-            : `${loopIndex}번째 반복`}
+            ? t('visualizer.loop_first')
+            : t('visualizer.loop_nth', { n: loopIndex })}
         </motion.span>
       </div>
 
