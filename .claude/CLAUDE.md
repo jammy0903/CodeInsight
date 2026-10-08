@@ -47,5 +47,7 @@ These belong to another AI agent (Ralph) and are required to stay in the project
 ## 📚 Reference
 - `context/project_overview.md` - Project details
 - `context/tech_stack.md` - Technology
-- `context/architecture.md` - System design
+- `deployment_info.md` - Vercel / Fly.io / Neon
 - `rules/` - Coding standards, API routes, DB schema
+- `../docs/principle.md` - Simulator pipeline (how each language is traced)
+- `../README.md`, `../packages/*/README.md` - Architecture & structure

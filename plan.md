@@ -124,12 +124,12 @@
 ### 10. 문서 갱신 ✅
 - [x] README, 패키지 README 2개, CONTRIBUTING, ROADMAP, `.claude/CLAUDE.md`·rules·context·deployment_info
 - [x] 백엔드 기본 포트 3000 → 3002 (프론트 기본값과 불일치하던 문제)
+- [x] 지난 기록 문서 삭제 (계획서·감사·세션 로그·E2E 보고서·옛 예시 코드·법적 고지 페이지·옛 데모 GIF 등) → 현재 코드 기준 문서만 남김
+- [x] `docs/principle.md`(시뮬레이터 원리)를 현재 코드에 맞게 갱신 (C `/trace`, Java `sourceCode`, JS V8 Inspector, 파일 구조)
 
 ## 남은 이슈 (이번 범위 밖)
 - 일부 레슨 콘텐츠의 영어/중국어 번역 누락 (예: `py-3-1` 설명)
 - JS 시뮬레이터는 동기 구간만 추적 (비동기 콜백 실행은 사전 제작 레슨 데이터로 대체)
 - C 시뮬레이터 테스트 12개는 gdb가 있는 환경에서만 통과
 - 개발용 스크립트 3개의 기존 타입 에러 (backup-courses, restore-courses, validate-simulators)
-- `docs/demo.gif`(2월 녹화)는 현재 UI와 다름 — README에서는 참조하지 않음
 - DeepSeek·FAL·Firebase API 키는 각 서비스 콘솔에서 직접 폐기 필요
-- 과거 기록 문서(`.claude/plans`, `.claude/audit`, `packages/frontend/E2E_*.md` 등)는 당시 기준으로 남아 있음

@@ -11,7 +11,7 @@ Playground 모드는 사용자가 입력한 코드를 **실제 실행**하면서
 ```
 사용자 코드 입력
     ↓
-① API 수신 (POST /api/v1/simulators/{lang}/simulate)
+① API 수신 (POST /api/v1/simulators/{lang}/…)
     ↓
 ② 보안 검증 (위험 패턴 차단)
     ↓
@@ -29,26 +29,23 @@ Playground 모드는 사용자가 입력한 코드를 **실제 실행**하면서
     ↓
 ⑨ 프론트엔드 변환 (스냅샷 → LessonStep[])
     ↓
-⑩ 시각화 렌더링 (ReferenceGraphView)
+⑩ 시각화 렌더링 (언어·개념별 뷰)
 ```
 
 ---
 
 ## ① API 수신
 
-각 언어별 Fastify 라우트가 등록되어 있다.
+각 언어별 Fastify 라우트가 `app.ts`에 등록되어 있다. 모든 API에 IP당 분당 100회 rate limit이 걸린다.
 
-| 언어 | 엔드포인트 | 등록 위치 |
-|------|-----------|----------|
-| C | `POST /api/v1/simulators/c/simulate` | `app.ts` |
-| Python | `POST /api/v1/simulators/python/simulate` | `app.ts` |
-| JavaScript | `POST /api/v1/simulators/javascript/simulate` | `app.ts` |
-| Java | `POST /api/v1/simulators/java/simulate` | `app.ts` |
+| 언어 | 단계 추적 엔드포인트 | 요청 본문 |
+|------|---------------------|-----------|
+| C | `POST /api/v1/simulators/c/trace` | `{ code, stdin? }` |
+| Python | `POST /api/v1/simulators/python/simulate` | `{ code }` |
+| JavaScript | `POST /api/v1/simulators/javascript/simulate` | `{ code }` |
+| Java | `POST /api/v1/simulators/java/simulate` | `{ sourceCode }` |
 
-**요청 형태:**
-```json
-{ "code": "사용자가 입력한 소스 코드" }
-```
+C의 `POST /c/simulate`는 단계 추적 없이 컴파일·실행 결과(stdout, exit code)만 돌려준다.
 
 **응답 형태:**
 ```json
@@ -194,48 +191,26 @@ Node.js → spawn('python3', ['debugger_agent.py', 'main.py'])
 - 불변/가변(mutable) 구분 가능
 - 컨테이너 내부 최대 50개 항목 제한
 
-### JavaScript — VM + AST 인스트루먼트
+### JavaScript — V8 Inspector (기본 엔진)
 
 ```
-Node.js → spawn('node', ['debugger_agent.js', 'main.js'])
+Node.js → spawn('node', ['--inspect-brk=0', 'main.js'])  → WebSocket으로 Inspector 연결
 ```
 
-1. **Acorn**으로 소스 코드를 AST로 파싱 (ES2020)
-2. **acorn-walk**으로 AST를 순회하며 18종 노드에 캡처 코드 삽입
-3. 변환된 코드를 `vm.createContext()` 샌드박스에서 실행
-4. `__capture__(line)` 콜이 매 라인에서 호출되어 상태 수집
-5. 비동기 처리: microtask(Promise) → macrotask(setTimeout) 순서
-
-**변환 예시:**
-```javascript
-// 원본:
-let x = 5;
-x = x + 1;
-
-// 인스트루먼트 후:
-var x = 5; __capture__(1);
-x = x + 1; __capture__(2);
-```
-
-**스냅샷 구조:**
-```json
-{
-  "line": 1,
-  "event": "STEP",
-  "stack": [
-    { "methodName": "__main__", "className": "Main", "variables": { "x": 5 } }
-  ],
-  "heap": [
-    { "id": "@1", "address": "@1", "type": "Array", "content": "[1,2,3]", "length": 3 }
-  ]
-}
-```
+1. 사용자 코드를 `main.js`로 저장하고 `node --inspect-brk=0`으로 실행 (첫 줄에서 정지)
+2. 출력된 `ws://` 주소로 Inspector에 연결 (Node 22의 global `WebSocket` 사용)
+3. `Runtime.enable`, `Debugger.enable` 후 `Debugger.stepInto` / `stepOver`로 한 단계씩 진행
+4. `Debugger.paused` 이벤트마다 콜 프레임과 `Runtime.getProperties`로 스코프 변수를 읽어 스냅샷 생성
+5. 스냅샷에 개념별 상태를 덧붙인다
+   - `event-loop-state-tracker` → `eventLoopState` (Call Stack, Web APIs, Task/Microtask Queue)
+   - `scope-state-tracker`, `this-state-tracker`, `prototype-state-tracker`
 
 **특징:**
-- 디버거 없이 코드 자체를 변형하여 추적
-- `vm` 모듈로 완전 격리 (require, fs 접근 불가)
-- 비동기(Promise, setTimeout) 시뮬레이션 가능
-- 특수값 인코딩: `undefined` → `"@@UNDEFINED@@"`, `NaN` → `"@@NaN@@"`
+- 코드를 변형하지 않고 실제 V8 디버거로 추적
+- 스텝 상한 초과 시 `MAX_STEPS_EXCEEDED` 에러
+- 비동기 콜백이 큐에서 꺼내져 실행되는 순서는 레슨에서 사전 제작 데이터(`eventLoopState`)로 보여준다
+
+**레거시 엔진**: `JS_SIM_ENGINE=legacy`이면 `agent/debugger_agent.js`가 Acorn으로 AST를 파싱해 `__capture__(line)` 호출을 삽입하고 `vm` 샌드박스에서 실행한다.
 
 ### Java — JDI (Java Debug Interface)
 
@@ -349,12 +324,17 @@ interface LessonStep {
 
 ## ⑩ 시각화 렌더링
 
-모든 언어가 최종적으로 **ReferenceGraphView** 컴포넌트로 렌더링된다.
+`LessonFlowVisualizer`가 언어에 맞는 뷰를 고른다 (Playground와 레슨이 같은 컴포넌트를 쓴다).
 
-- **스택 영역**: 함수 프레임 → 지역 변수 → 값 또는 참조 화살표
-- **힙 영역**: 객체, 배열, 문자열 등 참조 타입
-- **출력 영역**: stdout 누적 표시
+| 언어 | 주요 뷰 |
+|------|---------|
+| C | `CReferenceView` (스택 프레임 + 포인터 화살표), 메모리 탭, 반복문 트랙·분기 표시 |
+| Python | `PythonReferenceView` (이름표 → 객체 참조 그래프) |
+| Java | `JavaReferenceView` / `JavaMemoryView` (호출 스택 + 힙 객체) |
+| JavaScript | `EventLoopView`, `ScopeView`, `ThisBindingView`, `PrototypeChainView`, `PromiseView` |
+
 - **코드 하이라이트**: 현재 실행 라인 강조
+- **출력 영역**: stdout 누적 표시 (`useLessonTerminal`)
 
 ---
 
@@ -389,11 +369,14 @@ interface LessonStep {
 | 항목 | Playground | Lesson |
 |------|-----------|--------|
 | 코드 실행 | 실제 실행 | 실행 안 함 |
-| 데이터 출처 | 시뮬레이터가 동적 생성 | JSON에 사전 작성 |
-| 설명(explanation) | 없음 (빈 문자열) | JSON에 포함 |
+| 데이터 출처 | 시뮬레이터가 동적 생성 | JSON에 사전 작성 (delta 형식 → 서버에서 펼침) |
+| 설명(explanation) | 없음 (빈 문자열) | JSON에 포함, 시각화 위에 표시 |
+| 예측 질문 | 없음 | 스텝의 `predict` 필드 |
 | 시각화 데이터 | 자동 수집 | 수동 작성 |
-| 보안 위험 | 있음 (격리 필요) | 없음 |
+| 보안 위험 | 있음 (프로세스 격리·제한) | 없음 |
 | 응답 속도 | 느림 (실행 필요) | 빠름 (DB 조회만) |
+
+홈 화면 데모는 두 경로의 결과를 녹화해 재생한다 (`packages/frontend/scripts/record-home-demo.mjs`).
 
 ---
 
@@ -403,43 +386,35 @@ interface LessonStep {
 
 ```
 packages/backend/src/modules/simulators/
+├── safe-env.ts                       # 자식 프로세스용 최소 환경변수
+├── shared/gdb/                       # GDB/MI 엔진·파서·스냅샷 정규화 (C)
 ├── c/
-│   ├── routes.ts                    # API 엔드포인트
-│   ├── simulator.ts                 # 메인 서비스 (regex 기반)
-│   └── engine/
-│       ├── gdb-tracer.ts           # GDB/MI 통신
-│       └── file-manager.ts         # 임시 파일 관리
+│   ├── routes.ts                     # /trace, /simulate
+│   ├── c-simulation.service.ts       # GDB 기반 추적 서비스
+│   ├── engine/                       # c-compiler, c-gdb-client, c-file-manager
+│   ├── executor/                     # 실행 전용 (/simulate) + 보안 검사
+│   └── services/emscripten-validator.service.ts
 ├── python/
 │   ├── routes.ts
-│   ├── python-simulation.service.ts # 메인 서비스
-│   ├── agent/
-│   │   └── debugger_agent.py       # sys.settrace() 트레이서
-│   └── engine/
-│       ├── debugger-client.ts      # Python 프로세스 관리
-│       └── file-manager.ts
+│   ├── python-simulation.service.ts
+│   ├── agent/debugger_agent.py       # sys.settrace() 트레이서
+│   └── engine/                       # debugger-client, file-manager
 ├── javascript/
 │   ├── routes.ts
 │   ├── javascript-simulation.service.ts
-│   ├── agent/
-│   │   └── debugger_agent.js       # AST 인스트루먼트 + VM 실행
 │   ├── engine/
-│   │   ├── debugger-client.ts
-│   │   └── file-manager.ts
+│   │   ├── inspector-runner.ts       # node --inspect-brk 실행
+│   │   ├── inspector-client.ts       # Inspector WebSocket 클라이언트
+│   │   ├── inspector-snapshot-builder.ts
+│   │   └── *-state-tracker.ts        # event loop / scope / this / prototype
+│   ├── agent/debugger_agent.js       # 레거시 AST 엔진
 │   └── normalizer/
-│       └── js-snapshot-normalizer.ts  # diff 기반 이벤트 생성
 └── java/
     ├── routes.ts
     ├── java-simulation.service.ts
-    ├── agent/src/main/java/com/vis/
-    │   ├── DebuggerAgent.java      # JDI 이벤트 루프
-    │   ├── SnapshotMaker.java      # 메모리 상태 캡처
-    │   └── JsonWriter.java         # JSON 직렬화
-    ├── engine/
-    │   ├── compiler.ts             # javac 래퍼
-    │   ├── debugger-client.ts
-    │   └── file-manager.ts
+    ├── agent/src/main/java/com/vis/  # DebuggerAgent, SnapshotMaker, JsonWriter (JDI)
+    ├── engine/                       # compiler, debugger-client, file-manager, security
     └── normalizer/
-        └── java-event-normalizer.ts
 ```
 
 ### 프론트엔드 시뮬레이터 클라이언트
@@ -448,7 +423,7 @@ packages/backend/src/modules/simulators/
 packages/frontend/src/services/simulator/
 ├── index.ts                # 언어별 라우팅
 ├── cSimulator.ts           # C API 호출 + 변환
-├── pythonSimulator.ts      # Python API 호출 + 변환
-├── jsSimulator.ts          # JS API 호출 + 변환
+├── pythonSimulator.ts      # Python API 호출 + toPythonLessonSteps
+├── jsSimulator.ts          # JS API 호출 + toJsLessonSteps
 └── javaSimulator.ts        # Java API 호출 + 변환
 ```

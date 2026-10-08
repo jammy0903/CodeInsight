@@ -27,6 +27,7 @@
 - **홈 데모**: `features/home/demo/recordings.json` (녹화된 엔진 결과, `scripts/record-home-demo.mjs`로 갱신)
 
 ## 📚 참고
-- 상세 아키텍처: See `architecture.md`, `frontend_arch.md`, `backend_arch.md`
+- 아키텍처: 루트 `README.md`, `packages/frontend/README.md`, `packages/backend/README.md`
+- 시뮬레이터 동작 원리: `docs/principle.md`
 - Lesson JSON 상세: See `packages/backend/prisma/content/`
 - API Routes: See `.claude/rules/API_ROUTES.md`
