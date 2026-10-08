@@ -25,13 +25,13 @@ test.describe('HomePage - Public Route', () => {
     await expect(homePage.heroTitle).toBeVisible();
   });
 
-  test('로그인 버튼 표시 (비로그인 상태)', async () => {
-    await expect(homePage.loginButton).toBeVisible();
+  test('Playground 버튼 표시', async () => {
+    await expect(homePage.playgroundButton).toBeVisible();
   });
 
-  test('로그인 버튼 클릭 시 로그인 페이지로 이동', async ({ page }) => {
-    await homePage.clickLogin();
-    await expect(page).toHaveURL(/\/login|\/signup/);
+  test('Playground 버튼 클릭 시 Playground로 이동', async ({ page }) => {
+    await homePage.clickPlayground();
+    await expect(page).toHaveURL(/\/playground/);
   });
 
   test('스토리 패널 요소 확인', async ({ page }) => {

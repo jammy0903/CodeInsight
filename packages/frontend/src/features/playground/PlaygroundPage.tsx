@@ -59,11 +59,10 @@ export function PlaygroundPage() {
   });
 
   // 메모리 탭 표시 여부
-  const showMemoryTab = language === 'java' || language === 'c' || language === 'cpp';
+  const showMemoryTab = language === 'java' || language === 'c';
   const showJsMemoryTab = language === 'javascript';
   const canRenderVisualizer = (
     language === 'c' ||
-    language === 'cpp' ||
     language === 'python' ||
     language === 'java' ||
     language === 'javascript'

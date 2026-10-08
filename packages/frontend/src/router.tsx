@@ -6,7 +6,6 @@
 import { createBrowserRouter, redirect } from 'react-router-dom';
 import { RootLayout } from './layouts/RootLayout';
 import { HomePage } from './features/home';
-import { AuthPage } from './features/auth';
 
 import { PlaygroundPage } from './features/playground';
 import { CoursesPage } from './features/courses/CoursesPage';
@@ -21,7 +20,6 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: 'login', element: <AuthPage /> },
       {
         path: 'courses',
         element: <CoursesPage />,
@@ -46,14 +44,6 @@ export const router = createBrowserRouter([
         lazy: async () => {
           const { LanguageCoursePage } = await import('./features/courses/LanguageCoursePage');
           const Component = () => <LanguageCoursePage langOverride="c" />;
-          return { Component };
-        }
-      },
-      {
-        path: 'courses/cpp',
-        lazy: async () => {
-          const { LanguageCoursePage } = await import('./features/courses/LanguageCoursePage');
-          const Component = () => <LanguageCoursePage langOverride="cpp" />;
           return { Component };
         }
       },
@@ -96,20 +86,6 @@ export const router = createBrowserRouter([
         }
       },
       { path: 'playground', element: <PlaygroundPage /> },
-      {
-        path: 'privacy',
-        lazy: async () => {
-          const { PrivacyPolicyPage } = await import('./features/legal');
-          return { Component: PrivacyPolicyPage };
-        }
-      },
-      {
-        path: 'terms',
-        lazy: async () => {
-          const { TermsPage } = await import('./features/legal');
-          return { Component: TermsPage };
-        }
-      },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

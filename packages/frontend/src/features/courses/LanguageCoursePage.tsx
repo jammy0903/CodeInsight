@@ -6,6 +6,7 @@ import type { ChapterWithLessons } from '@/types';
 import { CourseGrid } from './components/CourseGrid';
 import { ChapterCard } from './components/ChapterCard';
 import { useStore } from '@/stores/store';
+import { useProgressStore } from '@/stores/progressStore';
 import { ChevronLeft } from 'lucide-react';
 import { useIsMobile, useLanguageCourse } from '@/hooks';
 import { CBrandIcon } from '@/components/ui/CBrandIcon';
@@ -16,19 +17,13 @@ interface ChapterProgressSnapshot {
   percentage: number;
 }
 
-type ChapterWithProgress = ChapterWithLessons & {
-  progress?: {
-    total?: number;
-    completed?: number;
-    percentage?: number;
-  };
-};
-
-function getChapterProgress(chapter: ChapterWithLessons): ChapterProgressSnapshot {
-  const chapterWithProgress = chapter as ChapterWithProgress;
-  const total = chapterWithProgress.progress?.total ?? chapter.lessons?.length ?? 0;
-  const completed = chapterWithProgress.progress?.completed ?? 0;
-  const percentage = chapterWithProgress.progress?.percentage ?? 0;
+function getChapterProgress(
+  chapter: ChapterWithLessons,
+  completedLessonIds: Record<string, true>
+): ChapterProgressSnapshot {
+  const total = chapter.lessons?.length ?? 0;
+  const completed = chapter.lessons?.filter((lesson) => completedLessonIds[lesson.id]).length ?? 0;
+  const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
   return { total, completed, percentage };
 }
 
@@ -42,7 +37,7 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
   const lang = langOverride ?? routeLang;
   const navigate = useNavigate();
   const setPageTitle = useStore((s) => s.setPageTitle);
-  const authLoading = useStore((s) => s.authLoading);
+  const completedLessonIds = useProgressStore((s) => s.completedLessonIds);
 
   // TanStack Query: loading, error, data 자동 관리
   const { data, isLoading, isError, error } = useLanguageCourse(lang);
@@ -56,13 +51,6 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
           icon: 'C',
           color: '#3B82F6',
           description: t('language_desc.c')
-        };
-      case 'cpp':
-        return {
-          name: t('languages.cpp'),
-          icon: 'C++',
-          color: '#2563EB',
-          description: t('language_desc.cpp')
         };
       case 'python':
         return {
@@ -85,20 +73,6 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
           color: '#81C784',
           description: t('language_desc.javascript')
         };
-      case 'python-practical':
-        return {
-          name: t('languages.python_practical'),
-          icon: '🤖',
-          color: '#9E9E9E',
-          description: t('language_desc.python_practical')
-        };
-      case 'ai-literacy':
-        return {
-          name: t('languages.ai-literacy'),
-          icon: '🛡️',
-          color: '#38BDF8',
-          description: t('language_desc.ai-literacy')
-        };
       default:
         return {
           name: lang?.toUpperCase() || '',
@@ -114,7 +88,7 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
 
   // 데이터에서 language와 chapters 추출
   const chapters = data?.chapters || [];
-  const pageLoading = authLoading || isLoading;
+  const pageLoading = isLoading;
 
   // 페이지 제목 설정
   useEffect(() => {
@@ -188,8 +162,7 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
                 }}
               >
                 {lang === 'c' && <CBrandIcon language="c" size={63} />}
-                {lang === 'cpp' && <CBrandIcon language="cpp" size={63} />}
-                {lang !== 'c' && lang !== 'cpp' && langInfo.icon}
+                {lang !== 'c' && langInfo.icon}
               </div>
               <div>
                 <h1 className="text-3xl font-bold tracking-tight text-[var(--theme-dashboard-title)]">
@@ -241,7 +214,7 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
               <div className="bg-[var(--theme-dashboard-card-bg)] rounded-xl border border-[var(--theme-dashboard-card-border)] overflow-hidden">
                 {chapters.map((chapter, index) => {
                   // 백엔드에서 계산된 진행률 사용 (DRY 원칙)
-                  const { total, completed, percentage: progress } = getChapterProgress(chapter);
+                  const { total, completed, percentage: progress } = getChapterProgress(chapter, completedLessonIds);
 
                   return (
                     <div key={chapter.id}>
@@ -285,7 +258,7 @@ export function LanguageCoursePage({ langOverride }: LanguageCoursePageProps = {
               <CourseGrid>
                 {chapters.map((chapter, index) => {
                   // 백엔드에서 계산된 진행률 사용 (DRY 원칙)
-                  const { total, completed } = getChapterProgress(chapter);
+                  const { total, completed } = getChapterProgress(chapter, completedLessonIds);
                   const isComplete = total > 0 && completed === total;
                   const isActive = !isComplete && index === 0;
 

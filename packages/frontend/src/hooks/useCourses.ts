@@ -4,17 +4,15 @@
  * WHY: API 상태 관리 단순화
  * - loading, error, data 수동 관리 제거
  * - isLoading, isError, isSuccess 자동 제공
- * - 인증 상태 기반 자동 쿼리 활성화
  */
 
 import { useQuery } from '@tanstack/react-query';
 import i18n from 'i18next';
-import { getLanguageWithChapters, getChapterWithLessons, getChapterProgress, getUserProgress, getLessonFull } from '@/services/courses';
-import { useStore } from '@/stores/store';
-import type { ChapterWithLessons, ChapterWithProgress, Language, UserProgress, LessonFull } from '@/types';
+import { getLanguageWithChapters, getChapterWithLessons, getLessonFull } from '@/services/courses';
+import type { ChapterWithLessons, Language, LessonFull } from '@/types';
 
 /**
- * 언어 코스 데이터 조회 (챕터 + 진행률 포함)
+ * 언어 코스 데이터 조회 (챕터 포함)
  *
  * @param languageId - 조회할 언어 ID (c, python, java 등)
  * @returns TanStack Query 결과 { data, isLoading, isError, error, isSuccess }
@@ -26,18 +24,12 @@ import type { ChapterWithLessons, ChapterWithProgress, Language, UserProgress, L
  * return <ChapterList chapters={data.chapters} />;
  */
 export function useLanguageCourse(languageId: string | undefined) {
-  const appUser = useStore((state) => state.appUser);
-  const authLoading = useStore((state) => state.authLoading);
   const locale = i18n.language;
 
   return useQuery<Language & { chapters: ChapterWithLessons[] }>({
-    // queryKey에 appUser.id 포함 → 로그인/로그아웃 시 자동 재요청
-    queryKey: ['language', languageId, appUser?.id, locale],
-
+    queryKey: ['language', languageId, locale],
     queryFn: () => getLanguageWithChapters(languageId!),
-
-    // authLoading 완료까지 대기 → 토큰 없이 보내는 레이스 컨디션 방지
-    enabled: !!languageId && !authLoading,
+    enabled: !!languageId,
   });
 }
 
@@ -57,40 +49,6 @@ export function useChapter(chapterId: string | undefined) {
     queryFn: () => getChapterWithLessons(chapterId!),
     enabled: !!chapterId,
     staleTime: 5 * 60 * 1000, // 5분: 챕터 구조는 세션 중 변경 안 됨
-  });
-}
-
-/**
- * 챕터 진행 상태 조회 (로그인 사용자 전용)
- */
-export function useChapterProgress(chapterId: string | undefined) {
-  const appUser = useStore((state) => state.appUser);
-
-  return useQuery<ChapterWithProgress>({
-    queryKey: ['chapter-progress', chapterId, appUser?.id],
-    queryFn: () => getChapterProgress(chapterId!),
-    enabled: !!chapterId && !!appUser,
-    staleTime: 60 * 1000,
-  });
-}
-
-/**
- * 사용자 진행 상태 조회
- *
- * @returns TanStack Query 결과 { data, isLoading }
- *
- * @example
- * const { data: progressList } = useUserProgress();
- */
-export function useUserProgress() {
-  // 선택적 구독: appUser만 구독하여 불필요한 리렌더링 방지
-  const appUser = useStore((state) => state.appUser);
-
-  return useQuery<UserProgress[]>({
-    queryKey: ['progress', appUser?.id],
-    queryFn: () => getUserProgress(),
-    // 로그인 상태일 때만 쿼리 실행
-    enabled: !!appUser,
   });
 }
 

@@ -11,8 +11,7 @@
  */
 
 import { memo, useMemo, type ComponentProps } from 'react';
-import type { LessonStep, FlowLanguage, FlowVariable } from '@codeinsight/shared';
-import { CppFlowVisualizer } from './cpp/CppFlowVisualizer';
+import type { LessonStep, FlowLanguage } from '@codeinsight/shared';
 import { ReferenceGraphView } from './shared/components/ReferenceGraphView';
 import { EventLoopView } from './javascript/components/EventLoopView';
 import { ScopeView } from './javascript/components/ScopeView';
@@ -42,7 +41,6 @@ interface LessonFlowVisualizerProps {
   language?: FlowLanguage | string;
   fullCode?: string;
   theme?: FlowTheme;
-  onVariableClick?: (variable: FlowVariable) => void;
   className?: string;
   memoryState?: MemoryState;
   prevMemoryState?: MemoryState;
@@ -94,7 +92,6 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
   language = 'c',
   fullCode,
   theme = 'light',
-  onVariableClick,
   className = '',
   memoryState,
   prevMemoryState,
@@ -498,20 +495,6 @@ export const LessonFlowVisualizer = memo(function LessonFlowVisualizer({
           step={flowStepWithAnimations}
           prevStep={prevFlowStep}
           language="javascript"
-        />
-      </div>
-    );
-  }
-
-  // C++ with heap data → CppFlowVisualizer (Stack/Heap 2-region)
-  if (language === 'cpp') {
-    return (
-      <div className={className}>
-        <CppFlowVisualizer
-          step={flowStepWithAnimations}
-          prevStep={prevFlowStep}
-          theme={theme}
-          onVariableClick={onVariableClick}
         />
       </div>
     );

@@ -44,8 +44,8 @@ export function useLessonTerminal({
       ? steps[currentStepIndex - 1]
       : null;
 
-    // C/C++: step.stdout (누적 문자열)
-    if (languageId === 'c' || languageId === 'cpp') {
+    // C: step.stdout (누적 문자열)
+    if (languageId === 'c') {
       if (!currentStep.stdout) return [];
       const currentLines = currentStep.stdout.split('\n').filter(Boolean);
       if (!diffMode) {
@@ -57,7 +57,7 @@ export function useLessonTerminal({
     }
 
     // Python: pythonMemoryState.output (JSON 레슨) 또는 stdout (시뮬레이터)
-    if (languageId === 'python' || languageId === 'python-practical') {
+    if (languageId === 'python') {
       const pyOutput = getOutputList(currentStep, 'pythonMemoryState');
       if (pyOutput.length > 0) {
         if (!diffMode) {

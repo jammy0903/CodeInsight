@@ -13,18 +13,12 @@ import type {
   Chapter,
   ChapterWithLessons,
   LessonFull,
-  UserProgress,
-  ProgressUpdateRequest,
-  ChapterWithProgress,
 } from '@/types';
 import {
   LanguagesSchema,
   ChaptersSchema,
   ChapterWithLessonsSchema,
   LessonFullSchema,
-  UserProgressSchema,
-  UserProgressListSchema,
-  ChapterWithProgressSchema,
 } from '@codeinsight/shared';
 import { logger } from '@/utils/logger';
 import { resolveStepLines } from '@/features/courses/utils/resolveStepLines';
@@ -37,9 +31,7 @@ const ENDPOINTS = {
   languages: '/courses/languages',
   chapters: (lang: string) => `/courses/${lang}/chapters`,
   chapter: (id: string) => `/courses/chapters/${id}`,
-  chapterProgress: (id: string) => `/courses/chapters/${id}/progress`,
   lesson: (id: string) => `/courses/lessons/${id}`,
-  progress: '/courses/progress',
 };
 
 function getRequestLocale(): string | undefined {
@@ -145,28 +137,6 @@ export async function getChapterWithLessons(chapterId: string): Promise<ChapterW
   }
 }
 
-/**
- * 챕터 진행 상태 (인증 필요)
- */
-export async function getChapterProgress(chapterId: string): Promise<ChapterWithProgress> {
-  try {
-    const response = await api.get<ChapterWithProgress>(ENDPOINTS.chapterProgress(chapterId));
-
-    // 런타임 검증
-    const parsed = ChapterWithProgressSchema.safeParse(response.data);
-    if (!parsed.success) {
-      logger.error('Invalid API response:', parsed.error);
-      throw new Error('Invalid chapter progress data from server');
-    }
-
-    return parsed.data;
-  } catch (err) {
-    const error = handleError(err);
-    logger.error('Failed to get chapter progress:', error);
-    throw error;
-  }
-}
-
 // =============================================
 // Lesson API
 // =============================================
@@ -201,54 +171,6 @@ export async function getLessonFull(lessonId: string): Promise<LessonFull> {
   } catch (err) {
     const error = handleError(err);
     logger.error('Failed to get lesson:', error);
-    throw error;
-  }
-}
-
-// =============================================
-// Progress API
-// =============================================
-
-/**
- * 사용자 전체 진행 상태 조회
- */
-export async function getUserProgress(): Promise<UserProgress[]> {
-  try {
-    const response = await api.get<UserProgress[]>(ENDPOINTS.progress);
-
-    // 런타임 검증
-    const parsed = UserProgressListSchema.safeParse(response.data);
-    if (!parsed.success) {
-      logger.error('Invalid API response:', parsed.error);
-      throw new Error('Invalid user progress data from server');
-    }
-
-    return parsed.data;
-  } catch (err) {
-    const error = handleError(err);
-    logger.error('Failed to get user progress:', error);
-    throw error;
-  }
-}
-
-/**
- * 진행 상태 업데이트
- */
-export async function updateProgress(data: ProgressUpdateRequest): Promise<UserProgress> {
-  try {
-    const response = await api.post<UserProgress>(ENDPOINTS.progress, data);
-
-    // 런타임 검증
-    const parsed = UserProgressSchema.safeParse(response.data);
-    if (!parsed.success) {
-      logger.error('Invalid API response:', parsed.error);
-      throw new Error('Invalid progress data from server');
-    }
-
-    return parsed.data;
-  } catch (err) {
-    const error = handleError(err);
-    logger.error('Failed to update progress:', error);
     throw error;
   }
 }

@@ -22,11 +22,9 @@ interface UseLessonDataOptions {
 function resolveLanguageId(lessonId: string | undefined, contentLanguage: string | undefined): SupportedLanguage | undefined {
   if (contentLanguage) return contentLanguage as SupportedLanguage;
   if (!lessonId) return undefined;
-  if (lessonId.startsWith('py-practical-')) return 'python-practical';
   if (lessonId.startsWith('py-')) return 'python';
   if (lessonId.startsWith('js-')) return 'javascript';
   if (lessonId.startsWith('java-')) return 'java';
-  if (lessonId.startsWith('cpp-')) return 'cpp';
   if (lessonId.startsWith('c-')) return 'c';
   return undefined;
 }

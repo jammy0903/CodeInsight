@@ -4,16 +4,8 @@
  */
 
 import { create } from 'zustand';
-import type { User as FirebaseUser } from 'firebase/auth';
 import type { Message, RunResult, Step } from '@/types/index';
 import type { SupportedLanguage } from '@/types/simulator';
-import type { StreakStatus } from '@/services/gamification';
-import type { AppUser } from './authStore';
-import { getStreak } from '@/services/gamification';
-import { logger } from '@/utils/logger';
-
-// App User 타입 — authStore.ts에서 정의, 여기서 re-export
-export type { AppUser, OAuthAccountInfo } from './authStore';
 
 interface Store {
   // === UI 상태 ===
@@ -26,23 +18,6 @@ interface Store {
   pageSubtitle: string;
   pageLanguage: SupportedLanguage | null;
   setPageTitle: (title: string, subtitle?: string, language?: SupportedLanguage | null) => void;
-
-  // === 사용자 (Firebase + App) ===
-  firebaseUser: FirebaseUser | null;
-  setFirebaseUser: (user: FirebaseUser | null) => void;
-  appUser: AppUser | null;
-  setAppUser: (user: AppUser | null) => void;
-  needsRegistration: boolean;
-  setNeedsRegistration: (needs: boolean) => void;
-  needsOnboarding: boolean;
-  setNeedsOnboarding: (needs: boolean) => void;
-  authLoading: boolean;
-  setAuthLoading: (loading: boolean) => void;
-
-  // === 스트릭 (Gamification) ===
-  streak: StreakStatus | null;
-  streakLoading: boolean;
-  refreshStreak: () => Promise<void>;
 
   // === 채팅 ===
   messages: Message[];
@@ -89,40 +64,6 @@ export const useStore = create<Store>((set, get) => ({
   pageSubtitle: '',
   pageLanguage: null,
   setPageTitle: (title, subtitle = '', language = null) => set({ pageTitle: title, pageSubtitle: subtitle, pageLanguage: language }),
-
-  // === 사용자 (Firebase + App) ===
-  firebaseUser: null,
-  setFirebaseUser: (user) => set({ firebaseUser: user }),
-  appUser: null,
-  setAppUser: (user) => set({ appUser: user }),
-  needsRegistration: false,
-  setNeedsRegistration: (needs) => set({ needsRegistration: needs }),
-  needsOnboarding: false,
-  setNeedsOnboarding: (needs) => set({ needsOnboarding: needs }),
-  authLoading: true,
-  setAuthLoading: (loading) => set({ authLoading: loading }),
-
-  // === 스트릭 (Gamification) ===
-  streak: null,
-  streakLoading: false,
-  refreshStreak: async () => {
-    const { appUser } = get();
-
-    // 로그인 안 된 상태
-    if (!appUser) {
-      set({ streak: null, streakLoading: false });
-      return;
-    }
-
-    try {
-      set({ streakLoading: true });
-      const data = await getStreak();
-      set({ streak: data, streakLoading: false });
-    } catch (error) {
-      logger.error('Failed to fetch streak:', error);
-      set({ streak: null, streakLoading: false });
-    }
-  },
 
   // === 채팅 ===
   messages: [],

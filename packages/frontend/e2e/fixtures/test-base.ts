@@ -4,15 +4,9 @@
  */
 
 import { test as base, expect, Page } from '@playwright/test';
-import { mockFirebaseAuth } from './auth-mock';
-import { mockStandaloneQuizAPIs } from './quiz-mock';
 
 // 테스트 확장: 공통 설정 + 커스텀 fixture
-export const test = base.extend<{
-  authenticatedPage: Page;
-  quizWithData: Page;
-  quizNoData: Page;
-}>({
+export const test = base.extend<{ page: Page }>({
   // 기본 페이지 설정
   page: async ({ page }, use) => {
     // 콘솔 모든 메시지 로깅 (디버깅용)
@@ -35,25 +29,6 @@ export const test = base.extend<{
     await use(page);
   },
 
-  // 인증된 페이지 (API 요청에 Authorization 헤더 자동 추가)
-  authenticatedPage: async ({ page }, use) => {
-    await mockFirebaseAuth(page);
-    await use(page);
-  },
-
-  // 퀴즈 데이터가 있는 인증된 페이지
-  quizWithData: async ({ page }, use) => {
-    await mockFirebaseAuth(page);
-    await mockStandaloneQuizAPIs(page, 'with-data');
-    await use(page);
-  },
-
-  // 퀴즈 데이터가 없는 인증된 페이지
-  quizNoData: async ({ page }, use) => {
-    await mockFirebaseAuth(page);
-    await mockStandaloneQuizAPIs(page, 'no-data');
-    await use(page);
-  },
 });
 
 export { expect };

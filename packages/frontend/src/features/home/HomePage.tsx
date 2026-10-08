@@ -11,7 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronDown, LogIn } from 'lucide-react';
+import { ArrowRight, ChevronDown, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useThemeStore } from '@/stores/themeStore';
 import { useStore } from '@/stores/store';
@@ -404,9 +404,7 @@ StoryPanel.displayName = 'StoryPanel';
 export default function HomePage() {
   const { t } = useTranslation();
   const currentTheme = useThemeStore((s) => s.theme);
-  const firebaseUser = useStore((s) => s.firebaseUser);
   const setPageTitle = useStore((s) => s.setPageTitle);
-  const isLoggedIn = !!firebaseUser;
 
   // 페이지 제목 초기화 (홈페이지는 빈 문자열 = 로고만 표시)
   useEffect(() => {
@@ -449,14 +447,12 @@ export default function HomePage() {
                   <ArrowRight className="w-5 h-5" />
                 </button>
               </Link>
-              {!isLoggedIn && (
-                <Link to="/login">
-                  <button className="btn-secondary px-8 py-4 rounded-lg inline-flex items-center gap-2 text-base">
-                    <LogIn className="w-5 h-5" />
-                    {t('auth.login')}
-                  </button>
-                </Link>
-              )}
+              <Link to="/playground">
+                <button className="btn-secondary px-8 py-4 rounded-lg inline-flex items-center gap-2 text-base">
+                  <Play className="w-5 h-5" />
+                  {t('nav.playground')}
+                </button>
+              </Link>
             </div>
           </div>
 

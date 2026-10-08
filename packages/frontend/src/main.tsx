@@ -14,19 +14,15 @@ import './index.css'
 console.log('🔗 API URL:', import.meta.env.VITE_API_URL);
 import './i18n' // i18n 설정 파일 임포트
 import { useStore } from './stores/store'
-import { auth } from './services/firebase'
-import { initializeAdMob } from './services/admob'
 
 type DebugWindow = Window & {
   useStore?: typeof useStore;
-  auth?: typeof auth;
 };
 
 // 개발 환경에서 디버깅용으로 window에 노출
 if (import.meta.env.DEV) {
   const debugWindow = window as DebugWindow;
   debugWindow.useStore = useStore;
-  debugWindow.auth = auth;
   // 환경변수 확인용 로그
   console.log('🔧 Environment:', {
     MODE: import.meta.env.MODE,
@@ -63,9 +59,6 @@ initTheme();
 
 // Initialize native platform features
 if (Capacitor.isNativePlatform()) {
-  // AdMob 초기화
-  initializeAdMob().catch(console.error);
-
   // Android 뒤로가기 버튼 핸들러
   // 히스토리가 있으면 뒤로 가기, 없으면 앱 종료
   App.addListener('backButton', ({ canGoBack }) => {

@@ -36,16 +36,20 @@
 - [x] `TopBar.tsx`: 스트릭 카드 제거
 - [x] 빌드 확인 → 커밋
 
-### 2. 프론트 정리
-- [ ] `features/{dashboard,report,admin,gamification,profile,auth,legal}` 삭제
-- [ ] 로그인 제거: `services/firebase.ts`, `stores/authStore.ts`, `services/api/tokenManager.ts`, `ProtectedRoute`, `NicknameModal`, `OnboardingModal`, `ReportModal`, axios 인증 헤더·401 재시도
-- [ ] Sidebar/TopBar의 로그인·프로필 영역, `/login`·`/privacy`·`/terms` 라우트 제거
-- [ ] `services/{gamification,notes,analytics*}`, store의 streak/user 상태 삭제
-- [ ] `LessonPage.tsx`의 streak·analytics·진도 저장 결합 제거, `useCourses` 진도 조회 제거
-- [ ] `python-practical` / `ai-literacy` / `cpp` 잔여 참조 정리 (SupportedLanguage 타입, ChapterCard, playgroundStore, visualizers/cpp 등)
-- [ ] 퀴즈 페이지 4종: 페이지는 삭제, 6단계에서 재사용할 컴포넌트만 남김
-- [ ] `firebase` 의존성 제거
-- [ ] 빌드 확인 → 커밋
+### 2. 프론트 정리 ✅
+- [x] `features/{dashboard,report,admin,gamification,profile,auth,legal,quiz}`, `visualizers/cpp` 삭제
+- [x] 로그인 제거: firebase 서비스, authStore, tokenManager, ProtectedRoute, Nickname/Onboarding/Report 모달, axios 인증 헤더·401 재시도
+- [x] Sidebar/TopBar/푸터의 로그인·프로필·문의 영역, `/login`·`/privacy`·`/terms` 라우트 제거
+- [x] services(gamification, notes, analytics, reports, standalone-quiz, user, admob, cppSimulator), store의 streak/user 상태 삭제
+- [x] 진도: 서버 저장 → localStorage(`stores/progressStore.ts`)로 대체
+- [x] `python-practical` / `ai-literacy` / `cpp` 잔여 참조 정리 (LessonUnifiedView의 AI 리터러시 전용 UI 포함)
+- [x] Playground persist v3 마이그레이션: 저장된 언어가 제거된 언어면 C로
+- [x] Firebase 환경변수 필수 조건 제거 → env 없이 실행 가능
+- [x] e2e: 인증/퀴즈 테스트·fixture 삭제, 홈 테스트를 Playground 버튼 기준으로 수정
+- [x] `firebase` 의존성 제거
+- [x] 덤: `LessonPage` 조건부 Hook 호출 버그 수정, `vitest.config.ts`의 `path` import 누락 수정
+- [x] 타입 체크·빌드 확인 → 커밋
+- 남김: Capacitor(Android 앱 래퍼), 번역 JSON의 미사용 키 → 7단계에서 정리
 
 ### 3. 백엔드 정리
 - [ ] `modules/{gamification,analytics,notes,admin,reports,problems,submissions,standalone-quizzes,users}` 삭제
@@ -77,5 +81,7 @@
 ### 7. 마무리
 - [ ] README를 포트폴리오 관점으로 재작성 (차별점, 아키텍처, 데모 GIF)
 - [ ] `render.yaml`, `.env.example`, docker-compose에서 Firebase 등 불필요 환경변수 제거
+- [ ] 번역 JSON(ko/en/zh)의 미사용 키 정리
+- [ ] Capacitor/Android 유지 여부 결정
 - [ ] 브라우저에서 전체 동선 확인 (Network 404 없음)
 - [ ] main 머지

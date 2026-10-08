@@ -1,3 +1,4 @@
+import path from 'path';
 import { defineConfig } from 'vitest/config';
 // import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'; // Commented out
 // import { playwright } from '@vitest/browser-playwright'; // Commented out

@@ -9,7 +9,6 @@
 import type { FlowLanguage } from '@codeinsight/shared';
 import type { IFlowAdapter } from './types';
 import { createCAdapter } from '../../c/adapters';
-import { createCppAdapter } from '../../cpp/adapters';
 import { createPythonAdapter } from '../../python/adapters';
 import { createJavaAdapter } from '../../java/adapters';
 import { createJavaScriptAdapter } from '../../javascript/adapters';
@@ -27,8 +26,6 @@ export function createAdapter(language: FlowLanguage | string, theme: Theme = 'l
   switch (language) {
     case 'c':
       return createCAdapter(theme);
-    case 'cpp':
-      return createCppAdapter(theme);
     case 'python':
       return createPythonAdapter(theme);
     case 'java':

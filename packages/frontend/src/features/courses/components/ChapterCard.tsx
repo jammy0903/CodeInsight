@@ -35,13 +35,6 @@ const LANGUAGE_THEMES: Record<string, {
     bgActive: 'linear-gradient(135deg, #D6EEF8 0%, #B8E0F0 100%)',
     textColor: '#5BA3C0',
   },
-  cpp: {
-    primary: '#4F46E5',
-    primaryRgb: '129, 140, 248',
-    bg: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
-    bgActive: 'linear-gradient(135deg, #E3E9FF 0%, #D3DCFF 100%)',
-    textColor: '#4338CA',
-  },
   python: {
     primary: '#F57C00',
     primaryRgb: '255, 213, 79',
@@ -62,20 +55,6 @@ const LANGUAGE_THEMES: Record<string, {
     bg: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
     bgActive: 'linear-gradient(135deg, #DCF1DD 0%, #B9DEB9 100%)',
     textColor: '#2E7D32',
-  },
-  'python-practical': {
-    primary: '#424242',
-    primaryRgb: '158, 158, 158',
-    bg: 'linear-gradient(135deg, #F5F5F5 0%, #E0E0E0 100%)',
-    bgActive: 'linear-gradient(135deg, #EEEEEE 0%, #D6D6D6 100%)',
-    textColor: '#424242',
-  },
-  'ai-literacy': {
-    primary: '#0369A1',
-    primaryRgb: '56, 189, 248',
-    bg: 'linear-gradient(135deg, #E0F2FE 0%, #D0E8FF 100%)',
-    bgActive: 'linear-gradient(135deg, #CBEAFE 0%, #BAE6FD 100%)',
-    textColor: '#0369A1',
   },
 };
 

@@ -83,7 +83,6 @@ interface LanguageCardProps {
 
 const STATIC_LANGUAGES: Array<{ id: string; icon: string }> = [
   { id: 'c', icon: 'C' },
-  { id: 'cpp', icon: 'C++' },
   { id: 'python', icon: '🐍' },
   { id: 'java', icon: '☕' },
   { id: 'javascript', icon: '⚡' },
@@ -96,12 +95,6 @@ const LANGUAGE_COLORS: Record<string, { bg: string; border: string; stitch: stri
     border: '#60A5FA',
     stitch: 'rgba(96, 165, 250, 0.5)',
     text: '#2563EB',
-  },
-  cpp: {
-    bg: 'linear-gradient(135deg, #E8EEFF 0%, #D5E1FF 100%)',
-    border: '#3B82F6',
-    stitch: 'rgba(59, 130, 246, 0.5)',
-    text: '#1D4ED8',
   },
   python: {
     bg: 'linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%)',
@@ -121,18 +114,6 @@ const LANGUAGE_COLORS: Record<string, { bg: string; border: string; stitch: stri
     stitch: 'rgba(129, 199, 132, 0.5)',
     text: '#2E7D32',
   },
-  'python-practical': {
-    bg: 'linear-gradient(135deg, #F5F5F5 0%, #E0E0E0 100%)',
-    border: '#9E9E9E',
-    stitch: 'rgba(117, 117, 117, 0.5)',
-    text: '#424242',
-  },
-  'ai-literacy': {
-    bg: 'linear-gradient(135deg, #E0F2FE 0%, #D0E8FF 100%)',
-    border: '#38BDF8',
-    stitch: 'rgba(56, 189, 248, 0.5)',
-    text: '#0369A1',
-  },
 };
 
 const DEFAULT_COLOR = {
@@ -145,7 +126,7 @@ const DEFAULT_COLOR = {
 function LanguageCard({ language, index, onClick }: LanguageCardProps) {
   const { t } = useTranslation();
   const colors = LANGUAGE_COLORS[language.id] || DEFAULT_COLOR;
-  const nameKey = language.id === 'python-practical' ? 'languages.python_practical' : `languages.${language.id}`;
+  const nameKey = `languages.${language.id}`;
 
   return (
     <motion.button
@@ -180,8 +161,7 @@ function LanguageCard({ language, index, onClick }: LanguageCardProps) {
         {/* 아이콘 */}
         <div className="text-4xl -mb-2 translate-y-1">
           {language.id === 'c' && <CBrandIcon language="c" size={63} />}
-          {language.id === 'cpp' && <CBrandIcon language="cpp" size={63} />}
-          {language.id !== 'c' && language.id !== 'cpp' && (language.icon || '📚')}
+          {language.id !== 'c' && (language.icon || '📚')}
         </div>
 
         {/* 언어 이름 */}

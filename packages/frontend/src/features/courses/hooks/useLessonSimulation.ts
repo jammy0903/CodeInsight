@@ -143,7 +143,7 @@ function mergeSteps(
     const jsonStep = jsonSteps.find((js) => js.line === simLine);
 
     const pythonMemoryState =
-      (lang === 'python' || lang === 'python-practical')
+      lang === 'python'
         ? convertToPythonMemoryState(simStep)
         : undefined;
 

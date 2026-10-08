@@ -39,8 +39,6 @@ function createMemoryAdapter(language: string): MemoryAdapter {
     case 'java':
       return new JavaMemoryAdapter();
     case 'c':
-    case 'cpp':
-    case 'c++':
       return new CMemoryAdapter();
     default:
       return { transform: () => null };
@@ -118,7 +116,7 @@ export const LessonMemoryVisualizer = memo(function LessonMemoryVisualizer({
   }
 
   // C
-  if (language.toLowerCase() === 'c' || language.toLowerCase() === 'cpp' || language.toLowerCase() === 'c++') {
+  if (language.toLowerCase() === 'c') {
     return (
       <div className={className}>
         <MemoryPanel

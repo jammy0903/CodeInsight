@@ -1,16 +1,16 @@
 interface CBrandIconProps {
-  language: 'c' | 'cpp';
+  language: 'c';
   size?: number;
   className?: string;
 }
 
 /**
- * C/C++ 전용 3D 스타일 배지 아이콘
- * - 표준 이모지가 없는 C/C++를 시각적으로 일관되게 표시
+ * C 전용 3D 스타일 배지 아이콘
+ * - 표준 이모지가 없는 C를 시각적으로 일관되게 표시
  */
 export function CBrandIcon({ language, size = 42, className }: CBrandIconProps) {
-  const label = language === 'cpp' ? 'C++' : 'C';
-  const fontSize = language === 'cpp' ? 22 : 30;
+  const label = language.toUpperCase();
+  const fontSize = 30;
 
   return (
     <svg

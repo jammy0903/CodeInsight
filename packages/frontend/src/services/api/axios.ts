@@ -1,26 +1,12 @@
 /**
  * Axios 인스턴스 설정
- * - 인증 토큰 자동 추가 (동기적 캐시 읽기)
  * - 기본 URL/타임아웃 설정
  * - 에러 처리 interceptor
- *
- * WHY 동기적 토큰 읽기:
- * - AuthProvider(상위 컨텍스트)가 onAuthStateChanged → setAuthToken()으로 토큰 관리
- * - 인터셉터는 캐시만 읽으면 됨 → 공개 API 즉시 발송, Firebase 중복 호출 제거
  */
 
 import axios from 'axios';
-
-declare module 'axios' {
-  interface InternalAxiosRequestConfig {
-    _retried?: boolean;
-  }
-}
 import { config } from '../../config';
-import { logger } from '@/utils/logger';
-import { getAuthToken, setAuthToken } from './tokenManager';
 import { handleAPIError } from '@/components/common/Toast/notifications';
-import { auth } from '../firebase';
 
 // API 기본 URL (버전 포함)
 const BASE_URL = config.api.baseUrl;
@@ -34,46 +20,15 @@ export const api = axios.create({
   timeout: 60000, // 60초
 });
 
-// Request Interceptor: 인증 토큰 자동 추가 (동기적 캐시 읽기)
-api.interceptors.request.use(
-  (config) => {
-    // AuthProvider가 관리하는 캐시에서 동기적으로 토큰 읽기
-    const token = getAuthToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    logger.error('Request interceptor error:', error);
-    return Promise.reject(error);
-  }
-);
-
-// Response Interceptor: 401 시 토큰 갱신 후 1회 재시도, 그 외 에러는 toast
+// Response Interceptor: 에러는 toast
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status ?? 0;
-
-      if (status === 401 && !error.config?._retried && auth.currentUser) {
-        error.config._retried = true;
-        try {
-          const freshToken = await auth.currentUser.getIdToken(true);
-          setAuthToken(freshToken);
-          error.config.headers.Authorization = `Bearer ${freshToken}`;
-          return api(error.config);
-        } catch (refreshError) {
-          logger.error('Token refresh failed:', refreshError);
-        }
-      }
-
       const message = error.response?.data?.message;
       handleAPIError(status, message);
     }
     return Promise.reject(error);
   }
 );
-
-

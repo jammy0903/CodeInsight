@@ -26,14 +26,6 @@ const LANGUAGE_THEMES: Record<string, {
     border: 'rgba(135, 206, 235, 0.5)',
     stitch: 'rgba(135, 206, 235, 0.5)',
   },
-  cpp: {
-    primary: '#4F46E5',
-    primaryLight: '#818CF8',
-    bg: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
-    bgHover: 'linear-gradient(135deg, #E6EBFF 0%, #D7E0FF 100%)',
-    border: 'rgba(129, 140, 248, 0.5)',
-    stitch: 'rgba(129, 140, 248, 0.5)',
-  },
   python: {
     primary: '#F57C00',
     primaryLight: '#FFD54F',
@@ -57,22 +49,6 @@ const LANGUAGE_THEMES: Record<string, {
     bgHover: 'linear-gradient(135deg, #DCF1DD 0%, #B9DEB9 100%)',
     border: 'rgba(129, 199, 132, 0.5)',
     stitch: 'rgba(129, 199, 132, 0.5)',
-  },
-  'python-practical': {
-    primary: '#424242',
-    primaryLight: '#9E9E9E',
-    bg: 'linear-gradient(135deg, #F5F5F5 0%, #E0E0E0 100%)',
-    bgHover: 'linear-gradient(135deg, #EEEEEE 0%, #D6D6D6 100%)',
-    border: 'rgba(158, 158, 158, 0.5)',
-    stitch: 'rgba(117, 117, 117, 0.5)',
-  },
-  'ai-literacy': {
-    primary: '#0369A1',
-    primaryLight: '#38BDF8',
-    bg: 'linear-gradient(135deg, #E0F2FE 0%, #D0E8FF 100%)',
-    bgHover: 'linear-gradient(135deg, #D6EDFE 0%, #C5E1FF 100%)',
-    border: 'rgba(56, 189, 248, 0.45)',
-    stitch: 'rgba(56, 189, 248, 0.5)',
   },
 };
 

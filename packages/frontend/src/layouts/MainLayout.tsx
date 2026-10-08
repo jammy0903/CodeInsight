@@ -1,20 +1,14 @@
 /**
  * MainLayout
  * 메인 레이아웃 - TopBar + Sidebar + Content + Footer
- *
- * NOTE: NicknameModal은 needsRegistration 상태일 때 자동 표시
  */
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { TopBar } from './TopBar';
 import { Sidebar } from './Sidebar';
-import { NicknameModal } from '@/components/NicknameModal';
-import { OnboardingModal } from '@/components/OnboardingModal';
-import { ReportModal } from '@/components/ReportModal';
-import { Github, Mail } from 'lucide-react';
+import { Github } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { useStore } from '@/stores/store';
@@ -27,8 +21,6 @@ export function MainLayout({ children }: MainLayoutProps) {
   const sidebarOpen = useStore((s) => s.sidebarOpen);
   const location = useLocation();
 
-  const [reportOpen, setReportOpen] = useState(false);
-
   // 페이지 타입 확인
   const isHomePage = location.pathname === '/';
   const isLessonPage = /^\/courses\/[^/]+\/[^/]+\/[^/]+$/.test(location.pathname);
@@ -36,12 +28,6 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      {/* 닉네임 등록 모달 - needsRegistration 시 자동 표시 */}
-      <NicknameModal />
-
-      {/* 온보딩 모달 - needsOnboarding 시 자동 표시 (닉네임 등록 후) */}
-      <OnboardingModal />
-
       {/* Sidebar */}
       <Sidebar />
 
@@ -84,15 +70,6 @@ export function MainLayout({ children }: MainLayoutProps) {
                   >
                     CodeInsight
                   </Link>
-                  <button
-                    onClick={() => setReportOpen(true)}
-                    className="text-sm transition-colors bg-transparent border-none cursor-pointer"
-                    style={{ color: 'var(--theme-layout-footer-text-muted)' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-link-hover)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--theme-layout-footer-text-muted)'; }}
-                  >
-                    Contact
-                  </button>
                 </div>
 
                 {/* 오른쪽: 테마 토글 + Stay in touch + 소셜 */}
@@ -118,21 +95,6 @@ export function MainLayout({ children }: MainLayoutProps) {
                     >
                       <Github className="w-4 h-4" />
                     </a>
-                    <button
-                      onClick={() => setReportOpen(true)}
-                      className="w-9 h-9 rounded-full flex items-center justify-center transition-colors border-none cursor-pointer"
-                      style={{ backgroundColor: 'var(--theme-layout-footer-social-bg)', color: 'var(--theme-layout-footer-text)' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--theme-layout-footer-social-hover)';
-                        e.currentTarget.style.color = '#ffffff';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--theme-layout-footer-social-bg)';
-                        e.currentTarget.style.color = 'var(--theme-layout-footer-text)';
-                      }}
-                    >
-                      <Mail className="w-4 h-4" />
-                    </button>
                   </div>
                 </div>
               </div>
@@ -145,13 +107,6 @@ export function MainLayout({ children }: MainLayoutProps) {
           </footer>
         )}
       </motion.main>
-
-      {/* 일반 문의 모달 */}
-      <ReportModal
-        open={reportOpen}
-        onOpenChange={setReportOpen}
-        type="general"
-      />
     </div>
   );
 }

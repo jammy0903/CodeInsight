@@ -52,93 +52,6 @@ function asString(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
-interface AiEvidenceData {
-  phase?: string;
-  expectedPath?: string;
-  actualPath?: string;
-  patch?: string;
-  output?: string;
-  expectedOutput?: string;
-  actualOutput?: string;
-  checklist: string[];
-}
-
-type HoverTarget = 'expect' | 'real' | 'patchOld' | 'patchNew' | null;
-
-function getAiEvidenceData(
-  stepRecord: Record<string, unknown> | undefined
-): AiEvidenceData {
-  if (!stepRecord) {
-    return { checklist: [] };
-  }
-
-  const state = isRecord(stepRecord.algorithmState) ? stepRecord.algorithmState : undefined;
-  const rawChecklist = state?.checklist;
-  const checklist = Array.isArray(rawChecklist)
-    ? rawChecklist.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
-    : [];
-
-  return {
-    phase: asString(state?.phase),
-    expectedPath: asString(state?.expectedPath),
-    actualPath: asString(state?.actualPath),
-    patch: asString(state?.patch),
-    output: asString(state?.output),
-    expectedOutput: asString(state?.expectedOutput),
-    actualOutput: asString(state?.actualOutput) || asString(state?.output),
-    checklist,
-  };
-}
-
-function extractPathSegments(path: string): string[] {
-  return path
-    .replace(/\[\d+\]/g, '')
-    .split('.')
-    .map((part) => part.trim())
-    .filter(Boolean);
-}
-
-function findLineForPath(codeText: string, path: string | undefined): number | undefined {
-  if (!path) return undefined;
-  const lines = codeText.split('\n');
-  const normalizedPath = path.replace(/\s+/g, '');
-  const segments = extractPathSegments(path);
-  let bestLine: number | undefined;
-  let bestScore = -1;
-
-  for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i];
-    const normalizedLine = line.replace(/\s+/g, '');
-    let score = 0;
-
-    if (normalizedLine.includes(normalizedPath)) score += 10;
-    for (const seg of segments) {
-      if (line.includes(seg)) score += 2;
-    }
-    if (line.trim().startsWith('//')) score -= 2;
-
-    if (score > bestScore) {
-      bestScore = score;
-      bestLine = i + 1;
-    }
-  }
-
-  return bestScore > 0 ? bestLine : undefined;
-}
-
-function parsePatchTokens(patch: string | undefined): { from: string; to: string } | undefined {
-  if (!patch) return undefined;
-  const parts = patch.split('->').map((p) => p.trim());
-  if (parts.length !== 2 || !parts[0] || !parts[1]) return undefined;
-  return { from: parts[0], to: parts[1] };
-}
-
-function replaceFirst(source: string, from: string, to: string): string {
-  const idx = source.indexOf(from);
-  if (idx < 0) return source;
-  return `${source.slice(0, idx)}${to}${source.slice(idx + from.length)}`;
-}
-
 export function LessonUnifiedView({
   code,
   steps,
@@ -149,63 +62,21 @@ export function LessonUnifiedView({
 }: LessonUnifiedViewProps) {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
-  const isAiLiteracy = languageId === 'ai-literacy';
   const [activeVizTab, setActiveVizTab] = useState<'flow' | 'memory' | 'jsMemory'>('flow');
   const [isConceptOpen, setIsConceptOpen] = useState(false);
-  const [hoveredPathTarget, setHoveredPathTarget] = useState<HoverTarget>(null);
 
   // Round navigation (shared for both layouts)
   const nav = useRoundNavigation({
     steps,
     lessonId,
     onQuiz,
-    forceSingleRound: isAiLiteracy,
   });
 
   const currentStep = steps[nav.actualStepIndex];
-  const prevStep = nav.actualStepIndex > 0 ? steps[nav.actualStepIndex - 1] : undefined;
   const currentStepRecord = currentStep as Record<string, unknown> | undefined;
-  const prevStepRecord = prevStep as Record<string, unknown> | undefined;
   const currentStepIllustrations = Array.isArray(currentStepRecord?.illustrations)
     ? (currentStepRecord.illustrations as Array<{ src: string; alt?: string; caption?: string }>)
     : undefined;
-  const aiEvidence = getAiEvidenceData(currentStepRecord);
-  const prevAiEvidence = getAiEvidenceData(prevStepRecord);
-  const effectiveExpectedPath = aiEvidence.expectedPath || prevAiEvidence.expectedPath;
-  const effectiveActualPath = aiEvidence.actualPath || prevAiEvidence.actualPath;
-  const patchTokens = parsePatchTokens(aiEvidence.patch);
-  const currentStepCode = asString(currentStepRecord?.code);
-  const expectedLine = useMemo(
-    () => findLineForPath(code, effectiveExpectedPath),
-    [code, effectiveExpectedPath]
-  );
-  const realLine = useMemo(
-    () => findLineForPath(code, effectiveActualPath),
-    [code, effectiveActualPath]
-  );
-  const currentCodeLine = useMemo(() => {
-    if (currentStepCode) return currentStepCode;
-    const line = currentStep?.line;
-    if (!line || line < 1) return '';
-    const lines = code.split('\n');
-    return lines[line - 1] || '';
-  }, [code, currentStep?.line, currentStepCode]);
-  const patchOldLineText = useMemo(() => {
-    if (!patchTokens) return '';
-    if (effectiveExpectedPath && effectiveActualPath && currentCodeLine.includes(effectiveActualPath)) {
-      return replaceFirst(currentCodeLine, effectiveActualPath, effectiveExpectedPath);
-    }
-    return replaceFirst(currentCodeLine, patchTokens.to, patchTokens.from);
-  }, [currentCodeLine, patchTokens, effectiveExpectedPath, effectiveActualPath]);
-  const patchNewLineText = currentCodeLine;
-  const pathPulseLine = useMemo(() => {
-    if (!isAiLiteracy || !hoveredPathTarget) return undefined;
-    if (hoveredPathTarget === 'expect') return expectedLine;
-    if (hoveredPathTarget === 'real') return realLine;
-    if (hoveredPathTarget === 'patchOld') return expectedLine ?? currentStep?.line;
-    if (hoveredPathTarget === 'patchNew') return realLine ?? currentStep?.line;
-    return undefined;
-  }, [isAiLiteracy, hoveredPathTarget, expectedLine, realLine, currentStep?.line]);
   const isExplanationRound = nav.round === 'explanation';
   const { showMemoryTab, showJsMemoryTab } = useMemo(() => {
     const vizSteps = nav.vizStepIndices.map(i => steps[i]);
@@ -218,9 +89,7 @@ export function LessonUnifiedView({
     };
   }, [languageId, nav.vizStepIndices, steps]);
   const hasVizTabs = showMemoryTab || showJsMemoryTab;
-  const flowLanguage = languageId === 'python-practical'
-    ? 'python'
-    : (languageId === 'ai-literacy' ? 'javascript' : (languageId || 'c'));
+  const flowLanguage = languageId || 'c';
   const rawConceptType = asString(currentStepRecord?.conceptVisualizationType) || asString(currentStepRecord?.visualizationType);
   const conceptType = rawConceptType && CONCEPT_TYPES.has(rawConceptType) ? rawConceptType : undefined;
   const conceptState = isRecord(currentStepRecord?.conceptState) ? currentStepRecord.conceptState : undefined;
@@ -301,39 +170,32 @@ export function LessonUnifiedView({
         borderColor: 'var(--theme-lesson-panel-border)',
       }}
     >
-      {!isAiLiteracy && (
-        <div className="flex gap-1">
+      <div className="flex gap-1">
+        <button
+          type="button"
+          onClick={nav.goToExplanationStart}
+          className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full transition-all ${
+            isExplanationRound
+              ? 'round-tab-active opacity-100'
+              : 'round-tab-inactive opacity-45 saturate-0 hover:opacity-70'
+          }`}
+        >
+          {t('lesson.explanation')}
+        </button>
+        {nav.hasVizRound && (
           <button
             type="button"
-            onClick={nav.goToExplanationStart}
+            onClick={nav.goToVisualizationStart}
             className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full transition-all ${
-              isExplanationRound
+              !isExplanationRound
                 ? 'round-tab-active opacity-100'
                 : 'round-tab-inactive opacity-45 saturate-0 hover:opacity-70'
             }`}
           >
-            {t('lesson.explanation')}
+            {t('lesson.visualization')}
           </button>
-          {nav.hasVizRound && (
-            <button
-              type="button"
-              onClick={nav.goToVisualizationStart}
-              className={`round-tab px-2.5 py-1 text-xs md:text-sm font-bold rounded-full transition-all ${
-                !isExplanationRound
-                  ? 'round-tab-active opacity-100'
-                  : 'round-tab-inactive opacity-45 saturate-0 hover:opacity-70'
-              }`}
-            >
-              {t('lesson.visualization')}
-            </button>
-          )}
-        </div>
-      )}
-      {isAiLiteracy && (
-        <span className="text-xs md:text-sm font-semibold opacity-80">
-          AI Verification
-        </span>
-      )}
+        )}
+      </div>
       <span className="ml-auto text-xs md:text-sm font-semibold opacity-60">
         {nav.stepIndex + 1}/{nav.totalInRound} · L{currentStep?.line || 1}
       </span>
@@ -360,131 +222,6 @@ export function LessonUnifiedView({
               keyInsightTitle={currentStep?.keyInsightTitle}
               illustrations={currentStepIllustrations}
             />
-            {isAiLiteracy && (
-              <div className="mt-4 rounded-xl border border-[var(--theme-lesson-panel-border)] bg-[var(--theme-lesson-panel-bg)] overflow-hidden">
-                <div className="px-3 py-2 text-sm font-semibold border-b border-[var(--theme-lesson-panel-border)] flex items-center gap-2">
-                  <span>Evidence</span>
-                  <span className="text-[11px] font-semibold rounded-full border border-[var(--theme-lesson-panel-border)] px-2 py-0.5 opacity-80">
-                    by {aiEvidence.phase || 'inspect'}
-                  </span>
-                </div>
-                <div className="px-3 py-3 space-y-2.5 text-xs">
-                  {(aiEvidence.expectedPath || aiEvidence.actualPath) && (
-                    <div
-                      className="rounded-lg border border-[var(--theme-lesson-panel-border)] px-2.5 py-2 transition-all duration-200"
-                      onMouseLeave={() => setHoveredPathTarget(null)}
-                    >
-                      <div className="font-semibold opacity-70 mb-1">Path Check</div>
-                      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-2 items-center">
-                        {effectiveExpectedPath && (
-                          <div
-                            className={`rounded-md border px-2 py-2 transition-all ${
-                              hoveredPathTarget === 'expect'
-                                ? 'border-rose-400 bg-rose-100 shadow-[0_0_0_2px_rgba(251,113,133,0.25)]'
-                                : 'border-rose-200 bg-rose-50'
-                            }`}
-                            onMouseEnter={() => setHoveredPathTarget('expect')}
-                          >
-                            <div className="mb-1 flex items-center gap-1.5">
-                              <span className="inline-flex items-center rounded-full border border-rose-300 bg-white px-2 py-0.5 text-[10px] font-semibold tracking-wide text-rose-700">
-                                EXPECT
-                              </span>
-                              <span className="text-[11px] text-rose-700">AI Guess</span>
-                            </div>
-                            <div className="font-mono break-all text-rose-900">{effectiveExpectedPath}</div>
-                            <div className="text-[11px] text-rose-700 mt-1">AI assumes {'->'} value</div>
-                          </div>
-                        )}
-                        {effectiveExpectedPath && effectiveActualPath && <div />}
-                        {effectiveActualPath && (
-                          <div
-                            className={`rounded-md border px-2 py-2 transition-all ${
-                              hoveredPathTarget === 'real'
-                                ? 'border-emerald-400 bg-emerald-100 shadow-[0_0_0_2px_rgba(52,211,153,0.25)]'
-                                : 'border-emerald-200 bg-emerald-50'
-                            }`}
-                            onMouseEnter={() => setHoveredPathTarget('real')}
-                          >
-                            <div className="mb-1 flex items-center gap-1.5">
-                              <span className="inline-flex items-center rounded-full border border-emerald-300 bg-white px-2 py-0.5 text-[10px] font-semibold tracking-wide text-emerald-700">
-                                REAL
-                              </span>
-                              <span className="text-[11px] text-emerald-700">Runtime</span>
-                            </div>
-                            <div className="font-mono break-all text-emerald-900">{effectiveActualPath}</div>
-                            <div className="text-[11px] text-emerald-700 mt-1">Runtime points {'=>'} source</div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {aiEvidence.patch && (
-                    <div className="rounded-lg border border-[var(--theme-lesson-panel-border)] px-2.5 py-2">
-                      <div className="font-semibold opacity-70 mb-1">Patch</div>
-                      <div className="space-y-1.5">
-                        <div
-                          className={`rounded-md border px-2 py-1.5 font-mono break-all transition-all ${
-                            hoveredPathTarget === 'patchOld'
-                              ? 'border-rose-400 bg-rose-100 shadow-[0_0_0_2px_rgba(251,113,133,0.25)]'
-                              : 'border-rose-200 bg-rose-50'
-                          }`}
-                          onMouseEnter={() => setHoveredPathTarget('patchOld')}
-                          onMouseLeave={() => setHoveredPathTarget(null)}
-                        >
-                          <span className="text-rose-700 mr-2">-</span>
-                          <span>{patchOldLineText || aiEvidence.patch}</span>
-                        </div>
-                        <div
-                          className={`rounded-md border px-2 py-1.5 font-mono break-all transition-all ${
-                            hoveredPathTarget === 'patchNew'
-                              ? 'border-emerald-400 bg-emerald-100 shadow-[0_0_0_2px_rgba(52,211,153,0.25)]'
-                              : 'border-emerald-200 bg-emerald-50'
-                          }`}
-                          onMouseEnter={() => setHoveredPathTarget('patchNew')}
-                          onMouseLeave={() => setHoveredPathTarget(null)}
-                        >
-                          <span className="text-emerald-700 mr-2">+</span>
-                          <span>{patchNewLineText || aiEvidence.patch}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {(aiEvidence.expectedOutput || aiEvidence.actualOutput || aiEvidence.output) && (
-                    <div className="rounded-lg border border-[var(--theme-lesson-panel-border)] px-2.5 py-2">
-                      <div className="font-semibold opacity-70 mb-1">Output</div>
-                      <div className="space-y-1.5">
-                        {(aiEvidence.expectedOutput || aiEvidence.output) && (
-                          <div className="rounded-md border border-rose-200 bg-rose-50 px-2 py-1.5 font-mono break-all">
-                            <span className="inline-flex items-center rounded-full border border-rose-300 bg-white px-2 py-0.5 text-[10px] font-semibold tracking-wide text-rose-700 mr-2">
-                              BEFORE
-                            </span>
-                            <span className="text-rose-900">{aiEvidence.expectedOutput || aiEvidence.output}</span>
-                          </div>
-                        )}
-                        {aiEvidence.actualOutput && (
-                          <div className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1.5 font-mono break-all">
-                            <span className="inline-flex items-center rounded-full border border-emerald-300 bg-white px-2 py-0.5 text-[10px] font-semibold tracking-wide text-emerald-700 mr-2">
-                              AFTER
-                            </span>
-                            <span className="text-emerald-900">{aiEvidence.actualOutput}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {aiEvidence.checklist.length > 0 && (
-                    <div className="rounded-lg border border-[var(--theme-lesson-panel-border)] px-2.5 py-2">
-                      <div className="font-semibold opacity-70 mb-1">Checklist</div>
-                      <div className="space-y-1">
-                        {aiEvidence.checklist.map((item) => (
-                          <div key={item} className="font-mono">- {item}</div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
           </motion.div>
         ) : (
           <motion.div
@@ -585,8 +322,6 @@ export function LessonUnifiedView({
       <LessonCodePanel
         code={code}
         highlightLine={currentStep?.line || 1}
-        pointerLine={isAiLiteracy ? currentStep?.line : undefined}
-        pulseLine={pathPulseLine}
         terminalLines={terminalLines}
         onSelectionChange={onSelectionChange}
         orientation={isMobile ? 'vertical' : 'horizontal'}

@@ -7,18 +7,15 @@
  * Route: /courses/:lessonId
  */
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Navigate, useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
-import { updateProgress } from '@/services/courses';
-import { useStore } from '@/stores/store';
+import { useProgressStore } from '@/stores/progressStore';
 
 // Hooks
 import { useLessonData } from './hooks/useLessonData';
 import { useLessonNavigation } from './hooks/useLessonNavigation';
-import { useLessonAnalytics } from './hooks/useLessonAnalytics';
 import { useLessonSimulation } from './hooks/useLessonSimulation';
 import { useCodeSelection } from './hooks/useCodeSelection';
 
@@ -54,33 +51,35 @@ function NotFoundView({ message, backPath }: { message: string; backPath: string
 
 // --- 메인 컴포넌트 ---
 
-const LANGUAGE_IDS = new Set(['c', 'cpp', 'java', 'python', 'javascript', 'python-practical', 'ai-literacy']);
+const LANGUAGE_IDS = new Set(['c', 'java', 'python', 'javascript']);
 
 function resolveLanguageId(lessonId: string | undefined, contentLanguage: string | undefined): string | undefined {
   if (contentLanguage) return contentLanguage;
   if (!lessonId) return undefined;
-  if (lessonId.startsWith('py-practical-')) return 'python-practical';
-  if (lessonId.startsWith('ai-')) return 'ai-literacy';
   if (lessonId.startsWith('py-')) return 'python';
   if (lessonId.startsWith('js-')) return 'javascript';
   if (lessonId.startsWith('java-')) return 'java';
-  if (lessonId.startsWith('cpp-')) return 'cpp';
   if (lessonId.startsWith('c-')) return 'c';
   return undefined;
 }
 
 export function LessonPage() {
-  const { t } = useTranslation();
   const { lessonId } = useParams<{ lessonId: string }>();
-  const navigate = useNavigate();
 
+  // /courses/:lessonId 경로에 언어 ID가 들어오면 언어 코스 페이지로 보낸다.
+  // Hook 호출 순서를 지키기 위해 리다이렉트 판단은 본문 컴포넌트 밖에서 한다.
   if (lessonId && LANGUAGE_IDS.has(lessonId)) {
     return <Navigate to={`/courses/${lessonId}`} replace />;
   }
 
-  const queryClient = useQueryClient();
-  const appUser = useStore((s) => s.appUser);
-  const refreshStreak = useStore((s) => s.refreshStreak);
+  return <LessonPageContent lessonId={lessonId} />;
+}
+
+function LessonPageContent({ lessonId }: { lessonId: string | undefined }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const markCompleted = useProgressStore((s) => s.markCompleted);
   const [resetCount, setResetCount] = React.useState(0);
 
   // 1. 데이터 패칭
@@ -92,40 +91,17 @@ export function LessonPage() {
   const { steps, code, simulating } = useLessonSimulation({ lesson, lang, lessonId });
 
   // 3. 위상 관리 (학습/퀴즈/완료)
-  const analyticsRef = useRef<{ finishTracking: () => void }>({ finishTracking: () => {} });
-
   const navigation = useLessonNavigation({
     totalSteps: steps.length,
     lessonId,
     code,
     steps,
-    onComplete: async () => {
-      if (!lessonId) return;
-      try {
-        await updateProgress({ lessonId, status: 'completed' });
-        queryClient.invalidateQueries({ queryKey: ['progress', appUser?.id] });
-        queryClient.invalidateQueries({ queryKey: ['chapter-progress'] });
-        queryClient.invalidateQueries({ queryKey: ['language'] });
-        await refreshStreak();
-      } catch (err) {
-        console.error('[Progress] Failed to save:', err);
-      }
-      analyticsRef.current.finishTracking();
+    onComplete: () => {
+      if (lessonId) markCompleted(lessonId);
     },
   });
 
-  // 4. 분석
-  const analytics = useLessonAnalytics({
-    lessonId,
-    totalSteps: steps.length,
-    currentStepIndex: navigation.currentStepIndex,
-  });
-
-  useEffect(() => {
-    analyticsRef.current = { finishTracking: analytics.finishTracking };
-  }, [analytics.finishTracking]);
-
-  // 5. 코드 선택
+  // 4. 코드 선택
   const { setSelection } = useCodeSelection();
 
   // --- 파생 데이터 ---

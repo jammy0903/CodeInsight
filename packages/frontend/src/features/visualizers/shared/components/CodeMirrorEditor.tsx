@@ -52,11 +52,9 @@ interface CodeMirrorEditorProps {
 
 const languageExtensions: Record<string, () => ReturnType<typeof cpp>> = {
   c: cpp,
-  cpp: cpp,
   python: python,
   java: java,
   javascript: javascript,
-  'python-practical': python,
 };
 
 const setInlineHintEffect = StateEffect.define<{ line: number | null; text: string | null }>();

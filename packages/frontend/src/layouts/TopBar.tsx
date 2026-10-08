@@ -4,7 +4,7 @@
  */
 
 import { motion } from 'framer-motion';
-import { Code2, Sparkles, Menu, UserRound } from 'lucide-react';
+import { Code2, Sparkles, Menu } from 'lucide-react';
 import { useStore } from '@/stores/store';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -19,11 +19,9 @@ const getLanguageInfo = (lang: SupportedLanguage | null, t: (key: string) => str
   if (!lang) return null;
   switch (lang) {
     case 'c': return { name: t('languages.c'), icon: 'C', color: '#3B82F6' };
-    case 'cpp': return { name: t('languages.cpp'), icon: 'C++', color: '#2563EB' };
     case 'python': return { name: 'Python', icon: '🐍', color: '#FFD54F' };
     case 'java': return { name: 'Java', icon: '☕', color: '#EC4899' };
     case 'javascript': return { name: 'JavaScript', icon: '⚡', color: '#81C784' };
-    case 'python-practical': return { name: t('languages.python_practical'), icon: '🤖', color: '#9E9E9E' };
   }
 };
 
@@ -33,7 +31,6 @@ export function TopBar() {
   const pageTitle = useStore((s) => s.pageTitle);
   const pageSubtitle = useStore((s) => s.pageSubtitle);
   const pageLanguage = useStore((s) => s.pageLanguage);
-  const appUser = useStore((s) => s.appUser);
   const isMobile = useIsMobile();
 
   const langInfo = pageLanguage ? getLanguageInfo(pageLanguage, t) : null;
@@ -106,8 +103,7 @@ export function TopBar() {
                   style={{ color: langInfo.color }}
                 >
                   {pageLanguage === 'c' && <CBrandIcon language="c" size={30} />}
-                  {pageLanguage === 'cpp' && <CBrandIcon language="cpp" size={30} />}
-                  {pageLanguage !== 'c' && pageLanguage !== 'cpp' && langInfo.icon}
+                  {pageLanguage !== 'c' && langInfo.icon}
                 </span>
                 <h2 className="text-base font-bold text-ellipsis whitespace-nowrap overflow-hidden" style={{ color: 'var(--theme-layout-top-bar-text)' }}>
                   {pageTitle}
@@ -135,22 +131,9 @@ export function TopBar() {
           </div>
         )}
 
-        {/* Right: Actions Area - 언어 토글 + 로그인 버튼 */}
+        {/* Right: Actions Area - 언어 토글 */}
         <div className="flex items-center gap-3 shrink-0">
           <LanguageToggle />
-          {/* 미로그인 상태일 때 로그인 버튼 */}
-          {!appUser && (
-            <Link
-              to="/login"
-              className="p-2 rounded-md transition-colors border hover:bg-[var(--theme-layout-top-bar-button-hover)]"
-              style={{
-                borderColor: 'var(--theme-layout-top-bar-border)',
-              }}
-              title={t('nav.login')}
-            >
-              <UserRound className="w-5 h-5" style={{ color: 'var(--theme-layout-top-bar-text)' }} />
-            </Link>
-          )}
         </div>
       </div>
     </header>

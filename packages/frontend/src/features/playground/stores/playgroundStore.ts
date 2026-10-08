@@ -165,27 +165,6 @@ public class Main {
     }
 }`;
 
-const LEGACY_DEFAULT_CPP_CODE = `#include <iostream>
-#include <vector>
-#include <string>
-#include <memory>
-
-int main() {
-    int x = 42;
-    double pi = 3.14;
-    std::string name = "CodeInsight";
-
-    std::vector<int> nums = {1, 2, 3};
-    nums.push_back(4);
-
-    std::cout << name << ": " << x << std::endl;
-
-    auto ptr = std::make_unique<int>(100);
-    std::cout << "ptr: " << *ptr << std::endl;
-
-    return 0;
-}`;
-
 const LEGACY_DEFAULT_JAVASCRIPT_CODE = `/**
  * 간단한 은행 계좌 클래스
  */
@@ -309,32 +288,6 @@ public class Main {
     }
 }`;
 
-const DEFAULT_CPP_CODE = `#include <iostream>
-#include <memory>
-#include <string>
-#include <vector>
-
-void grow(std::vector<int>& nums, std::unique_ptr<int>& heapValue) {
-    int local = nums[0];
-    nums.push_back(local + 2);
-    *heapValue += nums.back();
-    std::cout << "inside: " << *heapValue << "\\n";
-}
-
-int main() {
-    int x = 5;
-    int& ref = x;
-    std::vector<int> nums = {1, 2};
-    std::string label = "cpp";
-    auto heapValue = std::make_unique<int>(10);
-
-    grow(nums, heapValue);
-    ref += nums[1];
-
-    std::cout << label << " " << x << " " << nums.size() << " " << *heapValue << "\\n";
-    return 0;
-}`;
-
 const DEFAULT_JAVASCRIPT_CODE = `function update(user, numbers) {
   const alias = user;
   alias.score += numbers[0];
@@ -350,36 +303,18 @@ update(sameUser, numbers);
 console.log(user.score, numbers.length);
 `;
 
-const DEFAULT_PYTHON_PRACTICAL_CODE = `rows = [
-    {"name": "Ada", "score": 91},
-    {"name": "Lin", "score": 84},
-]
-
-passed = []
-
-for row in rows:
-    if row["score"] >= 90:
-        passed.append(row["name"])
-
-print(passed)
-`;
-
 const DEFAULT_CODES: Record<SupportedLanguage, string> = {
   c: DEFAULT_C_CODE,
-  cpp: DEFAULT_CPP_CODE,
   python: DEFAULT_PYTHON_CODE,
   java: DEFAULT_JAVA_CODE,
   javascript: DEFAULT_JAVASCRIPT_CODE,
-  'python-practical': DEFAULT_PYTHON_PRACTICAL_CODE,
 };
 
 const LEGACY_DEFAULT_CODES: Record<SupportedLanguage, string> = {
   c: LEGACY_DEFAULT_C_CODE,
-  cpp: LEGACY_DEFAULT_CPP_CODE,
   python: LEGACY_DEFAULT_PYTHON_CODE,
   java: LEGACY_DEFAULT_JAVA_CODE,
   javascript: LEGACY_DEFAULT_JAVASCRIPT_CODE,
-  'python-practical': LEGACY_DEFAULT_PYTHON_CODE,
 };
 
 // ============================================================
@@ -388,11 +323,9 @@ const LEGACY_DEFAULT_CODES: Record<SupportedLanguage, string> = {
 
 const DEFAULT_STDINS: Record<SupportedLanguage, string> = {
   c: '',
-  cpp: '',
   python: '',
   java: '',
   javascript: '',
-  'python-practical': '',
 };
 
 export const usePlaygroundStore = create<PlaygroundState>()(
@@ -474,12 +407,13 @@ export const usePlaygroundStore = create<PlaygroundState>()(
     }),
     {
       name: 'codeinsight-playground',
-      version: 2,
+      version: 3,
       migrate: (persistedState: unknown) => {
         if (!persistedState || typeof persistedState !== 'object') return persistedState;
 
         const state = persistedState as {
           codes?: Partial<Record<SupportedLanguage, string>>;
+          language?: string;
         };
 
         const nextCodes: Record<SupportedLanguage, string> = { ...DEFAULT_CODES };
@@ -493,9 +427,13 @@ export const usePlaygroundStore = create<PlaygroundState>()(
           nextCodes[language] = saved;
         });
 
+        // v3: 제거된 언어(cpp, python-practical)가 저장돼 있으면 C로 되돌림
+        const language = state.language && state.language in DEFAULT_CODES ? state.language : 'c';
+
         return {
           ...state,
           codes: nextCodes,
+          language,
         };
       },
       partialize: (state) => ({
