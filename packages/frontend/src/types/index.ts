@@ -90,6 +90,7 @@ export {
   // 콘텐츠
   type LessonContent,
   type LessonStep,
+  type StepPredict,
   type StepMemoryState,
   type MemoryChangeAction,
   // 메모리 시각화 (통일 형식)

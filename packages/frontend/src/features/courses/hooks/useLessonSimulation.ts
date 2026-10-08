@@ -163,6 +163,7 @@ function mergeSteps(
       explanation: jsonStep?.explanation || simStep.explanation || '',
       title: jsonStep?.title || `Line ${simLine}`,
       highlight: jsonStep?.highlight || [simLine],
+      predict: jsonStep?.predict,
       pythonMemoryState,
       javaMemoryState,
       eventLoopState,

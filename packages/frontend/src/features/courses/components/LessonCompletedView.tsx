@@ -11,14 +11,17 @@ import { useTranslation } from 'react-i18next';
 import { CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useEnterKey } from '@/hooks';
 import { useFocusCycle } from '@/hooks/useFocusCycle';
+import { useProgressStore } from '@/stores/progressStore';
 
 interface LessonCompletedViewProps {
+  lessonId: string;
   lessonOrder: number;
   nextLessonPath: string | null;
   chapterPath: string;
 }
 
 export function LessonCompletedView({
+  lessonId,
   lessonOrder,
   nextLessonPath,
   chapterPath,
@@ -27,6 +30,9 @@ export function LessonCompletedView({
   const navigate = useNavigate();
   const hasNext = nextLessonPath !== null;
   const containerRef = useRef<HTMLDivElement>(null);
+  const predictionResults = useProgressStore((s) => s.predictions[lessonId]);
+  const predictionValues = Object.values(predictionResults ?? {});
+  const predictionCorrect = predictionValues.filter(Boolean).length;
 
   useFocusCycle({
     containerRef,
@@ -79,6 +85,11 @@ export function LessonCompletedView({
       <p className="mb-6 text-[var(--theme-dashboard-text)]">
         {hasNext ? t('lesson.continue_next') : t('lesson.chapter_completed')}
       </p>
+      {predictionValues.length > 0 && (
+        <p className="-mt-3 mb-6 text-sm font-semibold text-[var(--theme-dashboard-text)]">
+          {t('lesson.predict.summary', { correct: predictionCorrect, total: predictionValues.length })}
+        </p>
+      )}
       <div className="flex gap-3 justify-center">
         <button
           onClick={() => navigate(chapterPath)}

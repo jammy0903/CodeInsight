@@ -179,6 +179,20 @@ export const MemoryChangeSchema = z.object({
 // Event-Driven Visualization용 이벤트 타입 import
 import { VisualizationEventSchema } from './events';
 
+/**
+ * 실행 중 예측 질문
+ * 시각화 라운드에서 이 스텝으로 넘어가기 전에 결과를 먼저 예측하게 한다.
+ */
+export const StepPredictSchema = z.object({
+  question: z.string(),
+  options: z.array(z.string()).min(2),
+  answer: z.number().int().min(0), // options의 정답 인덱스
+}).refine((p) => p.answer < p.options.length, {
+  message: 'answer must be a valid option index',
+});
+
+export type StepPredict = z.infer<typeof StepPredictSchema>;
+
 export const LessonStepSchema = z.object({
   line: z.number(), // step.code로부터 런타임 계산 후 주입됨
   highlight: z.array(z.number()).optional(), // 런타임 계산 또는 직접 지정
@@ -197,6 +211,7 @@ export const LessonStepSchema = z.object({
   keyInsight: z.string().optional(),
   keyInsightTitle: z.string().optional(),
   analogy: z.string().optional(),
+  predict: StepPredictSchema.optional(),
   misconception: z.string().optional(),
   tip: z.string().optional(),
   output: z.string().optional(),

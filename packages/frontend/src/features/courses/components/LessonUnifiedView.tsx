@@ -13,6 +13,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Layers, Lightbulb } from 'lucide-react';
 
 import { useRoundNavigation } from '../hooks/useRoundNavigation';
+import { usePredictGate } from '../hooks/usePredictGate';
+import { PredictQuestion, PredictResult } from './PredictPanel';
 import { useLessonVisualization } from '../hooks/useLessonVisualization';
 import { useLessonTerminal } from '@/features/visualizers/shared/hooks/useLessonTerminal';
 import { useStepGestures } from '@/features/visualizers/shared/hooks/useStepGestures';
@@ -72,7 +74,12 @@ export function LessonUnifiedView({
     onQuiz,
   });
 
+  // 실행 중 예측하기 (시각화 라운드): 모든 이동은 gate를 거친다
+  const gate = usePredictGate({ steps, nav, lessonId });
+
   const currentStep = steps[nav.actualStepIndex];
+  // 예측 중에는 곧 실행될 줄을 가리킨다 (디버거의 다음 줄 표시처럼)
+  const highlightLine = (gate.pendingIndex !== null ? steps[gate.pendingIndex]?.line : currentStep?.line) || 1;
   const currentStepRecord = currentStep as Record<string, unknown> | undefined;
   const currentStepIllustrations = Array.isArray(currentStepRecord?.illustrations)
     ? (currentStepRecord.illustrations as Array<{ src: string; alt?: string; caption?: string }>)
@@ -121,8 +128,8 @@ export function LessonUnifiedView({
 
   // Keyboard gestures (desktop)
   useStepGestures({
-    onPrev: nav.goPrev,
-    onNext: nav.goNext,
+    onPrev: gate.goPrev,
+    onNext: gate.goNext,
     enabled: !isMobile,
     isModalOpen: isConceptOpen,
     canGoPrev: nav.canGoPrev,
@@ -149,6 +156,7 @@ export function LessonUnifiedView({
 
   // Next button label
   const nextLabel = (() => {
+    if (gate.pendingIndex !== null) return t('lesson.predict.choose');
     if (isExplanationRound) {
       if (nav.stepIndex >= steps.length - 1) {
         return nav.hasVizRound ? t('lesson.visualization') : t('lesson.quiz');
@@ -276,6 +284,12 @@ export function LessonUnifiedView({
               </div>
             )}
 
+            {gate.pendingPredict ? (
+              <PredictQuestion predict={gate.pendingPredict} onAnswer={gate.answer} />
+            ) : gate.feedback ? (
+              <PredictResult feedback={gate.feedback} />
+            ) : null}
+
             {/* Visualization content */}
             <div className={`w-full min-h-[67px] px-0 py-2 ${isMobile ? 'viz-zoom-container' : ''}`}>
               {activeVizTab === 'flow' || !hasVizTabs ? (
@@ -321,7 +335,7 @@ export function LessonUnifiedView({
     <div className="flex flex-col">
       <LessonCodePanel
         code={code}
-        highlightLine={currentStep?.line || 1}
+        highlightLine={highlightLine}
         terminalLines={terminalLines}
         onSelectionChange={onSelectionChange}
         orientation={isMobile ? 'vertical' : 'horizontal'}
@@ -339,8 +353,8 @@ export function LessonUnifiedView({
       </LessonCodePanel>
 
       <LessonBottomNav
-        onPrev={nav.goPrev}
-        onNext={nav.goNext}
+        onPrev={gate.goPrev}
+        onNext={gate.goNext}
         canGoPrev={nav.canGoPrev}
         nextLabel={nextLabel}
         onQuiz={onQuiz}

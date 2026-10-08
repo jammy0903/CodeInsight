@@ -147,6 +147,7 @@ function LessonPageContent({ lessonId }: { lessonId: string | undefined }) {
       </div>
       {navigation.phase === 'completed' ? (
         <LessonCompletedView
+          lessonId={lessonId || ''}
           lessonOrder={lesson.order}
           nextLessonPath={nextLessonPath}
           chapterPath={languageCoursePath}
