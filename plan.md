@@ -97,10 +97,19 @@
 - 참고: shared 스키마를 바꾼 뒤 dev 서버는 `vite --force`로 재시작해야 함 (optimizeDeps 캐시)
 
 ### 7. 마무리
-- [ ] README를 포트폴리오 관점으로 재작성 (차별점, 아키텍처, 데모 GIF)
-- [ ] `render.yaml`, `.env.example`, docker-compose에서 Firebase 등 불필요 환경변수 제거
-- [ ] 번역 JSON(ko/en/zh)의 미사용 키 정리, `feature_languages_desc`의 C++ 언급
-- [ ] `EventLoopView` 헤더 등 하드코딩된 한국어 문자열 i18n
-- [ ] Capacitor/Android 유지 여부 결정
-- [ ] 브라우저에서 전체 동선 확인 (Network 404 없음)
-- [ ] main 머지
+- [x] README를 포트폴리오 관점으로 재작성 (차별점, 아키텍처, 설계 결정, Firebase 없는 실행 방법, 현재 UI 스크린샷)
+- [x] `render.yaml`, `.env.example` 2개, docker-compose: 코드가 실제로 읽는 변수만 남김, 불필요한 `docker.sock` 마운트 제거
+- [x] 번역: 하드코딩 문구 ~45곳 i18n, 미사용 네임스페이스 13개·C++ 언급 삭제
+- [x] Android(Capacitor·AdMob, 커밋된 키스토어 포함) 제거 — Play 스토어 미배포 확인
+- [x] 영업 메일 자동화 스크립트 7개 삭제
+- [x] **보안**: 요청 속도 제한이 실제로는 어느 라우트에도 적용되지 않던 문제 수정 (전역 IP당 분당 100회, 429 응답)
+- [x] 전체 화면 확인 (ko/en, 홈·코스·챕터·레슨·Playground 실행·삭제된 경로): 콘솔 에러·실패 요청 없음
+- [ ] ⚠️ 사용자 조치: Neon DB 비밀번호 교체 → Render `DATABASE_URL` 갱신 (머지 전)
+- [ ] main 머지 (머지 시 Render 배포에서 마이그레이션이 운영 DB에 적용됨)
+
+## 남은 이슈 (이번 범위 밖)
+- 일부 레슨 콘텐츠의 영어/중국어 번역 누락 (예: `py-3-1` 설명)
+- JS 시뮬레이터는 동기 구간만 추적 (비동기 콜백 실행은 사전 제작 레슨 데이터로 대체)
+- C 시뮬레이터 테스트 12개는 gdb가 있는 환경에서만 통과
+- 개발용 스크립트 3개의 기존 타입 에러 (backup-courses, restore-courses, validate-simulators)
+- `docs/demo.gif`(2월 녹화)는 현재 UI와 다름 — README에서는 참조하지 않음
