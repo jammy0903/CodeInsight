@@ -8,11 +8,6 @@ import { env } from './env';
 export const config = {
   api: {
     baseUrl: `${env.VITE_API_URL}/api/${env.VITE_API_VERSION}`,
-    timeout: {
-      run: env.VITE_C_RUN_TIMEOUT,
-      judge: env.VITE_C_JUDGE_TIMEOUT,
-      trace: env.VITE_TRACER_TIMEOUT,
-    },
   },
 } as const;
 

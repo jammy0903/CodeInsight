@@ -5,8 +5,6 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
-import { Capacitor } from '@capacitor/core'
-import { App } from '@capacitor/app'
 import { router } from './router'
 import { queryClient } from './config/queryClient'
 import './index.css'
@@ -56,20 +54,6 @@ const initTheme = () => {
 };
 
 initTheme();
-
-// Initialize native platform features
-if (Capacitor.isNativePlatform()) {
-  // Android 뒤로가기 버튼 핸들러
-  // 히스토리가 있으면 뒤로 가기, 없으면 앱 종료
-  App.addListener('backButton', ({ canGoBack }) => {
-    if (canGoBack) {
-      window.history.back();
-    } else {
-      // 홈 화면에서 뒤로가기 → 앱 최소화 (종료 대신)
-      App.minimizeApp();
-    }
-  });
-}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

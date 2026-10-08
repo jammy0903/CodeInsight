@@ -34,8 +34,7 @@ const app: FastifyInstance = Fastify({
 });
 
 // CORS 설정
-const capacitorOrigins = ['capacitor://localhost', 'https://localhost', 'http://localhost'];
-const allowedOrigins = [...config.server.corsOrigins, ...capacitorOrigins];
+const allowedOrigins = config.server.corsOrigins;
 
 app.register(cors, {
   methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
