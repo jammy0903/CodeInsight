@@ -1,197 +1,139 @@
-<div align="center">
+# CodeInsight
 
-<h1>
-  <img src="https://img.shields.io/badge/CodeInsight-000000?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTkuNCA2LjRMMy44IDEybDUuNiA1LjZMMTEuOCAxNS4yIDcuMiAxMmw0LjYtNC42em01LjIgMGwtMS40IDEuNEwxNy44IDEybC00LjYgNC42IDEuNiAxLjZMMjAuMiAxMnoiLz48L3N2Zz4=&logoColor=white" alt="CodeInsight" />
-</h1>
-
-**코드가 어떻게 실행되는지, 눈으로 직접 확인하세요.**
-
-*Watch your code come alive — memory, variables, and call stacks visualized step by step.*
-
-<br />
-
-[![React](https://img.shields.io/badge/React_19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org)
-[![Firebase](https://img.shields.io/badge/Firebase-DD2C00?style=flat-square&logo=firebase&logoColor=white)](https://firebase.google.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
-
-<br />
-
-**[📖 Docs](#getting-started)** · **[🐛 Issues](https://github.com/jammy0903/CodeInsight/issues)**
+**코드를 실제로 실행해서, 메모리와 실행 흐름이 어떻게 바뀌는지 한 단계씩 보여주는 학습 도구입니다.**
+C · Python · JavaScript · Java를 지원합니다.
 
 *웹사이트로 배포해 운영했으며, 현재는 운영을 종료했습니다. 소스는 MIT 라이선스로 공개되어 있습니다.*
 
-<br />
-
-![CodeInsight Demo](./docs/demo.gif)
-
-</div>
+![홈 화면 데모: Python 참조와 별칭](docs/images/home-demo-python.png)
 
 ---
 
-## What is CodeInsight?
+## Python Tutor와 무엇이 다른가
 
-코드를 처음 배울 때 가장 어려운 건 **"코드가 실제로 어떻게 실행되는가"** 입니다.
+코드를 한 줄씩 실행하며 스택과 힙을 그려주는 도구로는 [Python Tutor](https://pythontutor.com)가 대표적입니다.
+CodeInsight는 같은 출발점에서 두 가지를 다르게 했습니다.
 
-CodeInsight는 코드 한 줄 한 줄이 실행될 때 메모리, 변수, 콜 스택이 어떻게 변하는지를 **시각적으로** 보여주는 학습 플랫폼입니다. C, Python, JavaScript, Java 모두 지원합니다.
+### 1. 실행 결과를 보기 전에 먼저 예측하게 한다
 
+시각화 라운드에서 오개념이 흔한 줄에 도달하면, 다음 단계로 넘어가기 전에 결과를 먼저 고르게 합니다.
+답을 고르면 그 줄이 실행되고, 시각화가 **실제로 무엇이 바뀌었는지** 보여줍니다.
+
+| 예측 | 실행 후 |
+|---|---|
+| ![예측 질문](docs/images/predict-question.png) | ![예측 결과](docs/images/predict-feedback.png) |
+
+질문은 오개념이 가장 흔한 지점에 넣었습니다.
+
+| 레슨 | 질문 |
+|---|---|
+| C 역참조 쓰기 | `*remote = 100;`이 바꾸는 건 포인터일까, 원본일까? |
+| Python 리스트 | `append`는 새 리스트를 만들까? `del` 후 빈자리가 남을까? |
+| Java 참조 전달 | 메서드 안에서 필드를 바꾸는 것과 매개변수를 재할당하는 것의 차이 |
+| JS 이벤트 루프 | `setTimeout`과 `Promise.then` 중 무엇이 먼저 출력될까? |
+
+### 2. 개념마다 그 개념에 맞는 그림을 쓴다
+
+모든 코드를 "프레임 + 객체 + 화살표" 한 가지 그림으로 그리지 않고, 개념별 전용 뷰를 둡니다.
+
+| 언어 | 전용 뷰 |
+|---|---|
+| JavaScript | 이벤트 루프(Call Stack · Web APIs · Task/Microtask Queue), Promise 상태, 프로토타입 체인, 스코프, `this` 바인딩 |
+| C | 스택 프레임과 포인터 화살표, 반복문 진행 트랙, 분기 진입/스킵 표시 |
+| Python | 이름표(변수)와 객체의 참조 그래프, 가변/불변 객체 구분 |
+| Java | 호출 스택과 힙 객체, 참조 변수 호버 시 대상 객체 하이라이트 |
+
+![이벤트 루프 뷰](docs/images/home-demo-event-loop.png)
+
+---
+
+## 구성
+
+- **레슨**: 4개 언어, 43개 챕터, 202개 레슨 (한국어 · 영어 · 중국어). 설명 라운드 → 시각화 라운드 → 퀴즈 순서로 진행합니다.
+- **Playground**: 직접 작성한 코드를 실행하고 같은 시각화로 따라갑니다.
+- **계정 없음**: 로그인 없이 모든 기능을 쓸 수 있습니다. 진도와 예측 결과는 브라우저(localStorage)에 저장합니다.
+
+## 아키텍처
+
+```mermaid
+flowchart LR
+  subgraph Browser[Frontend · React]
+    PG[Playground] --> SVC[simulator client<br/>응답 → LessonStep]
+    LS[Lesson] --> SVC
+    SVC --> AD[언어별 Transformer]
+    AD --> VIEW[개념별 뷰]
+  end
+
+  subgraph API[Backend · Fastify]
+    SIM[/simulators/:lang/simulate/]
+    CRS[/courses/*/]
+  end
+
+  SVC -- 사용자 코드 --> SIM
+  LS -- 레슨 JSON --> CRS
+  CRS --> DB[(PostgreSQL<br/>레슨 콘텐츠)]
+
+  SIM --> C[C · gcc + GDB/MI]
+  SIM --> PY[Python · sys.settrace]
+  SIM --> JS[JavaScript · V8 Inspector]
+  SIM --> JV[Java · JDI 디버거 에이전트]
 ```
-코드 작성  →  단계별 실행  →  메모리 변화 시각화  →  단계별 설명  →  퀴즈로 확인
-```
 
----
+| 언어 | 실행 추적 방식 |
+|---|---|
+| C | gcc로 컴파일한 뒤 GDB/MI로 한 줄씩 진행하며 스택·힙·포인터 스냅샷 수집 |
+| Python | `sys.settrace` 기반 에이전트로 이름과 객체 참조를 추적 |
+| JavaScript | Node.js V8 Inspector로 스텝 실행하며 스코프와 콜 스택 수집 |
+| Java | JDI(Java Debug Interface) 에이전트로 프레임과 힙 객체 수집 |
 
-## Features
-
-### 시각화 엔진
-
-| 언어 | 시각화 항목 |
-|------|------------|
-| **C** | 스택/힙 메모리, 포인터, 제어 흐름, 함수 프레임 |
-| **Python** | 변수 스코프, 참조 그래프, 단계별 실행 |
-| **JavaScript** | 이벤트 루프, 프로토타입 체인, 스코프, Promise, `this` 바인딩 |
-| **Java** | JVM 메모리 모델, 객체 참조 |
-
-### 학습 시스템
-
-- **Lesson 모드** — 미리 설계된 커리큘럼을 단계별 가이드와 함께 학습
-- **Playground 모드** — 직접 코드를 작성하고 실시간으로 시각화
-- **알고리즘 시각화** — 배열, 그래프, 정렬 알고리즘 시각화
-- **퀴즈** — 레슨 후 이해도 확인 퀴즈 (O/X, 객관식)
-- **단계별 설명** — 각 실행 단계마다 템플릿 기반 설명 제공
-
-### 플랫폼
-
-- **진도 추적** — 학습 스트릭, 완료 기록, 분석 리포트
-- **다크/라이트 테마** — 시스템 설정 연동
-- **다국어** — 한국어 / English
-- **소셜 로그인** — Google, GitHub, Kakao
-- **모바일 브라우저 지원** — 반응형 레이아웃
-
----
-
-## Tech Stack
+시뮬레이터는 API 서버의 자식 프로세스로 실행됩니다. 실행 시간 제한, 스텝 상한, 위험 패턴 검사, 최소 환경변수, 요청 속도 제한(IP당 분당 100회)을 적용합니다. 실행 단위 컨테이너 격리는 적용하지 않았습니다.
 
 ```
 packages/
-├── frontend/     React 19 + Vite + TailwindCSS + Zustand + React Query
-├── backend/      Node.js + Fastify + Prisma ORM
-└── shared/       TypeScript 공유 타입 & 스키마
-
-packages/backend/src/modules/simulators/   언어별 코드 실행 엔진 (C·C++ GDB, Python sys.settrace, JavaScript AST·V8 Inspector, Java JDI)
+├── frontend/   React 19 · Vite · TailwindCSS · Zustand · TanStack Query
+├── backend/    Fastify · Prisma · 언어별 시뮬레이터 (src/modules/simulators)
+└── shared/     프론트·백엔드 공용 Zod 스키마와 타입
 ```
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | React 19, Vite, TailwindCSS, Zustand, TanStack Query, Framer Motion |
-| Backend | Node.js, Fastify, Prisma ORM, Zod |
-| Database | PostgreSQL (Neon) |
-| Auth | Firebase Authentication (Google, GitHub, Kakao) |
-| Simulators | API 서버 컨테이너 안의 자식 프로세스로 실행 (실행 시간 제한 · 스텝 상한 · 위험 패턴 검사 · 최소 환경변수 · 요청 속도 제한). 실행 단위 컨테이너 격리는 적용하지 않음 |
-| Infra | Render (Frontend, Backend Docker 이미지) · Neon (DB) |
-| Monorepo | pnpm workspaces + TypeScript |
+## 설계에서 내린 결정
 
----
+- **예측 질문은 시각화 라운드에 둔다.** 답을 고른 직후 시각화가 실제 변화를 보여줘야 예측과 결과의 차이가 눈에 들어옵니다. 이동(버튼 · 키보드 · 스와이프)은 모두 `usePredictGate` 훅을 거치며, 질문 중에는 다음 단계로 넘어가지 않습니다. 각 질문의 첫 답만 기록해, 다시 풀어 맞혀도 오개념 기록이 지워지지 않습니다.
+- **홈 데모는 녹화를 재생한다.** 실제 엔진 결과를 `scripts/record-home-demo.mjs`로 녹화해 번들에 넣고, Playground·레슨과 같은 변환 함수로 재생합니다. 백엔드가 잠들어 있어도 첫 화면이 바로 움직입니다.
+- **레슨 JSON은 변경분(delta)만 적는다.** 각 단계에는 바뀐 시각화 상태만 쓰고, 서버가 이전 단계 상태와 합쳐 전체 상태로 펼칩니다.
+- **이벤트 루프는 사전 제작 데이터를 쓴다.** JS 시뮬레이터는 동기 구간만 추적하므로, microtask와 task의 실행 순서를 보여주는 레슨은 미리 작성한 단계 데이터를 사용합니다.
 
-## Java Frame Visualization Flow (Current)
+## 실행하기
 
-아래 플로우는 현재 Java 레슨/플레이그라운드에서 함수 프레임이 시각화되는 실제 경로를 나타냅니다.
-
-```mermaid
-flowchart TD
-  A[User Java Code<br/>Main + user classes] --> B[Backend API<br/>POST /api/v1/simulators/java/simulate]
-  B --> C[JavaSimulationService]
-  C --> D[DebuggerAgent (JDI STEP_INTO)]
-  D --> E[SnapshotMaker]
-  E --> F[Snapshots JSON<br/>stack[methodName, variables], heap]
-  F --> G[Frontend javaSimulator.ts<br/>steps -> LessonStep]
-  G --> H[LessonFlowVisualizer<br/>language=java]
-  H --> I[JavaTransformer]
-  I --> J[FlowStep<br/>variables + frames]
-  J --> K[JavaReferenceView]
-  K --> L[Rendered Stack Frames<br/>main, &lt;init&gt;, showInfo, deposit, withdraw ...]
-
-  D -. excludes .-> X[java.*, javax.*, jdk.*, sun.*, com.sun.*]
-```
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js >= 18
-- pnpm >= 8
-- PostgreSQL
-- GCC · GDB, Python 3, JDK 17 (시뮬레이터 실행용. 또는 Docker 이미지로 한 번에 실행)
-- Firebase 프로젝트
-
-### Setup
+**필요한 것**: Node.js 18 이상, pnpm, PostgreSQL. 시뮬레이터를 로컬에서 돌리려면 GCC · GDB, Python 3, JDK 17이 필요합니다.
 
 ```bash
-# 클론
 git clone https://github.com/jammy0903/CodeInsight.git
 cd CodeInsight
-
-# 의존성 설치
 pnpm install
 
-# 환경변수 설정
-cp .env.example .env
-# .env 파일을 열어서 DB URL, Firebase 설정 등을 입력하세요
+# PostgreSQL (Docker 예시)
+docker run -d --name codeinsight-db -p 5432:5432 \
+  -e POSTGRES_USER=codeinsight -e POSTGRES_PASSWORD=codeinsight123 -e POSTGRES_DB=codeinsight \
+  postgres:16
 
-# DB 마이그레이션 & 시드
+# 스키마 적용 + 레슨 콘텐츠 시드
 cd packages/backend
-npx prisma migrate dev
+npx prisma migrate deploy
 npx prisma db seed
 cd ../..
 
-# 개발 서버 시작
 pnpm dev
 ```
 
-개발 서버:
 - Frontend → `http://localhost:5174`
 - Backend API → `http://localhost:3002`
 
-### Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL 연결 문자열 |
-| `FIREBASE_PROJECT_ID` | Firebase 프로젝트 ID |
-| `FIREBASE_CLIENT_EMAIL` | Firebase 서비스 계정 이메일 |
-| `FIREBASE_PRIVATE_KEY` | Firebase 서비스 계정 키 |
-| `VITE_API_URL` | 프론트엔드에서 사용할 백엔드 URL |
-
-전체 목록은 [`.env.example`](.env.example) 참고.
-
-### Commands
+모든 환경변수에는 기본값이 있어 `.env` 없이 실행됩니다. 바꿀 수 있는 값은 [`.env.example`](.env.example)과 [`packages/backend/.env.example`](packages/backend/.env.example)에 있습니다.
 
 ```bash
-pnpm dev          # 전체 개발 서버 실행
-pnpm build        # 전체 프로덕션 빌드
-pnpm test         # 전체 테스트 실행
-pnpm clean        # 빌드 아티팩트 삭제
+pnpm build   # 전체 빌드
+pnpm test    # 전체 테스트 (C 시뮬레이터 테스트는 gdb 필요)
 ```
-
----
-
-## Contributing
-
-PR 환영합니다! 기여 전 [CONTRIBUTING.md](CONTRIBUTING.md)를 먼저 읽어주세요.
-
-```bash
-git checkout -b feat/your-feature
-# 작업 후
-git commit -m "feat: describe your change"
-git push origin feat/your-feature
-# GitHub에서 PR 생성
-```
-
----
 
 ## License
 

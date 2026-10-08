@@ -45,13 +45,15 @@ declare module 'fastify' {
 const rateLimitPlugin: FastifyPluginAsync = async (fastify) => {
   // @fastify/rate-limit 기본 등록 (전역 설정)
   await fastify.register(rateLimit, {
-    global: false, // 전역 적용 비활성화 (라우트별로 적용)
+    global: true, // 모든 라우트에 IP 기준 기본 제한 (사용자 코드를 실행하는 API 보호)
     max: 100,
     timeWindow: '1 minute',
     keyGenerator: (request: FastifyRequest) => request.ip,
     errorResponseBuilder: (request, context) => {
       const retryAfter = Math.ceil(context.ttl / 1000);
+      // statusCode가 없으면 전역 에러 핸들러가 500으로 응답한다
       return {
+        statusCode: 429,
         error: 'rate_limit_exceeded',
         message: 'Too many requests, please try again later.',
         retryAfter,
@@ -79,6 +81,7 @@ export function getRateLimitConfig(preset: RateLimitPreset) {
         max: config.max,
         timeWindow: config.timeWindow,
         errorResponseBuilder: () => ({
+          statusCode: 429,
           error: 'rate_limit_exceeded',
           message: config.message,
           retryAfter: 60,
